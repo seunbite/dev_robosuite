@@ -10,6 +10,8 @@ from robosuite.utils.input_utils import *
 from demo_saycan import SayCanController
 from demo_vild import ViLDDetector
 from demo_cliport import CLIPortController
+from PIL import Image
+import datetime
 
 MAX_FR = 25  # max frame rate for running simulation
 
@@ -22,11 +24,33 @@ class IntegratedSystem:
         self.vild = ViLDDetector()
         self.cliport = CLIPortController(env)
         
+        # Create directory for saving images
+        self.save_dir = "execution_images"
+        os.makedirs(self.save_dir, exist_ok=True)
+        
+        # Create timestamped subdirectory for this run
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.current_run_dir = os.path.join(self.save_dir, timestamp)
+        os.makedirs(self.current_run_dir, exist_ok=True)
+        
+        self.step_counter = 0
+        
+    def save_image(self, stage=""):
+        """Save current simulator view as PNG."""
+        image = self.get_camera_image()
+        
+        # Create filename with step counter and stage
+        filename = f"step_{self.step_counter:03d}_{stage}.png"
+        filepath = os.path.join(self.current_run_dir, filename)
+        
+        # Save image
+        Image.fromarray(image).save(filepath)
+        print(f"Saved image: {filepath}")
+        
     def get_camera_image(self):
         """Get camera image from environment."""
         # Get camera matrix
         camera_id = 0
-        camera_matrix = self.env.sim.model.cam_mat0[camera_id]
         width = height = 256  # Default size
         
         # Get image from simulator
@@ -44,6 +68,9 @@ class IntegratedSystem:
         """Execute high-level task using integrated components."""
         print(f"Executing task: {task_description}")
         
+        # Save initial state
+        self.save_image("initial_state")
+        
         # Get scene description using ViLD
         image = self.get_camera_image()
         scene_desc = self.vild.get_scene_description(image)
@@ -56,10 +83,24 @@ class IntegratedSystem:
             print(f"{i+1}. {step}")
             
         # Execute each step using CLIPort
-        for step in plan:
-            obs = self.cliport.execute_instruction(step)
-            self.env.render()  # Update visualization
+        for i, step in enumerate(plan):
+            print(f"\nExecuting step {i+1}: {step}")
+            self.step_counter += 1
             
+            # Save image before step
+            self.save_image(f"step_{i+1}_before")
+            
+            # Execute step
+            obs = self.cliport.execute_instruction(step)
+            
+            # Save image after step
+            self.save_image(f"step_{i+1}_after")
+            
+            # Update visualization
+            self.env.render()
+            
+        # Save final state
+        self.save_image("final_state")
         return obs
 
 def main():
@@ -76,10 +117,10 @@ def main():
         has_renderer=True,
         has_offscreen_renderer=True,  # Need both renderers
         ignore_done=True,
-        use_camera_obs=True,         # Enable camera observations
+        use_camera_obs=True,
         control_freq=20,
-        camera_names=["frontview"],  # Specify camera names
-        camera_heights=256,          # Camera resolution
+        camera_names=["frontview"],
+        camera_heights=256,
         camera_widths=256,
     )
     
