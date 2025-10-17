@@ -22,12 +22,30 @@ class IntegratedSystem:
         self.vild = ViLDDetector()
         self.cliport = CLIPortController(env)
         
+    def get_camera_image(self):
+        """Get camera image from environment."""
+        # Get camera matrix
+        camera_id = 0
+        camera_matrix = self.env.sim.model.cam_mat0[camera_id]
+        width = height = 256  # Default size
+        
+        # Get image from simulator
+        img = self.env.sim.render(
+            width=width,
+            height=height,
+            camera_name="frontview",
+            depth=False,
+            device_id=0
+        )
+        
+        return img
+        
     def execute_task(self, task_description):
         """Execute high-level task using integrated components."""
         print(f"Executing task: {task_description}")
         
         # Get scene description using ViLD
-        image = self.env.get_camera_image()  # Changed from get_camera_image_top
+        image = self.get_camera_image()
         scene_desc = self.vild.get_scene_description(image)
         print(f"Scene description: {scene_desc}")
         
@@ -40,6 +58,7 @@ class IntegratedSystem:
         # Execute each step using CLIPort
         for step in plan:
             obs = self.cliport.execute_instruction(step)
+            self.env.render()  # Update visualization
             
         return obs
 
@@ -55,10 +74,13 @@ def main():
     env = suite.make(
         **options,
         has_renderer=True,
-        has_offscreen_renderer=False,
+        has_offscreen_renderer=True,  # Need both renderers
         ignore_done=True,
-        use_camera_obs=False,
+        use_camera_obs=True,         # Enable camera observations
         control_freq=20,
+        camera_names=["frontview"],  # Specify camera names
+        camera_heights=256,          # Camera resolution
+        camera_widths=256,
     )
     
     # Reset environment
