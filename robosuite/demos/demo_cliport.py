@@ -29,6 +29,10 @@ class CLIPortController:
         # Define object colors and their typical positions
         self.object_colors = ["red", "green", "blue", "yellow"]
         
+        # Store robot state
+        self.robot = self.env.robots[0]  # Assume single robot
+        self.default_joint_pos = np.array([0, -np.pi/4, 0, -3*np.pi/4, 0, np.pi/2, np.pi/4])
+        
     def get_camera_image(self):
         """Get camera image from environment."""
         width = height = 256  # Default size
@@ -103,6 +107,25 @@ class CLIPortController:
                 
         return target_color, target_location
         
+    def get_joint_angles(self, target_pos):
+        """Convert target position to joint angles using inverse kinematics."""
+        # Get current joint positions
+        current_joints = self.robot.sim.data.qpos[self.robot.joint_indexes]
+        
+        # Calculate desired joint angles using IK
+        desired_joints = self.robot.ik(
+            target_pos,
+            current_joints,
+            orientation=np.array([1, 0, 0, 0])  # Default orientation (w,x,y,z)
+        )
+        
+        # Add gripper command (last joint)
+        action = np.zeros(self.env.action_dim)
+        action[:7] = desired_joints
+        action[-1] = 1.0  # Gripper command (1 = close, -1 = open)
+        
+        return action
+        
     def get_action(self, instruction):
         """Get pick and place action from instruction."""
         # Parse instruction
@@ -115,33 +138,39 @@ class CLIPortController:
         image = self.get_camera_image()
         
         # Find object position
-        pick_xyz = self.find_object_position(image, target_color)
-        if pick_xyz is None:
+        pick_pos = self.find_object_position(image, target_color)
+        if pick_pos is None:
             print(f"Could not find {target_color} object in image")
             return None
             
         # Get place position
         if target_location and target_location in self.target_positions:
-            place_xyz = self.target_positions[target_location]
+            place_pos = self.target_positions[target_location]
         else:
             # Default to middle if no location specified
-            place_xyz = self.target_positions["middle"]
+            place_pos = self.target_positions["middle"]
+            
+        # Convert positions to joint angles
+        pick_action = self.get_joint_angles(pick_pos)
+        place_action = self.get_joint_angles(place_pos)
         
-        return {
-            'pick': pick_xyz,
-            'place': place_xyz
-        }
+        return pick_action, place_action
         
     def execute_instruction(self, instruction):
         """Execute language instruction."""
-        # Get action
-        action = self.get_action(instruction)
-        if action is None:
-            print("Failed to generate action")
+        # Get actions
+        actions = self.get_action(instruction)
+        if actions is None:
+            print("Failed to generate actions")
             return None
+            
+        pick_action, place_action = actions
         
-        # Execute action
-        obs, reward, done, info = self.env.step(action)
+        # Execute pick action
+        obs, _, _, _ = self.env.step(pick_action)
+        
+        # Execute place action
+        obs, reward, done, info = self.env.step(place_action)
         
         return obs
 
