@@ -8,6 +8,7 @@ import torch
 import clip
 from PIL import Image
 import cv2
+from inverse_kinematics import InverseKinematics
 
 class CLIPortController:
     def __init__(self, env):
@@ -16,6 +17,10 @@ class CLIPortController:
         # Load CLIP model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.clip_model, self.preprocess = clip.load("ViT-B/32", device=self.device)
+        
+        # Initialize IK solver
+        self.robot = self.env.robots[0]  # Assume single robot
+        self.ik_solver = InverseKinematics(self.robot)
         
         # Define target positions
         self.target_positions = {
@@ -29,9 +34,12 @@ class CLIPortController:
         # Define object colors and their typical positions
         self.object_colors = ["red", "green", "blue", "yellow"]
         
-        # Store robot state
-        self.robot = self.env.robots[0]  # Assume single robot
-        self.default_joint_pos = np.array([0, -np.pi/4, 0, -3*np.pi/4, 0, np.pi/2, np.pi/4])
+        # Default orientation (facing down)
+        self.default_orientation = np.array([
+            [1, 0, 0],
+            [0, -1, 0],
+            [0, 0, -1]
+        ])
         
     def get_camera_image(self):
         """Get camera image from environment."""
@@ -107,25 +115,6 @@ class CLIPortController:
                 
         return target_color, target_location
         
-    def get_joint_angles(self, target_pos):
-        """Convert target position to joint angles using inverse kinematics."""
-        # Get current joint positions
-        current_joints = self.robot.sim.data.qpos[self.robot.joint_indexes]
-        
-        # Calculate desired joint angles using IK
-        desired_joints = self.robot.ik(
-            target_pos,
-            current_joints,
-            orientation=np.array([1, 0, 0, 0])  # Default orientation (w,x,y,z)
-        )
-        
-        # Add gripper command (last joint)
-        action = np.zeros(self.env.action_dim)
-        action[:7] = desired_joints
-        action[-1] = 1.0  # Gripper command (1 = close, -1 = open)
-        
-        return action
-        
     def get_action(self, instruction):
         """Get pick and place action from instruction."""
         # Parse instruction
@@ -150,9 +139,34 @@ class CLIPortController:
             # Default to middle if no location specified
             place_pos = self.target_positions["middle"]
             
-        # Convert positions to joint angles
-        pick_action = self.get_joint_angles(pick_pos)
-        place_action = self.get_joint_angles(place_pos)
+        # Get joint angles for pick position
+        pick_joints, pick_success = self.ik_solver.get_joint_angles(
+            pick_pos, 
+            self.default_orientation
+        )
+        
+        if not pick_success:
+            print("Failed to find IK solution for pick position")
+            return None
+            
+        # Get joint angles for place position
+        place_joints, place_success = self.ik_solver.get_joint_angles(
+            place_pos,
+            self.default_orientation
+        )
+        
+        if not place_success:
+            print("Failed to find IK solution for place position")
+            return None
+            
+        # Create pick and place actions
+        pick_action = np.zeros(self.env.action_dim)
+        pick_action[:7] = pick_joints
+        pick_action[-1] = 1.0  # Close gripper
+        
+        place_action = np.zeros(self.env.action_dim)
+        place_action[:7] = place_joints
+        place_action[-1] = -1.0  # Open gripper
         
         return pick_action, place_action
         
