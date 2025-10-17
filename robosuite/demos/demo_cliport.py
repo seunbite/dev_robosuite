@@ -99,7 +99,7 @@ class CLIPortController:
         
         # Get pick/place action maps
         pick_map, place_map = self.transport_net.apply(
-            {'params': self.transport_net.params},
+            {'params': self.transport_net.param},
             image_input.cpu().numpy(),
             text_features
         )
