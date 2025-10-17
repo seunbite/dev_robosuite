@@ -17,6 +17,12 @@ class InverseKinematics:
             "upper": np.array([2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3.7525, 2.8973])
         }
         
+        # Get robot link names
+        self.robot_links = [name for name in self.robot.sim.model.body_names 
+                          if name.startswith("robot0_")]
+        self.eef_link_name = "robot0_link7"  # End effector link
+        self.hand_link_name = "robot0_right_hand"  # Gripper base link
+        
     def forward_kinematics(self, q):
         """
         Compute end-effector position for given joint angles.
@@ -32,8 +38,8 @@ class InverseKinematics:
         self.robot.sim.forward()
         
         # Get end-effector position and rotation
-        pos = self.robot.sim.data.get_body_xpos("panda0_link7")
-        rot_mat = self.robot.sim.data.get_body_xmat("panda0_link7").reshape(3, 3)
+        pos = self.robot.sim.data.get_body_xpos(self.eef_link_name)
+        rot_mat = self.robot.sim.data.get_body_xmat(self.eef_link_name).reshape(3, 3)
         
         # Restore original joint positions
         self.robot.sim.data.qpos[self.robot.joint_indexes] = original_joints
@@ -103,11 +109,25 @@ class InverseKinematics:
             Joint angles (7-DOF) and success flag
         """
         try:
+            # Print available robot links for debugging
+            print("Available robot links:", self.robot_links)
+            print("Using end-effector link:", self.eef_link_name)
+            
+            # Convert inputs to numpy arrays
+            target_pos = np.array(target_pos)
+            if target_rot is not None:
+                target_rot = np.array(target_rot)
+            
+            # Get IK solution
             q = self.inverse_kinematics(target_pos, target_rot, initial_guess)
             
             # Verify solution
             final_pos, final_rot = self.forward_kinematics(q)
             pos_error = np.linalg.norm(final_pos - target_pos)
+            
+            print(f"IK solution found with position error: {pos_error:.3f}m")
+            print(f"Target position: {target_pos}")
+            print(f"Achieved position: {final_pos}")
             
             if pos_error > 0.01:  # 1cm threshold
                 print(f"Warning: Large position error in IK solution: {pos_error:.3f}m")
