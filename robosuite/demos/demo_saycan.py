@@ -5,7 +5,7 @@ SayCan combines LLM planning with robotic affordances for long-horizon tasks.
 
 import numpy as np
 import robosuite as suite
-import openai
+from openai import OpenAI
 import clip
 import torch
 import PIL.Image as Image
@@ -36,9 +36,7 @@ PLACE_TARGETS = {
 class SayCanController:
     def __init__(self, env, openai_api_key):
         self.env = env
-        openai.api_key = openai_api_key
-        self.clip_model, self.clip_preprocess = clip.load("ViT-B/32")
-        self.clip_model.cuda().eval()
+        self.client = OpenAI(api_key=openai_api_key)
         self.llm_cache = {}
         
     def get_scene_description(self):
@@ -50,25 +48,34 @@ class SayCanController:
         
     def get_llm_plan(self, task_description, scene_description):
         """Get high-level plan from LLM."""
-        prompt = f"""Scene: {scene_description}
+        prompt = f"""Given the following scene and task, generate a step-by-step plan using available actions.
+
+Scene: {scene_description}
 Task: {task_description}
-Plan:
+
+Available actions:
+- Pick up any block (blue, red, green, yellow)
+- Place blocks on other blocks or in bowls
+- Place blocks in corners or middle
+
+Step-by-step plan:
 1."""
         
         response = self.call_llm(prompt)
         return self.parse_llm_response(response)
         
-    def call_llm(self, prompt, engine="text-davinci-002"):
+    def call_llm(self, prompt, model="gpt-3.5-turbo-instruct"):
         """Call LLM with caching."""
-        cache_key = (prompt, engine)
+        cache_key = (prompt, model)
         if cache_key in self.llm_cache:
             return self.llm_cache[cache_key]
             
-        response = openai.Completion.create(
-            engine=engine,
+        response = self.client.completions.create(
+            model=model,
             prompt=prompt,
             max_tokens=256,
-            temperature=0
+            temperature=0,
+            stop=["Task:", "Scene:"]  # Stop generation at new task/scene
         )
         self.llm_cache[cache_key] = response
         return response
@@ -77,9 +84,25 @@ Plan:
         """Parse LLM response into action sequence."""
         # Extract steps from response
         steps = []
-        for line in response.choices[0].text.split('\n'):
+        text = response.choices[0].text.strip()
+        
+        for line in text.split('\n'):
+            line = line.strip()
             if line.startswith('Pick') or line.startswith('Place'):
-                steps.append(line.strip())
+                steps.append(line)
+                
+        # If no explicit steps found, try to extract actions from text
+        if not steps:
+            # Look for action keywords
+            text = text.lower()
+            for pick_target in PICK_TARGETS:
+                if pick_target.lower() in text:
+                    for place_target in PLACE_TARGETS:
+                        if place_target.lower() in text:
+                            step = f"Pick up the {pick_target} and place it on the {place_target}"
+                            steps.append(step)
+                            break
+                            
         return steps
         
     def get_action(self, step_description):
@@ -114,7 +137,9 @@ def main():
         "Stack",
         robots="Panda",
         has_renderer=True,
-        has_offscreen_renderer=True,
+        has_offscreen_renderer=False,
+        ignore_done=True,
+        use_camera_obs=False,
         control_freq=20,
     )
     
