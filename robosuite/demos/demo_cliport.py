@@ -55,17 +55,43 @@ class CLIPortController:
         self.env = env
         
         # Load CLIP model
-        self.clip_model, self.preprocess = clip.load("ViT-B/32")
-        self.clip_model.cuda().eval()
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.clip_model, self.preprocess = clip.load("ViT-B/32", device=self.device)
         
         # Initialize TransporterNet
         self.transport_net = TransporterNet()
         # TODO: Load pretrained weights
         
-    def get_action(self, image, instruction):
+    def get_camera_image(self):
+        """Get camera image from environment."""
+        # Get camera matrix
+        camera_id = 0
+        camera_matrix = self.env.sim.model.cam_mat0[camera_id]
+        width = height = 256  # Default size
+        
+        # Get image from simulator
+        img = self.env.sim.render(
+            width=width,
+            height=height,
+            camera_name="frontview",
+            depth=False,
+            device_id=0
+        )
+        
+        return img
+        
+    def get_action(self, instruction):
         """Get pick and place action from image and language instruction."""
+        # Get current image
+        image = self.get_camera_image()
+        
+        # Preprocess image for CLIP
+        if isinstance(image, np.ndarray):
+            image = Image.fromarray(image)
+        image_input = self.preprocess(image).unsqueeze(0).to(self.device)
+        
         # Get CLIP text features
-        text_tokens = clip.tokenize([instruction]).cuda()
+        text_tokens = clip.tokenize([instruction]).to(self.device)
         with torch.no_grad():
             text_features = self.clip_model.encode_text(text_tokens)
             text_features /= text_features.norm(dim=-1, keepdim=True)
@@ -74,7 +100,7 @@ class CLIPortController:
         # Get pick/place action maps
         pick_map, place_map = self.transport_net.apply(
             {'params': self.transport_net.params},
-            image,
+            image_input.cpu().numpy(),
             text_features
         )
         
@@ -83,8 +109,13 @@ class CLIPortController:
         place_yx = np.unravel_index(place_map.argmax(), place_map.shape)
         
         # Convert to world coordinates
-        pick_xyz = self.env.get_pixel_coords(pick_yx)
-        place_xyz = self.env.get_pixel_coords(place_yx)
+        pick_xyz = np.array([pick_yx[1] / 256.0 * 0.6 - 0.3,  # Scale to workspace bounds
+                           -0.8 + pick_yx[0] / 256.0 * 0.6,
+                           0.03])  # Fixed height for picking
+                           
+        place_xyz = np.array([place_yx[1] / 256.0 * 0.6 - 0.3,
+                            -0.8 + place_yx[0] / 256.0 * 0.6,
+                            0.15])  # Higher height for placing
         
         return {
             'pick': pick_xyz,
@@ -93,11 +124,8 @@ class CLIPortController:
         
     def execute_instruction(self, instruction):
         """Execute language instruction."""
-        # Get observation
-        obs = self.env._get_observations()
-        
         # Get action
-        action = self.get_action(obs['image'], instruction)
+        action = self.get_action(instruction)
         
         # Execute action
         obs, reward, done, info = self.env.step(action)
@@ -113,6 +141,8 @@ def main():
         robots="Panda",
         has_renderer=True,
         has_offscreen_renderer=True,
+        ignore_done=True,
+        use_camera_obs=True,
         control_freq=20,
     )
     
