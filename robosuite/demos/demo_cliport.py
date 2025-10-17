@@ -94,7 +94,7 @@ class CLIPortController:
     def execute_instruction(self, instruction):
         """Execute language instruction."""
         # Get observation
-        obs = self.env.get_observation()
+        obs = self.env._get_observations()
         
         # Get action
         action = self.get_action(obs['image'], instruction)
