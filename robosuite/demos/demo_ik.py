@@ -42,9 +42,12 @@ if __name__ == "__main__":
 
     # Get robot configuration
     robot = env.robots[0]  # Get the first robot
+    # Get end-effector site name
+    eef_site_id = robot.eef_site_id["right"]  # For single-arm robot, use "right" end-effector
+    
     robot_config = {
         "joint_names": robot.joint_indexes,
-        "end_effector_sites": [robot.eef_site_id],  # List of end effector site names
+        "end_effector_sites": ["robot0_right_ee"],  # Use actual site name
         "nullspace_gains": [1.0] * len(robot.joint_indexes),  # Nullspace gains for each joint
     }
 
