@@ -76,17 +76,6 @@ class CodeAsPoliciesController:
         self.gripper_dim = env.robots[0].gripper["right"].dof if hasattr(env.robots[0], "gripper") else 0
         self.neutral = np.zeros(self.action_dim + self.gripper_dim)
         
-        # Create directory for saving images
-        self.save_dir = "execution_images"
-        os.makedirs(self.save_dir, exist_ok=True)
-        
-        # Create timestamped subdirectory for this run
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.current_run_dir = os.path.join(self.save_dir, timestamp)
-        os.makedirs(self.current_run_dir, exist_ok=True)
-        
-        self.step_counter = 0
-        
     def setup_objects(self):
         """Setup initial objects in the environment."""
         # Define available colors and objects
@@ -353,58 +342,27 @@ class CodeAsPoliciesController:
 
         return lmp_env
 
-    def save_image(self, stage=""):
-        """Save current simulator view as PNG."""
-        image = self.get_camera_image()
-        
-        # Create filename with step counter and stage
-        filename = f"step_{self.step_counter:03d}_{stage}.png"
-        filepath = os.path.join(self.current_run_dir, filename)
-        
-        # Save image
-        Image.fromarray(image).save(filepath)
-        print(f"Saved image: {filepath}")
-        
-    def get_camera_image(self):
-        """Get camera image from environment."""
-        # Get camera matrix
-        camera_id = 0
-        width = height = 256  # Default size
-        
-        # Get image from simulator
-        img = self.env.sim.render(
-            width=width,
-            height=height,
-            camera_name="frontview",
-            depth=False,
-            device_id=0
-        )
-        
-        return img
-
     def execute_task(self, task_description):
         """Execute high-level task using Code as Policies."""
         print(f"Executing task: {task_description}")
-        
-        # Save initial state
-        self.save_image("initial_state")
         
         # Generate and execute code using LMP
         try:
             # Get current object list
             object_list = list(self.obj_name_to_id.keys())
             
+            # Make sure environment is visible
+            self.env.render()
+            time.sleep(0.5)  # Give time for viewer to initialize
+            
             # Execute task using LMP
             self.lmp_tabletop_ui(task_description, f'objects = {object_list}')
             
-            # Render environment
+            # Render final state
             self.env.render()
             
         except Exception as e:
             print(f"Error executing task: {e}")
-            
-        # Save final state
-        self.save_image("final_state")
 
 def main(
     env_name = "Stack",
@@ -428,7 +386,6 @@ def main(
         "has_renderer": True,
         "has_offscreen_renderer": False,
         "use_camera_obs": False,
-        "control_freq": 20,
         
         # Camera parameters
         "camera_names": ["agentview"],
