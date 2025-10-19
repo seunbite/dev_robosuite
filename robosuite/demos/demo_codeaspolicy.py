@@ -100,6 +100,74 @@ class CodeAsPoliciesController:
                     'include_context': True,
                     'has_return': False,
                     'return_val_name': 'ret_val',
+                },
+                'parse_obj_name': {
+                    'prompt_text': self.get_parse_obj_name_prompt(),
+                    'engine': self.model_name,
+                    'max_tokens': 512,
+                    'temperature': 0,
+                    'query_prefix': '# ',
+                    'query_suffix': '.',
+                    'stop': ['#', 'objects = ['],
+                    'maintain_session': False,
+                    'debug_mode': False,
+                    'include_context': True,
+                    'has_return': True,
+                    'return_val_name': 'ret_val',
+                },
+                'parse_position': {
+                    'prompt_text': self.get_parse_position_prompt(),
+                    'engine': self.model_name,
+                    'max_tokens': 512,
+                    'temperature': 0,
+                    'query_prefix': '# ',
+                    'query_suffix': '.',
+                    'stop': ['#'],
+                    'maintain_session': False,
+                    'debug_mode': False,
+                    'include_context': True,
+                    'has_return': True,
+                    'return_val_name': 'ret_val',
+                },
+                'parse_question': {
+                    'prompt_text': self.get_parse_question_prompt(),
+                    'engine': self.model_name,
+                    'max_tokens': 512,
+                    'temperature': 0,
+                    'query_prefix': '# ',
+                    'query_suffix': '.',
+                    'stop': ['#', 'objects = ['],
+                    'maintain_session': False,
+                    'debug_mode': False,
+                    'include_context': True,
+                    'has_return': True,
+                    'return_val_name': 'ret_val',
+                },
+                'transform_shape_pts': {
+                    'prompt_text': self.get_transform_shape_pts_prompt(),
+                    'engine': self.model_name,
+                    'max_tokens': 512,
+                    'temperature': 0,
+                    'query_prefix': '# ',
+                    'query_suffix': '.',
+                    'stop': ['#'],
+                    'maintain_session': False,
+                    'debug_mode': False,
+                    'include_context': True,
+                    'has_return': True,
+                    'return_val_name': 'new_shape_pts',
+                },
+                'fgen': {
+                    'prompt_text': self.get_fgen_prompt(),
+                    'engine': self.model_name,
+                    'max_tokens': 512,
+                    'temperature': 0,
+                    'query_prefix': '# define function: ',
+                    'query_suffix': '.',
+                    'stop': ['# define', '# example'],
+                    'maintain_session': False,
+                    'debug_mode': False,
+                    'include_context': True,
                 }
             }
         }
@@ -112,8 +180,9 @@ class CodeAsPoliciesController:
         return """
         # Python 2D robot control script
         import numpy as np
-        from env_utils import put_first_on_second, get_obj_pos, get_obj_names, say
-        
+        from env_utils import put_first_on_second, get_obj_pos, get_obj_names, say, get_corner_name, get_side_name, is_obj_visible, stack_objects_in_order
+        from plan_utils import parse_obj_name, parse_position, parse_question, transform_shape_pts
+
         objects = ['blue block', 'red block', 'green block']
         # put the blue block on the red block.
         say('Ok - putting the blue block on the red block')
@@ -124,12 +193,137 @@ class CodeAsPoliciesController:
         say('Stacking blocks with green block on top')
         order_bottom_to_top = ['red block', 'blue block', 'green block']
         stack_objects_in_order(object_names=order_bottom_to_top)
+        
+        objects = ['yellow block', 'green block', 'yellow bowl']
+        # put the yellow block in its matching bowl.
+        say('Putting the yellow block in the yellow bowl')
+        put_first_on_second('yellow block', 'yellow bowl')
+        
+        objects = ['blue block', 'red block', 'green block']
+        # arrange blocks in a triangle.
+        say('Arranging blocks in a triangle formation')
+        triangle_pts = parse_position('a triangle with size 10cm around the middle with 3 points')
+        for block_name, pt in zip(['blue block', 'red block', 'green block'], triangle_pts):
+            put_first_on_second(block_name, pt)
+        """
+
+    def get_parse_obj_name_prompt(self):
+        """Get the prompt template for parsing object names."""
+        return """
+        import numpy as np
+        from env_utils import get_obj_pos, parse_position
+        from utils import get_obj_positions_np
+
+        objects = ['blue block', 'cyan block', 'purple bowl']
+        # the block closest to the purple bowl.
+        block_names = ['blue block', 'cyan block']
+        block_positions = get_obj_positions_np(block_names)
+        closest_block_idx = get_closest_idx(points=block_positions, point=get_obj_pos('purple bowl'))
+        closest_block_name = block_names[closest_block_idx]
+        ret_val = closest_block_name
+        """
+
+    def get_parse_position_prompt(self):
+        """Get the prompt template for parsing positions."""
+        return """
+        import numpy as np
+        from shapely.geometry import *
+        from shapely.affinity import *
+        from env_utils import denormalize_xy, parse_obj_name, get_obj_names, get_obj_pos
+
+        # a triangle with size 10cm with 3 points.
+        polygon = make_triangle(size=0.1, center=denormalize_xy([0.5, 0.5]))
+        points = get_points_from_polygon(polygon)
+        ret_val = points
+        """
+
+    def get_parse_question_prompt(self):
+        """Get the prompt template for parsing questions."""
+        return """
+        from utils import get_obj_pos, get_obj_names, parse_obj_name, bbox_contains_pt
+
+        objects = ['yellow bowl', 'blue block', 'yellow block']
+        # is the blue block to the right of the yellow bowl?
+        ret_val = get_obj_pos('blue block')[0] > get_obj_pos('yellow bowl')[0]
+        """
+
+    def get_transform_shape_pts_prompt(self):
+        """Get the prompt template for transforming shape points."""
+        return """
+        import numpy as np
+        from utils import get_obj_pos, get_obj_names, parse_position, parse_obj_name
+
+        # make it bigger by 1.5.
+        new_shape_pts = scale_pts_around_centroid_np(shape_pts, scale_x=1.5, scale_y=1.5)
+        """
+
+    def get_fgen_prompt(self):
+        """Get the prompt template for function generation."""
+        return """
+        import numpy as np
+        from shapely.geometry import *
+        from shapely.affinity import *
+        from env_utils import get_obj_pos, get_obj_names
+        from ctrl_utils import put_first_on_second
+
+        # define function: total = get_total(xs=numbers).
+        def get_total(xs):
+            return np.sum(xs)
         """
 
     def setup_lmp_env(self):
         """Setup the LMP environment wrapper."""
-        # TODO: Implement LMP environment wrapper
-        pass
+        # Initialize environment configuration
+        self.cfg_tabletop['env'] = {
+            'init_objs': list(self.env.obj_name_to_id.keys()),
+            'coords': {
+                'bottom_left': (-0.3, -0.8),
+                'top_right': (0.3, -0.2),
+                'table_z': 0.0
+            }
+        }
+
+        # Create LMP environment wrapper
+        from codeaspolicies.env_wrapper import LMPWrapper
+        lmp_env = LMPWrapper(self.env, self.cfg_tabletop, render=True)
+
+        # Setup fixed and variable variables
+        fixed_vars = {'np': np}
+        fixed_vars.update({
+            name: eval(name)
+            for name in shapely.geometry.__all__ + shapely.affinity.__all__
+        })
+
+        variable_vars = {
+            k: getattr(lmp_env, k)
+            for k in [
+                'get_bbox', 'get_obj_pos', 'get_color', 'is_obj_visible',
+                'denormalize_xy', 'put_first_on_second', 'get_obj_names',
+                'get_corner_name', 'get_side_name',
+            ]
+        }
+        variable_vars['say'] = lambda msg: print(f'Robot says: {msg}')
+
+        # Create function generator
+        from codeaspolicies.lmp_utils import LMPFGen, LMP
+        lmp_fgen = LMPFGen(self.cfg_tabletop['lmps']['fgen'], fixed_vars, variable_vars)
+
+        # Create LMP components
+        variable_vars.update({
+            k: LMP(k, self.cfg_tabletop['lmps'][k], lmp_fgen, fixed_vars, variable_vars)
+            for k in ['parse_obj_name', 'parse_position', 'parse_question', 'transform_shape_pts']
+        })
+
+        # Create main UI LMP
+        self.lmp_tabletop_ui = LMP(
+            'tabletop_ui',
+            self.cfg_tabletop['lmps']['tabletop_ui'],
+            lmp_fgen,
+            fixed_vars,
+            variable_vars
+        )
+
+        return lmp_env
 
     def save_image(self, stage=""):
         """Save current simulator view as PNG."""
@@ -169,8 +363,14 @@ class CodeAsPoliciesController:
         
         # Generate and execute code using LMP
         try:
-            # TODO: Implement LMP code generation and execution
-            pass
+            # Get current object list
+            object_list = list(self.env.obj_name_to_id.keys())
+            
+            # Execute task using LMP
+            self.lmp_tabletop_ui(task_description, f'objects = {object_list}')
+            
+            # Render environment
+            self.env.render()
             
         except Exception as e:
             print(f"Error executing task: {e}")
@@ -221,8 +421,6 @@ def main(
     # Example tasks
     tasks = [
         "Stack red block on the green block",
-        "Put the blue block in the yellow bowl",
-        "Move all blocks to the right side",
     ]
     
     # Execute tasks
