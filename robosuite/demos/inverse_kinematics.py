@@ -1,118 +1,126 @@
 """
-Inverse Kinematics implementation for robosuite robots.
-Currently supports Panda robot arm.
+Inverse Kinematics implementation using PyBullet.
+Supports any robot loaded in PyBullet environment.
 """
 
 import numpy as np
-from scipy.optimize import minimize
+import pybullet
 
 class InverseKinematics:
     def __init__(self, robot):
-        self.robot = robot
-        self.n_joints = len(self.robot.joint_indexes)
-        
-        # Joint limits for Panda robot
-        self.joint_limits = {
-            "lower": np.array([-2.8973, -1.7628, -2.8973, -3.0718, -2.8973, -0.0175, -2.8973]),
-            "upper": np.array([2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3.7525, 2.8973])
-        }
-        
-        # Get robot link names
-        self.robot_links = [name for name in self.robot.sim.model.body_names 
-                          if name.startswith("robot0_")]
-        self.eef_link_name = "robot0_link7"  # End effector link
-        self.hand_link_name = "robot0_right_hand"  # Gripper base link
-        
-    def forward_kinematics(self, q):
         """
-        Compute end-effector position for given joint angles.
+        Initialize IK solver for a robot.
         Args:
-            q: Joint angles (7-DOF for Panda)
+            robot: PyBullet robot object (robot ID)
+        """
+        self.robot = robot
+        
+        # Get number of joints
+        self.n_joints = pybullet.getNumJoints(self.robot)
+        
+        # Get joint info
+        self.joint_info = []
+        self.joint_indices = []
+        self.joint_limits = {"lower": [], "upper": []}
+        
+        for i in range(self.n_joints):
+            info = pybullet.getJointInfo(self.robot, i)
+            if info[2] == pybullet.JOINT_REVOLUTE:  # Only consider revolute joints
+                self.joint_info.append(info)
+                self.joint_indices.append(i)
+                self.joint_limits["lower"].append(info[8])  # Lower limit
+                self.joint_limits["upper"].append(info[9])  # Upper limit
+        
+        self.joint_limits["lower"] = np.array(self.joint_limits["lower"])
+        self.joint_limits["upper"] = np.array(self.joint_limits["upper"])
+        
+        # Get end effector link index (last revolute joint by default)
+        self.eef_link_id = self.joint_indices[-1]
+        
+    def forward_kinematics(self, joint_angles):
+        """
+        Compute end-effector pose for given joint angles using PyBullet.
+        Args:
+            joint_angles: List/array of joint angles
         Returns:
             pos: End-effector position (x,y,z)
             rot_mat: End-effector rotation matrix (3x3)
         """
-        # Set robot joints
-        original_joints = self.robot.sim.data.qpos[self.robot.joint_indexes].copy()
-        self.robot.sim.data.qpos[self.robot.joint_indexes] = q
-        self.robot.sim.forward()
+        # Store current joint states
+        original_states = []
+        for i in self.joint_indices:
+            original_states.append(pybullet.getJointState(self.robot, i)[0])
         
-        # Get end-effector position and rotation
-        pos = self.robot.sim.data.get_body_xpos(self.eef_link_name)
-        rot_mat = self.robot.sim.data.get_body_xmat(self.eef_link_name).reshape(3, 3)
+        # Set joint angles
+        for i, angle in zip(self.joint_indices, joint_angles):
+            pybullet.resetJointState(self.robot, i, angle)
         
-        # Restore original joint positions
-        self.robot.sim.data.qpos[self.robot.joint_indexes] = original_joints
-        self.robot.sim.forward()
+        # Get end effector state
+        state = pybullet.getLinkState(self.robot, self.eef_link_id)
+        pos = np.array(state[0])
+        rot = np.array(state[1])  # Quaternion
+        rot_mat = np.array(pybullet.getMatrixFromQuaternion(rot)).reshape(3, 3)
+        
+        # Restore original joint states
+        for i, state in zip(self.joint_indices, original_states):
+            pybullet.resetJointState(self.robot, i, state)
         
         return pos, rot_mat
         
     def inverse_kinematics(self, target_pos, target_rot=None, initial_guess=None):
         """
-        Compute inverse kinematics for target end-effector pose.
+        Compute inverse kinematics using PyBullet's built-in IK solver.
         Args:
             target_pos: Target position (x,y,z)
-            target_rot: Target rotation matrix (3x3) or None for position-only IK
-            initial_guess: Initial joint angles guess (7-DOF) or None for current joints
+            target_rot: Target rotation as quaternion [x,y,z,w] or None
+            initial_guess: Initial joint angles or None
         Returns:
-            q: Joint angles solution (7-DOF)
+            Joint angles solution
         """
-        if initial_guess is None:
-            initial_guess = self.robot.sim.data.qpos[self.robot.joint_indexes].copy()
-            
-        def objective(q):
-            # Get current end-effector pose
-            current_pos, current_rot = self.forward_kinematics(q)
-            
-            # Position error
-            pos_error = np.linalg.norm(current_pos - target_pos)
-            
-            # Rotation error (if target rotation provided)
-            rot_error = 0
-            if target_rot is not None:
-                # Use rotation matrix difference
-                rot_error = np.linalg.norm(current_rot - target_rot)
-            
-            # Joint limits penalty
-            limit_penalty = 0
-            for i in range(len(q)):
-                if q[i] < self.joint_limits["lower"][i]:
-                    limit_penalty += (self.joint_limits["lower"][i] - q[i])**2
-                elif q[i] > self.joint_limits["upper"][i]:
-                    limit_penalty += (q[i] - self.joint_limits["upper"][i])**2
-            
-            # Total cost
-            cost = pos_error + (0.5 * rot_error if target_rot is not None else 0) + (0.1 * limit_penalty)
-            return cost
-            
-        # Optimize joint angles
-        result = minimize(
-            objective,
-            initial_guess,
-            method='BFGS',
-            options={'maxiter': 100}
-        )
+        if initial_guess is not None:
+            # Set initial guess
+            for i, angle in zip(self.joint_indices, initial_guess):
+                pybullet.resetJointState(self.robot, i, angle)
         
-        if not result.success:
-            print("Warning: IK optimization did not converge")
+        # Calculate IK
+        if target_rot is not None:
+            joint_angles = pybullet.calculateInverseKinematics(
+                self.robot,
+                self.eef_link_id,
+                target_pos,
+                target_rot,
+                jointDamping=[0.01] * len(self.joint_indices),
+                maxNumIterations=100,
+                residualThreshold=1e-5
+            )
+        else:
+            joint_angles = pybullet.calculateInverseKinematics(
+                self.robot,
+                self.eef_link_id,
+                target_pos,
+                maxNumIterations=100,
+                residualThreshold=1e-5
+            )
             
-        return result.x
+        # Extract only the relevant joint angles
+        solution = np.array([joint_angles[i] for i in self.joint_indices])
+        
+        # Clip to joint limits
+        solution = np.clip(solution, self.joint_limits["lower"], self.joint_limits["upper"])
+        
+        return solution
         
     def get_joint_angles(self, target_pos, target_rot=None, initial_guess=None):
         """
         High-level interface to get joint angles for target pose.
         Args:
             target_pos: Target position (x,y,z)
-            target_rot: Target rotation matrix (3x3) or None
+            target_rot: Target rotation as quaternion [x,y,z,w] or None
             initial_guess: Initial joint angles or None
         Returns:
-            Joint angles (7-DOF) and success flag
+            Joint angles and success flag
         """
         try:
-            # Print available robot links for debugging
-            print("Available robot links:", self.robot_links)
-            print("Using end-effector link:", self.eef_link_name)
-            
             # Convert inputs to numpy arrays
             target_pos = np.array(target_pos)
             if target_rot is not None:
@@ -122,7 +130,7 @@ class InverseKinematics:
             q = self.inverse_kinematics(target_pos, target_rot, initial_guess)
             
             # Verify solution
-            final_pos, final_rot = self.forward_kinematics(q)
+            final_pos, _ = self.forward_kinematics(q)
             pos_error = np.linalg.norm(final_pos - target_pos)
             
             print(f"IK solution found with position error: {pos_error:.3f}m")
@@ -132,7 +140,7 @@ class InverseKinematics:
             if pos_error > 0.01:  # 1cm threshold
                 print(f"Warning: Large position error in IK solution: {pos_error:.3f}m")
                 return None, False
-                
+            
             return q, True
             
         except Exception as e:
