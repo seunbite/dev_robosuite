@@ -25,7 +25,7 @@ class CLIPortController:
         # Create robot config for IK solver
         self.robot_config = {
             "joint_names": self.robot.joint_indexes,
-            "end_effector_sites": ["right_ee"],  # Assuming right arm end effector
+            "end_effector_sites": ["gripper0_right_grip_site"],  # Right arm end effector
             "nullspace_gains": [1.0] * len(self.robot.joint_indexes),
         }
         
