@@ -13,7 +13,8 @@ import time
 import numpy as np
 import robosuite as suite
 from robosuite.utils.input_utils import *
-from robosuite.controllers.composite.composite_controller_config import refactor_composite_controller_config
+from robosuite.controllers.composite.composite_controller_factory import refactor_composite_controller_config
+
 from PIL import Image
 import datetime
 import openai
