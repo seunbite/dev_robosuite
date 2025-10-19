@@ -19,8 +19,9 @@ from PIL import Image
 import datetime
 import openai
 import threading
-import pybullet
 import cv2
+import shapely.geometry
+import shapely.affinity
 from shapely.geometry import *
 from shapely.affinity import *
 
