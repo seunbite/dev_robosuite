@@ -26,6 +26,13 @@ if __name__ == "__main__":
     options["env_name"] = "Stack"  # or use choose_environment() for interactive selection
     options["robots"] = "Panda"    # or use choose_robots() for interactive selection
 
+    # Load the default controller config
+    controller_name = "IK_POSE"
+    arm_controller_config = suite.load_part_controller_config(default_controller=controller_name)
+    options["controller_configs"] = refactor_composite_controller_config(
+        arm_controller_config, options["robots"], ["right", "left"]
+    )
+
     # Initialize environment
     env = suite.make(
         **options,
@@ -42,12 +49,10 @@ if __name__ == "__main__":
 
     # Get robot configuration
     robot = env.robots[0]  # Get the first robot
-    # Get end-effector site name
-    eef_site_id = robot.eef_site_id["right"]  # For single-arm robot, use "right" end-effector
     
     robot_config = {
         "joint_names": robot.joint_indexes,
-        "end_effector_sites": ["robot0_right_ee"],  # Use actual site name
+        "end_effector_sites": ["gripper0_right_grip_site"],  # Use actual site name from the model
         "nullspace_gains": [1.0] * len(robot.joint_indexes),  # Nullspace gains for each joint
     }
 
@@ -56,9 +61,9 @@ if __name__ == "__main__":
         model=env.sim.model,
         data=env.sim.data,
         robot_config=robot_config,
-        damping=0.05,  # Damping coefficient
-        integration_dt=1/20.0,  # Integration timestep
-        max_dq=10.0,  # Maximum joint velocity
+        damping=0.05,
+        integration_dt=1/20.0,
+        max_dq=10.0,
     )
 
     # Define target positions and orientations
@@ -80,8 +85,12 @@ if __name__ == "__main__":
         [1, 0, 0, 0],       # Back to default
     ]
 
+    # Get gripper dimension
+    gripper_dim = robot.gripper["right"].dof
+    
     # Number of steps to stay at each target
-    steps_per_target = 100
+    steps_per_action = 75
+    steps_per_rest = 75
 
     print("Starting IK control demo...")
     print("The robot will move through several target positions...")
@@ -92,11 +101,11 @@ if __name__ == "__main__":
         print(f"Position: {pos}")
         print(f"Orientation: {ori}")
 
-        # Prepare target action
+        # Prepare target action (position + axis angle)
         target_action = np.concatenate([pos, T.quat2axisangle(ori)])
 
         # Move to target pose
-        for _ in range(steps_per_target):
+        for _ in range(steps_per_action):
             start_time = time.time()
 
             # Get desired joint positions from IK solver
@@ -106,15 +115,25 @@ if __name__ == "__main__":
                 Kori=0.95,  # Orientation gain
             )
 
-            # Create action - set joint positions
+            # Create action - set joint positions and add gripper command
             action = np.zeros(robot.action_dim)
             action[:len(q_des)] = q_des  # Set joint positions
-
+            
             # Step the environment
             env.step(action)
             env.render()
 
             # Maintain timing
+            elapsed = time.time() - start_time
+            if elapsed < 1./MAX_FR:
+                time.sleep(1./MAX_FR - elapsed)
+
+        # Rest at current position
+        for _ in range(steps_per_rest):
+            start_time = time.time()
+            env.step(action)  # Keep the same action
+            env.render()
+
             elapsed = time.time() - start_time
             if elapsed < 1./MAX_FR:
                 time.sleep(1./MAX_FR - elapsed)
