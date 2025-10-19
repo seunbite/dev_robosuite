@@ -31,7 +31,7 @@ if __name__ == "__main__":
     controller_name = "IK_POSE"
     arm_controller_config = suite.load_part_controller_config(default_controller=controller_name)
     options["controller_configs"] = refactor_composite_controller_config(
-        arm_controller_config, options["robots"], ["right", "left"]
+        arm_controller_config, options["robots"], ["right"]  # Single arm robot, only use right arm config
     )
 
     # Initialize environment
@@ -59,8 +59,8 @@ if __name__ == "__main__":
 
     # Initialize IK solver
     ik_solver = IKSolver(
-        model=env.sim.model.ptr,  # Get the raw MuJoCo model pointer
-        data=env.sim.data.ptr,    # Get the raw MuJoCo data pointer
+        model=env.sim.model,  # MuJoCo model
+        data=env.sim.data,    # MuJoCo data
         robot_config=robot_config,
         damping=0.05,
         integration_dt=1/20.0,
