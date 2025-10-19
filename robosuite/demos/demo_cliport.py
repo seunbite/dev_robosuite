@@ -8,7 +8,8 @@ import torch
 import clip
 from PIL import Image
 import cv2
-from inverse_kinematics import InverseKinematics
+import robosuite.utils.transform_utils as T
+from robosuite.utils.ik_utils import IKSolver
 
 class CLIPortController:
     def __init__(self, env):
@@ -20,7 +21,25 @@ class CLIPortController:
         
         # Initialize IK solver
         self.robot = self.env.robots[0]  # Assume single robot
-        self.ik_solver = InverseKinematics(self.robot)
+        
+        # Create robot config for IK solver
+        self.robot_config = {
+            "joint_names": self.robot.joint_names,
+            "end_effector_sites": ["right_ee"],  # Assuming right arm end effector
+            "nullspace_gains": [1.0] * len(self.robot.joint_names),
+        }
+        
+        # Initialize IK solver
+        self.ik_solver = IKSolver(
+            model=self.env.sim.model,
+            data=self.env.sim.data,
+            robot_config=self.robot_config,
+            damping=0.05,
+            integration_dt=1.0 / self.env.control_freq,
+            max_dq=0.5,
+            input_type="keyboard",
+            debug=False
+        )
         
         # Define target positions
         self.target_positions = {
@@ -34,12 +53,12 @@ class CLIPortController:
         # Define object colors and their typical positions
         self.object_colors = ["red", "green", "blue", "yellow"]
         
-        # Default orientation (facing down)
-        self.default_orientation = np.array([
+        # Default orientation (facing down) in quaternion (w,x,y,z)
+        self.default_orientation = T.mat2quat(np.array([
             [1, 0, 0],
             [0, -1, 0],
             [0, 0, -1]
-        ])
+        ]))
         
     def get_camera_image(self):
         """Get camera image from environment."""
@@ -139,33 +158,29 @@ class CLIPortController:
             # Default to middle if no location specified
             place_pos = self.target_positions["middle"]
             
-        # Get joint angles for pick position
-        pick_joints, pick_success = self.ik_solver.get_joint_angles(
-            pick_pos, 
-            self.default_orientation
-        )
+        # Create pick and place actions using IK solver
+        pick_action = np.zeros(self.env.action_dim)
+        place_action = np.zeros(self.env.action_dim)
         
-        if not pick_success:
+        # Prepare target pose for pick position
+        pick_target = np.concatenate([pick_pos, np.zeros(3)])  # Position + zero rotation
+        pick_joints = self.ik_solver.solve(pick_target)
+        if pick_joints is None:
             print("Failed to find IK solution for pick position")
             return None
             
-        # Get joint angles for place position
-        place_joints, place_success = self.ik_solver.get_joint_angles(
-            place_pos,
-            self.default_orientation
-        )
-        
-        if not place_success:
+        # Prepare target pose for place position
+        place_target = np.concatenate([place_pos, np.zeros(3)])  # Position + zero rotation
+        place_joints = self.ik_solver.solve(place_target)
+        if place_joints is None:
             print("Failed to find IK solution for place position")
             return None
             
-        # Create pick and place actions
-        pick_action = np.zeros(self.env.action_dim)
-        pick_action[:7] = pick_joints
+        # Set joint positions and gripper actions
+        pick_action[:len(pick_joints)] = pick_joints
         pick_action[-1] = 1.0  # Close gripper
         
-        place_action = np.zeros(self.env.action_dim)
-        place_action[:7] = place_joints
+        place_action[:len(place_joints)] = place_joints
         place_action[-1] = -1.0  # Open gripper
         
         return pick_action, place_action
@@ -180,11 +195,32 @@ class CLIPortController:
             
         pick_action, place_action = actions
         
-        # Execute pick action
-        obs, _, _, _ = self.env.step(pick_action)
+        # Execute pick action with interpolation
+        steps_per_action = 75  # Number of steps for smooth motion
         
-        # Execute place action
-        obs, reward, done, info = self.env.step(place_action)
+        # Move to pick position
+        for i in range(steps_per_action):
+            alpha = (i + 1) / steps_per_action
+            current_action = pick_action * alpha
+            obs, _, _, _ = self.env.step(current_action)
+            self.env.render()
+        
+        # Execute pick (close gripper)
+        for _ in range(20):  # Hold for 20 steps
+            obs, _, _, _ = self.env.step(pick_action)
+            self.env.render()
+        
+        # Move to place position
+        for i in range(steps_per_action):
+            alpha = (i + 1) / steps_per_action
+            current_action = pick_action * (1 - alpha) + place_action * alpha
+            obs, _, _, _ = self.env.step(current_action)
+            self.env.render()
+        
+        # Execute place (open gripper)
+        for _ in range(20):  # Hold for 20 steps
+            obs, reward, done, info = self.env.step(place_action)
+            self.env.render()
         
         return obs
 
