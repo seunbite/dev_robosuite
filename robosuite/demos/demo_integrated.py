@@ -144,7 +144,7 @@ def main():
         
         # Execute task with frame rate control
         start_time = time.time()
-        obs = system.execute_task(task)a
+        obs = system.execute_task(task)
         env.render()
         
         # Limit frame rate
