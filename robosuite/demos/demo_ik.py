@@ -8,6 +8,7 @@ import time
 import robosuite as suite
 from robosuite.utils.input_utils import *
 import robosuite.utils.transform_utils as T
+from robosuite.controllers.composite.composite_controller_factory import refactor_composite_controller_config
 
 # Maximum frames per second
 MAX_FR = 25
@@ -28,7 +29,10 @@ if __name__ == "__main__":
     # Load the default controller config
     controller_name = "IK_POSE"
     arm_controller_config = suite.load_part_controller_config(default_controller=controller_name)
-    options["controller_configs"] = arm_controller_config
+    robot = options["robots"] if not isinstance(options["robots"], list) else options["robots"][0]
+    options["controller_configs"] = refactor_composite_controller_config(
+        arm_controller_config, robot, ["right"]  # Single arm robot, only use right arm config
+    )
 
     # Initialize environment
     env = suite.make(
