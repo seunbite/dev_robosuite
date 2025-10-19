@@ -78,12 +78,12 @@ if __name__ == "__main__":
     ]
 
     target_orientations = [
-        [1, 0, 0, 0],       # Default orientation (w,x,y,z)
-        T.axisangle2quat([0, np.pi/4, 0]),  # Rotated 45° around Y
-        T.axisangle2quat([0, -np.pi/4, 0]), # Rotated -45° around Y
-        T.axisangle2quat([0, 0, np.pi/4]),  # Rotated 45° around Z
-        T.axisangle2quat([0, 0, -np.pi/4]), # Rotated -45° around Z
-        [1, 0, 0, 0],       # Back to default
+        np.array([0, 0, 0]),                # Default orientation (axis-angle)
+        np.array([0, np.pi/4, 0]),          # Rotated 45° around Y
+        np.array([0, -np.pi/4, 0]),         # Rotated -45° around Y
+        np.array([0, 0, np.pi/4]),          # Rotated 45° around Z
+        np.array([0, 0, -np.pi/4]),         # Rotated -45° around Z
+        np.array([0, 0, 0]),                # Back to default
     ]
 
     # Get gripper dimension
@@ -103,7 +103,7 @@ if __name__ == "__main__":
         print(f"Orientation: {ori}")
 
         # Prepare target action (position + axis angle)
-        target_action = np.concatenate([pos, T.quat2axisangle(ori)])
+        target_action = np.concatenate([np.array(pos), ori])
 
         # Move to target pose
         for _ in range(steps_per_action):
