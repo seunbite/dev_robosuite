@@ -9,6 +9,7 @@ import robosuite as suite
 from robosuite.utils.input_utils import *
 from robosuite.utils.ik_utils import IKSolver
 import robosuite.utils.transform_utils as T
+from robosuite.controllers.composite.composite_controller_factory import refactor_composite_controller_config
 
 # Maximum frames per second
 MAX_FR = 25
