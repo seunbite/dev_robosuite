@@ -1,159 +1,217 @@
 """
-This demo shows how to use SayCan with robosuite.
-SayCan combines LLM planning with robotic affordances for long-horizon tasks.
+This demo integrates SayCan, ViLD and CLIPort for language-driven robotic manipulation.
+It uses IK_POSE controller for precise end-effector control.
 """
 
+import os
+import time
 import numpy as np
 import robosuite as suite
-from openai import OpenAI
-import clip
-import torch
-import PIL.Image as Image
-from collections import defaultdict
+from robosuite.utils.input_utils import *
+from robosuite.controllers.composite.composite_controller_factory import refactor_composite_controller_config
+from demo_saycan import SayCanController
+from demo_vild import ViLDDetector
+from demo_cliport import CLIPortController
+from PIL import Image
 import datetime
-import os
 
-# Constants for the environment
-PICK_TARGETS = {
-    "blue block": None,
-    "red block": None,
-    "green block": None,
-    "yellow block": None,
-}
+MAX_FR = 25  # max frame rate for running simulation
 
-PLACE_TARGETS = {
-    "blue bowl": None,
-    "red bowl": None,
-    "green bowl": None,
-    "yellow bowl": None,
-    "top left corner": (-0.3 + 0.05, -0.2 - 0.05, 0),
-    "top right corner": (0.3 - 0.05, -0.2 - 0.05, 0),
-    "middle": (0, -0.5, 0),
-    "bottom left corner": (-0.3 + 0.05, -0.8 + 0.05, 0),
-    "bottom right corner": (0.3 - 0.05, -0.8 + 0.05, 0),
-}
-
-class SayCanController:
-    def __init__(self, env, openai_api_key):
+class IntegratedSystem:
+    def __init__(self, env):
         self.env = env
-        self.client = OpenAI(api_key=openai_api_key)
-        self.llm_cache = {}
         
-    def get_scene_description(self):
-        """Get scene description using ViLD."""
-        # Get top-down image
-        img = self.env.get_camera_image_top()
-        # TODO: Implement ViLD scene detection
-        return "Scene contains: blue block, red block, green bowl"
+        # Initialize components
+        self.saycan = SayCanController(env, os.getenv("OPENAI_API_KEY"))
+        self.vild = ViLDDetector()
+        self.cliport = CLIPortController(env)
         
-    def get_llm_plan(self, task_description, scene_description):
-        """Get high-level plan from LLM."""
-        prompt = f"""Given the following scene and task, generate a step-by-step plan using available actions.
-
-Scene: {scene_description}
-Task: {task_description}
-
-Available actions:
-- Pick up any block (blue, red, green, yellow)
-- Place blocks on other blocks or in bowls
-- Place blocks in corners or middle
-
-Step-by-step plan:
-1."""
+        # Get IK controller settings
+        self.action_dim = 6  # 6-DOF pose control
+        self.gripper_dim = env.robots[0].gripper["right"].dof if hasattr(env.robots[0], "gripper") else 0
+        self.neutral = np.zeros(self.action_dim + self.gripper_dim)
         
-        response = self.call_llm(prompt)
-        return self.parse_llm_response(response)
+        # Create directory for saving images
+        self.save_dir = "execution_images"
+        os.makedirs(self.save_dir, exist_ok=True)
         
-    def call_llm(self, prompt, model="gpt-3.5-turbo-instruct"):
-        """Call LLM with caching."""
-        cache_key = (prompt, model)
-        if cache_key in self.llm_cache:
-            return self.llm_cache[cache_key]
-            
-        response = self.client.completions.create(
-            model=model,
-            prompt=prompt,
-            max_tokens=256,
-            temperature=0,
-            stop=["Task:", "Scene:"]  # Stop generation at new task/scene
+        # Create timestamped subdirectory for this run
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.current_run_dir = os.path.join(self.save_dir, timestamp)
+        os.makedirs(self.current_run_dir, exist_ok=True)
+        
+        self.step_counter = 0
+        
+    def save_image(self, stage=""):
+        """Save current simulator view as PNG."""
+        image = self.get_camera_image()
+        
+        # Create filename with step counter and stage
+        filename = f"step_{self.step_counter:03d}_{stage}.png"
+        filepath = os.path.join(self.current_run_dir, filename)
+        
+        # Save image
+        Image.fromarray(image).save(filepath)
+        print(f"Saved image: {filepath}")
+        
+    def get_camera_image(self):
+        """Get camera image from environment."""
+        # Get camera matrix
+        camera_id = 0
+        width = height = 256  # Default size
+        
+        # Get image from simulator
+        img = self.env.sim.render(
+            width=width,
+            height=height,
+            camera_name="frontview",
+            depth=False,
+            device_id=0
         )
-        self.llm_cache[cache_key] = response
-        return response
         
-    def parse_llm_response(self, response):
-        """Parse LLM response into action sequence."""
-        # Extract steps from response
-        steps = []
-        text = response.choices[0].text.strip()
+        return img
         
-        for line in text.split('\n'):
-            line = line.strip()
-            if line.startswith('Pick') or line.startswith('Place'):
-                steps.append(line)
-                
-        # If no explicit steps found, try to extract actions from text
-        if not steps:
-            # Look for action keywords
-            text = text.lower()
-            for pick_target in PICK_TARGETS:
-                if pick_target.lower() in text:
-                    for place_target in PLACE_TARGETS:
-                        if place_target.lower() in text:
-                            step = f"Pick up the {pick_target} and place it on the {place_target}"
-                            steps.append(step)
-                            break
-                            
-        return steps
+    def execute_task(self, task_description):
+        """Execute high-level task using integrated components."""
+        print(f"Executing task: {task_description}")
         
-    def get_action(self, step_description):
-        """Convert step description to robot action."""
-        # Parse step into pick/place targets
-        if 'Pick' in step_description:
-            target = step_description.split('Pick the ')[-1].split(' and')[0]
-            action = {'pick': target}
-        elif 'Place' in step_description:
-            target = step_description.split('Place it on ')[-1]
-            action = {'place': target}
-        return action
+        # Save initial state
+        self.save_image("initial_state")
         
-    def execute_plan(self, task_description):
-        """Execute full task plan."""
-        # Get scene description
-        scene_desc = self.get_scene_description()
+        # Get scene description using ViLD
+        image = self.get_camera_image()
+        scene_desc = self.vild.get_scene_description(image)
+        print(f"Scene description: {scene_desc}")
         
-        # Get plan from LLM
-        plan = self.get_llm_plan(task_description, scene_desc)
-        
-        # Execute each step
-        for step in plan:
-            action = self.get_action(step)
-            obs, reward, done, info = self.env.step(action)
+        # Get action plan using SayCan
+        plan = self.saycan.get_llm_plan(task_description, scene_desc)
+        print("Action plan:")
+        for i, step in enumerate(plan):
+            print(f"{i+1}. {step}")
             
+        # Execute each step using CLIPort
+        for i, step in enumerate(plan):
+            print(f"\nExecuting step {i+1}: {step}")
+            self.step_counter += 1
+            
+            # Save image before step
+            self.save_image(f"step_{i+1}_before")
+            
+            # Parse step into IK action
+            action = self.neutral.copy()
+            
+            # Example: Convert high-level instruction to IK action
+            # This is a simplified example - you would need to implement proper parsing
+            if "move" in step.lower():
+                if "up" in step.lower():
+                    action[2] = 0.1  # Move up in z-direction
+                elif "down" in step.lower():
+                    action[2] = -0.1  # Move down in z-direction
+                elif "left" in step.lower():
+                    action[1] = 0.1  # Move left in y-direction
+                elif "right" in step.lower():
+                    action[1] = -0.1  # Move right in y-direction
+                elif "forward" in step.lower():
+                    action[0] = 0.1  # Move forward in x-direction
+                elif "backward" in step.lower():
+                    action[0] = -0.1  # Move backward in x-direction
+            
+            # Execute IK control for this step
+            for _ in range(75):  # Number of steps for smooth motion
+                start = time.time()
+                
+                # For IK_POSE controller, if action includes rotation (indices 3-5)
+                # we need to convert to axis-angle representation
+                if np.any(action[3:6] != 0):
+                    vec = np.zeros(3)
+                    vec = action[3:6]
+                    action[3:6] = vec
+                
+                # Apply action
+                obs = self.env.step(action)
+                self.env.render()
+                
+                # Limit frame rate
+                elapsed = time.time() - start
+                diff = 1 / MAX_FR - elapsed
+                if diff > 0:
+                    time.sleep(diff)
+            
+            # Return to neutral pose
+            for _ in range(75):
+                start = time.time()
+                obs = self.env.step(self.neutral)
+                self.env.render()
+                
+                elapsed = time.time() - start
+                diff = 1 / MAX_FR - elapsed
+                if diff > 0:
+                    time.sleep(diff)
+            
+            # Save image after step
+            self.save_image(f"step_{i+1}_after")
+            
+        # Save final state
+        self.save_image("final_state")
         return obs
 
-def main():
-    # Create environment
+def main(
+    env_name = "Stack",
+    robot = "Panda",
+):
+    options = {}
+    options["env_name"] = env_name  # or use choose_environment() for interactive selection
+    options["robots"] = robot    # or use choose_robots() for interactive selection
+
+    # Load the IK_POSE controller
+    controller_name = "IK_POSE"
+    arm_controller_config = suite.load_part_controller_config(default_controller=controller_name)
+    robot = options["robots"][0] if isinstance(options["robots"], list) else options["robots"]
+    options["controller_configs"] = refactor_composite_controller_config(
+        arm_controller_config, robot, ["right", "left"]
+    )
+
+    # Initialize the task
     env = suite.make(
-        "Stack",
-        robots="Panda",
+        **options,
         has_renderer=True,
-        has_offscreen_renderer=False,
+        has_offscreen_renderer=True,  # Need both renderers
         ignore_done=True,
-        use_camera_obs=False,
+        use_camera_obs=True,
         control_freq=20,
+        camera_names=["frontview"],
+        camera_heights=256,
+        camera_widths=256,
     )
     
-    # Initialize controller
-    controller = SayCanController(env, os.getenv("OPENAI_API_KEY"))
-    
     # Reset environment
-    obs = env.reset()
+    env.reset()
+    env.viewer.set_camera(camera_id=0)
     
-    # Example task
-    task = "Pick up the blue block and stack it on the red block"
+    # Initialize system
+    system = IntegratedSystem(env)
     
-    # Execute task
-    obs = controller.execute_plan(task)
+    # Example tasks
+    tasks = [
+        "Stack red block on the green block",
+    ]
     
+    # Execute tasks
+    for task in tasks:
+        print(f"\nExecuting task: {task}")
+        
+        # Execute task with frame rate control
+        start_time = time.time()
+        obs = system.execute_task(task)
+        env.render()
+        
+        # Limit frame rate
+        elapsed = time.time() - start_time
+        diff = 1 / MAX_FR - elapsed
+        if diff > 0:
+            time.sleep(diff)
+            
+        input("\nPress Enter to continue to next task...")
+        
 if __name__ == "__main__":
     main()
