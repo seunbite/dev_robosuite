@@ -63,6 +63,10 @@ class CodeAsPoliciesController:
         openai.api_key = api_key
         self.model_name = 'code-davinci-002'  # or 'text-davinci-002'
         
+        # Initialize object tracking
+        self.obj_name_to_id = {}
+        self.setup_objects()
+        
         # Initialize LMP components
         self.setup_lmp_components()
         
@@ -81,6 +85,45 @@ class CodeAsPoliciesController:
         os.makedirs(self.current_run_dir, exist_ok=True)
         
         self.step_counter = 0
+        
+    def setup_objects(self):
+        """Setup initial objects in the environment."""
+        # Define available colors and objects
+        self.COLORS = {
+            'blue':   (78/255,  121/255, 167/255, 255/255),
+            'red':    (255/255,  87/255,  89/255, 255/255),
+            'green':  (89/255,  169/255,  79/255, 255/255),
+            'yellow': (237/255, 201/255,  72/255, 255/255),
+        }
+        
+        # Create some initial objects
+        self.create_block('red', [-0.2, -0.2, 0.02])
+        self.create_block('blue', [0, -0.2, 0.02])
+        self.create_block('green', [0.2, -0.2, 0.02])
+        
+    def create_block(self, color, position):
+        """Create a block with given color and position."""
+        block_name = f"{color} block"
+        
+        # Create collision shape
+        size = [0.02, 0.02, 0.02]
+        collision_id = pybullet.createCollisionShape(pybullet.GEOM_BOX, halfExtents=size)
+        visual_id = pybullet.createVisualShape(pybullet.GEOM_BOX, halfExtents=size)
+        
+        # Create multibody
+        block_id = pybullet.createMultiBody(
+            baseMass=0.1,
+            baseCollisionShapeIndex=collision_id,
+            baseVisualShapeIndex=visual_id,
+            basePosition=position
+        )
+        
+        # Set color
+        pybullet.changeVisualShape(block_id, -1, rgbaColor=self.COLORS[color])
+        
+        # Store object
+        self.obj_name_to_id[block_name] = block_id
+        return block_id
 
     def setup_lmp_components(self):
         """Setup Language Model Programming (LMP) components."""
@@ -275,7 +318,7 @@ class CodeAsPoliciesController:
         """Setup the LMP environment wrapper."""
         # Initialize environment configuration
         self.cfg_tabletop['env'] = {
-            'init_objs': list(self.env.obj_name_to_id.keys()),
+            'init_objs': list(self.obj_name_to_id.keys()),
             'coords': {
                 'bottom_left': (-0.3, -0.8),
                 'top_right': (0.3, -0.2),
@@ -285,7 +328,7 @@ class CodeAsPoliciesController:
 
         # Create LMP environment wrapper
         from codeaspolicies.env_wrapper import LMPWrapper
-        lmp_env = LMPWrapper(self.env, self.cfg_tabletop, render=True)
+        lmp_env = LMPWrapper(self, self.cfg_tabletop, render=True)  # Pass self instead of env
 
         # Setup fixed and variable variables
         fixed_vars = {'np': np}
@@ -364,7 +407,7 @@ class CodeAsPoliciesController:
         # Generate and execute code using LMP
         try:
             # Get current object list
-            object_list = list(self.env.obj_name_to_id.keys())
+            object_list = list(self.obj_name_to_id.keys())
             
             # Execute task using LMP
             self.lmp_tabletop_ui(task_description, f'objects = {object_list}')
