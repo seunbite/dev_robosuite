@@ -1,6 +1,6 @@
 """
 This demo shows how to use robosuite's IK controller to control a robot arm.
-The robot will move to several target positions sequentially.
+The robot will move through several target positions sequentially.
 """
 
 import numpy as np
@@ -44,63 +44,96 @@ if __name__ == "__main__":
     env.reset()
     env.viewer.set_camera(camera_id=0)
 
-    # Define target positions and orientations
-    target_positions = [
-        [0.3, 0.0, 0.5],    # Front
-        [0.0, 0.3, 0.5],    # Right
-        [-0.3, 0.0, 0.5],   # Back
-        [0.0, -0.3, 0.5],   # Left
-        [0.0, 0.0, 0.7],    # Up
-        [0.0, 0.0, 0.3],    # Down
+    # Get robot's initial state
+    robot = env.robots[0]
+    initial_pos = robot.ee_pos
+    initial_ori = T.mat2euler(robot.ee_ori_mat)
+
+    # Define relative movements
+    delta_positions = [
+        [0.2, 0.0, 0.0],     # Move right
+        [0.0, 0.2, 0.0],     # Move forward
+        [0.0, 0.0, 0.2],     # Move up
+        [-0.2, 0.0, 0.0],    # Move left
+        [0.0, -0.2, 0.0],    # Move back
+        [0.0, 0.0, -0.2],    # Move down
     ]
 
-    target_orientations = [
-        np.array([0, 0, 0]),                # Default orientation (axis-angle)
-        np.array([0, np.pi/4, 0]),          # Rotated 45° around Y
-        np.array([0, -np.pi/4, 0]),         # Rotated -45° around Y
-        np.array([0, 0, np.pi/4]),          # Rotated 45° around Z
-        np.array([0, 0, -np.pi/4]),         # Rotated -45° around Z
-        np.array([0, 0, 0]),                # Back to default
+    delta_rotations = [
+        [0.3, 0.0, 0.0],     # Roll
+        [0.0, 0.3, 0.0],     # Pitch
+        [0.0, 0.0, 0.3],     # Yaw
+        [-0.3, 0.0, 0.0],    # -Roll
+        [0.0, -0.3, 0.0],    # -Pitch
+        [0.0, 0.0, -0.3],    # -Yaw
     ]
 
     # Get gripper dimension
-    gripper_dim = env.robots[0].gripper["right"].dof
+    gripper_dim = robot.gripper["right"].dof
     
-    # Number of steps to stay at each target
+    # Number of steps for each movement
     steps_per_action = 75
     steps_per_rest = 75
 
     print("Starting IK control demo...")
-    print("The robot will move through several target positions...")
+    print("The robot will move through several positions and orientations...")
 
-    # Move through each target position
-    for i, (pos, ori) in enumerate(zip(target_positions, target_orientations)):
-        print(f"\nMoving to target {i+1}/{len(target_positions)}")
-        print(f"Position: {pos}")
-        print(f"Orientation: {ori}")
+    # First test position changes
+    print("\nTesting position control...")
+    for i, delta_pos in enumerate(delta_positions):
+        print(f"\nExecuting position change {i+1}/{len(delta_positions)}")
+        print(f"Delta position: {delta_pos}")
 
-        # Create action
-        action = np.zeros(env.robots[0].action_dim)
-        action[0:3] = pos  # Position
-        action[3:6] = ori  # Orientation (axis-angle)
-
-        # Move to target pose
+        # Create action with position change
+        action = np.zeros(robot.action_dim)
+        action[:3] = delta_pos  # Position change
+        
+        # Execute movement
         for _ in range(steps_per_action):
             start_time = time.time()
-            
-            # Step the environment
             env.step(action)
             env.render()
 
-            # Maintain timing
             elapsed = time.time() - start_time
             if elapsed < 1./MAX_FR:
                 time.sleep(1./MAX_FR - elapsed)
 
-        # Rest at current position
+        # Rest
+        action[:3] = 0  # No movement
         for _ in range(steps_per_rest):
             start_time = time.time()
-            env.step(action)  # Keep the same action
+            env.step(action)
+            env.render()
+
+            elapsed = time.time() - start_time
+            if elapsed < 1./MAX_FR:
+                time.sleep(1./MAX_FR - elapsed)
+
+    # Then test orientation changes
+    print("\nTesting orientation control...")
+    for i, delta_rot in enumerate(delta_rotations):
+        print(f"\nExecuting rotation {i+1}/{len(delta_rotations)}")
+        print(f"Delta rotation: {delta_rot}")
+
+        # Create action with orientation change
+        action = np.zeros(robot.action_dim)
+        action[3:6] = delta_rot  # Orientation change
+        
+        # Execute movement
+        for _ in range(steps_per_action):
+            start_time = time.time()
+            env.step(action)
+            env.render()
+
+            elapsed = time.time() - start_time
+            if elapsed < 1./MAX_FR:
+                time.sleep(1./MAX_FR - elapsed)
+
+        # Rest
+        action[3:6] = 0  # No movement
+        for _ in range(steps_per_rest):
+            start_time = time.time()
+            env.step(action)
             env.render()
 
             elapsed = time.time() - start_time
