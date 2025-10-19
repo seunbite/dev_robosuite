@@ -96,28 +96,16 @@ class CodeAsPoliciesController:
             'yellow': (237/255, 201/255,  72/255, 255/255),
         }
         
-        # Create some initial objects
-        self.create_block('red', [-0.2, -0.2, 0.02])
-        self.create_block('blue', [0, -0.2, 0.02])
-        self.create_block('green', [0.2, -0.2, 0.02])
+        # Map existing objects in the environment
+        self.map_existing_objects()
         
-    def create_block(self, color, position):
-        """Create a block with given color and position."""
-        block_name = f"{color} block"
-        
-        # Create block using robosuite's built-in cube object
-        size = [0.02, 0.02, 0.02]
-        block = self.env.add_object(
-            'cube',
-            size=size,
-            rgba=self.COLORS[color],
-            position=position,
-            mass=0.1
-        )
-        
-        # Store object
-        self.obj_name_to_id[block_name] = block
-        return block
+    def map_existing_objects(self):
+        """Map existing objects in the Stack environment."""
+        # Stack environment has cubes by default
+        for i, cube in enumerate(self.env.cubes):
+            color = list(self.COLORS.keys())[i % len(self.COLORS)]
+            block_name = f"{color} block"
+            self.obj_name_to_id[block_name] = cube
 
     def setup_lmp_components(self):
         """Setup Language Model Programming (LMP) components."""
