@@ -101,9 +101,11 @@ class CodeAsPoliciesController:
         
     def map_existing_objects(self):
         """Map existing objects in the Stack environment."""
-        # Stack environment has cubes by default
-        for i, cube in enumerate(self.env.cubes):
-            color = list(self.COLORS.keys())[i % len(self.COLORS)]
+        # Stack environment has cubeA and cubeB by default
+        cubes = [self.env.cubeA, self.env.cubeB]
+        colors = ['red', 'blue']  # Fixed colors for the two cubes
+        
+        for cube, color in zip(cubes, colors):
             block_name = f"{color} block"
             self.obj_name_to_id[block_name] = cube
 
