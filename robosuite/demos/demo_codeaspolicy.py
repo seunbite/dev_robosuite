@@ -62,7 +62,7 @@ class CodeAsPoliciesController:
     def __init__(self, env, api_key):
         self.env = env
         openai.api_key = api_key
-        self.model_name = 'code-davinci-002'  # or 'text-davinci-002'
+        self.model_name = 'gpt-3.5-turbo'  # Using ChatGPT model
         
         # Initialize object tracking
         self.obj_name_to_id = {}
@@ -386,9 +386,13 @@ def main(
         "has_renderer": True,
         "has_offscreen_renderer": False,
         "use_camera_obs": False,
+        "render_camera": "frontview",
+        "render_collision_mesh": False,
+        "render_visual_mesh": True,
+        "render_gpu_device_id": -1,
         
         # Camera parameters
-        "camera_names": ["agentview"],
+        "camera_names": ["frontview"],
         "camera_heights": 256,
         "camera_widths": 256,
     }
@@ -406,10 +410,13 @@ def main(
         **options
     )
     
-    # Reset environment and set camera
+    # Reset environment and setup viewer
     env.reset()
     env.viewer.set_camera(camera_id=0)
-    env.render()  # Initial render to setup viewer
+    
+    # Initial render and pause to setup viewer
+    env.render()
+    time.sleep(1.0)  # Give more time for viewer to initialize
     
     # Initialize Code as Policies controller
     controller = CodeAsPoliciesController(env, api_key)
