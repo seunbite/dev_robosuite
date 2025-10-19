@@ -414,9 +414,36 @@ def main(
     if api_key is None:
         raise ValueError("Please provide an OpenAI API key")
 
-    options = {}
-    options["env_name"] = env_name
-    options["robots"] = robot
+    # Create environment configuration
+    options = {
+        "env_name": env_name,
+        "robots": robot,
+        "controller_configs": None,  # Will be set after env creation
+        
+        # Gripper visualization parameters
+        "control_freq": 20,
+        "horizon": 1000,
+        "ignore_done": True,
+        "hard_reset": False,
+        
+        # Camera parameters
+        "camera_names": ["frontview", "sideview", "birdview"],
+        "camera_heights": 256,
+        "camera_widths": 256,
+        
+        # Visualization parameters
+        "has_renderer": True,
+        "has_offscreen_renderer": True,
+        "render_camera": "frontview",
+        "render_collision_mesh": False,
+        "render_visual_mesh": True,
+        "render_gpu_device_id": -1,
+        "use_camera_obs": True,
+        
+        # Placement parameters
+        "placement_initializer": None,
+        "table_offset": [0, 0, 0.8],
+    }
 
     # Load the IK_POSE controller
     controller_name = "IK_POSE"
@@ -428,27 +455,20 @@ def main(
 
     # Initialize the task
     env = suite.make(
-        **options,
-        has_renderer=True,
-        has_offscreen_renderer=True,
-        ignore_done=True,
-        use_camera_obs=True,
-        control_freq=20,
-        camera_names=["frontview"],
-        camera_heights=256,
-        camera_widths=256,
+        **options
     )
     
-    # Reset environment
+    # Reset environment and set camera
     env.reset()
     env.viewer.set_camera(camera_id=0)
+    env.render()  # Initial render to setup viewer
     
     # Initialize Code as Policies controller
     controller = CodeAsPoliciesController(env, api_key)
     
     # Example tasks
     tasks = [
-        "Stack red block on the green block",
+        "Stack red block on the blue block",
     ]
     
     # Execute tasks
@@ -457,7 +477,15 @@ def main(
         
         # Execute task with frame rate control
         start_time = time.time()
+        
+        # Make sure environment is visible
+        env.render()
+        time.sleep(1)  # Give time for viewer to initialize
+        
+        # Execute task
         controller.execute_task(task)
+        
+        # Ensure final state is rendered
         env.render()
         
         # Limit frame rate
