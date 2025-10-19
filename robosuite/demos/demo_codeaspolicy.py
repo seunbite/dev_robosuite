@@ -418,7 +418,6 @@ def main(
     options = {
         "env_name": env_name,
         "robots": robot,
-        "controller_configs": None,  # Will be set after env creation
         
         # Basic parameters
         "control_freq": 20,
@@ -427,21 +426,22 @@ def main(
         
         # Visualization parameters
         "has_renderer": True,
-        "has_offscreen_renderer": True,
-        "use_camera_obs": True,
+        "has_offscreen_renderer": False,
+        "use_camera_obs": False,
+        "control_freq": 20,
         
         # Camera parameters
         "camera_names": ["agentview"],
         "camera_heights": 256,
         "camera_widths": 256,
     }
-
-    # Load the IK_POSE controller
-    controller_name = "IK_POSE"
+    
+    # Load the desired controller
+    controller_name = "OSC_POSE"  # Use OSC_POSE for precise end-effector control
     arm_controller_config = suite.load_part_controller_config(default_controller=controller_name)
     robot = options["robots"][0] if isinstance(options["robots"], list) else options["robots"]
     options["controller_configs"] = refactor_composite_controller_config(
-        arm_controller_config, robot, ["right", "left"]
+        arm_controller_config, robot, ["right"]  # Only use right arm
     )
 
     # Initialize the task
