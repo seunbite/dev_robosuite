@@ -43,9 +43,9 @@ if __name__ == "__main__":
     # Get robot configuration
     robot = env.robots[0]  # Get the first robot
     robot_config = {
-        "joint_names": robot.joint_names,
+        "joint_names": robot.joint_indexes,
         "end_effector_sites": [robot.eef_site_id],  # List of end effector site names
-        "nullspace_gains": [1.0] * len(robot.joint_names),  # Nullspace gains for each joint
+        "nullspace_gains": [1.0] * len(robot.joint_indexes),  # Nullspace gains for each joint
     }
 
     # Initialize IK solver
