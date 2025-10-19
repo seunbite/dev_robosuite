@@ -1,5 +1,5 @@
 """
-This demo shows how to use robosuite's IK solver to control a robot arm.
+This demo shows how to use robosuite's IK controller to control a robot arm.
 The robot will move to several target positions sequentially.
 """
 
@@ -7,9 +7,7 @@ import numpy as np
 import time
 import robosuite as suite
 from robosuite.utils.input_utils import *
-from robosuite.utils.ik_utils import IKSolver
 import robosuite.utils.transform_utils as T
-from robosuite.controllers.composite.composite_controller_factory import refactor_composite_controller_config
 
 # Maximum frames per second
 MAX_FR = 25
@@ -30,9 +28,7 @@ if __name__ == "__main__":
     # Load the default controller config
     controller_name = "IK_POSE"
     arm_controller_config = suite.load_part_controller_config(default_controller=controller_name)
-    options["controller_configs"] = refactor_composite_controller_config(
-        arm_controller_config, options["robots"], ["right"]  # Single arm robot, only use right arm config
-    )
+    options["controller_configs"] = arm_controller_config
 
     # Initialize environment
     env = suite.make(
@@ -47,25 +43,6 @@ if __name__ == "__main__":
     # Reset environment
     env.reset()
     env.viewer.set_camera(camera_id=0)
-
-    # Get robot configuration
-    robot = env.robots[0]  # Get the first robot
-    
-    robot_config = {
-        "joint_names": robot.joint_indexes,
-        "end_effector_sites": ["gripper0_right_grip_site"],  # Use actual site name from the model
-        "nullspace_gains": [1.0] * len(robot.joint_indexes),  # Nullspace gains for each joint
-    }
-
-    # Initialize IK solver
-    ik_solver = IKSolver(
-        model=env.sim.model,  # MuJoCo model
-        data=env.sim.data,    # MuJoCo data
-        robot_config=robot_config,
-        damping=0.05,
-        integration_dt=1/20.0,
-        max_dq=10.0,
-    )
 
     # Define target positions and orientations
     target_positions = [
@@ -87,7 +64,7 @@ if __name__ == "__main__":
     ]
 
     # Get gripper dimension
-    gripper_dim = robot.gripper["right"].dof
+    gripper_dim = env.robots[0].gripper["right"].dof
     
     # Number of steps to stay at each target
     steps_per_action = 75
@@ -102,23 +79,14 @@ if __name__ == "__main__":
         print(f"Position: {pos}")
         print(f"Orientation: {ori}")
 
-        # Prepare target action (position + axis angle)
-        target_action = np.concatenate([np.array(pos), ori])
+        # Create action
+        action = np.zeros(env.robots[0].action_dim)
+        action[0:3] = pos  # Position
+        action[3:6] = ori  # Orientation (axis-angle)
 
         # Move to target pose
         for _ in range(steps_per_action):
             start_time = time.time()
-
-            # Get desired joint positions from IK solver
-            q_des = ik_solver.solve(
-                target_action.reshape(1, -1),  # Reshape for single end-effector
-                Kpos=0.95,  # Position gain
-                Kori=0.95,  # Orientation gain
-            )
-
-            # Create action - set joint positions and add gripper command
-            action = np.zeros(robot.action_dim)
-            action[:len(q_des)] = q_des  # Set joint positions
             
             # Step the environment
             env.step(action)
