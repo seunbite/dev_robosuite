@@ -59,8 +59,8 @@ if __name__ == "__main__":
 
     # Initialize IK solver
     ik_solver = IKSolver(
-        model=env.sim.model,
-        data=env.sim.data,
+        model=env.sim.model.ptr,  # Get the raw MuJoCo model pointer
+        data=env.sim.data.ptr,    # Get the raw MuJoCo data pointer
         robot_config=robot_config,
         damping=0.05,
         integration_dt=1/20.0,
