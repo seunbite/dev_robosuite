@@ -105,25 +105,19 @@ class CodeAsPoliciesController:
         """Create a block with given color and position."""
         block_name = f"{color} block"
         
-        # Create collision shape
+        # Create block using robosuite's built-in cube object
         size = [0.02, 0.02, 0.02]
-        collision_id = pybullet.createCollisionShape(pybullet.GEOM_BOX, halfExtents=size)
-        visual_id = pybullet.createVisualShape(pybullet.GEOM_BOX, halfExtents=size)
-        
-        # Create multibody
-        block_id = pybullet.createMultiBody(
-            baseMass=0.1,
-            baseCollisionShapeIndex=collision_id,
-            baseVisualShapeIndex=visual_id,
-            basePosition=position
+        block = self.env.add_object(
+            'cube',
+            size=size,
+            rgba=self.COLORS[color],
+            position=position,
+            mass=0.1
         )
         
-        # Set color
-        pybullet.changeVisualShape(block_id, -1, rgbaColor=self.COLORS[color])
-        
         # Store object
-        self.obj_name_to_id[block_name] = block_id
-        return block_id
+        self.obj_name_to_id[block_name] = block
+        return block
 
     def setup_lmp_components(self):
         """Setup Language Model Programming (LMP) components."""
