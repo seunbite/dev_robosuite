@@ -420,29 +420,20 @@ def main(
         "robots": robot,
         "controller_configs": None,  # Will be set after env creation
         
-        # Gripper visualization parameters
+        # Basic parameters
         "control_freq": 20,
         "horizon": 1000,
         "ignore_done": True,
-        "hard_reset": False,
-        
-        # Camera parameters
-        "camera_names": ["frontview", "sideview", "birdview"],
-        "camera_heights": 256,
-        "camera_widths": 256,
         
         # Visualization parameters
         "has_renderer": True,
         "has_offscreen_renderer": True,
-        "render_camera": "frontview",
-        "render_collision_mesh": False,
-        "render_visual_mesh": True,
-        "render_gpu_device_id": -1,
         "use_camera_obs": True,
         
-        # Placement parameters
-        "placement_initializer": None,
-        "table_offset": [0, 0, 0.8],
+        # Camera parameters
+        "camera_names": ["agentview"],
+        "camera_heights": 256,
+        "camera_widths": 256,
     }
 
     # Load the IK_POSE controller
