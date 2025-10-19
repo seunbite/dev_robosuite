@@ -62,7 +62,7 @@ class CodeAsPoliciesController:
     def __init__(self, env, api_key):
         self.env = env
         openai.api_key = api_key
-        self.model_name = 'gpt-3.5-turbo'  # Using ChatGPT model
+        self.model_name = 'text-davinci-003'  # Using latest completion model
         
         # Initialize object tracking
         self.obj_name_to_id = {}
