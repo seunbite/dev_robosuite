@@ -62,8 +62,11 @@ if __name__ == "__main__":
     print("Welcome to robosuite v{}!".format(suite.__version__))
     print(suite.__logo__)
 
-    # Choose environment and add it to options
-    options["env_name"] = choose_environment()
+    # Auto-select environment (index 0)
+    envs = sorted(suite.ALL_ENVIRONMENTS)
+    env_idx = 0
+    options["env_name"] = envs[env_idx]
+    print(f"Auto-selected environment: [{env_idx}] {options['env_name']}")
 
     # If a multi-arm environment has been chosen, choose configuration and appropriate robot(s)
     if "TwoArm" in options["env_name"]:
@@ -87,13 +90,24 @@ if __name__ == "__main__":
         options["robots"] = choose_robots(use_humanoids=True)
     # Else, we simply choose a single (single-armed) robot to instantiate in the environment
     else:
-        options["robots"] = choose_robots(exclude_bimanual=True)
+        # Auto-select robot (index 4)
+        robots = sorted({"Sawyer", "Panda", "Jaco", "Kinova3", "IIWA", "UR5e", "SpotWithArmFloating", "XArm7"})
+        robot_idx = 4
+        options["robots"] = robots[robot_idx]
+        print(f"Auto-selected robot: [{robot_idx}] {options['robots']}")
 
     # Hacky way to grab joint dimension for now
     joint_dim = 6 if options["robots"] == "UR5e" else (16 if options["robots"] == "GR1" else 7)
 
-    # Choose controller
-    controller_name = choose_controller(part_controllers=True)
+    # Auto-select controller (try OSC_POSE or JOINT_POSITION instead of IK_POSE)
+    controllers = list(suite.ALL_PART_CONTROLLERS)
+    # Try to find OSC_POSE first, otherwise use index 0
+    controller_choice = "OSC_POSE" 
+    # controller_choice = "IK_POSE"
+    controller_idx = controllers.index(controller_choice)
+    controller_name = controllers[controller_idx]
+    print(f"Auto-selected controller: [{controller_idx}] {controller_name}")
+    print(f"Available controllers: {controllers}")
 
     # Load the desired controller
     arm_controller_config = suite.load_part_controller_config(default_controller=controller_name)
@@ -106,7 +120,7 @@ if __name__ == "__main__":
     controller_settings = {
         "OSC_POSE": [6, 6, 0.1],
         "OSC_POSITION": [3, 3, 0.1],
-        "IK_POSE": [6, 6, 0.01],
+        "IK_POSE": [6, 6, 2],  # Increased from 0.01 to 0.1 for visible movement
         "JOINT_POSITION": [joint_dim, joint_dim, 0.2],
         "JOINT_VELOCITY": [joint_dim, joint_dim, -0.1],
         "JOINT_TORQUE": [joint_dim, joint_dim, 0.25],
@@ -116,6 +130,9 @@ if __name__ == "__main__":
     action_dim = controller_settings[controller_name][0]
     num_test_steps = controller_settings[controller_name][1]
     test_value = controller_settings[controller_name][2]
+    
+    print(f"\nController: {controller_name}")
+    print(f"Action dim: {action_dim}, Test steps: {num_test_steps}, Test value: {test_value}")
 
     # Define the number of timesteps to use per controller action as well as timesteps in between actions
     steps_per_action = 75
@@ -144,12 +161,19 @@ if __name__ == "__main__":
 
     # Define neutral value
     neutral = np.zeros(action_dim + gripper_dim)
+    
+    # Stabilize the robot for a few steps with neutral actions
+    print("Stabilizing robot...")
+    for _ in range(50):
+        env.step(np.tile(neutral, n))
+        env.render()
 
     # Keep track of done variable to know when to break loop
     count = 0
     # Loop through controller space
     while count < num_test_steps:
         action = neutral.copy()
+        print(f"\n=== Testing dimension {count} ===")
         for i in range(steps_per_action):
             start = time.time()
             if controller_name in {"IK_POSE", "OSC_POSE"} and count > 2:
@@ -160,6 +184,8 @@ if __name__ == "__main__":
             else:
                 action[count] = test_value
             total_action = np.tile(action, n)
+            if i == 0:  # Only print first action of each dimension
+                print(f"Action: {action}, Total action: {total_action}")
             env.step(total_action)
             env.render()
 
@@ -183,3 +209,6 @@ if __name__ == "__main__":
 
     # Shut down this env before starting the next test
     env.close()
+
+with open("cues.txt", "w") as f:
+    f.write(f"Controller: {controller_name}\n")
