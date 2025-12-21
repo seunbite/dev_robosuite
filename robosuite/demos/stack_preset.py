@@ -104,7 +104,6 @@ class PresetPoseGenerator:
         # Get robot
         self.robot = self.env.robots[0]
         
-<<<<<<< Updated upstream
         # Print all joints in the simulation model for debugging
         print("\n" + "="*60)
         print("ALL JOINTS IN SIMULATION MODEL")
@@ -206,40 +205,6 @@ class PresetPoseGenerator:
         print(f"Initial positions (degrees): {np.rad2deg(robot_joint_pos)}")
         
         # Get initial joint positions (robot controlled + head joints if applicable)
-=======
-        # For GR1ArmsOnly, also include head joints
-        self.include_head_joints = (robot_name == "GR1ArmsOnly")
-        self.head_joint_names = []
-        self.head_joint_qpos_addrs = []
-        
-        if self.include_head_joints:
-            # Find head joint names and qpos addresses
-            head_joint_candidates = ["head_yaw", "head_roll", "head_pitch"]
-            
-            for joint_name in head_joint_candidates:
-                try:
-                    # Try with robot prefix
-                    prefixed_name = f"robot0_{joint_name}"
-                    qpos_addr = self.env.sim.model.get_joint_qpos_addr(prefixed_name)
-                    self.head_joint_names.append(prefixed_name)
-                    self.head_joint_qpos_addrs.append(qpos_addr)
-                except:
-                    try:
-                        # Try without prefix
-                        qpos_addr = self.env.sim.model.get_joint_qpos_addr(joint_name)
-                        self.head_joint_names.append(joint_name)
-                        self.head_joint_qpos_addrs.append(qpos_addr)
-                    except:
-                        pass
-            
-            if self.head_joint_names:
-                print(f"Including {len(self.head_joint_names)} head joints: {self.head_joint_names}")
-            else:
-                print("Warning: Could not find head joints, continuing without them")
-                self.include_head_joints = False
-        
-        # Get initial joint positions
->>>>>>> Stashed changes
         self.initial_joint_pos = self._get_joint_positions()
         self.num_joints = len(self.initial_joint_pos)
         
@@ -311,53 +276,14 @@ class PresetPoseGenerator:
     def _get_joint_positions(self):
         """Get current joint positions, including head joints if applicable."""
         joint_pos = self.robot._joint_positions.copy()
-<<<<<<< Updated upstream
-=======
-        
-        # Add head joints if needed
-        if self.include_head_joints and self.head_joint_qpos_addrs:
-            head_positions = []
-            for qpos_addr in self.head_joint_qpos_addrs:
-                if isinstance(qpos_addr, (list, tuple, np.ndarray)):
-                    # Joint has multiple DOF (e.g., free joint)
-                    head_positions.append(self.env.sim.data.qpos[qpos_addr[0]])
-                else:
-                    # Single DOF joint
-                    head_positions.append(self.env.sim.data.qpos[qpos_addr])
-            joint_pos = np.concatenate([joint_pos, np.array(head_positions)])
-        
->>>>>>> Stashed changes
         return joint_pos
     
     def _set_joint_positions(self, joint_positions):
         """Set joint positions and update simulation, including head joints if applicable."""
-<<<<<<< Updated upstream
         robot_joint_pos = joint_positions
         # Set robot joint positions
         self.robot.set_robot_joint_positions(robot_joint_pos)
         
-=======
-        # Split joint positions into robot joints and head joints
-        if self.include_head_joints and self.head_joint_qpos_addrs:
-            num_head_joints = len(self.head_joint_qpos_addrs)
-            robot_joint_pos = joint_positions[:-num_head_joints] if num_head_joints > 0 else joint_positions
-            head_joint_pos = joint_positions[-num_head_joints:] if num_head_joints > 0 else []
-        else:
-            robot_joint_pos = joint_positions
-            head_joint_pos = []
-        
-        # Set robot joint positions
-        self.robot.set_robot_joint_positions(robot_joint_pos)
-        
-        # Set head joint positions directly in MuJoCo
-        if head_joint_pos:
-            for i, qpos_addr in enumerate(self.head_joint_qpos_addrs):
-                if isinstance(qpos_addr, (list, tuple, np.ndarray)):
-                    self.env.sim.data.qpos[qpos_addr[0]] = head_joint_pos[i]
-                else:
-                    self.env.sim.data.qpos[qpos_addr] = head_joint_pos[i]
-        
->>>>>>> Stashed changes
         self.env.sim.forward()
         
     
@@ -703,7 +629,6 @@ class PresetPoseGenerator:
                 joint_angle_arrays.append(angles)
                 joint_angle_info.append(f"{joint_name}: default range")
         
-<<<<<<< Updated upstream
         # Calculate number of angle positions per joint
         num_angles_per_joint = [len(angles) for angles in joint_angle_arrays]
         
@@ -731,27 +656,6 @@ class PresetPoseGenerator:
         
         # Generate combinations using product of different angle ranges
         selected_combinations = list(product(*[range(num) for num in num_angles_per_joint]))
-=======
-        # Calculate number of joints to include in combinations
-        # If except_last_joint is True, exclude only the last arm joint (not head joints)
-        num_head_joints = len(self.head_joint_qpos_addrs) if self.include_head_joints else 0
-        num_arm_joints = self.num_joints - num_head_joints
-        
-        if except_last_joint:
-            # Exclude last arm joint, but include all head joints
-            num_joints_for_combinations = num_arm_joints - 1 + num_head_joints
-        else:
-            num_joints_for_combinations = self.num_joints
-        
-        total_combinations = num_angles ** num_joints_for_combinations
-        print(f"\nAngle range: {angle_min_deg}° to {angle_max_deg}° (step: {angle_step_deg}°)")
-        print(f"Angles per joint: {list(np.rad2deg(angles).astype(int))}")
-        print(f"Positions per joint: {num_angles}")
-        print(f"Joints in combinations: {num_joints_for_combinations} (arm: {num_arm_joints - (1 if except_last_joint else 0)}, head: {num_head_joints})")
-        print(f"Total combinations: {total_combinations:,}")
-        
-        selected_combinations = list(product(range(num_angles), repeat=num_joints_for_combinations))
->>>>>>> Stashed changes
         pose_count = 0
         start_time = time.time()
         
@@ -766,26 +670,8 @@ class PresetPoseGenerator:
             # Create joint position array (fixed joints will keep initial values)
             joint_pos = self.initial_joint_pos.copy()
             
-<<<<<<< Updated upstream
             # Map angle_indices to active joint positions only
             angle_idx_iter = iter(angle_indices)
-=======
-            # Map angle_indices to joint positions
-            # If except_last_joint is True, skip the last arm joint
-            angle_idx_iter = iter(angle_indices)
-            
-            # Set arm joint positions (excluding last if except_last_joint is True)
-            num_arm_joints_to_set = num_arm_joints - (1 if except_last_joint else 0)
-            for i in range(num_arm_joints_to_set):
-                angle_idx = next(angle_idx_iter)
-                joint_pos[i] = angles[angle_idx]
-            
-            # Set head joint positions (always included if head joints exist)
-            if self.include_head_joints:
-                for i in range(num_head_joints):
-                    angle_idx = next(angle_idx_iter)
-                    joint_pos[num_arm_joints + i] = angles[angle_idx]
->>>>>>> Stashed changes
             
             # Set positions only for active joints using their respective angle arrays
             angle_values = []
