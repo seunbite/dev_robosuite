@@ -1,37 +1,15 @@
-"""
-Generate and save preset robot poses by rotating all joints in combinations.
+FIXED_JOINT_INDICES = {
+    'GR1' : "0-2, 20-31"
+}
 
-This script:
-1. Initializes a robot in robosuite
-2. Systematically rotates ALL joints through combinations of angles (e.g., every 30°)
-3. Captures either:
-   - Camera images of each pose (default)
-   - 3D plots of joint positions (with --use-3d-points True)
-4. Saves them as PNG files
+SPECIFIED_JOINT_ANGLES = {
+    'GR1' : {
+        "robot0_head_yaw" : [-30, 0, 30],
+        "robot0_head_roll" : [-30, 0, 30],
+        "robot0_head_pitch" : [-30, 0, 30],
+    }
+}
 
-Example:
-    Joint 0,1,2,3,4,5,6 = [  0°,   0°,   0°,   0°,   0°,   0°,   0°]
-    Joint 0,1,2,3,4,5,6 = [  0°,   0°,   0°,   0°,   0°,   0°,  30°]
-    Joint 0,1,2,3,4,5,6 = [  0°,   0°,   0°,   0°,   0°,  30°,   0°]
-    ...
-
-3D Points Mode:
-    - Saves 3D matplotlib plots showing joint positions
-    - Points: Purple → Yellow gradient (root body → last joint)
-    - Lines: Black → White gradient connecting joints
-    - Saved to: {output_dir}/{robot_name}/3d_points/
-
-WARNING: This generates MANY poses! 
-    - 7 joints, 30° step, ±90° range = 7^7 = 823,543 poses
-    - 7 joints, 30° step, ±180° range = 13^7 = 62,748,517 poses
-
-Usage:
-    # Camera images
-    python stack_preset.py --robot IIWA --angle-step 90
-    
-    # 3D point plots
-    python stack_preset.py --robot Panda --angle-step 90 --use-3d-points True
-"""
 
 import fire
 import os
@@ -126,25 +104,188 @@ class PresetPoseGenerator:
         # Get robot
         self.robot = self.env.robots[0]
         
-        # Get initial joint positions
+        # Print all joints in the simulation model for debugging
+        print("\n" + "="*60)
+        print("ALL JOINTS IN SIMULATION MODEL")
+        print("="*60)
+        print(f"Total joints in model: {self.env.sim.model.njnt}")
+        print(f"Total qpos dimension: {self.env.sim.model.nq}")
+        print("\nAll joint names (with qpos addresses):")
+        all_joint_info = []
+        for i in range(self.env.sim.model.njnt):
+            try:
+                joint_name = self.env.sim.model.joint_id2name(i)
+                if joint_name is None:
+                    joint_name = f"joint_{i}"
+            except:
+                joint_name = f"joint_{i}"
+            
+            joint_type = self.env.sim.model.jnt_type[i]
+            try:
+                qpos_addr = self.env.sim.model.get_joint_qpos_addr(joint_name)
+                if isinstance(qpos_addr, (list, tuple, np.ndarray)):
+                    qpos_val = self.env.sim.data.qpos[qpos_addr[0]:qpos_addr[1]]
+                    qpos_dim = qpos_addr[1] - qpos_addr[0]
+                else:
+                    qpos_val = self.env.sim.data.qpos[qpos_addr]
+                    qpos_dim = 1
+                
+                # Check if this joint name contains certain keywords
+                keywords = []
+                if joint_name and "head" in joint_name.lower():
+                    keywords.append("HEAD")
+                if joint_name and "torso" in joint_name.lower():
+                    keywords.append("TORSO")
+                if joint_name and ("arm" in joint_name.lower() or "right" in joint_name.lower() or "left" in joint_name.lower()):
+                    keywords.append("ARM")
+                if joint_name and "leg" in joint_name.lower():
+                    keywords.append("LEG")
+                if joint_name and ("gripper" in joint_name.lower() or "hand" in joint_name.lower()):
+                    keywords.append("GRIPPER")
+                
+                keyword_str = f" [{', '.join(keywords)}]" if keywords else ""
+                print(f"  [{i:2d}] {joint_name:40s} type={joint_type}, qpos_addr={qpos_addr}, qpos_dim={qpos_dim}, value={qpos_val}{keyword_str}")
+                all_joint_info.append({
+                    'name': joint_name,
+                    'type': joint_type,
+                    'qpos_addr': qpos_addr,
+                    'qpos_dim': qpos_dim,
+                    'keywords': keywords
+                })
+            except Exception as e:
+                print(f"  [{i:2d}] {joint_name or f'joint_{i}':40s} (type: {joint_type}, error getting qpos: {e})")
+        
+        # Summary
+        head_joints = [j for j in all_joint_info if "HEAD" in j['keywords']]
+        torso_joints = [j for j in all_joint_info if "TORSO" in j['keywords']]
+        arm_joints = [j for j in all_joint_info if "ARM" in j['keywords']]
+        
+        print(f"\nSummary:")
+        print(f"  Head joints found: {len(head_joints)}")
+        print(f"  Torso joints found: {len(torso_joints)}")
+        print(f"  Arm-related joints found: {len(arm_joints)}")
+        
+        # Get all joints from robot model
+        print("\n" + "="*60)
+        print("ROBOT MODEL JOINTS")
+        print("="*60)
+        try:
+            robot_model_joints = list(self.robot.robot_model.joints)
+            print(f"Robot model joints ({len(robot_model_joints)}): {robot_model_joints}")
+            
+            # Get arm joints
+            try:
+                arm_joints = list(self.robot.robot_model.arm_joints)
+                print(f"Arm joints ({len(arm_joints)}): {arm_joints}")
+            except:
+                print("Could not get arm joints")
+            
+            # Get head joints
+            try:
+                head_joints = list(self.robot.robot_model.head_joints)
+                print(f"Head joints ({len(head_joints)}): {head_joints}")
+            except:
+                print("Could not get head joints")
+            
+            # Get torso joints
+            try:
+                torso_joints = list(self.robot.robot_model.torso_joints)
+                print(f"Torso joints ({len(torso_joints)}): {torso_joints}")
+            except:
+                print("Could not get torso joints")
+        except Exception as e:
+            print(f"Error getting robot model joints: {e}")
+        
+        # Get robot's controlled joint positions
+        print("\n" + "="*60)
+        print("ROBOT CONTROLLED JOINTS (robot._joint_positions)")
+        print("="*60)
+        robot_joint_pos = self.robot._joint_positions.copy()
+        print(f"Number of controlled joints: {len(robot_joint_pos)}")
+        print(f"Initial positions (degrees): {np.rad2deg(robot_joint_pos)}")
+        
+        # Get initial joint positions (robot controlled + head joints if applicable)
         self.initial_joint_pos = self._get_joint_positions()
         self.num_joints = len(self.initial_joint_pos)
         
-        print(f"Robot initialized with {self.num_joints} joints")
-        print(f"Initial joint positions: {np.rad2deg(self.initial_joint_pos)}")
+        # Build joint names list
+        try:
+            robot_model_joints = list(self.robot.robot_model.joints)
+            if len(robot_model_joints) >= len(robot_joint_pos):
+                base_joint_names = robot_model_joints[:len(robot_joint_pos)]
+            else:
+                base_joint_names = robot_model_joints + [f"joint_{i}" for i in range(len(robot_model_joints), len(robot_joint_pos))]
+            
+            # Add head joint names
+            self.joint_names = base_joint_names
+        except:
+            base_joint_names = [f"joint_{i}" for i in range(len(robot_joint_pos))]
+            self.joint_names = base_joint_names
+        
+        # Parse fixed joint indices from FIXED_JOINT_INDICES
+        self.fixed_joint_indices = []
+        if robot_name in FIXED_JOINT_INDICES:
+            fixed_indices_str = FIXED_JOINT_INDICES[robot_name]
+            try:
+                for part in fixed_indices_str.split(","):
+                    part = part.strip()
+                    if not part:
+                        continue
+                    if "-" in part:
+                        # Range format: "0-2" -> [0, 1, 2]
+                        start, end = part.split("-", 1)
+                        start = int(start.strip())
+                        end = int(end.strip())
+                        if start > end:
+                            print(f"Warning: Invalid range '{part}' (start > end), skipping")
+                            continue
+                        self.fixed_joint_indices.extend(range(start, end + 1))
+                    else:
+                        # Single number
+                        self.fixed_joint_indices.append(int(part))
+                # Remove duplicates and sort, and filter to valid range
+                self.fixed_joint_indices = sorted(list(set([idx for idx in self.fixed_joint_indices if 0 <= idx < self.num_joints])))
+                if self.fixed_joint_indices:
+                    print(f"\nFixed joints from FIXED_JOINT_INDICES: {self.fixed_joint_indices}")
+            except ValueError as e:
+                print(f"Warning: Could not parse fixed_joint_indices '{fixed_indices_str}': {e}")
+                self.fixed_joint_indices = []
+        
+        # Active joints: all joints except last (gripper) and fixed joints
+        base_active_joint_indices = list(range(self.num_joints - 1))  # Exclude last joint (gripper)
+        self.active_joint_indices = [idx for idx in base_active_joint_indices if idx not in self.fixed_joint_indices]
+        
+        print("\n" + "="*60)
+        print("JOINT SPACE SUMMARY")
+        print("="*60)
+        print(f"Total joints in pose: {self.num_joints}")
+        print("Joint names and initial positions:")
+        for i, (name, pos) in enumerate(zip(self.joint_names, np.rad2deg(self.initial_joint_pos))):
+            if i in self.fixed_joint_indices:
+                marker = " [FIXED]"
+            elif i in self.active_joint_indices:
+                marker = " [ACTIVE]"
+            else:
+                marker = ""
+            print(f"  [{i}] {name}: {pos:+.2f}°{marker}")
+        print(f"\nActive joints: {len(self.active_joint_indices)} joints")
+        if self.fixed_joint_indices:
+            print(f"Fixed joints: {len(self.fixed_joint_indices)} joints (will keep initial values)")
+        print("="*60 + "\n")
     
     def _get_joint_positions(self):
-        """Get current joint positions."""
-        return self.robot._joint_positions.copy()
+        """Get current joint positions, including head joints if applicable."""
+        joint_pos = self.robot._joint_positions.copy()
+        return joint_pos
     
     def _set_joint_positions(self, joint_positions):
-        """Set joint positions and update simulation."""
-        self.robot.set_robot_joint_positions(joint_positions)
+        """Set joint positions and update simulation, including head joints if applicable."""
+        robot_joint_pos = joint_positions
+        # Set robot joint positions
+        self.robot.set_robot_joint_positions(robot_joint_pos)
+        
         self.env.sim.forward()
         
-        # Step a few times to stabilize
-        for _ in range(10):
-            self.env.step(np.zeros(self.robot.action_dim))
     
     def _capture_image(self, width: int = None, height: int = None):
         """Capture current camera view as numpy array."""
@@ -415,7 +556,7 @@ class PresetPoseGenerator:
         """
         Generate poses using all combinations of joint angles.
         
-        ALL joints move simultaneously in combinations:
+        Active joints (arm + head joints) move simultaneously in combinations:
         Example with 2 joints, angles [0°, 30°, 60°]:
             [0°,  0°]
             [0°, 30°]
@@ -427,14 +568,14 @@ class PresetPoseGenerator:
             [60°,30°]
             [60°,60°]
         
-        WARNING: This generates angle_positions^num_joints poses!
-        For 7 joints with 7 angles each: 7^7 = 823,543 poses
+        WARNING: This generates angle_positions^num_active_joints poses!
+        For 7 active joints with 7 angles each: 7^7 = 823,543 poses
         
         Args:
             angle_step_deg: Step size in degrees (larger = fewer combinations)
             angle_min_deg: Minimum angle in degrees
             angle_max_deg: Maximum angle in degrees
-            except_last_joint: If True, skip last joint (gripper)
+            except_last_joint: Deprecated - now automatically uses arm + head joints
             use_3d_points: If True, save 3D joint position plots instead of images
         """
         print("\n" + "="*60)
@@ -460,20 +601,61 @@ class PresetPoseGenerator:
             print(f"Saving 3D point plots to: {self.output_dir}")
             print(f"Saving 3D coordinates to: {jsonl_path}")
         
+        # Prepare angle arrays for each active joint
+        # Check if robot has specified joint angles
+        specified_angles = SPECIFIED_JOINT_ANGLES.get(self.robot_name, {})
+        
+        # Default angle range
         angle_min = np.deg2rad(angle_min_deg)
         angle_max = np.deg2rad(angle_max_deg)
         angle_step = np.deg2rad(angle_step_deg)
+        default_angles = np.arange(angle_min, angle_max + angle_step/2, angle_step)
         
-        angles = np.arange(angle_min, angle_max + angle_step/2, angle_step)
-        num_angles = len(angles)
+        # Create angle arrays for each active joint
+        joint_angle_arrays = []
+        joint_angle_info = []
+        for active_joint_idx in self.active_joint_indices:
+            joint_name = self.joint_names[active_joint_idx]
+            
+            # Check if this joint has specified angles
+            if joint_name in specified_angles:
+                # Use specified angles (convert to radians)
+                angles = np.deg2rad(np.array(specified_angles[joint_name]))
+                joint_angle_arrays.append(angles)
+                joint_angle_info.append(f"{joint_name}: {specified_angles[joint_name]} (specified)")
+            else:
+                # Use default angle range
+                angles = default_angles
+                joint_angle_arrays.append(angles)
+                joint_angle_info.append(f"{joint_name}: default range")
         
-        total_combinations = num_angles ** (self.num_joints-1 if except_last_joint else self.num_joints)
-        print(f"\nAngle range: {angle_min_deg}° to {angle_max_deg}° (step: {angle_step_deg}°)")
-        print(f"Angles per joint: {list(np.rad2deg(angles).astype(int))}")
-        print(f"Positions per joint: {num_angles}")
-        print(f"Total combinations: {total_combinations:,}")
+        # Calculate number of angle positions per joint
+        num_angles_per_joint = [len(angles) for angles in joint_angle_arrays]
         
-        selected_combinations = list(product(range(num_angles), repeat=self.num_joints-1 if except_last_joint else self.num_joints))
+        # Calculate total combinations
+        total_combinations = 1
+        for num in num_angles_per_joint:
+            total_combinations *= num
+        
+        print(f"\n{'='*60}")
+        print("GENERATION PARAMETERS")
+        print(f"{'='*60}")
+        print(f"Default angle range: {angle_min_deg}° to {angle_max_deg}° (step: {angle_step_deg}°)")
+        print(f"Default angle values: {list(np.rad2deg(default_angles).astype(int))}")
+        print(f"\nActive joints ({len(self.active_joint_indices)}) and their angle ranges:")
+        for i, (active_idx, info) in enumerate(zip(self.active_joint_indices, joint_angle_info)):
+            print(f"  [{i}] [{active_idx}] {info}")
+            print(f"      Angle values: {np.rad2deg(joint_angle_arrays[i]).astype(int).tolist()}")
+            print(f"      Number of positions: {num_angles_per_joint[i]}")
+        if self.fixed_joint_indices:
+            print(f"\nFixed joints (excluded from combinations): {self.fixed_joint_indices}")
+            for idx in self.fixed_joint_indices:
+                print(f"  [{idx}] {self.joint_names[idx]}: {np.rad2deg(self.initial_joint_pos[idx]):+.2f}° (fixed)")
+        print(f"\nTotal data points to generate: {total_combinations:,}")
+        print(f"{'='*60}\n")
+        
+        # Generate combinations using product of different angle ranges
+        selected_combinations = list(product(*[range(num) for num in num_angles_per_joint]))
         pose_count = 0
         start_time = time.time()
         
@@ -485,61 +667,68 @@ class PresetPoseGenerator:
                 print(f"Found {len(object_positions)} environment objects: {list(object_positions.keys())}")
         
         for combo_idx, angle_indices in tqdm(enumerate(selected_combinations)):
-            # Create joint position array
+            # Create joint position array (fixed joints will keep initial values)
             joint_pos = self.initial_joint_pos.copy()
             
-            for joint_idx, angle_idx in enumerate(angle_indices):
-                joint_pos[joint_idx] = angles[angle_idx]
+            # Map angle_indices to active joint positions only
+            angle_idx_iter = iter(angle_indices)
             
-            try:
-                self._set_joint_positions(joint_pos)
+            # Set positions only for active joints using their respective angle arrays
+            angle_values = []
+            for i, active_joint_idx in enumerate(self.active_joint_indices):
+                angle_idx = angle_indices[i]
+                angle_value = joint_angle_arrays[i][angle_idx]
+                joint_pos[active_joint_idx] = angle_value
+                angle_values.append(angle_value)
+            
+            # Fixed joints remain at initial positions (already set by copy())
+            self._set_joint_positions(joint_pos)
+            
+            # Generate filename with joint angles (only for active joints)
+            angles_str = "_".join([f"j{self.active_joint_indices[j]}{int(np.rad2deg(angle_values[j])):+04d}" 
+                                    for j in range(len(angle_indices))])
+            
+            if use_3d_points:
+                # Capture 3D joint positions
+                positions_3d = self._get_3d_joint_positions()
+                filename = f"{self.robot_name}_pose_{combo_idx:06d}_{angles_str}.png"
+                filepath = self._save_3d_plot(positions_3d, filename, object_positions)
                 
-                # Generate filename with joint angles
-                angles_str = "_".join([f"j{j}{int(np.rad2deg(angles[idx])):+04d}" 
-                                      for j, idx in enumerate(angle_indices)])
-                
-                if use_3d_points:
-                    # Capture 3D joint positions
-                    positions_3d = self._get_3d_joint_positions()
-                    filename = f"{self.robot_name}_pose_{combo_idx:06d}_{angles_str}.png"
-                    filepath = self._save_3d_plot(positions_3d, filename, object_positions)
+                # Save to JSONL
+                if jsonl_path:
+                    # Create data entry (only for active joints)
+                    joint_angles_deg = [float(np.rad2deg(angle_values[j])) for j in range(len(angle_indices))]
                     
-                    # Save to JSONL
-                    if jsonl_path:
-                        # Create data entry
-                        joint_angles_deg = [float(np.rad2deg(angles[idx])) for idx in angle_indices]
-                        
-                        data_entry = {
-                            "pose_id": combo_idx,
-                            "filename": filename,
-                            "robot_name": self.robot_name,
-                            "joint_angles_deg": joint_angles_deg,
-                            "joint_angles_rad": [float(angles[idx]) for idx in angle_indices],
-                            "joint_positions_3d": {
-                                "root_body": positions_3d[0].tolist(),
-                                "joints": [pos.tolist() for pos in positions_3d[1:]]
-                            },
-                            "num_joints": len(positions_3d) - 1,  # Exclude root body
+                    data_entry = {
+                        "pose_id": combo_idx,
+                        "filename": filename,
+                        "robot_name": self.robot_name,
+                        "active_joint_indices": self.active_joint_indices,
+                        "fixed_joint_indices": self.fixed_joint_indices,
+                        "joint_angles_deg": joint_angles_deg,
+                            "joint_angles_rad": [float(angle_values[j]) for j in range(len(angle_indices))],
+                        "joint_positions_3d": {
+                            "root_body": positions_3d[0].tolist(),
+                            "joints": [pos.tolist() for pos in positions_3d[1:]]
+                        },
+                        "num_joints": len(positions_3d) - 1,  # Exclude root body
+                    }
+                    
+                    # Add object positions if available
+                    if object_positions:
+                        data_entry["object_positions"] = {
+                            name: pos.tolist() for name, pos in object_positions.items()
                         }
-                        
-                        # Add object positions if available
-                        if object_positions:
-                            data_entry["object_positions"] = {
-                                name: pos.tolist() for name, pos in object_positions.items()
-                            }
-                        
-                        self._save_pose_data_to_jsonl(data_entry, jsonl_path)
-                else:
-                    # Capture camera image
-                    image = self._capture_image()
-                    filename = f"{self.robot_name}_pose_{combo_idx:06d}_{angles_str}.png"
-                    filepath = self._save_image(image, filename)
-                
-                pose_count += 1
+                    
+                    self._save_pose_data_to_jsonl(data_entry, jsonl_path)
+            else:
+                # Capture camera image
+                image = self._capture_image()
+                filename = f"{self.robot_name}_pose_{combo_idx:06d}_{angles_str}.png"
+                filepath = self._save_image(image, filename)
             
-            except Exception as e:
-                print(f"Error at combination {combo_idx}: {e}")
-                continue
+            pose_count += 1
+            
             
             # Return to initial pose occasionally to prevent drift
             if pose_count % 500 == 0:
@@ -561,7 +750,7 @@ class PresetPoseGenerator:
 
 
 def main(
-    robot: str = "Baxter",
+    robot: str = "GR1",
     env: str = "Lift",
     angle_step: float = 90.0,
     angle_min: float = -90.0,
