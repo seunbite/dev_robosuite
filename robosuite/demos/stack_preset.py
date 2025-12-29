@@ -25,6 +25,15 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import json
 
+# Optional: HuggingFace hub for uploading to hub
+try:
+    from huggingface_hub import HfApi
+    from datasets import Dataset
+    HF_HUB_AVAILABLE = True
+except ImportError:
+    HF_HUB_AVAILABLE = False
+    print("Warning: huggingface_hub and datasets libraries not available. Install with: pip install huggingface_hub datasets")
+
 import robosuite as suite
 from robosuite.controllers.composite.composite_controller_factory import refactor_composite_controller_config
 
@@ -41,6 +50,10 @@ class PresetPoseGenerator:
         capture_image_width: int = 1024,
         capture_image_height: int = 1024,
         camera_fov: float = 60.0,
+        hf_repo_id: str = None,
+        hf_push_batch_size: int = 100,
+        save_local: bool = True,
+        save_hf: bool = False,
     ):
         """
         Initialize the pose generator.
@@ -53,6 +66,10 @@ class PresetPoseGenerator:
             capture_image_width: Width of captured images
             capture_image_height: Height of captured images
             camera_fov: Camera field of view in degrees (larger = wider view)
+            hf_repo_id: HuggingFace repository ID (e.g., "username/dataset-name") to upload images
+            hf_push_batch_size: Number of images to batch before pushing to HuggingFace hub
+            save_local: Whether to save images locally (default: True)
+            save_hf: Whether to save images to HuggingFace hub (default: False)
         """
         self.robot_name = robot_name
         self.env_name = env_name
@@ -62,8 +79,28 @@ class PresetPoseGenerator:
         self.capture_image_width = capture_image_width
         self.capture_image_height = capture_image_height
         
-        # Create output directory
-        os.makedirs(self.output_dir, exist_ok=True)
+        # Save settings
+        self.save_local = save_local
+        self.save_hf = save_hf
+        self.hf_repo_id = hf_repo_id if save_hf else None
+        self.hf_push_batch_size = hf_push_batch_size
+        self.hf_upload_count = 0  # Track number of uploads
+        self.hf_dataset_data = []  # Batch buffer for HuggingFace dataset
+        
+        if self.save_hf:
+            if not self.hf_repo_id:
+                raise ValueError("hf_repo_id must be provided when save_hf=True")
+            if not HF_HUB_AVAILABLE:
+                raise ImportError("huggingface_hub and datasets libraries are required for HuggingFace upload. Install with: pip install huggingface_hub datasets")
+            print(f"HuggingFace upload enabled: {self.hf_repo_id}")
+            print(f"Images will be uploaded in batches of {self.hf_push_batch_size} (or at the end)")
+        
+        if self.save_local:
+            # Create output directory only if saving locally
+            os.makedirs(self.output_dir, exist_ok=True)
+            print(f"Local save enabled: {self.output_dir}")
+        else:
+            print("Local save disabled (images will only be uploaded to HuggingFace if save_hf=True)")
         
         print(f"Initializing robot: {robot_name}")
         
@@ -303,11 +340,85 @@ class PresetPoseGenerator:
         return obs[::-1]
     
     def _save_image(self, image_array, filename):
-        """Save image array as PNG."""
+        """Save image array as PNG. Returns PIL Image object."""
         img = Image.fromarray(image_array)
-        filepath = os.path.join(self.output_dir, filename)
-        img.save(filepath)
-        return filepath
+        if self.save_local:
+            filepath = os.path.join(self.output_dir, filename)
+            img.save(filepath)
+            return filepath
+        return None
+    
+    def _add_to_hf_batch(self, image_array, filename, pose_id, angle_values, angle_indices):
+        """Add image and metadata to HuggingFace dataset batch."""
+        img = Image.fromarray(image_array)
+        
+        # Create metadata entry with joint angles as separate columns
+        entry = {
+            "image": img,
+            "filename": filename,
+            "pose_id": pose_id,
+            "robot_name": self.robot_name,
+            "active_joint_indices": self.active_joint_indices,
+            "fixed_joint_indices": self.fixed_joint_indices,
+        }
+        
+        # Add joint angles as separate columns for each active joint
+        for i, active_joint_idx in enumerate(self.active_joint_indices):
+            joint_angle_deg = float(np.rad2deg(angle_values[i]))
+            entry[f"joint_{active_joint_idx}_angle_deg"] = joint_angle_deg
+        
+        # Also add as a list column
+        entry["joint_angles_deg"] = [float(np.rad2deg(angle_values[j])) for j in range(len(angle_indices))]
+        
+        self.hf_dataset_data.append(entry)
+        
+        # Push to hub when batch is full
+        if len(self.hf_dataset_data) >= self.hf_push_batch_size:
+            self._push_hf_batch()
+    
+    def _push_hf_batch(self):
+        """Push current batch to HuggingFace hub as Dataset."""
+        if not self.hf_dataset_data or not self.hf_repo_id:
+            return
+        
+        try:
+            print(f"\nPushing batch of {len(self.hf_dataset_data)} images to HuggingFace hub...")
+            
+            # Create dataset from batch
+            batch_dataset = Dataset.from_list(self.hf_dataset_data)
+            
+            # Push to hub (append mode if dataset already exists)
+            if self.hf_upload_count == 0:
+                # First push: create new dataset
+                batch_dataset.push_to_hub(self.hf_repo_id, private=False)
+                print(f"✓ Created new dataset: {self.hf_repo_id}")
+            else:
+                # Subsequent pushes: load existing and concatenate
+                try:
+                    from datasets import load_dataset, concatenate_datasets
+                    existing_dataset = load_dataset(self.hf_repo_id, split="train")
+                    # Concatenate datasets using the proper function
+                    combined_dataset = concatenate_datasets([existing_dataset, batch_dataset])
+                    combined_dataset.push_to_hub(self.hf_repo_id, private=False)
+                    print(f"✓ Appended {len(self.hf_dataset_data)} images to {self.hf_repo_id} (total: {len(combined_dataset)})")
+                except Exception as load_error:
+                    # If loading fails, try to push as new (overwrite)
+                    print(f"Warning: Could not load existing dataset ({load_error}), creating new one...")
+                    batch_dataset.push_to_hub(self.hf_repo_id, private=False)
+            
+            self.hf_upload_count += 1
+            self.hf_dataset_data = []  # Clear batch
+            
+        except Exception as e:
+            print(f"Warning: Failed to push batch to HuggingFace hub: {e}")
+            print("Batch will be lost. Consider enabling save_local=True to keep backups.")
+            import traceback
+            traceback.print_exc()
+    
+    def _push_remaining_hf_batch(self):
+        """Push any remaining items in the batch buffer."""
+        if self.hf_dataset_data:
+            self._push_hf_batch()
     
     def _save_pose_data_to_jsonl(self, data_entry, jsonl_path):
         """
@@ -547,7 +658,7 @@ class PresetPoseGenerator:
     
     def generate_combination_poses(
         self,
-        angle_step_deg: float = 30.0,
+        angle_step_deg: float = 90.0,
         angle_min_deg: float = -90.0,
         angle_max_deg: float = 90.0,
         except_last_joint: bool = True,
@@ -725,20 +836,34 @@ class PresetPoseGenerator:
                 # Capture camera image
                 image = self._capture_image()
                 filename = f"{self.robot_name}_pose_{combo_idx:06d}_{angles_str}.png"
-                filepath = self._save_image(image, filename)
+                
+                # Save locally if enabled
+                if self.save_local:
+                    filepath = self._save_image(image, filename)
+                
+                # Add to HuggingFace dataset batch if enabled
+                if self.save_hf:
+                    self._add_to_hf_batch(image, filename, combo_idx, angle_values, angle_indices)
             
             pose_count += 1
-            
             
             # Return to initial pose occasionally to prevent drift
             if pose_count % 500 == 0:
                 self._set_joint_positions(self.initial_joint_pos)
+        
+        # Push final batch to HuggingFace hub
+        if self.save_hf and not use_3d_points:
+            self._push_remaining_hf_batch()
+            if self.hf_upload_count > 0:
+                print(f"Total batches pushed to HuggingFace hub: {self.hf_upload_count}")
         
         total_time = time.time() - start_time
         print(f"\n{'='*60}")
         print(f"COMPLETE: Generated {pose_count:,} combination poses")
         print(f"Time taken: {total_time/60:.1f} minutes ({total_time/pose_count:.2f} sec/pose)")
         print(f"Saved images to: {self.output_dir}")
+        if self.hf_repo_id and not use_3d_points:
+            print(f"Uploaded to HuggingFace hub: {self.hf_repo_id}")
         if jsonl_path and os.path.exists(jsonl_path):
             file_size_mb = os.path.getsize(jsonl_path) / (1024**2)
             print(f"Saved 3D coordinates to: {jsonl_path} ({file_size_mb:.2f} MB)")
@@ -760,6 +885,11 @@ def main(
     capture_image_width: int = 1024,
     capture_image_height: int = 1024,
     camera_fov: float = 60.0,
+    save_local: bool = False,
+    save_hf: bool = True,
+    hf_repo_id: str = 'seunbite',
+    hf_push_batch_size: int = 100,
+    except_last_joint: bool = False,
 ):
     """
     Generate preset robot poses by combining all joint angles.
@@ -775,6 +905,10 @@ def main(
         capture_image_width: Width of captured images
         capture_image_height: Height of captured images
         camera_fov: Camera field of view in degrees (larger = wider view, default: 60.0)
+        hf_repo_id: HuggingFace repository ID (e.g., "username/dataset-name") to upload images (default: None)
+        hf_push_batch_size: Number of images to batch before pushing to HuggingFace hub (default: 100)
+        save_local: Whether to save images locally (default: True)
+        save_hf: Whether to save images to HuggingFace hub (default: False)
     
     Examples:
         # Camera images mode (default)
@@ -788,6 +922,10 @@ def main(
         # Quick test with 3D points
         python stack_preset.py --robot IIWA --angle-step 60 --use-3d-points True
         # Result: 4^7 = 16,384 3D plots
+        
+        # With HuggingFace upload
+        python stack_preset.py --robot GR1 --angle-step 90 --hf-repo-id username/robot-poses
+        # Images will be uploaded to HuggingFace hub in batches of 100 (default)
     """
     
     print("="*60)
@@ -810,6 +948,10 @@ def main(
         capture_image_width=capture_image_width,
         capture_image_height=capture_image_height,
         camera_fov=camera_fov,
+        hf_repo_id=f"{hf_repo_id}/{robot}" if save_hf else None,
+        hf_push_batch_size=hf_push_batch_size,
+        save_local=save_local,
+        save_hf=save_hf,
     )
     
     try:
