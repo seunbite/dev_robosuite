@@ -159,8 +159,18 @@ class IKSolver:
         return target_pos, target_ori
 
     def _compute_jacobian(self, model: mujoco.MjModel, data: mujoco.MjData):
+        # Use internal MuJoCo objects if model/data are robosuite wrappers
+        if hasattr(model, '_model'):
+            mujoco_model = model._model
+        else:
+            mujoco_model = model
+        if hasattr(data, '_data'):
+            mujoco_data = data._data
+        else:
+            mujoco_data = data
+            
         for i, site_id in enumerate(self.site_ids):
-            mujoco.mj_jacSite(model, data, self.jac_temps[i][:3], self.jac_temps[i][3:], site_id)
+            mujoco.mj_jacSite(mujoco_model, mujoco_data, self.jac_temps[i][:3], self.jac_temps[i][3:], site_id)
 
         jac = np.vstack(self.jac_temps)
         # compute jacobian for our dof_ids
@@ -277,11 +287,25 @@ class IKSolver:
         eye = np.eye(len(self.dof_ids))
         # basically dq = J^{-1} dx. This formulation is nicer since m is small in dimensionality.
         self.dq = jac.T @ np.linalg.solve(jac @ jac.T + diag, self.twist)
+        
         # Nullspace control: intuitively, (eye - np.linalg.pinv(jac) @ jac)
         # projects dqs into the nullspace of the Jacobian, which intuitively
         # only allows movements that don't affect the task space.
-        dq_null = (eye - np.linalg.pinv(jac) @ jac) @ (self.Kn * (self.q0 - self.full_model_data.qpos[self.dof_ids]))
-        self.dq += dq_null
+        # 
+        # Update q0 to current joint positions before nullspace control
+        # This ensures nullspace control maintains the current pose rather than trying to move to zero
+        # This is especially important when target position equals current position (distance=0)
+        # 
+        # Note: If q0 is set to current position, then (q0 - current_pos) = 0, making nullspace control zero
+        # This effectively disables nullspace control when we want to maintain pose
+        self.q0 = self.full_model_data.qpos[self.dof_ids].copy()
+        q_nullspace_error = self.q0 - self.full_model_data.qpos[self.dof_ids]
+        
+        # Only apply nullspace control if there's a significant difference
+        # This prevents nullspace control from causing unwanted pose changes
+        if np.linalg.norm(q_nullspace_error) > 1e-6:
+            dq_null = (eye - np.linalg.pinv(jac) @ jac) @ (self.Kn * q_nullspace_error)
+            self.dq += dq_null
 
         if self.max_dq > 0:
             dq_abs_max = np.abs(self.dq).max()

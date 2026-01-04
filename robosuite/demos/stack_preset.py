@@ -86,6 +86,7 @@ class PresetPoseGenerator:
         self.hf_push_batch_size = hf_push_batch_size
         self.hf_upload_count = 0  # Track number of uploads
         self.hf_dataset_data = []  # Batch buffer for HuggingFace dataset
+        self.hf_all_batches = []  # Accumulate all batches for final upload
         
         if self.save_hf:
             if not self.hf_repo_id:
@@ -124,7 +125,7 @@ class PresetPoseGenerator:
             arm_controller_config, robot_name, ["right", "left"]
         )
         
-        # Create environment
+        # Create environment (EmptySpace is now registered in robosuite)
         self.env = suite.make(**options, horizon=1000)
         self.env.reset()
         
@@ -371,54 +372,74 @@ class PresetPoseGenerator:
         entry["joint_angles_deg"] = [float(np.rad2deg(angle_values[j])) for j in range(len(angle_indices))]
         
         self.hf_dataset_data.append(entry)
+        # Also accumulate in all batches for final upload
+        self.hf_all_batches.append(entry)
         
-        # Push to hub when batch is full
+        # Push to hub when batch is full (but keep accumulating)
         if len(self.hf_dataset_data) >= self.hf_push_batch_size:
             self._push_hf_batch()
     
     def _push_hf_batch(self):
-        """Push current batch to HuggingFace hub as Dataset."""
+        """Accumulate batch data (will be uploaded all at once at the end)."""
         if not self.hf_dataset_data or not self.hf_repo_id:
             return
         
-        try:
-            print(f"\nPushing batch of {len(self.hf_dataset_data)} images to HuggingFace hub...")
-            
-            # Create dataset from batch
-            batch_dataset = Dataset.from_list(self.hf_dataset_data)
-            
-            # Push to hub (append mode if dataset already exists)
-            if self.hf_upload_count == 0:
-                # First push: create new dataset
-                batch_dataset.push_to_hub(self.hf_repo_id, private=False)
-                print(f"✓ Created new dataset: {self.hf_repo_id}")
-            else:
-                # Subsequent pushes: load existing and concatenate
-                try:
-                    from datasets import load_dataset, concatenate_datasets
-                    existing_dataset = load_dataset(self.hf_repo_id, split="train")
-                    # Concatenate datasets using the proper function
-                    combined_dataset = concatenate_datasets([existing_dataset, batch_dataset])
-                    combined_dataset.push_to_hub(self.hf_repo_id, private=False)
-                    print(f"✓ Appended {len(self.hf_dataset_data)} images to {self.hf_repo_id} (total: {len(combined_dataset)})")
-                except Exception as load_error:
-                    # If loading fails, try to push as new (overwrite)
-                    print(f"Warning: Could not load existing dataset ({load_error}), creating new one...")
-                    batch_dataset.push_to_hub(self.hf_repo_id, private=False)
-            
-            self.hf_upload_count += 1
-            self.hf_dataset_data = []  # Clear batch
-            
-        except Exception as e:
-            print(f"Warning: Failed to push batch to HuggingFace hub: {e}")
-            print("Batch will be lost. Consider enabling save_local=True to keep backups.")
-            import traceback
-            traceback.print_exc()
+        # Just accumulate, don't upload yet
+        # The batch data is already in hf_all_batches via _add_to_hf_batch
+        print(f"Accumulated batch {self.hf_upload_count + 1}: {len(self.hf_dataset_data)} images (total accumulated: {len(self.hf_all_batches)})")
+        self.hf_upload_count += 1
+        self.hf_dataset_data = []  # Clear batch buffer (but data is in hf_all_batches)
     
     def _push_remaining_hf_batch(self):
-        """Push any remaining items in the batch buffer."""
+        """Push any remaining items in the batch buffer and final accumulated dataset."""
+        # First add any remaining items in current batch to accumulated list
         if self.hf_dataset_data:
-            self._push_hf_batch()
+            # These should already be in hf_all_batches, but add them just in case
+            for entry in self.hf_dataset_data:
+                if entry not in self.hf_all_batches:
+                    self.hf_all_batches.append(entry)
+            self.hf_dataset_data = []
+        
+        # Now push all accumulated batches as one final dataset
+        if not self.hf_all_batches:
+            return
+        
+        print(f"\n{'='*60}")
+        print(f"FINAL UPLOAD: Uploading all {len(self.hf_all_batches)} accumulated images...")
+        print(f"{'='*60}")
+        
+        try:
+            from datasets import Dataset, load_dataset, concatenate_datasets
+            
+            final_dataset = Dataset.from_list(self.hf_all_batches)
+            
+            # Check if dataset already exists on hub
+            try:
+                print(f"Checking for existing dataset at {self.hf_repo_id}...")
+                existing_dataset = load_dataset(self.hf_repo_id, split="train", trust_remote_code=True)
+                print(f"Found existing dataset with {len(existing_dataset)} images")
+                
+                # Always merge to ensure we don't lose any existing data
+                print(f"Merging {len(existing_dataset)} existing + {len(final_dataset)} new images...")
+                combined_dataset = concatenate_datasets([existing_dataset, final_dataset])
+                print(f"Pushing combined dataset with {len(combined_dataset)} total images...")
+                combined_dataset.push_to_hub(self.hf_repo_id, private=False)
+                print(f"✓ Successfully uploaded {len(combined_dataset)} total images to {self.hf_repo_id}")
+            except Exception as load_error:
+                # Dataset doesn't exist or can't be loaded, push as new
+                print(f"No existing dataset found (or error loading: {load_error})")
+                print(f"Creating new dataset with {len(final_dataset)} images...")
+                final_dataset.push_to_hub(self.hf_repo_id, private=False)
+                print(f"✓ Successfully created dataset with {len(final_dataset)} images at {self.hf_repo_id}")
+            
+            # Clear accumulated batches
+            self.hf_all_batches = []
+            
+        except Exception as e:
+            print(f"Error in final upload: {e}")
+            import traceback
+            traceback.print_exc()
+            print("Warning: Final upload failed. Data may be incomplete.")
     
     def _save_pose_data_to_jsonl(self, data_entry, jsonl_path):
         """
@@ -885,8 +906,8 @@ def main(
     capture_image_width: int = 1024,
     capture_image_height: int = 1024,
     camera_fov: float = 60.0,
-    save_local: bool = False,
-    save_hf: bool = True,
+    save_local: bool = True,
+    save_hf: bool = False,
     hf_repo_id: str = 'seunbite',
     hf_push_batch_size: int = 100,
     except_last_joint: bool = False,
