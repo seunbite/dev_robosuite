@@ -193,3 +193,19 @@ class GR1ArmsOnly(GR1):
         init_qpos[0:7] = right_arm_init
         init_qpos[7:14] = left_arm_init
         return init_qpos
+
+    @property
+    def base_xpos_offset(self):
+        """
+        Lower base position for arms-only variant (no legs).
+        Since there are no legs, the base should be closer to ground level.
+        """
+        return {
+            "bins": (-0.30, -0.1, 0.55),
+            "empty": (-0.29, 0, 0.55),
+            "table": lambda table_length: (-0.15 - table_length / 2, 0, 0.55),
+        }
+
+    @property
+    def default_base(self):
+        return "NoActuationBase"

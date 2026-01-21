@@ -22,6 +22,7 @@ ROBOT_CLASS_MAPPING = {
     "UR5e": FixedBaseRobot,
     "SpotWithArm": LeggedRobot,
     "SpotWithArmFloating": LeggedRobot,
+    "Go2": LeggedRobot,
     "PandaOmron": WheeledRobot,
     "Tiago": WheeledRobot,
     "GR1": LeggedRobot,

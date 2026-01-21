@@ -15,6 +15,7 @@ from .no_actuation_base import NoActuationBase
 from .floating_legged_base import FloatingLeggedBase
 from .null_base import NullBase
 from .spot_base import Spot, SpotFloating
+from .go2_base import Go2Base
 
 BASE_MAPPING = {
     "RethinkMount": RethinkMount,
@@ -26,6 +27,7 @@ BASE_MAPPING = {
     "FloatingLeggedBase": FloatingLeggedBase,
     "Spot": Spot,
     "SpotFloating": SpotFloating,
+    "Go2Base": Go2Base,
     "NullBase": NullBase,
 }
 

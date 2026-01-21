@@ -609,7 +609,6 @@ class NonVerbalCueGenerator:
         self,
         pose_name: str,
         movements: List[Dict],
-        repeat: int = 1,
         hold_time: float = 2.0,
         save_gif: bool = True,
         output_filename: str = None,
@@ -621,14 +620,16 @@ class NonVerbalCueGenerator:
         
         Args:
             pose_name: Name of the pose from pose_set
-            movements: List of movement dictionaries, each with:
-                - type: 'position_move' or 'orientation_move'
-                - parameters: dict with movement parameters
-            repeat: Number of times to repeat the movement sequence
+            movements: List of movement group dictionaries, each with:
+                - repetition: Number of times to repeat this group
+                - motions: List of motion dictionaries, each with:
+                    - type: 'position_move' or 'orientation_move'
+                    - parameters: dict with movement parameters
             hold_time: Time to hold initial pose in seconds
             save_gif: Whether to save motion as GIF
             output_filename: Output filename for GIF (auto-generated if None)
             gif_duration: Duration of each frame in milliseconds for GIF
+            pose_index: Optional pose_id to use (if None, randomly selects)
         """
         print(f"\n{'='*60}")
         print(f"Executing cue: {pose_name}")
@@ -701,86 +702,111 @@ class NonVerbalCueGenerator:
         image = self._capture_image()
         frames.append(Image.fromarray(image))
         
+        # Parse movements structure: each item can have 'repetition' and 'motions'
+        # New format: [{'repetition': 3, 'motions': [...]}, ...]
+        # Old format: [{'type': ..., 'parameters': ...}, ...] (for backward compatibility)
+        movement_groups = []
+        for movement_item in movements:
+            if 'motions' in movement_item:
+                # New format: has 'repetition' and 'motions'
+                repetition = movement_item.get('repetition', 1)
+                motions = movement_item.get('motions', [])
+                movement_groups.append({'repetition': repetition, 'motions': motions})
+            else:
+                # Old format: single movement, treat as repetition=1
+                movement_groups.append({'repetition': 1, 'motions': [movement_item]})
+        
         # Store joint positions for each movement to enable exact repetition
         # First repeat: execute movements and store joint positions
         # Subsequent repeats: use stored joint positions for exact repetition
         stored_movement_joint_positions = []
         
-        # Execute movements and capture one frame per movement (at end of each movement)
-        for rep in range(repeat):
-            print(f"\n--- Repeat {rep + 1}/{repeat} ---")
+        # Execute movement groups
+        for group_idx, group in enumerate(movement_groups):
+            repetition = group['repetition']
+            motions = group['motions']
             
-            for i, movement in enumerate(movements):
-                move_type = movement.get('type')
-                params = movement.get('parameters', {})
+            print(f"\n--- Movement Group {group_idx + 1}/{len(movement_groups)} (repetition: {repetition}) ---")
+            
+            # Store joint positions for this group's motions
+            group_stored_positions = []
+            
+            for rep in range(repetition):
+                print(f"\n  --- Repeat {rep + 1}/{repetition} ---")
                 
-                print(f"  Movement {i+1}: {move_type} with params {params}")
-                
-                # If this is not the first repeat, use stored joint positions
-                if rep > 0 and i < len(stored_movement_joint_positions):
-                    print(f"    Using stored joint positions from first repeat")
-                    stored_joint_pos = stored_movement_joint_positions[i]
-                    self._set_joint_positions(stored_joint_pos.copy())
-                    # Update IK solver's q0
-                    self.ik_solver.q0 = stored_joint_pos[self.ik_solver.dof_ids].copy()
-                    # Zero velocities
-                    self.env.sim.data.qvel[:] = 0
-                    self.env.sim.forward()
+                for i, motion in enumerate(motions):
+                    move_type = motion.get('type')
+                    params = motion.get('parameters', {})
                     
-                    # Capture frame
-                    movement_frames = []
-                    image = self._capture_image()
-                    movement_frames.append(Image.fromarray(image))
-                else:
-                    # First repeat: execute movement normally
-                    movement_frames = []
-                    if move_type == 'position_move':
-                        movement_frames = self._move_position(
-                            direction=params.get('direction', 'right'),
-                            distance=params.get('distance', 0.1),
-                            speed=params.get('speed', 0.1),  # Speed in m/s
-                            capture_frames=True,
-                        )
-                    elif move_type == 'orientation_move':
-                        movement_frames = self._move_orientation(
-                            joint=params.get('joint', 'yaw'),
-                            angle=params.get('angle', 30),
-                            direction=params.get('direction', 'right'),
-                            speed=params.get('speed', 30.0),  # Angular speed in deg/s
-                            capture_frames=True,
-                        )
+                    print(f"    Motion {i+1}: {move_type} with params {params}")
+                    
+                    # If this is not the first repeat, use stored joint positions
+                    if rep > 0 and i < len(group_stored_positions):
+                        print(f"      Using stored joint positions from first repeat")
+                        stored_joint_pos = group_stored_positions[i]
+                        self._set_joint_positions(stored_joint_pos.copy())
+                        # Update IK solver's q0
+                        self.ik_solver.q0 = stored_joint_pos[self.ik_solver.dof_ids].copy()
+                        # Zero velocities
+                        self.env.sim.data.qvel[:] = 0
+                        self.env.sim.forward()
+                        
+                        # Capture frame
+                        movement_frames = []
+                        image = self._capture_image()
+                        movement_frames.append(Image.fromarray(image))
                     else:
-                        print(f"    Warning: Unknown movement type '{move_type}'")
+                        # First repeat: execute movement normally
+                        movement_frames = []
+                        if move_type == 'position_move':
+                            movement_frames = self._move_position(
+                                direction=params.get('direction', 'right'),
+                                distance=params.get('distance', 0.1),
+                                speed=params.get('speed', 0.1),  # Speed in m/s
+                                capture_frames=True,
+                            )
+                        elif move_type == 'orientation_move':
+                            movement_frames = self._move_orientation(
+                                joint=params.get('joint', 'yaw'),
+                                angle=params.get('angle', 30),
+                                direction=params.get('direction', 'right'),
+                                speed=params.get('speed', 30.0),  # Angular speed in deg/s
+                                capture_frames=True,
+                            )
+                        else:
+                            print(f"      Warning: Unknown movement type '{move_type}'")
+                        
+                        # Store joint positions after movement (for first repeat only)
+                        if rep == 0:
+                            current_joint_pos = self._get_joint_positions()
+                            group_stored_positions.append(current_joint_pos.copy())
+                            print(f"      Stored joint positions for motion {i+1} (shape: {current_joint_pos.shape})")
                     
-                    # Store joint positions after movement (for first repeat only)
-                    if rep == 0:
-                        current_joint_pos = self._get_joint_positions()
-                        stored_movement_joint_positions.append(current_joint_pos.copy())
-                        print(f"    Stored joint positions for movement {i+1} (shape: {current_joint_pos.shape})")
-                
-                # Add frame captured at end of movement (should be exactly 1 frame)
-                if len(movement_frames) > 0:
-                    frames.extend(movement_frames)
-                    print(f"    -> Captured {len(movement_frames)} frame(s) (total frames: {len(frames)})")
-                else:
-                    print(f"    Warning: No frames captured for movement {i+1}!")
-                    # Even if no frames captured, add a frame to maintain frame count
-                    if capture_frames:
+                    # Add frame captured at end of movement (should be exactly 1 frame)
+                    if len(movement_frames) > 0:
+                        frames.extend(movement_frames)
+                        print(f"      -> Captured {len(movement_frames)} frame(s) (total frames: {len(frames)})")
+                    else:
+                        print(f"      Warning: No frames captured for motion {i+1}!")
+                        # Even if no frames captured, add a frame to maintain frame count
                         image = self._capture_image()
                         frames.append(Image.fromarray(image))
-                        print(f"    -> Added fallback frame (total frames: {len(frames)})")
+                        print(f"      -> Added fallback frame (total frames: {len(frames)})")
         
         print(f"\n{'='*60}")
         print("Cue execution completed!")
         print(f"Captured {len(frames)} frames")
-        expected_frames = 1 + len(movements) * repeat
-        print(f"Expected: 1 (initial) + {len(movements)} (movements) * {repeat} (repeat) = {expected_frames}")
+        # Calculate expected frames: 1 initial + sum of (motions * repetition) for each group
+        expected_frames = 1
+        for group in movement_groups:
+            expected_frames += len(group['motions']) * group['repetition']
+        print(f"Expected: 1 (initial) + sum of (motions * repetition) for each group = {expected_frames}")
         
         # Save GIF if requested
         if save_gif and len(frames) > 0:
             if output_filename is None:
                 now = datetime.now().strftime("%Y%m%d_%H%M%S")
-                output_filename = f"{now}_{self.robot_name}_{pose_name}_p{pose_id}_r{repeat}_h{hold_time:.1f}.gif"
+                output_filename = f"{now}_{self.robot_name}_{pose_name}_p{pose_id}_h{hold_time:.1f}.gif"
             
             filepath = os.path.join(self.output_dir, output_filename)
             
@@ -817,11 +843,10 @@ class NonVerbalCueGenerator:
 
 def main(
     robot: str = "Panda",
-    pose_index: Optional[int] = 416,
+    pose_index: Optional[int] = None,
     env: str = "EmptySpace",
     controller: str = "IK_POSE",
     cue_name: str = "waving",
-    repeat: int = 3,
     jsonl_path: str = "data/poses/closest_poses_results.jsonl",
     output_dir: str = "data/motions",
     save_gif: bool = True,
@@ -831,7 +856,6 @@ def main(
     capture_image_width: int = 512,
     capture_image_height: int = 512,
     camera_fov: float = 60.0,
-    distance: float = 3,
     hz: int = 5,
 ):
     """
@@ -842,8 +866,8 @@ def main(
         env: Environment name
         controller: Controller name (should support IK)
         cue_name: Name of the cue to execute
-        repeat: Number of times to repeat
         jsonl_path: Path to pose database JSONL file
+        Note: repetition is now defined in cue definition, not as an argument
     """
     
     # Define cues - maps cue names to pose + movements
@@ -852,57 +876,73 @@ def main(
             'pose': 'Elbow_down',
             'movements': [
                 {
+                    'repetition' : 3,
+                    'motions': [
+                        
+                {
                     'type': 'position_move',
                     'parameters': {
-                        'direction': 'up',
-                        'distance': distance,
+                        'direction': 'left',
+                        'distance': 0.3,
                         'speed': 1.0,
                     }
                 },
                 {
                     'type': 'position_move',
                     'parameters': {
-                        'direction': 'down',
-                        'distance': distance,
+                        'direction': 'right',
+                        'distance': 0.3,
                         'speed': 1.0,
                     }
-                },
+                }
+                    ]
+                }
             ]
         },
         'nodding': {
             'pose': 'Elbow_up',
             'movements': [
                 {
-                    'type': 'orientation_move',
-                    'parameters': {
-                        'joint': 'pitch',
-                        'angle': 15,
-                        'direction': 'down',
-                        'speed': 1.0,
-                    }
-                },
-                {
-                    'type': 'orientation_move',
-                    'parameters': {
-                        'joint': 'pitch',
-                        'angle': 15,
-                        'direction': 'up',
-                        'speed': 1.0,
-                    }
-                },
+                    'repetition': 3,
+                    'motions': [
+                        {
+                            'type': 'orientation_move',
+                            'parameters': {
+                                'joint': 'pitch',
+                                'angle': 15,
+                                'direction': 'down',
+                                'speed': 1.0,
+                            }
+                        },
+                        {
+                            'type': 'orientation_move',
+                            'parameters': {
+                                'joint': 'pitch',
+                                'angle': 15,
+                                'direction': 'up',
+                                'speed': 1.0,
+                            }
+                        },
+                    ]
+                }
             ]
         },
         'pointing': {
             'pose': 'Stretched_out',
             'movements': [
                 {
-                    'type': 'position_move',
-                    'parameters': {
-                        'direction': 'forward',
-                        'distance': 0.2,
-                        'speed': 0.8,
-                    }
-                },
+                    'repetition': 1,
+                    'motions': [
+                        {
+                            'type': 'position_move',
+                            'parameters': {
+                                'direction': 'forward',
+                                'distance': 0.2,
+                                'speed': 0.8,
+                            }
+                        },
+                    ]
+                }
             ]
         },
     }
@@ -930,10 +970,10 @@ def main(
     
     try:
         # Execute cue
+        # Note: repeat is now defined in each movement group's 'repetition' field
         generator.execute_cue(
             pose_name=cue_def['pose'],
             movements=cue_def['movements'],
-            repeat=repeat,
             hold_time=hold_time,
             save_gif=save_gif,
             output_filename=output_filename,

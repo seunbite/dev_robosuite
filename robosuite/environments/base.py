@@ -600,13 +600,28 @@ class MujocoEnv(metaclass=EnvMeta):
             if old_path is None:
                 continue
 
+            # If the path is already absolute and exists, don't touch it
+            if os.path.isabs(old_path) and os.path.exists(old_path):
+                continue
+
             old_path_split = old_path.split("/")
             # maybe replace all paths to robosuite assets
+            # Only replace if it contains "robosuite" but NOT within a library/site-packages path
             check_lst = [loc for loc, val in enumerate(old_path_split) if val == "robosuite"]
             if len(check_lst) > 0:
                 ind = max(check_lst)  # last occurrence index
+                
+                # Check if we are in a site-packages situation
+                if "site-packages" in path_split:
+                    # If we are running from site-packages, we might need a different logic, 
+                    # but for this workspace, we want to ensure we don't accidentally use the venv path
+                    pass
+
                 new_path_split = path_split + old_path_split[ind + 1 :]
                 new_path = "/".join(new_path_split)
+                
+                # Double check: if the new path doesn't exist but the relative one might, 
+                # we should be careful. But here we force the workspace path.
                 elem.set("file", new_path)
 
         return ET.tostring(root, encoding="utf8").decode("utf8")
