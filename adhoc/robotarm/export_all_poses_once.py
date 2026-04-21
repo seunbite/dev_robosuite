@@ -140,7 +140,7 @@ class AllPoseExporter:
             return np.array([0.0, 0.0, 0.0])
     
     def _get_ee_orientation_rpy(self, arm="right"):
-        """Get end effector orientation as roll, pitch, yaw in radians."""
+        """Get end effector orientation as roll, gripper_orientation, yaw in radians."""
         try:
             orn_dict = self.robot._hand_orn
             if arm in orn_dict:

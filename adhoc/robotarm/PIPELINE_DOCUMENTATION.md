@@ -106,7 +106,7 @@ The system generates all possible joint angle combinations using a discrete angl
 **Process**:
 - For a robot with N active joints, this generates 3^N pose combinations
 - Each combination is evaluated by setting the joint positions and computing the end-effector orientation
-- All poses are stored with their computed orientations (roll, pitch, yaw in degrees and radians)
+- All poses are stored with their computed orientations (roll, gripper_orientation, yaw in degrees and radians)
 
 **Code Reference**: Lines 242-296 in `find_closest_poses.py`
 ```python
@@ -125,7 +125,7 @@ for combo_idx, angle_indices in tqdm(enumerate(selected_combinations), ...):
 
 After generating all poses, the system filters them based on target orientation criteria:
 
-1. **Orientation Matching**: Each pose is scored by its orientation difference from target roll, pitch, and yaw angles
+1. **Orientation Matching**: Each pose is scored by its orientation difference from target roll, gripper_orientation, and yaw angles
    - Uses circular distance calculation to handle angle wrapping (e.g., 359° and 1° are considered close)
    - Poses with orientation difference > 60° are filtered out (line 381)
 
@@ -163,7 +163,7 @@ if front_poses:
 
 **Output**: A JSONL database (`closest_poses_results.jsonl`) containing pose candidates with:
 - Joint angles (degrees and radians)
-- End-effector orientation (roll, pitch, yaw)
+- End-effector orientation (roll, gripper_orientation, yaw)
 - Root-to-EE distance
 - Rank and pose_id
 

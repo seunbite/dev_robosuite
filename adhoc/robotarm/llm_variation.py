@@ -260,7 +260,7 @@ def main(
     prompt: str = "make it look depressed",
     pose_index: Optional[int] = None,
     controller: str = "IK_POSE",
-    jsonl_path: str = "data/poses/closest_poses_results.jsonl",
+    jsonl_path: str = "data/seed/closest_poses_results.jsonl",
     config_path: str = "data/seed/motion_config.json",
     proximal_degree_scale: float = 0.25,
     camera_distance: float = 1.3,

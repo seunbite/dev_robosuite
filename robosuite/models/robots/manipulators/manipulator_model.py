@@ -36,6 +36,8 @@ class ManipulatorModel(RobotModel):
             arms = ["right"]
         elif self.arm_type == "bimanual":
             arms = ["right", "left"]
+        else:
+            arms = []
         self.hand_rotation_offset = {}
         for arm in arms:
             hand_element = find_elements(

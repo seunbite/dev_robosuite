@@ -22,9 +22,32 @@ import robosuite as suite
 from robosuite.controllers.composite.composite_controller_factory import refactor_composite_controller_config
 from robosuite.utils.ik_utils import IKSolver
 
-# Fixed joint indices (matching stack_preset.py)
+# Import pose configuration
+from arm_pose_config import poses, pitch_poses, pose_set
+
+
+def _debug_log(msg: str):
+    ts = datetime.now().strftime("%H:%M:%S")
+    print(f"[jacobian_debug {ts}] {msg}", flush=True)
+
+# Fixed joint indices - now arm-specific for humanoid robots
 FIXED_JOINT_INDICES = {
-    'GR1': "0-2, 20-31"
+    'GR1': {
+        'right': "0-5, 13-19, 20-31",  # Fix head, torso, left arm, legs
+        'left': "0-5, 6-12, 20-31",     # Fix head, torso, right arm, legs
+    },
+    'GR1FixedLowerBody': {
+        'right': "0-5, 13-19",  # Fix head, torso, left arm
+        'left': "0-5, 6-12",     # Fix head, torso, right arm
+    },
+    'GR1FloatingBody': {
+        'right': "0-5, 13-19",
+        'left': "0-5, 6-12",
+    },
+    'GR1ArmsOnly': {
+        'right': "7-13",
+        'left': "0-6",
+    },
 }
 
 
@@ -36,11 +59,12 @@ class JacobianCalculator:
         robot_name: str = "Panda",
         env_name: str = "EmptySpace",
         controller_name: str = "IK_POSE",
-        jsonl_path: str = "data/poses/closest_poses_results.jsonl",
+        jsonl_path: str = "data/seed/closest_poses_results.jsonl",
         has_renderer: bool = False,
         has_offscreen_renderer: bool = True,
         control_freq: int = 20,
         save_jacobian_gif: bool = False,
+        active_arm: Optional[str] = None,  # For humanoid robots: "right" or "left"
     ):
         """
         Initialize the Jacobian calculator.
@@ -71,8 +95,10 @@ class JacobianCalculator:
             self.output_dir = None
         
         print(f"Initializing robot: {robot_name}")
+        _debug_log("starting JacobianCalculator init")
         
         # Load pose data from JSONL
+        _debug_log(f"loading pose database from {jsonl_path}")
         self.pose_database = self._load_pose_database(jsonl_path)
         print(f"Loaded {len(self.pose_database)} poses from {jsonl_path}")
         
@@ -82,6 +108,7 @@ class JacobianCalculator:
             "robots": robot_name,
             "has_renderer": has_renderer,
             "has_offscreen_renderer": has_offscreen_renderer,
+            "renderer": "mujoco",
             "ignore_done": True,
             "use_camera_obs": True,
             "camera_names": "frontview",
@@ -91,47 +118,65 @@ class JacobianCalculator:
         }
         
         # Load controller config
+        _debug_log(f"loading controller config: {controller_name}")
         arm_controller_config = suite.load_part_controller_config(default_controller=controller_name)
         options["controller_configs"] = refactor_composite_controller_config(
             arm_controller_config, robot_name, ["right", "left"]
         )
         
         # Create environment
+        _debug_log("calling suite.make")
         self.env = suite.make(**options, horizon=10000)
+        _debug_log("suite.make returned")
+        _debug_log("calling env.reset")
         self.env.reset()
+        _debug_log("env.reset returned")
         
         # Disable gravity
         self.env.sim.model.opt.gravity[:] = [0, 0, 0]
         print("Gravity disabled")
+        _debug_log("gravity disabled")
         
         # Get robot
         self.robot = self.env.robots[0]
+        _debug_log("robot handle acquired")
         
         # Get initial joint positions
         self.initial_joint_pos = self.robot._joint_positions.copy()
         self.num_joints = len(self.initial_joint_pos)
         
-        # Parse fixed joint indices
+        # Parse fixed joint indices (arm-specific for humanoid robots)
         self.fixed_joint_indices = []
         if robot_name in FIXED_JOINT_INDICES:
-            fixed_indices_str = FIXED_JOINT_INDICES[robot_name]
-            try:
-                for part in fixed_indices_str.split(","):
-                    part = part.strip()
-                    if not part:
-                        continue
-                    if "-" in part:
-                        start, end = part.split("-", 1)
-                        start = int(start.strip())
-                        end = int(end.strip())
-                        if start > end:
+            fixed_data = FIXED_JOINT_INDICES[robot_name]
+            # Check if arm-specific (dict) or global (string)
+            if isinstance(fixed_data, dict) and active_arm:
+                fixed_indices_str = fixed_data.get(active_arm, "")
+            elif isinstance(fixed_data, str):
+                fixed_indices_str = fixed_data
+            else:
+                fixed_indices_str = ""
+            
+            if fixed_indices_str:
+                try:
+                    for part in fixed_indices_str.split(","):
+                        part = part.strip()
+                        if not part:
                             continue
-                        self.fixed_joint_indices.extend(range(start, end + 1))
-                    else:
-                        self.fixed_joint_indices.append(int(part))
-                self.fixed_joint_indices = sorted(list(set([idx for idx in self.fixed_joint_indices if 0 <= idx < self.num_joints])))
-            except ValueError:
-                self.fixed_joint_indices = []
+                        if "-" in part:
+                            start, end = part.split("-", 1)
+                            start = int(start.strip())
+                            end = int(end.strip())
+                            if start > end:
+                                continue
+                            self.fixed_joint_indices.extend(range(start, end + 1))
+                        else:
+                            self.fixed_joint_indices.append(int(part))
+                    self.fixed_joint_indices = sorted(list(set([idx for idx in self.fixed_joint_indices if 0 <= idx < self.num_joints])))
+                    if self.fixed_joint_indices:
+                        print(f"Fixed joints for {robot_name} ({active_arm} arm): {len(self.fixed_joint_indices)} joints")
+                except ValueError:
+                    self.fixed_joint_indices = []
         
         # Active joints (exclude last joint (gripper) and fixed joints)
         base_active_joint_indices = list(range(self.num_joints - 1))
@@ -139,9 +184,13 @@ class JacobianCalculator:
         
         # Initialize IK solver to get joint names and end effector site
         try:
-            joint_names = list(self.robot.robot_model.joints)
+            all_joint_names = list(self.robot.robot_model.joints)
         except:
-            joint_names = [self.env.sim.model.joint_id2name(idx) for idx in self.robot.joint_indexes]
+            all_joint_names = [self.env.sim.model.joint_id2name(idx) for idx in self.robot.joint_indexes]
+        
+        # Filter joint names to only include active joints
+        # This ensures IK solver only considers active joints in dof_ids
+        active_joint_names = [all_joint_names[i] for i in self.active_joint_indices if i < len(all_joint_names)]
         
         # Get end effector site name from gripper
         try:
@@ -150,12 +199,13 @@ class JacobianCalculator:
             eef_site_name = "gripper0_right_grip_site"
         
         robot_config = {
-            "joint_names": joint_names,
+            "joint_names": active_joint_names,  # Use only active joints
             "end_effector_sites": [eef_site_name],
-            "nullspace_gains": [1.0] * len(joint_names),
+            "nullspace_gains": [1.0] * len(active_joint_names),
         }
         
         # Initialize IK solver
+        _debug_log("initializing IK solver")
         self.ik_solver = IKSolver(
             model=self.env.sim.model._model,
             data=self.env.sim.data._data,
@@ -168,15 +218,45 @@ class JacobianCalculator:
             input_action_repr="absolute",
             input_rotation_repr="axis_angle"
         )
+        _debug_log("IK solver initialized")
+        
+        # Convert active JOINT indices to MuJoCo DOF addresses for Jacobian indexing.
+        # Robot joint indices (from robot.robot_model.joints) may NOT match MuJoCo
+        # joint indices when the model has a free joint (e.g. GR1 floating body).
+        # Use joint NAMES to bridge between the two index systems.
+        mujoco_model = self.env.sim.model._model
+        active_dof_addresses = []
+        for j_idx in self.active_joint_indices:
+            if j_idx < len(all_joint_names):
+                jname = all_joint_names[j_idx]
+                try:
+                    mj_joint_id = mujoco_model.joint(jname).id
+                    dof_addr = mujoco_model.jnt_dofadr[mj_joint_id]
+                    active_dof_addresses.append(dof_addr)
+                except Exception:
+                    # Fallback: use robot joint index as DOF address (correct if no free joint)
+                    active_dof_addresses.append(j_idx)
+            else:
+                active_dof_addresses.append(j_idx)
+        self.active_dof_addresses = np.array(active_dof_addresses)
+        self.ik_solver.dof_ids = self.active_dof_addresses
+        
+        # Check if DOF addresses differ from joint indices (indicates free joint)
+        if not np.array_equal(self.active_dof_addresses, np.array(self.active_joint_indices)):
+            print(f"Free joint detected: robot joint indices {self.active_joint_indices} → DOF addresses {list(self.active_dof_addresses)}")
+        else:
+            print(f"Active DOF ids (joint=DOF): {list(self.active_dof_addresses)}")
         
         self.eef_site_name = eef_site_name
-        self.joint_names = joint_names
+        self.joint_names = active_joint_names  # Store active joint names
+        self.all_joint_names = all_joint_names  # Store all joint names for reference
         
         print(f"Total joints: {self.num_joints}")
         print(f"Active joints: {len(self.active_joint_indices)}")
         print(f"Fixed joints: {len(self.fixed_joint_indices)}")
         print(f"End effector site: {eef_site_name}")
         print(f"Robot initialized successfully!")
+        _debug_log("JacobianCalculator init complete")
     
     def _load_pose_database(self, jsonl_path: str) -> List[Dict]:
         """Load pose database from JSONL file."""
@@ -198,18 +278,12 @@ class JacobianCalculator:
         pitch_deg: Optional[float] = None,
         yaw_deg: Optional[float] = None,
         robot_name: Optional[str] = None,
+        tolerance: float = 30.0,
+        dir_name: Optional[str] = None,
+        pitch_type: Optional[str] = None,
     ) -> List[Dict]:
         """
         Find poses matching the given orientation criteria.
-        
-        Args:
-            roll_deg: Target roll angle in degrees
-            pitch_deg: Target pitch angle in degrees
-            yaw_deg: Target yaw angle in degrees
-            robot_name: Filter by robot name (if None, uses self.robot_name)
-        
-        Returns:
-            List of matching pose dictionaries
         """
         if robot_name is None:
             robot_name = self.robot_name
@@ -217,37 +291,37 @@ class JacobianCalculator:
         matching_poses = []
         
         for pose in self.pose_database:
-            # Filter by robot name
             if pose.get("robot") != robot_name:
                 continue
             
-            # Get actual end effector orientation from orientation field
+            # 1. Check if we have high-level labels (dir, gripper_orientation)
+            # This is much faster and matches our classification logic
+            if dir_name is not None and pose.get("dir") != dir_name:
+                continue
+            if pitch_type is not None and pose.get("gripper_orientation") != pitch_type:
+                continue
+
+            # 2. Check by orientation (RPY)
             orientation = pose.get("orientation", {})
             pose_roll_deg = orientation.get("roll_deg")
             pose_pitch_deg = orientation.get("pitch_deg")
             pose_yaw_deg = orientation.get("yaw_deg")
             
-            # Filter by orientation (within tolerance)
-            tolerance = 5.0  # degrees
             match = True
-            
             if roll_deg is not None and pose_roll_deg is not None:
                 roll_diff = abs(pose_roll_deg - roll_deg)
                 roll_diff = min(roll_diff, 360 - roll_diff)
-                if roll_diff > tolerance:
-                    match = False
+                if roll_diff > tolerance: match = False
             
             if pitch_deg is not None and pose_pitch_deg is not None:
                 pitch_diff = abs(pose_pitch_deg - pitch_deg)
                 pitch_diff = min(pitch_diff, 360 - pitch_diff)
-                if pitch_diff > tolerance:
-                    match = False
+                if pitch_diff > tolerance: match = False
             
             if yaw_deg is not None and pose_yaw_deg is not None:
                 yaw_diff = abs(pose_yaw_deg - yaw_deg)
                 yaw_diff = min(yaw_diff, 360 - yaw_diff)
-                if yaw_diff > tolerance:
-                    match = False
+                if yaw_diff > tolerance: match = False
             
             if match:
                 matching_poses.append(pose)
@@ -324,7 +398,7 @@ class JacobianCalculator:
         # Find matching poses
         matching_poses = self._find_matching_poses(
             roll_deg=pose_def.get('roll'),
-            pitch_deg=pose_def.get('pitch'),
+            pitch_deg=pose_def.get('gripper_orientation'),
             yaw_deg=pose_def.get('yaw'),
         )
         
@@ -390,16 +464,15 @@ class JacobianCalculator:
         print("Jacobian matrix for each joint (column of the full Jacobian)")
         print(f"{'='*60}\n")
         
-        # Get joint names for DOF IDs
-        for i, dof_id in enumerate(dof_ids):
-            if dof_id < len(self.joint_names):
-                joint_name = self.joint_names[dof_id]
-            else:
-                joint_name = f"DOF_{dof_id}"
-            
+        # Build joint names from active_joint_indices (not DOF addresses, which may differ for free joints)
+        joint_names_list = [
+            self.all_joint_names[j] if j < len(self.all_joint_names) else f"Joint_{j}"
+            for j in self.active_joint_indices
+        ]
+        
+        for i, (dof_id, jname) in enumerate(zip(dof_ids, joint_names_list)):
             jac_column = jac_subset[:, i]
-            
-            print(f"Joint {i+1}/{len(dof_ids)}: {joint_name} (DOF ID: {dof_id})")
+            print(f"Joint {i+1}/{len(dof_ids)}: {jname} (DOF addr: {dof_id})")
             print(f"  Position Jacobian (3x1):")
             print(f"    {jac_column[0:3]}")
             print(f"  Rotation Jacobian (3x1):")
@@ -410,7 +483,7 @@ class JacobianCalculator:
         print(f"\n{'='*60}")
         print("Full Jacobian Matrix (6x{})".format(len(dof_ids)))
         print("Rows: [pos_x, pos_y, pos_z, rot_x, rot_y, rot_z]")
-        print("Columns: Joints (in order of DOF IDs)")
+        print("Columns: Joints (in order of DOF addresses)")
         print(f"{'='*60}")
         print("\nPosition Jacobian (3x{}):".format(len(dof_ids)))
         print(jac_subset[0:3, :])
@@ -418,14 +491,7 @@ class JacobianCalculator:
         print(jac_subset[3:6, :])
         print(f"\n{'='*60}\n")
         
-        # Print joint names
         print("Joint names (in order of columns):")
-        joint_names_list = []
-        for dof_id in dof_ids:
-            if dof_id < len(self.joint_names):
-                joint_names_list.append(self.joint_names[dof_id])
-            else:
-                joint_names_list.append(f"DOF_{dof_id}")
         print(joint_names_list)
         print()
         
@@ -492,11 +558,12 @@ class JacobianCalculator:
         other_axis1_jac = pos_jac[other_axes_idx[0], :]
         other_axis2_jac = pos_jac[other_axes_idx[1], :]
         
-        # Score for each joint: target_axis contribution / (sqrt(other_axis1^2 + other_axis2^2) + epsilon)
-        # Higher score = better (strong target axis contribution, weak other axes contribution)
+        # Score for each joint: target_axis_contribution^2 / (total_magnitude^2 + epsilon)
+        # This represents the "dominance" or "alignment" of the joint with the target axis.
+        # Squaring the ratio heavily penalizes joints that move in multiple axes.
         epsilon = 1e-6
-        other_axes_magnitude = np.sqrt(other_axis1_jac**2 + other_axis2_jac**2) + epsilon
-        scores = np.abs(target_axis_jac) / other_axes_magnitude
+        total_magnitude_sq = np.sum(pos_jac**2, axis=0) + epsilon
+        scores = (target_axis_jac**2) / total_magnitude_sq
         
         # Create list of (joint_idx, joint_name, joint_dof_id, score) tuples
         joint_scores = []
@@ -629,7 +696,7 @@ def main(
     axis: str = "y",
     env: str = "EmptySpace",
     controller: str = "IK_POSE",
-    jsonl_path: str = "data/poses/closest_poses_results.jsonl",
+    jsonl_path: str = "data/seed/closest_poses_results.jsonl",
     save_jacobian_gif: bool = False,
 ):
     """
@@ -670,4 +737,3 @@ def main(
 
 if __name__ == "__main__":
     fire.Fire(main)
-

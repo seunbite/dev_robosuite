@@ -1,137 +1,112 @@
-from arm_pose_config import direction_pose_set, pitch_poses, poses, height_map
-
 import sys
 import os
 import json
-from itertools import product
+from tqdm import tqdm
+import fire
 
-jsonl_path = "data/poses/closest_poses_results.jsonl"
+# Path to the shared pose database
+jsonl_path = "data/seed/closest_poses_results.jsonl"
 
-if os.path.exists(jsonl_path):
-    os.remove(jsonl_path)
-else:
-    print("File does not exist, will create new one")
+def main(
+    reset: bool = False, 
+    angle_step: float = 90.0, 
+    robots: list = None
+):
+    # 1. Option to reset the database
+    if reset and os.path.exists(jsonl_path):
+        os.remove(jsonl_path)
+        print(f"Removed {jsonl_path}")
 
-robots = ["IIWA", "Panda", "Sawyer", "Kinova3", "Jaco", "UR5e", "XArm7"]
-
-# Generate all combinations from direction_pose_set
-total_combinations = 0
-
-for robot in robots:
-    for pose_name, pose_config in direction_pose_set.items():
-        # Get configurations
-        height_val = height_map[pose_config['height']]  # Single height value
-        direction_name = pose_config['dir']  # e.g., 'up', 'front', 'down'
-        ee_pitch_name = pose_config['pitch']  # e.g., 'vertical', 'horizontal'
+    # 2. List of robots to process
+    if robots is None:
+        robots = ["IIWA", "Panda", "Sawyer", "Kinova3", "Jaco", "UR5e", "XArm7"]
+    
+    print(f"\nStarting Global Brute Force for {len(robots)} robots...")
+    
+    for robot in robots:
+        print(f"\n{'='*60}")
+        print(f"PROCESS ROBOT: {robot}")
+        print(f"{'='*60}")
         
-        # Get direction poses (roll/yaw combinations)
-        direction_poses = poses[direction_name]  # List of {'roll': ..., 'yaw': ...}
+        # We call the script with --brute_force True
+        # This will iterate through 3^N combinations and classify them by orientation and region.
+        # It's much faster than calling the script 100 times per robot.
+        cmd = f"python adhoc/robotarm/find_closest_poses.py --robot {robot} --brute_force True --angle_step {angle_step} --stack_jsonl_path {jsonl_path}"
         
-        # Get pitch values
-        pitch_values = pitch_poses[ee_pitch_name]  # List of pitch values: [0, 180] or [90, -90]
-        
-        # Generate all combinations: direction x pitch
-        for dir_pose, pitch_val in product(direction_poses, pitch_values):
-            roll = dir_pose['roll']
-            yaw = dir_pose['yaw']
-            
-            print(f"\n{'='*60}")
-            print(f"Generating: {pose_name}")
-            print(f"  Robot: {robot}")
-            print(f"  Height: {height_val}")
-            print(f"  Roll: {roll}, Pitch: {pitch_val}, Yaw: {yaw}")
-            print(f"{'='*60}")
-            
-            # Build command
-            cmd = f"python adhoc/robotarm/find_closest_poses.py --robot {robot} --roll {roll} --pitch {pitch_val} --yaw {yaw}"
-            if height_val:
-                cmd += f" --height {height_val}"
-            
-            # Execute
-            os.system(cmd)
-            total_combinations += 1
+        ret = os.system(cmd)
+        if ret != 0:
+            print(f"Warning: Failed to process {robot}")
 
-print(f"\nTotal combinations generated: {total_combinations}")
+    # 3. Print Summary
+    print_summary(jsonl_path)
 
-# Read results and create summary table
-print("\n" + "="*80)
-print("POSE GENERATION SUMMARY")
-print("="*80)
 
-if not os.path.exists(jsonl_path):
-    print(f"Error: JSONL file not found: {jsonl_path}")
-    sys.exit(1)
+def print_summary(path=None):
+    """Print a detailed summary table of the pose database."""
+    if path is None:
+        path = jsonl_path
 
-# Load all poses
-pose_results = []
-with open(jsonl_path, 'r') as f:
-    for line in f:
-        if line.strip():
-            pose_results.append(json.loads(line))
+    if not os.path.exists(path):
+        print(f"Error: JSONL file not found: {path}")
+        return
 
-if not pose_results:
-    print("No poses found in JSONL file")
-    sys.exit(1)
+    import numpy as np
 
-# Get all unique robots
-all_robots = sorted(set(p.get('robot') for p in pose_results))
+    poses = []
+    with open(path, 'r') as f:
+        for line in f:
+            if line.strip():
+                poses.append(json.loads(line))
 
-# Get all unique (roll, pitch, yaw) combinations
-combos = {}
-for p in pose_results:
-    key = (p.get('roll_deg'), p.get('pitch_deg'), p.get('yaw_deg'))
-    if key not in combos:
-        combos[key] = {robot: 0 for robot in all_robots}
-    combos[key][p.get('robot')] += 1
+    all_robots = sorted(set(p.get('robot', '?') for p in poses))
+    all_dirs = ['up', 'down', 'front', 'back', 'left', 'right']
+    all_grips = ['vertical', 'horizontal']
 
-# Sort combinations for consistent display
-def sort_key(x):
-    roll, pitch, yaw = x
-    return (
-        roll if roll is not None else 999,
-        pitch if pitch is not None else 999,
-        yaw if yaw is not None else 999
-    )
-combo_list = sorted(combos.keys(), key=sort_key)
+    # ── Table 1: Direction × Gripper Orientation ──
+    print("\n" + "=" * 80)
+    print("POSE DATABASE SUMMARY")
+    print("=" * 80)
 
-# Format angle for display
-def format_angle(angle):
-    if angle is None:
-        return "None"
-    return str(int(angle))
+    header_cols = []
+    for d in all_dirs:
+        for g in all_grips:
+            header_cols.append(f"{d[:2]}_{g[0]}")
 
-# Print table header
-header = f"{'Roll/Pitch/Yaw':<20}"
-for robot in all_robots:
-    header += f"{robot:>10}"
-header += f"{'Total':>10}"
-print(header)
-print("-" * (20 + 10 * (len(all_robots) + 1)))
+    col_w = 7
+    robot_w = 10
+    header = f"{'Robot':<{robot_w}}" + "".join(f"{c:>{col_w}}" for c in header_cols) + f"{'TOTAL':>{col_w}}"
+    print(f"\n[Direction × Gripper Orientation]")
+    print(header)
+    print("-" * len(header))
 
-# Print each row
-for combo in combo_list:
-    roll, pitch, yaw = combo
-    row_label = f"({format_angle(roll)}, {format_angle(pitch)}, {format_angle(yaw)})"
-    row = f"{row_label:<20}"
-    total = 0
     for robot in all_robots:
-        count = combos[combo][robot]
-        row += f"{count:>10}"
-        total += count
-    row += f"{total:>10}"
-    print(row)
+        rp = [p for p in poses if p.get('robot') == robot]
+        cells = []
+        for d in all_dirs:
+            for g in all_grips:
+                cnt = sum(1 for p in rp if p.get('dir') == d and p.get('gripper_orientation') == g)
+                cells.append(cnt)
+        row = f"{robot:<{robot_w}}" + "".join(f"{c:>{col_w}}" for c in cells) + f"{sum(cells):>{col_w}}"
+        print(row)
 
-# Print totals row
-print("-" * (20 + 10 * (len(all_robots) + 1)))
-total_row = f"{'TOTAL':<20}"
-grand_total = 0
-for robot in all_robots:
-    robot_total = sum(combos[combo][robot] for combo in combo_list)
-    total_row += f"{robot_total:>10}"
-    grand_total += robot_total
-total_row += f"{grand_total:>10}"
-print(total_row)
+    # ── Table 2: Percentile distribution per axis per robot ──
+    for axis in ['x', 'y', 'z']:
+        pct_key = f"{axis}_pct"
+        print(f"\n[{axis.upper()} Percentile Stats by Robot × Direction]")
+        stat_header = f"{'Robot':<{robot_w}}{'Dir':<8}{'count':>7}{'min':>6}{'p25':>6}{'p50':>6}{'p75':>6}{'max':>6}"
+        print(stat_header)
+        print("-" * len(stat_header))
+        for robot in all_robots:
+            for d in all_dirs:
+                rp = [p for p in poses if p.get('robot') == robot and p.get('dir') == d]
+                vals = [p.get(pct_key, 0) for p in rp if pct_key in p]
+                if not vals:
+                    continue
+                arr = np.array(vals)
+                print(f"{robot:<{robot_w}}{d:<8}{len(vals):>7}{int(arr.min()):>6}{int(np.percentile(arr, 25)):>6}{int(np.percentile(arr, 50)):>6}{int(np.percentile(arr, 75)):>6}{int(arr.max()):>6}")
 
-print("="*80)
-print(f"Total poses generated: {len(pose_results)}")
-print("="*80)
+    print("\n" + "=" * 80)
+    print("Done!")
+
+if __name__ == "__main__":
+    fire.Fire(main)

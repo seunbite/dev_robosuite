@@ -71,6 +71,8 @@ class MjRenderContext:
                 from robosuite.renderers.context.osmesa_context import OSMesaGLContext as GLContext
             elif _SYSTEM == "Linux" and _MUJOCO_GL == "egl":
                 from robosuite.renderers.context.egl_context import EGLGLContext as GLContext
+            elif _SYSTEM == "Darwin" and _MUJOCO_GL == "cgl":
+                from mujoco.cgl import GLContext
             else:
                 from robosuite.renderers.context.glfw_context import GLFWGLContext as GLContext
 
@@ -80,7 +82,10 @@ class MjRenderContext:
         self.device_id = device_id
 
         # setup GL context with defaults for now
-        self.gl_ctx = GLContext(max_width=max_width, max_height=max_height, device_id=self.device_id)
+        if _SYSTEM == "Darwin" and _MUJOCO_GL == "cgl":
+            self.gl_ctx = GLContext(max_width=max_width, max_height=max_height)
+        else:
+            self.gl_ctx = GLContext(max_width=max_width, max_height=max_height, device_id=self.device_id)
         self.gl_ctx.make_current()
 
         # Ensure the model data has been updated so that there
@@ -197,18 +202,26 @@ class MjRenderContext:
 
     def __del__(self):
         # free mujoco rendering context and GL rendering context
-        self.con.free()
+        if hasattr(self, "con"):
+            self.con.free()
         try:
-            self.gl_ctx.free()
+            if hasattr(self, "gl_ctx"):
+                self.gl_ctx.free()
         except Exception:
             # avoid getting OpenGL.error.GLError
             pass
-        del self.con
-        del self.gl_ctx
-        del self.scn
-        del self.cam
-        del self.vopt
-        del self.pert
+        if hasattr(self, "con"):
+            del self.con
+        if hasattr(self, "gl_ctx"):
+            del self.gl_ctx
+        if hasattr(self, "scn"):
+            del self.scn
+        if hasattr(self, "cam"):
+            del self.cam
+        if hasattr(self, "vopt"):
+            del self.vopt
+        if hasattr(self, "pert"):
+            del self.pert
 
 
 class MjRenderContextOffscreen(MjRenderContext):

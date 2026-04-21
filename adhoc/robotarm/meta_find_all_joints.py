@@ -1,194 +1,111 @@
 """
-Meta script to generate poses for all roll/pitch/yaw combinations.
-
-Generates poses for:
-- Roll: range(-180, 181, 90) = [-180, -90, 0, 90, 180] (5 values)
-- Pitch: range(-180, 181, 90) = [-180, -90, 0, 90, 180] (5 values)
-- Yaw: range(-180, 181, 90) = [-180, -90, 0, 90, 180] (5 values)
-Total: 5 * 5 * 5 = 125 combinations
-
-For each robot, runs find_closest_poses.py for all combinations,
-then creates a summary table showing pose counts per combination.
+Efficiently export all possible poses for all robots into a single database.
+This script scans the entire joint space of each robot ONCE and saves 
+position, orientation, and region info for all combinations.
 """
 
-import sys
 import os
 import json
+import numpy as np
 from itertools import product
+from tqdm import tqdm
+import fire
 
-# JSONL file path
-jsonl_path = "data/poses/closest_poses_results.jsonl"
+from find_closest_poses import ClosestPoseFinder
+from arm_pose_config import poses as dir_configs, pitch_poses
 
-# Remove existing JSONL file if it exists
-if os.path.exists(jsonl_path):
-    os.remove(jsonl_path)
-    print(f"Removed existing JSONL file: {jsonl_path}")
-else:
-    print(f"JSONL file does not exist, will create new one: {jsonl_path}")
+def export_all_poses(
+    output_path="data/seed/closest_poses_results.jsonl",
+    angle_step=90.0, # 90 deg -> 3^N poses, 45 deg -> 5^N poses
+    robots=["IIWA", "Panda", "Sawyer", "Kinova3", "Jaco", "UR5e", "XArm7"]
+):
+    if os.path.exists(output_path):
+        os.remove(output_path)
+        print(f"Removed existing database: {output_path}")
 
-# Define angle values: range(-180, 181, 90) = [-180, -90, 0, 90, 180]
-angle_values = list(range(-180, 181, 90))
-
-# Generate all combinations of (roll, pitch, yaw)
-combinations = list(product(angle_values, angle_values, angle_values))
-total_combinations = len(combinations)
-print(f"\n{'='*80}")
-print(f"POSE GENERATION: ALL ROLL/PITCH/YAW COMBINATIONS")
-print(f"{'='*80}")
-print(f"Total combinations: {total_combinations} (5 * 5 * 5)")
-print(f"Angle values: {angle_values}")
-print(f"{'='*80}\n")
-
-# Robot list
-# robots = ["IIWA", "Panda", "Sawyer", "Kinova3", "Jaco", "UR5e", "XArm7"]
-robots = ["IIWA", "Panda"]
-
-# Total number of executions
-total_executions = len(robots) * total_combinations
-print(f"Total executions: {total_executions} ({len(robots)} robots × {total_combinations} combinations)")
-print(f"Starting pose generation...\n")
-
-# Execute find_closest_poses.py for each robot and combination
-execution_count = 0
-for robot in robots:
-    print(f"\n{'='*80}")
-    print(f"Processing robot: {robot}")
-    print(f"{'='*80}")
-    
-    for combo_idx, (roll, pitch, yaw) in enumerate(combinations, 1):
-        execution_count += 1
-        print(f"\n[{execution_count}/{total_executions}] Robot: {robot}, "
-              f"Roll: {roll}°, Pitch: {pitch}°, Yaw: {yaw}°")
+    for robot_name in robots:
+        print(f"\nScanning Pose Space for: {robot_name} (Step: {angle_step} deg)")
+        finder = ClosestPoseFinder(robot_name=robot_name)
         
-        # Build command
-        cmd = (f"python adhoc/robotarm/find_closest_poses.py "
-               f"--robot {robot} --roll {roll} --pitch {pitch} --yaw {yaw}")
+        # 1. Determine search space
+        num_independent = len(finder.active_joint_indices)
+        # For bimanual/symmetric robots, ClosestPoseFinder already handles reducing indices
+        # If we want to force symmetry, we can check if it's Tiago etc.
+        if robot_name in ["Tiago", "PandaOmron"]:
+            num_independent = num_independent // 2
+            
+        angle_min, angle_max = np.deg2rad(-90), np.deg2rad(90)
+        step_rad = np.deg2rad(angle_step)
+        possible_angles = np.arange(angle_min, angle_max + step_rad/2, step_rad)
         
-        # Execute command
-        exit_code = os.system(cmd)
+        combinations = list(product(possible_angles, repeat=num_independent))
+        print(f"Total combinations to simulate: {len(combinations):,}")
+
+        # 2. First pass: Find min/max bounds for global regions
+        all_data = []
+        x_vals, y_vals, z_vals = [], [], []
         
-        if exit_code != 0:
-            print(f"Warning: Command failed with exit code {exit_code}")
-            print(f"Command: {cmd}")
+        print("Simulating and capturing EE data...")
+        for combo_idx, combo in enumerate(tqdm(combinations)):
+            joint_pos = finder.initial_joint_pos.copy()
+            # Symmetric assignment
+            for i, val in enumerate(combo):
+                if len(finder.active_joint_indices) > num_independent: # Bimanual
+                    joint_pos[finder.active_joint_indices[i]] = val
+                    joint_pos[finder.active_joint_indices[i + num_independent]] = val
+                else:
+                    joint_pos[finder.active_joint_indices[i]] = val
+            
+            finder._set_joint_positions(joint_pos)
+            
+            # Get EE state
+            ee_pos = finder._get_ee_position(arm="right")
+            root_pos = finder._get_root_position()
+            rpy = finder._get_ee_orientation_rpy(arm="right")
+            
+            dx, dy, dz = ee_pos - root_pos
+            
+            # Construct angles_str for reference
+            angles_str = "_".join([f"j{i}{int(np.rad2deg(v)):+04d}" for i, v in enumerate(combo)])
 
-print(f"\n{'='*80}")
-print("POSE GENERATION COMPLETE")
-print(f"{'='*80}\n")
+            all_data.append({
+                "pose_id": combo_idx,
+                "angles_str": angles_str,
+                "joint_angles_rad": [float(v) for v in combo],
+                "joint_angles_deg": [float(np.rad2deg(v)) for v in combo],
+                "active_joint_indices": [int(idx) for idx in finder.active_joint_indices[:num_independent]],
+                "x_diff": float(dx), "y_diff": float(dy), "z_diff": float(dz),
+                "ee_pos": [float(v) for v in ee_pos],
+                "root_pos": [float(v) for v in root_pos],
+                "roll_deg": float(np.rad2deg(rpy[0])),
+                "pitch_deg": float(np.rad2deg(rpy[1])),
+                "yaw_deg": float(np.rad2deg(rpy[2])),
+            })
+            x_vals.append(dx); y_vals.append(dy); z_vals.append(dz)
 
-# Read results and create summary table
-print(f"\n{'='*80}")
-print("POSE GENERATION SUMMARY")
-print(f"{'='*80}")
+        # 3. Second pass: Compute percentiles and save
+        for axis in ['x', 'y', 'z']:
+            values = np.array([e[f"{axis}_diff"] for e in all_data])
+            order = np.argsort(values)
+            n = len(values)
+            for rank, idx in enumerate(order):
+                all_data[idx][f"{axis}_pct"] = int(round(rank / max(n - 1, 1) * 100))
 
-if not os.path.exists(jsonl_path):
-    print(f"Error: JSONL file not found: {jsonl_path}")
-    sys.exit(1)
+        with open(output_path, 'a') as f:
+            for entry in all_data:
+                entry["robot"] = robot_name
+                entry["orientation"] = {
+                    "roll_deg": entry.pop("roll_deg"),
+                    "pitch_deg": entry.pop("pitch_deg"),
+                    "yaw_deg": entry.pop("yaw_deg")
+                }
+                
+                f.write(json.dumps(entry) + '\n')
+        
+        finder.close()
+        print(f"Successfully exported {len(all_data)} poses for {robot_name}")
 
-# Load all poses
-poses = []
-with open(jsonl_path, 'r') as f:
-    for line in f:
-        if line.strip():
-            try:
-                poses.append(json.loads(line))
-            except json.JSONDecodeError as e:
-                print(f"Warning: Failed to parse line: {e}")
-                continue
+    print(f"\nPose database complete: {output_path}")
 
-if not poses:
-    print("No poses found in JSONL file")
-    sys.exit(1)
-
-print(f"Total poses loaded: {len(poses)}")
-
-# Get all unique robots
-all_robots = sorted(set(p.get('robot') for p in poses if p.get('robot')))
-print(f"Robots found: {all_robots}")
-
-# Get all unique (roll, pitch, yaw) combinations from the data
-combos = {}
-for p in poses:
-    roll = p.get('roll_deg')
-    pitch = p.get('pitch_deg')
-    yaw = p.get('yaw_deg')
-    key = (roll, pitch, yaw)
-    
-    if key not in combos:
-        combos[key] = {robot: 0 for robot in all_robots}
-    
-    robot = p.get('robot')
-    if robot in combos[key]:
-        combos[key][robot] += 1
-
-# Sort combinations for consistent display
-# Sort by roll, then pitch, then yaw
-def sort_key(x):
-    roll, pitch, yaw = x
-    return (
-        roll if roll is not None else 999,
-        pitch if pitch is not None else 999,
-        yaw if yaw is not None else 999
-    )
-
-combo_list = sorted(combos.keys(), key=sort_key)
-
-# Format angle for display
-def format_angle(angle):
-    if angle is None:
-        return "None"
-    return str(int(angle))
-
-# Print summary statistics
-print(f"\nUnique (roll, pitch, yaw) combinations found: {len(combo_list)}")
-print(f"Expected combinations: {total_combinations}")
-
-# Print table header
-# Use wider format for readability
-col_width = 12
-header = f"{'Roll/Pitch/Yaw':<25}"
-for robot in all_robots:
-    header += f"{robot:>{col_width}}"
-header += f"{'Total':>{col_width}}"
-print("\n" + header)
-print("-" * (25 + col_width * (len(all_robots) + 1)))
-
-# Print each row
-for combo in combo_list:
-    roll, pitch, yaw = combo
-    row_label = f"({format_angle(roll)}, {format_angle(pitch)}, {format_angle(yaw)})"
-    row = f"{row_label:<25}"
-    total = 0
-    for robot in all_robots:
-        count = combos[combo][robot]
-        row += f"{count:>{col_width}}"
-        total += count
-    row += f"{total:>{col_width}}"
-    print(row)
-
-# Print totals row
-print("-" * (25 + col_width * (len(all_robots) + 1)))
-total_row = f"{'TOTAL':<25}"
-grand_total = 0
-for robot in all_robots:
-    robot_total = sum(combos[combo][robot] for combo in combo_list)
-    total_row += f"{robot_total:>{col_width}}"
-    grand_total += robot_total
-total_row += f"{grand_total:>{col_width}}"
-print(total_row)
-
-# Print final summary
-print(f"\n{'='*80}")
-print(f"Total poses generated: {len(poses)}")
-print(f"Total unique combinations: {len(combo_list)}")
-print(f"Robots processed: {len(all_robots)}")
-print(f"{'='*80}\n")
-
-# Additional statistics
-print("Statistics per robot:")
-print("-" * 80)
-for robot in all_robots:
-    robot_poses = [p for p in poses if p.get('robot') == robot]
-    robot_combos = len(set((p.get('roll_deg'), p.get('pitch_deg'), p.get('yaw_deg')) 
-                       for p in robot_poses))
-    print(f"  {robot:>10}: {len(robot_poses):>6} poses, {robot_combos:>4} unique combinations")
-print("-" * 80)
+if __name__ == "__main__":
+    fire.Fire(export_all_poses)

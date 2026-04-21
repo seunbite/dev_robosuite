@@ -3,7 +3,7 @@ Query closest poses from pre-exported JSONL file.
 Much faster than recalculating poses every time.
 
 Usage:
-    python adhoc/robotarm/query_poses_from_export.py --robot IIWA --roll 0 --pitch 90 --yaw 0
+    python adhoc/robotarm/query_poses_from_export.py --robot IIWA --roll 0 --gripper_orientation 90 --yaw 0
     python adhoc/robotarm/query_poses_from_export.py --robot Panda --roll 180 --yaw 0 --height high
 """
 
@@ -119,7 +119,7 @@ def create_tiled_image(
         robot: Robot name
         top_poses: List of pose dictionaries
         roll_deg: Target roll (for filename)
-        pitch_deg: Target pitch (for filename)
+        pitch_deg: Target gripper_orientation (for filename)
         yaw_deg: Target yaw (for filename)
         height: Height filter (for filename)
         tile_size: Size to resize each tile
@@ -339,7 +339,7 @@ def create_tiled_image(
 def query_closest_poses(
     robot: str = "IIWA",
     roll: Optional[float] = None,
-    pitch: Optional[float] = None,
+    gripper_orientation: Optional[float] = None,
     yaw: Optional[float] = None,
     top_k: int = 100,
     height: Optional[str] = None,
@@ -359,7 +359,7 @@ def query_closest_poses(
     Args:
         robot: Robot name
         roll: Target roll angle in degrees (None to ignore)
-        pitch: Target pitch angle in degrees (None to ignore)
+        gripper_orientation: Target gripper_orientation angle in degrees (None to ignore)
         yaw: Target yaw angle in degrees (None to ignore)
         top_k: Number of top poses to return
         height: Filter by height ("high", "medium", "low", or None)
@@ -375,13 +375,13 @@ def query_closest_poses(
     
     Examples:
         # Basic query
-        python adhoc/robotarm/query_poses_from_export.py --robot IIWA --roll 0 --pitch 90 --yaw 0
+        python adhoc/robotarm/query_poses_from_export.py --robot IIWA --roll 0 --gripper_orientation 90 --yaw 0
         
         # With height filter
         python adhoc/robotarm/query_poses_from_export.py --robot Panda --roll 180 --yaw 0 --height high --top-k 50
         
         # Save tile image
-        python adhoc/robotarm/query_poses_from_export.py --robot IIWA --roll 0 --pitch 90 --yaw 0 --save-tile-image
+        python adhoc/robotarm/query_poses_from_export.py --robot IIWA --roll 0 --gripper_orientation 90 --yaw 0 --save-tile-image
         
         # Custom tile output
         python adhoc/robotarm/query_poses_from_export.py --robot Panda --roll 180 --yaw 0 --save-tile-image --tile-output my_poses.png
@@ -392,7 +392,7 @@ def query_closest_poses(
     print(f"Robot: {robot}")
     print(f"Target orientation:")
     print(f"  Roll:  {roll}°" if roll is not None else "  Roll:  None (ignored)")
-    print(f"  Pitch: {pitch}°" if pitch is not None else "  Pitch: None (ignored)")
+    print(f"  Pitch: {gripper_orientation}°" if gripper_orientation is not None else "  Pitch: None (ignored)")
     print(f"  Yaw:   {yaw}°" if yaw is not None else "  Yaw:   None (ignored)")
     print(f"Top K: {top_k}")
     if height:
@@ -416,7 +416,7 @@ def query_closest_poses(
     
     # Convert target angles to radians
     target_roll = np.deg2rad(roll) if roll is not None else None
-    target_pitch = np.deg2rad(pitch) if pitch is not None else None
+    target_pitch = np.deg2rad(gripper_orientation) if gripper_orientation is not None else None
     target_yaw = np.deg2rad(yaw) if yaw is not None else None
     
     # Calculate orientation differences
@@ -495,7 +495,7 @@ def query_closest_poses(
             robot=robot,
             top_poses=top_poses,
             roll_deg=roll,
-            pitch_deg=pitch,
+            pitch_deg=gripper_orientation,
             yaw_deg=yaw,
             height=height,
             tile_size=tile_size,
@@ -508,7 +508,7 @@ def query_closest_poses(
         "robot": robot,
         "target_orientation": {
             "roll_deg": roll,
-            "pitch_deg": pitch,
+            "pitch_deg": gripper_orientation,
             "yaw_deg": yaw,
         },
         "height_filter": height,

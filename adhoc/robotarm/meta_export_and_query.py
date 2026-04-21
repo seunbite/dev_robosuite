@@ -6,7 +6,7 @@ Meta script to:
 This is MUCH faster than the old approach of recalculating poses for each query.
 """
 
-from pose_config import direction_pose_set, pitch_poses, poses, height_map
+from arm_pose_config import direction_pose_set, pitch_poses, poses, height_map
 import sys
 import os
 import json
@@ -67,12 +67,12 @@ for robot in robots:
         # Get configurations
         height_val = height_map[pose_config['height']]
         direction_name = pose_config['dir']
-        ee_pitch_name = pose_config['pitch']
+        ee_pitch_name = pose_config['gripper_orientation']
         
         # Get direction poses (roll/yaw combinations)
         direction_poses = poses[direction_name]
         
-        # Get pitch values
+        # Get gripper_orientation values
         pitch_values = pitch_poses[ee_pitch_name]
         
         # Generate all combinations
@@ -89,7 +89,7 @@ for robot in robots:
             
             # Build query command
             cmd = f"python adhoc/robotarm/query_poses_from_export.py --robot {robot}"
-            cmd += f" --roll {roll} --pitch {pitch_val} --yaw {yaw}"
+            cmd += f" --roll {roll} --gripper_orientation {pitch_val} --yaw {yaw}"
             if height_val:
                 cmd += f" --height {height_val}"
             

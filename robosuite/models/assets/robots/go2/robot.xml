@@ -18,14 +18,17 @@
     </default>
     <default class="hip">
     </default>
+    <!-- Must inherit pitch axis from go2 (0 1 0). If these blocks sit outside class go2,
+         MuJoCo falls back to default joint axis (0 0 1), which is collinear with the leg;
+         thigh/knee motion then does not translate the foot (only hip abduction does). -->
     <default class="front_hip">
-      <joint range="-1.5708 3.4907"/>
+      <joint axis="0 1 0" range="-1.5708 3.4907"/>
     </default>
     <default class="back_hip">
-      <joint range="-0.5236 4.5379"/>
+      <joint axis="0 1 0" range="-0.5236 4.5379"/>
     </default>
     <default class="knee">
-      <joint range="-2.7227 -0.83776"/>
+      <joint axis="0 1 0" range="-2.7227 -0.83776"/>
       <motor ctrlrange="-45.43 45.43"/>
     </default>
     <default class="go2_visual">

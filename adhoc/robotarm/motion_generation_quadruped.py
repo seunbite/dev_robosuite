@@ -226,7 +226,7 @@ class QuadrupedMotionGenerator:
         
         joint_type_keywords = {
             'hip': ['hip', 'abduction', 'abd', 'roll', 'hx', '0'],
-            'shoulder': ['shoulder', 'thigh', 'flexion', 'pitch', 'hy', '1'],
+            'shoulder': ['shoulder', 'thigh', 'flexion', 'gripper_orientation', 'hy', '1'],
             'knee': ['knee', 'calf', 'shank', 'kn', '2'],
         }
         
@@ -403,7 +403,7 @@ class QuadrupedMotionGenerator:
             # Body height movement - pick one leg (all will move together)
             selected_leg = 'FL'  # Use front-left as representative
         elif affects == 'front_vs_back':
-            # Body pitch - pick front or back leg
+            # Body gripper_orientation - pick front or back leg
             selected_leg = 'FL' if joint_preference == 'proximal' else 'HL'
         elif affects == 'left_vs_right':
             # Body roll - pick left or right leg

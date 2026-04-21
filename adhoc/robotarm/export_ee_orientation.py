@@ -1,5 +1,5 @@
 """
-Export end effector orientations (pitch, yaw, roll) for generated poses.
+Export end effector orientations (gripper_orientation, yaw, roll) for generated poses.
 
 This script loads generated poses and calculates end effector orientations
 for each pose configuration.
@@ -118,21 +118,21 @@ class EEOrientationExporter:
     
     def _get_ee_orientation_rpy(self, arm="right"):
         """
-        Get end effector orientation as roll, pitch, yaw in radians.
+        Get end effector orientation as roll, gripper_orientation, yaw in radians.
         
         Args:
             arm: Which arm to get orientation for ("right" or "left")
             
         Returns:
-            np.ndarray: [roll, pitch, yaw] in radians
+            np.ndarray: [roll, gripper_orientation, yaw] in radians
         """
         try:
             # Get rotation matrix
             orn_dict = self.robot._hand_orn
             if arm in orn_dict:
                 rot_mat = orn_dict[arm]
-                # Convert rotation matrix to euler angles (roll, pitch, yaw)
-                # mat2euler returns [roll, pitch, yaw]
+                # Convert rotation matrix to euler angles (roll, gripper_orientation, yaw)
+                # mat2euler returns [roll, gripper_orientation, yaw]
                 rpy = T.mat2euler(rot_mat)
                 return rpy
             else:

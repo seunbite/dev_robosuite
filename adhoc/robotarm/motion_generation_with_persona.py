@@ -227,8 +227,8 @@ class PersonalityMotionGenerator(MotionGenerator):
                 if isinstance(pose, dict):
                     height = pose.get('height', '?')
                     direction = pose.get('dir', '?')
-                    pitch = pose.get('pitch', '?')
-                    description_parts.append(f"pose {i+1}: {height} height, {direction} direction, {pitch} pitch")
+                    gripper_orientation = pose.get('gripper_orientation', '?')
+                    description_parts.append(f"pose {i+1}: {height} height, {direction} direction, {gripper_orientation} gripper_orientation")
                 else:
                     description_parts.append(f"pose {i+1}: {pose}")
             

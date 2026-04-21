@@ -60,7 +60,7 @@ def query_humanoid_poses(
         python adhoc/humanoid/query_humanoid_poses.py --robot GR1ArmsOnly --active-arm right --roll 0 --pitch 90 --yaw 0 --save-tile-image
     """
     # Construct input file path
-    input_file = f"data/poses/humanoid/all_{robot}_{active_arm}_poses.jsonl"
+    input_file = f"data/poses/{robot}/all_{robot}_{active_arm}_poses.jsonl"
     
     # Call the generic query function
     result = query_closest_poses(

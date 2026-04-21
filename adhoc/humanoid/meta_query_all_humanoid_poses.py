@@ -16,7 +16,10 @@ from pathlib import Path
 
 # Add parent directory to import pose_config
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'robotarm'))
-from pose_config import direction_pose_set, pitch_poses, poses, height_map
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'robotarm'))
+from arm_pose_config import direction_pose_set, pitch_poses, poses, height_map
 
 import fire
 
@@ -39,7 +42,7 @@ def meta_query_all_humanoid_poses(
     Args:
         robot: Humanoid robot name (GR1ArmsOnly, GR1FixedLowerBody, etc.)
         active_arm: Which arm ("right" or "left")
-        output_jsonl: Output JSONL path (default: data/poses/humanoid/closest_{robot}_{arm}_poses.jsonl)
+        output_jsonl: Output JSONL path (default: data/poses/{robot}/closest_{robot}_{arm}_poses.jsonl)
         top_k: Number of top poses per combination
     
     Examples:
@@ -60,7 +63,7 @@ def meta_query_all_humanoid_poses(
     
     # Determine output file
     if output_jsonl is None:
-        output_jsonl = f"data/poses/humanoid/closest_{robot}_{active_arm}_poses.jsonl"
+        output_jsonl = f"data/poses/{robot}/closest_{robot}_{active_arm}_poses.jsonl"
     
     # Clear output JSONL
     if os.path.exists(output_jsonl):
@@ -108,7 +111,7 @@ def meta_query_all_humanoid_poses(
                 cmd += f" --height {height_val}"
             
             # Temporary output file
-            temp_output = f"data/poses/humanoid/temp_query_{robot}_{active_arm}_{query_count}.json"
+            temp_output = f"data/poses/{robot}/temp_query_{robot}_{active_arm}_{query_count}.json"
             cmd += f" --output-file {temp_output}"
             
             # Execute query
@@ -124,6 +127,7 @@ def meta_query_all_humanoid_poses(
                 with open(output_jsonl, 'a') as f_out:
                     for i, pose in enumerate(result.get("poses", []), 1):
                         # Add metadata for motion_generation compatibility
+                        # Include dir/pitch/region fields required by _find_matching_poses()
                         entry = {
                             "robot": robot,
                             "active_arm": active_arm,
@@ -145,7 +149,14 @@ def meta_query_all_humanoid_poses(
                             "root_to_ee_distance": pose["root_to_ee_distance"],
                             "root_position": pose["root_position"],
                             "ee_position": pose["ee_position"],
+                            "x_diff": pose.get("x_diff", 0.0),
+                            "y_diff": pose.get("y_diff", 0.0),
                             "z_diff": pose["z_diff"],
+                            "x_region": pose.get("x_region"),
+                            "y_region": pose.get("y_region"),
+                            "z_region": pose.get("z_region"),
+                            "dir": pose.get("dir"),
+                            "pitch": pose.get("pitch"),
                             "is_front": pose["is_front"],
                             "arm": active_arm,
                         }
