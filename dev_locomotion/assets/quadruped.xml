@@ -1,0 +1,113 @@
+<mujoco model="dev_quadruped">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="RK4" iterations="30"/>
+
+  <visual>
+    <headlight diffuse="0.7 0.7 0.7" ambient="0.25 0.25 0.25" specular="0.15 0.15 0.15"/>
+    <rgba haze="0.15 0.2 0.25 1"/>
+  </visual>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="256" height="256" rgb1="0.88 0.90 0.92" rgb2="0.76 0.79 0.83"/>
+    <material name="floor" texture="grid" texrepeat="4 4" reflectance="0.05"/>
+    <material name="body_mat" rgba="0.19 0.32 0.47 1"/>
+    <material name="leg_mat" rgba="0.80 0.52 0.23 1"/>
+    <material name="foot_mat" rgba="0.10 0.10 0.10 1"/>
+  </asset>
+
+  <default>
+    <joint armature="0.01" damping="0.5" limited="true"/>
+    <geom margin="0.002" condim="3" friction="1.1 0.05 0.02" solimp="0.9 0.95 0.001" solref="0.004 1"/>
+    <motor ctrllimited="true" ctrlrange="-33 33"/>
+  </default>
+
+  <worldbody>
+    <light pos="0 0 2.5" dir="0 0 -1"/>
+    <geom name="floor" type="plane" size="4 4 0.1" material="floor"/>
+
+    <body name="base" pos="0 0 0.34">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="8.5" diaginertia="0.10 0.25 0.28"/>
+      <geom name="body" type="box" size="0.19 0.06 0.05" material="body_mat"/>
+
+      <body name="FR_hip_root" pos="0.1934 -0.092 0">
+        <joint name="FR_hip_joint" axis="1 0 0" range="-0.7 0.7"/>
+        <geom name="FR_hip_link" type="capsule" fromto="0 0 0 0 -0.0955 0" size="0.017" material="leg_mat"/>
+        <body name="FR_thigh" pos="0 -0.0955 0">
+          <joint name="FR_thigh_joint" axis="0 1 0" range="-1.0 2.2"/>
+          <geom name="FR_thigh_link" type="capsule" fromto="0 0 0 0 0 -0.213" size="0.018" material="leg_mat"/>
+          <body name="FR_calf" pos="0 0 -0.213">
+            <joint name="FR_calf_joint" axis="0 1 0" range="-2.9 -0.05"/>
+            <geom name="FR_calf_link" type="capsule" fromto="0 0 0 0 0 -0.23" size="0.015" material="leg_mat"/>
+            <body name="FR_foot" pos="0 0 -0.23">
+              <geom name="FR_foot_geom" type="sphere" size="0.022" material="foot_mat"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <body name="FL_hip_root" pos="0.1934 0.092 0">
+        <joint name="FL_hip_joint" axis="1 0 0" range="-0.7 0.7"/>
+        <geom name="FL_hip_link" type="capsule" fromto="0 0 0 0 0.0955 0" size="0.017" material="leg_mat"/>
+        <body name="FL_thigh" pos="0 0.0955 0">
+          <joint name="FL_thigh_joint" axis="0 1 0" range="-1.0 2.2"/>
+          <geom name="FL_thigh_link" type="capsule" fromto="0 0 0 0 0 -0.213" size="0.018" material="leg_mat"/>
+          <body name="FL_calf" pos="0 0 -0.213">
+            <joint name="FL_calf_joint" axis="0 1 0" range="-2.9 -0.05"/>
+            <geom name="FL_calf_link" type="capsule" fromto="0 0 0 0 0 -0.23" size="0.015" material="leg_mat"/>
+            <body name="FL_foot" pos="0 0 -0.23">
+              <geom name="FL_foot_geom" type="sphere" size="0.022" material="foot_mat"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <body name="RR_hip_root" pos="-0.1934 -0.092 0">
+        <joint name="RR_hip_joint" axis="1 0 0" range="-0.7 0.7"/>
+        <geom name="RR_hip_link" type="capsule" fromto="0 0 0 0 -0.0955 0" size="0.017" material="leg_mat"/>
+        <body name="RR_thigh" pos="0 -0.0955 0">
+          <joint name="RR_thigh_joint" axis="0 1 0" range="-1.0 2.2"/>
+          <geom name="RR_thigh_link" type="capsule" fromto="0 0 0 0 0 -0.213" size="0.018" material="leg_mat"/>
+          <body name="RR_calf" pos="0 0 -0.213">
+            <joint name="RR_calf_joint" axis="0 1 0" range="-2.9 -0.05"/>
+            <geom name="RR_calf_link" type="capsule" fromto="0 0 0 0 0 -0.23" size="0.015" material="leg_mat"/>
+            <body name="RR_foot" pos="0 0 -0.23">
+              <geom name="RR_foot_geom" type="sphere" size="0.022" material="foot_mat"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <body name="RL_hip_root" pos="-0.1934 0.092 0">
+        <joint name="RL_hip_joint" axis="1 0 0" range="-0.7 0.7"/>
+        <geom name="RL_hip_link" type="capsule" fromto="0 0 0 0 0.0955 0" size="0.017" material="leg_mat"/>
+        <body name="RL_thigh" pos="0 0.0955 0">
+          <joint name="RL_thigh_joint" axis="0 1 0" range="-1.0 2.2"/>
+          <geom name="RL_thigh_link" type="capsule" fromto="0 0 0 0 0 -0.213" size="0.018" material="leg_mat"/>
+          <body name="RL_calf" pos="0 0 -0.213">
+            <joint name="RL_calf_joint" axis="0 1 0" range="-2.9 -0.05"/>
+            <geom name="RL_calf_link" type="capsule" fromto="0 0 0 0 0 -0.23" size="0.015" material="leg_mat"/>
+            <body name="RL_foot" pos="0 0 -0.23">
+              <geom name="RL_foot_geom" type="sphere" size="0.022" material="foot_mat"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor name="FR_hip_motor" joint="FR_hip_joint"/>
+    <motor name="FR_thigh_motor" joint="FR_thigh_joint"/>
+    <motor name="FR_calf_motor" joint="FR_calf_joint"/>
+    <motor name="FL_hip_motor" joint="FL_hip_joint"/>
+    <motor name="FL_thigh_motor" joint="FL_thigh_joint"/>
+    <motor name="FL_calf_motor" joint="FL_calf_joint"/>
+    <motor name="RR_hip_motor" joint="RR_hip_joint"/>
+    <motor name="RR_thigh_motor" joint="RR_thigh_joint"/>
+    <motor name="RR_calf_motor" joint="RR_calf_joint"/>
+    <motor name="RL_hip_motor" joint="RL_hip_joint"/>
+    <motor name="RL_thigh_motor" joint="RL_thigh_joint"/>
+    <motor name="RL_calf_motor" joint="RL_calf_joint"/>
+  </actuator>
+</mujoco>

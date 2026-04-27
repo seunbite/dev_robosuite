@@ -13,7 +13,11 @@ long_description = "".join(lines)
 
 setup(
     name="robosuite",
-    packages=[package for package in find_packages() if package.startswith("robosuite")],
+    packages=[
+        package
+        for package in find_packages()
+        if package.startswith("robosuite") or package.startswith("dev_locomotion")
+    ],
     install_requires=[
         "numpy>=1.13.3",
         "numba>=0.49.1",
@@ -30,6 +34,7 @@ setup(
     ],
     eager_resources=["*"],
     include_package_data=True,
+    package_data={"dev_locomotion": ["retrieval_data/*.jsonl"]},
     python_requires=">=3",
     description="robosuite: A Modular Simulation Framework and Benchmark for Robot Learning",
     author="Yuke Zhu",

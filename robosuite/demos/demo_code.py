@@ -822,7 +822,7 @@ def execute_command(controller: RobotController, command: str, model: str = 'gpt
 
 def main(
     mode: str = 'all',  # single, all, interactive
-    cues_file: str = 'data/seed/cues.txt', 
+    cues_file: str = 'data/seed/_remainder/cues.txt', 
     codes_file: str = 'data/logs/codes.jsonl', 
     model: str = 'gpt-4o-mini', 
     no_render: bool = False,
