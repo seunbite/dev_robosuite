@@ -145,11 +145,18 @@ def _grid_prompt(
     cols: int,
     rows: int,
     tile_labels: list[str],
+    temporal_prompt: bool = False,
 ) -> str:
+    temporal_line = (
+        "\nThis cue is TEMPORAL / rhythmic — weight whether the static pose suggests the cue's "
+        "motion tempo and repetition pattern, not only final pose shape.\n"
+        if temporal_prompt
+        else ""
+    )
     numbered = "\n".join(f"  {i + 1}. {tile_labels[i]}" for i in range(n_tiles))
     return f"""
 You are identifying the ground-truth iconic pose for a robot gesture cue from a tiled image.
-
+{temporal_line}
 The image shows {n_tiles} cropped robot renders in a {cols}x{rows} grid.
 Tiles are numbered 1..{n_tiles} left-to-right, top-to-bottom.
 Each tile is one representative pose from a (dir, gripper_orientation) group.
@@ -191,6 +198,7 @@ def _evaluate_one_grid(
     img_dir: Path,
     vlm: VLMClient | None,
     dry_run: bool,
+    temporal_prompt: bool = False,
 ) -> dict[str, Any]:
     cue = ev["cue"]
     gt_poses = _parse_gt_poses(ev["groundtruth"])
@@ -271,6 +279,7 @@ def _evaluate_one_grid(
         cols=cols,
         rows=rows,
         tile_labels=labels,
+        temporal_prompt=temporal_prompt,
     )
     text = vlm.generate(prompt, images=[grid_img])
     try:
@@ -310,11 +319,14 @@ def run(args: argparse.Namespace) -> None:
 
     rows = _dedupe_rows_by_cue(consolidated["rows"])
     rows = sorted(rows, key=lambda r: int(r.get("cue_idx", 0)))
-    if args.max_cues:
-        rows = rows[: int(args.max_cues)]
-    if args.cue_indices:
+    if args.cues:
+        want = {x.strip() for x in args.cues.split(",") if x.strip()}
+        rows = [r for r in rows if r.get("cue") in want]
+    elif args.cue_indices:
         want = {int(x) for x in args.cue_indices.split(",") if x.strip()}
         rows = [r for r in rows if int(r.get("cue_idx", -1)) in want]
+    if args.max_cues:
+        rows = rows[: int(args.max_cues)]
 
     grid_sizes = [int(x) for x in args.grid_sizes.split(",") if x.strip()]
     for n in grid_sizes:
@@ -353,6 +365,7 @@ def run(args: argparse.Namespace) -> None:
                 img_dir=img_dir,
                 vlm=vlm,
                 dry_run=args.dry_run,
+                temporal_prompt=getattr(args, "temporal_prompt", False),
             )
             results.append(rec)
             if args.dry_run:
@@ -445,6 +458,12 @@ def main() -> None:
     p.add_argument("--grid-sizes", default="6,12", help="Comma-separated: 6 and/or 12")
     p.add_argument("--max-cues", type=int, default=20)
     p.add_argument("--cue-indices", type=str, default=None)
+    p.add_argument("--cues", type=str, default=None, help="Comma-separated cue names")
+    p.add_argument(
+        "--temporal-prompt",
+        action="store_true",
+        help="Add tempo/rhythm emphasis for dynamic_temporal cues",
+    )
     p.add_argument("--dry-run", action="store_true", help="Only save grid PNGs, no API")
     p.add_argument(
         "--resume",
