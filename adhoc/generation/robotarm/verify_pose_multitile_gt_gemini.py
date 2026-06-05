@@ -38,7 +38,7 @@ from verify_pose_tiles_gemini import (  # noqa: E402
     _load_tile_pick,
     _resolve_pose_image,
 )
-from vlm_client import VLMClient, is_vllm_backend, require_vllm_server  # noqa: E402
+from vlm_client import VLMClient, is_local_backend, is_vllm_http_backend, require_vllm_server  # noqa: E402
 
 CONSOLIDATED = _REPO / "data/results/verify/pilot40_pose_eval_consolidated.json"
 TILE_DIR = _REPO / "data/results/visualize/pose_groups_12"
@@ -327,8 +327,12 @@ def run(args: argparse.Namespace) -> None:
 
     vlm: VLMClient | None = None
     if not args.dry_run:
-        if is_vllm_backend(args.vlm_backend):
+        if is_vllm_http_backend(args.vlm_backend):
             require_vllm_server()
+        elif is_local_backend(args.vlm_backend):
+            from vllm_local import get_vllm_engine
+
+            get_vllm_engine(model=args.model)
         vlm = VLMClient(backend=args.vlm_backend, model=args.model)
 
     results: list[dict[str, Any]] = list(existing)
@@ -430,9 +434,9 @@ def main() -> None:
     p.add_argument("--model", default=None, help="Override VLM_MODEL env")
     p.add_argument(
         "--vlm-backend",
-        default=os.getenv("VLM_BACKEND", "vllm"),
-        choices=["vllm", "openai", "qwen", "gemini"],
-        help="Default vllm (Qwen via vLLM). gemini=Google API.",
+        default=os.getenv("VLM_BACKEND", "local"),
+        choices=["local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
+        help="Default local (in-process vLLM). vllm/openai=HTTP server; gemini=Google API.",
     )
     p.add_argument("--grid-sizes", default="6,12", help="Comma-separated: 6 and/or 12")
     p.add_argument("--max-cues", type=int, default=20)

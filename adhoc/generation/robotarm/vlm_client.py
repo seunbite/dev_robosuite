@@ -1,4 +1,4 @@
-"""Unified VLM client: vLLM (OpenAI-compatible) or Gemini API."""
+"""Unified VLM client: vLLM local, vLLM HTTP server, or Gemini API."""
 from __future__ import annotations
 
 import base64
@@ -8,7 +8,8 @@ from typing import Any
 
 from PIL import Image
 
-_VLLM_BACKENDS = frozenset({"vllm", "openai", "qwen"})
+_VLLM_HTTP_BACKENDS = frozenset({"vllm", "openai", "qwen"})
+_LOCAL_BACKENDS = frozenset({"local", "vllm-local"})
 
 
 def _pil_to_b64_png(img: Image.Image) -> str:
@@ -17,9 +18,14 @@ def _pil_to_b64_png(img: Image.Image) -> str:
     return base64.b64encode(buf.getvalue()).decode("ascii")
 
 
-def is_vllm_backend(backend: str | None = None) -> bool:
-    b = (backend or os.getenv("VLM_BACKEND", "vllm")).lower()
-    return b in _VLLM_BACKENDS
+def is_local_backend(backend: str | None = None) -> bool:
+    b = (backend or os.getenv("VLM_BACKEND", "local")).lower()
+    return b in _LOCAL_BACKENDS
+
+
+def is_vllm_http_backend(backend: str | None = None) -> bool:
+    b = (backend or os.getenv("VLM_BACKEND", "local")).lower()
+    return b in _VLLM_HTTP_BACKENDS
 
 
 def require_vllm_server(base_url: str | None = None, timeout: float = 10.0) -> str:
@@ -28,7 +34,7 @@ def require_vllm_server(base_url: str | None = None, timeout: float = 10.0) -> s
     if not url:
         raise ValueError(
             "Set VLM_BASE_URL in .env (e.g. http://127.0.0.1:8000/v1). "
-            "Then start inference: bash scripts/start_vllm_server.sh"
+            "Or use --vlm-backend local / run_pose_vlm_eval.py (no server)."
         )
     models_url = f"{url}/models"
     try:
@@ -40,9 +46,9 @@ def require_vllm_server(base_url: str | None = None, timeout: float = 10.0) -> s
         raise RuntimeError("Install httpx (pip install httpx) for server health checks") from e
     except Exception as e:
         raise ConnectionError(
-            f"vLLM server not reachable at {url} ({e}). "
-            "On the GPU node (salloc session), run in another terminal:\n"
-            "  bash scripts/start_vllm_server.sh"
+            f"vLLM HTTP server not reachable at {url} ({e}). "
+            "Use in-process inference instead:\n"
+            "  python adhoc/generation/robotarm/run_pose_vlm_eval.py --experiment multitile20"
         ) from e
     return url
 
@@ -58,21 +64,26 @@ class VLMClient:
         api_key: str | None = None,
         base_url: str | None = None,
     ) -> None:
-        self.backend = (backend or os.getenv("VLM_BACKEND", "vllm")).lower()
+        self.backend = (backend or os.getenv("VLM_BACKEND", "local")).lower()
         self.model = model or os.getenv("VLM_MODEL") or self._default_model()
         self._client: Any = None
         self._kind = self.backend
 
-        if self.backend in _VLLM_BACKENDS:
-            self._kind = "vllm"
+        if self.backend in _LOCAL_BACKENDS:
+            self._kind = "local"
+            from vllm_local import get_vllm_engine
+
+            self._client = get_vllm_engine(model=self.model)
+        elif self.backend in _VLLM_HTTP_BACKENDS:
+            self._kind = "vllm_http"
             from openai import OpenAI
 
             key = api_key or os.getenv("OPENAI_API_KEY") or os.getenv("VLM_API_KEY") or "EMPTY"
             url = base_url or os.getenv("VLM_BASE_URL") or os.getenv("OPENAI_BASE_URL")
             if not url:
                 raise ValueError(
-                    "Set VLM_BASE_URL for vllm backend (e.g. http://127.0.0.1:8000/v1). "
-                    "Start server: bash scripts/start_vllm_server.sh"
+                    "Set VLM_BASE_URL for HTTP vllm backend, "
+                    "or use --vlm-backend local for in-process inference."
                 )
             self._client = OpenAI(api_key=key, base_url=url)
         elif self.backend == "gemini":
@@ -83,16 +94,19 @@ class VLMClient:
                 raise ValueError("Set GOOGLE_API_KEY (or GEMINI_API_KEY) for gemini backend")
             self._client = genai.Client(api_key=key)
         else:
-            raise ValueError(f"Unknown VLM backend: {self.backend} (use vllm or gemini)")
+            raise ValueError(f"Unknown VLM backend: {self.backend} (use local, vllm, or gemini)")
 
     def _default_model(self) -> str:
-        if self.backend in _VLLM_BACKENDS:
+        if self.backend in _LOCAL_BACKENDS or self.backend in _VLLM_HTTP_BACKENDS:
             return os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-32B-Instruct")
         return os.getenv("VLM_MODEL", "gemini-2.5-pro")
 
     def generate(self, prompt: str, images: list[Image.Image] | None = None) -> str:
         images = images or []
-        if self._kind == "vllm":
+        if self._kind == "local":
+            return self._client.generate(prompt, images)
+
+        if self._kind == "vllm_http":
             parts: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
             for img in images:
                 parts.append(
