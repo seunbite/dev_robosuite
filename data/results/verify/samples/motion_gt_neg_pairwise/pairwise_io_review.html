@@ -1,0 +1,823 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<title>GT vs neg pairwise — inputs &amp; outputs (n=10)</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:1200px;margin:20px auto;padding:0 16px 48px;background:#fafafa}
+h1{font-size:22px} h2{font-size:17px;margin-top:32px;border-bottom:1px solid #ddd;padding-bottom:6px}
+h3{font-size:14px;color:#444;margin:16px 0 8px}
+.summary{background:#fff;border:1px solid #ccc;border-radius:10px;padding:14px 18px;margin:16px 0 24px}
+.summary table{border-collapse:collapse;width:100%}
+.summary th,.summary td{border:1px solid #e0e0e0;padding:8px 10px;text-align:left;font-size:14px}
+.note{font-size:13px;color:#666}
+.answer{background:#e8f5e9;border:1px solid #81c784;border-radius:8px;padding:10px 14px;margin:10px 0;font-size:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.media{width:100%;border:1px solid #ccc;border-radius:8px;background:#fff}
+.prompt-box{margin:12px 0}
+pre{background:#f0f0f2;padding:12px;border-radius:8px;font-size:11px;white-space:pre-wrap;max-height:320px;overflow:auto}
+.out{border-radius:8px;padding:12px;font-size:13px;border:1px solid #ddd;background:#fff}
+.out.ok{border-color:#81c784;background:#f1f8e9}
+.out.miss{border-color:#e57373;background:#ffebee}
+.out-hdr{margin-bottom:8px}
+.badge{font-weight:700;padding:2px 8px;border-radius:4px;font-size:12px}
+.badge.ok{background:#c8e6c9;color:#1b5e20}
+.badge.miss{background:#ffcdd2;color:#b71c1c}
+.assess{line-height:1.45;color:#333}
+.dim{color:#888;font-size:13px}
+nav a{margin-right:12px;font-size:13px}
+</style></head><body>
+<h1>GT vs neg-axis pairwise — inputs &amp; outputs (10 cues)</h1>
+<div class="summary">
+  <p>Same text prompt + side-by-side media. <b>GT</b> = component tail; <b>neg</b> = perpendicular-axis swap. Accuracy = <code>better_side == gt_side</code>.</p>
+  <table>
+    <tr><th>Modality</th><th>Correct</th><th>Accuracy</th></tr>
+    <tr><td>alpha_frame_trajectory (stitched PNG)</td><td>7/10</td><td>70%</td></tr>
+    <tr><td>mp4 (stitched single video)</td><td>8/10</td><td>80%</td></tr>
+  </table>
+  <p class="note">First 3: idx 15, 45, 104 · Extra 7: idx 7–13</p>
+</div>
+<nav>
+  <b>Jump:</b>
+  <a href="#c7">7</a> <a href="#c8">8</a> <a href="#c9">9</a> <a href="#c10">10</a> <a href="#c11">11</a> <a href="#c12">12</a> <a href="#c13">13</a> <a href="#c15">15</a> <a href="#c45">45</a> <a href="#c104">104</a>
+</nav>
+
+<section id="c7">
+  <h2>7. raise_fists_victory</h2>
+  <div class="answer">VLM should pick <code>right</code> (GT component on RIGHT, neg on LEFT)</div>
+  <p class="note">Layout: LEFT=axis, RIGHT=gt</p>
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="007_raise_fists_victory_pair_extra.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="007_raise_fists_victory_pair_extra.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: raise_fists_victory
+- description: Starting with its arm raised, the robot performs a quick preparatory dip before thrusting its fist powerfully upward, holding the peak pose, and finishing with a triumphant shake.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=up, gripper_orientation=vertical
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement wrist (y+)
+- RIGHT: movement shoulder (z+)
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out ok">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>right</code> · GT <code>right</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 0.95</p>
+      <p class="assess">The cue &quot;raise_fists_victory&quot; describes a multi-part action: a preparatory dip, a powerful upward thrust, a hold, and a final triumphant shake. The primary, most iconic part of this gesture is the powerful upward thrust. The RIGHT side&#x27;s motion is described as `movement shoulder (z+)`, which directly corresponds to a vertical, upward thrust of the entire arm—the core of the &quot;raise&quot; action. The final static pose effectively represents the &quot;hold at the peak&quot; element. The LEFT side shows a horizontal wrist shake (`movement wrist (y+)`). While a shake is mentioned in the cue description, it&#x27;s a secondary, finishing element. Without the primary upward thrust, the shake on its own does not convey the meaning of &quot;raising a fist in victory.&quot; Therefore, the RIGHT side&#x27;s motion is more fundamental and appropriate for the cue.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;The cue \&quot;raise_fists_victory\&quot; describes a multi-part action: a preparatory dip, a powerful upward thrust, a hold, and a final triumphant shake. The primary, most iconic part of this gesture is the powerful upward thrust. The RIGHT side&#x27;s motion is described as `movement shoulder (z+)`, which directly corresponds to a vertical, upward thrust of the entire arm—the core of the \&quot;raise\&quot; action. The final static pose effectively represents the \&quot;hold at the peak\&quot; element. The LEFT side shows a horizontal wrist shake (`movement wrist (y+)`). While a shake is mentioned in the cue description, it&#x27;s a secondary, finishing element. Without the primary upward thrust, the shake on its own does not convey the meaning of \&quot;raising a fist in victory.\&quot; Therefore, the RIGHT side&#x27;s motion is more fundamental and appropriate for the cue.&quot;,
+  &quot;confidence&quot;: 0.95
+}</pre></details>
+    </div>
+    <div class="out miss">
+      <div class="out-hdr"><b>mp4</b> · pred <code>left</code> · GT <code>right</code> · <span class="badge miss">MISS</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The left side better embodies the &#x27;raise_fists_victory&#x27; cue. While both sides show a preparatory dip and an upward thrust, only the left side includes the crucial final &#x27;triumphant shake&#x27;. This shake is clearly visible in the overlapping frames and the back-and-forth motion at the purple end of the end-effector path. The right side performs a simple, linear lift and hold, which lacks the expressive, celebratory quality of the shake described in the cue.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The left side better embodies the &#x27;raise_fists_victory&#x27; cue. While both sides show a preparatory dip and an upward thrust, only the left side includes the crucial final &#x27;triumphant shake&#x27;. This shake is clearly visible in the overlapping frames and the back-and-forth motion at the purple end of the end-effector path. The right side performs a simple, linear lift and hold, which lacks the expressive, celebratory quality of the shake described in the cue.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+<section id="c8">
+  <h2>8. fist_pump</h2>
+  <div class="answer">VLM should pick <code>left</code> (GT component on LEFT, neg on RIGHT)</div>
+  <p class="note">Layout: LEFT=gt, RIGHT=axis</p>
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="008_fist_pump_pair_extra.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="008_fist_pump_pair_extra.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: fist_pump
+- description: From a neutral mid-chest position, the robot arm pulls back slightly in anticipation before thrusting upward in a fast, triumphant fist pump, holding at the apex.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=front, gripper_orientation=horizontal
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement shoulder (z+)
+- RIGHT: movement shoulder (y+)
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out ok">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The cue for a &#x27;fist_pump&#x27; explicitly requires a fast, upward thrust. The motion on the left side clearly executes this upward movement, with the arm rising vertically from the shoulder. This perfectly matches the iconic action of a triumphant fist pump. In contrast, the motion on the right side is a sideways swing along the y-axis, which does not convey the meaning of &#x27;fist_pump&#x27; at all. Therefore, the left side is far more appropriate.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The cue for a &#x27;fist_pump&#x27; explicitly requires a fast, upward thrust. The motion on the left side clearly executes this upward movement, with the arm rising vertically from the shoulder. This perfectly matches the iconic action of a triumphant fist pump. In contrast, the motion on the right side is a sideways swing along the y-axis, which does not convey the meaning of &#x27;fist_pump&#x27; at all. Therefore, the left side is far more appropriate.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+    <div class="out ok">
+      <div class="out-hdr"><b>mp4</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 5.0</p>
+      <p class="assess">The left side is more appropriate. A &#x27;fist pump&#x27; is an iconic gesture of triumph characterized by a sharp, upward thrust. The left side correctly performs this vertical motion, moving directly upward. The right side performs a sideways, horizontal motion, which does not align with the meaning of a fist pump and would likely be interpreted as a different gesture.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The left side is more appropriate. A &#x27;fist pump&#x27; is an iconic gesture of triumph characterized by a sharp, upward thrust. The left side correctly performs this vertical motion, moving directly upward. The right side performs a sideways, horizontal motion, which does not align with the meaning of a fist pump and would likely be interpreted as a different gesture.&quot;,
+  &quot;confidence&quot;: 5.0
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+<section id="c9">
+  <h2>9. flex_bicep</h2>
+  <div class="answer">VLM should pick <code>right</code> (GT component on RIGHT, neg on LEFT)</div>
+  <p class="note">Layout: LEFT=axis, RIGHT=gt</p>
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="009_flex_bicep_pair_extra.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="009_flex_bicep_pair_extra.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: flex_bicep
+- description: Starting with the arm extended to the side, the robot quickly curls its elbow up in a classic bicep flex, holds the pose, then gives a small, triumphant shake.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=left, gripper_orientation=horizontal
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement elbow (y+)
+- RIGHT: movement shoulder (z+)
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out miss">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>left</code> · GT <code>right</code> · <span class="badge miss">MISS</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The cue &#x27;flex_bicep&#x27; describes a curling motion at the elbow. The LEFT side motion clearly executes this by pivoting primarily at the &#x27;elbow&#x27; joint, bringing the forearm up towards the upper arm in a classic curl. The RIGHT side, in contrast, lifts the entire arm from the &#x27;shoulder&#x27; joint, which does not represent a bicep flex. Therefore, the trajectory and joint rotation on the left side are far more appropriate for the cue.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The cue &#x27;flex_bicep&#x27; describes a curling motion at the elbow. The LEFT side motion clearly executes this by pivoting primarily at the &#x27;elbow&#x27; joint, bringing the forearm up towards the upper arm in a classic curl. The RIGHT side, in contrast, lifts the entire arm from the &#x27;shoulder&#x27; joint, which does not represent a bicep flex. Therefore, the trajectory and joint rotation on the left side are far more appropriate for the cue.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+    <div class="out miss">
+      <div class="out-hdr"><b>mp4</b> · pred <code>left</code> · GT <code>right</code> · <span class="badge miss">MISS</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The left side is significantly more appropriate because it correctly interprets &#x27;flex_bicep&#x27; as an elbow curl. The motion is a clear rotation around the elbow joint, bringing the forearm up towards the upper arm in a classic flexing motion. The right side incorrectly translates the cue as a shoulder lift, raising the entire arm while keeping the elbow relatively straight. This does not convey the meaning of flexing a bicep.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The left side is significantly more appropriate because it correctly interprets &#x27;flex_bicep&#x27; as an elbow curl. The motion is a clear rotation around the elbow joint, bringing the forearm up towards the upper arm in a classic flexing motion. The right side incorrectly translates the cue as a shoulder lift, raising the entire arm while keeping the elbow relatively straight. This does not convey the meaning of flexing a bicep.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+<section id="c10">
+  <h2>10. shrug_idk</h2>
+  <div class="answer">VLM should pick <code>right</code> (GT component on RIGHT, neg on LEFT)</div>
+  <p class="note">Layout: LEFT=axis, RIGHT=gt</p>
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="010_shrug_idk_pair_extra.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="010_shrug_idk_pair_extra.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: shrug_idk
+- description: Starting with its arm already raised, the robot performs a quick upward and outward lift from the shoulder, holds briefly, then relaxes back down, mimicking a classic &#x27;I don&#x27;t know&#x27; shrug.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=up, gripper_orientation=vertical
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement wrist (y-)
+- RIGHT: movement shoulder (z-)
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out ok">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>right</code> · GT <code>right</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The cue for a shrug is an &#x27;upward and outward lift from the shoulder&#x27;. The motion on the right is a clear vertical lift of the entire arm, initiated from the shoulder joint, which directly mimics the primary action of a human shrug. The left side&#x27;s motion is a lateral tilt or rotation, seemingly from the wrist or elbow, which does not convey the &#x27;upward lift&#x27; central to the shrug gesture.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;The cue for a shrug is an &#x27;upward and outward lift from the shoulder&#x27;. The motion on the right is a clear vertical lift of the entire arm, initiated from the shoulder joint, which directly mimics the primary action of a human shrug. The left side&#x27;s motion is a lateral tilt or rotation, seemingly from the wrist or elbow, which does not convey the &#x27;upward lift&#x27; central to the shrug gesture.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+    <div class="out ok">
+      <div class="out-hdr"><b>mp4</b> · pred <code>right</code> · GT <code>right</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The right side is significantly more appropriate for conveying a shrug. A shrug is fundamentally a lifting motion of the shoulders. The right side&#x27;s motion shows the entire arm lifting from its base, effectively mimicking a shoulder lift. This &#x27;up and down&#x27; movement is the core component of the gesture. In contrast, the left side performs a rotation at the wrist, which does not involve the shoulder and fails to represent the &#x27;I don&#x27;t know&#x27; shrug.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;The right side is significantly more appropriate for conveying a shrug. A shrug is fundamentally a lifting motion of the shoulders. The right side&#x27;s motion shows the entire arm lifting from its base, effectively mimicking a shoulder lift. This &#x27;up and down&#x27; movement is the core component of the gesture. In contrast, the left side performs a rotation at the wrist, which does not involve the shoulder and fails to represent the &#x27;I don&#x27;t know&#x27; shrug.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+<section id="c11">
+  <h2>11. self_scratch_head_confused</h2>
+  <div class="answer">VLM should pick <code>left</code> (GT component on LEFT, neg on RIGHT)</div>
+  <p class="note">Layout: LEFT=gt, RIGHT=axis</p>
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="011_self_scratch_head_confused_pair_extra.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="011_self_scratch_head_confused_pair_extra.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: self_scratch_head_confused
+- description: From its left side, the robot raises its arm to its head and pauses in thought, then scratches its head a few times with a confused motion.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=left, gripper_orientation=vertical
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement wrist (z+)
+- RIGHT: movement shoulder (y+)
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out ok">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The left side is much more appropriate. The cue requires a &quot;scratching&quot; motion, which is typically a small, repetitive movement. The left side executes this perfectly with a series of small, rapid up-and-down motions at the wrist, clearly mimicking someone scratching their head in confusion. In contrast, the right side performs a large, sweeping swing of the entire arm from the shoulder. This large-scale motion does not resemble scratching at all and fails to convey the specific action described in the cue.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The left side is much more appropriate. The cue requires a \&quot;scratching\&quot; motion, which is typically a small, repetitive movement. The left side executes this perfectly with a series of small, rapid up-and-down motions at the wrist, clearly mimicking someone scratching their head in confusion. In contrast, the right side performs a large, sweeping swing of the entire arm from the shoulder. This large-scale motion does not resemble scratching at all and fails to convey the specific action described in the cue.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+    <div class="out ok">
+      <div class="out-hdr"><b>mp4</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The left side is much more appropriate. The small, repetitive, up-and-down motion generated by the wrist joint accurately mimics the action of scratching. In contrast, the right side&#x27;s motion is a large, sweeping arc driven by the shoulder, which looks more like repeatedly tapping or patting the head rather than the characteristic back-and-forth of a confused scratch.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The left side is much more appropriate. The small, repetitive, up-and-down motion generated by the wrist joint accurately mimics the action of scratching. In contrast, the right side&#x27;s motion is a large, sweeping arc driven by the shoulder, which looks more like repeatedly tapping or patting the head rather than the characteristic back-and-forth of a confused scratch.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+<section id="c12">
+  <h2>12. facepalm</h2>
+  <div class="answer">VLM should pick <code>left</code> (GT component on LEFT, neg on RIGHT)</div>
+  <p class="note">Layout: LEFT=gt, RIGHT=axis</p>
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="012_facepalm_pair_extra.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="012_facepalm_pair_extra.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: facepalm
+- description: Starting with its arm raised, the robot sharply rotates its wrist to orient the gripper like a palm, then quickly brings it to its &#x27;face&#x27; and holds it there in a classic facepalm gesture.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=up, gripper_orientation=horizontal
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement shoulder (x-)
+- RIGHT: movement wrist (z-)
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out miss">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>right</code> · GT <code>left</code> · <span class="badge miss">MISS</span></div>
+      <p><b>confidence:</b> 0.9</p>
+      <p class="assess">The right side is significantly more appropriate. A facepalm gesture is defined by the rotation of the wrist to bring the palm to the face. The right side&#x27;s motion is dominated by this wrist rotation, which correctly orients the gripper to simulate a palm covering the &#x27;face&#x27;. In contrast, the left side uses a large shoulder movement to bring the entire arm down, with minimal wrist rotation. This fails to capture the essential &#x27;palming&#x27; action and looks more like a generic &#x27;lower arm&#x27; motion.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;The right side is significantly more appropriate. A facepalm gesture is defined by the rotation of the wrist to bring the palm to the face. The right side&#x27;s motion is dominated by this wrist rotation, which correctly orients the gripper to simulate a palm covering the &#x27;face&#x27;. In contrast, the left side uses a large shoulder movement to bring the entire arm down, with minimal wrist rotation. This fails to capture the essential &#x27;palming&#x27; action and looks more like a generic &#x27;lower arm&#x27; motion.&quot;,
+  &quot;confidence&quot;: 0.9
+}</pre></details>
+    </div>
+    <div class="out ok">
+      <div class="out-hdr"><b>mp4</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The LEFT side is significantly more appropriate. The defining action of a facepalm is bringing the hand to the face. The LEFT motion executes this core component by moving the entire arm forward, placing the gripper in front of the robot&#x27;s &#x27;face&#x27; area. The RIGHT motion only rotates the wrist in place, which does not convey a facepalm at all and looks more like a &#x27;so-so&#x27; or twisting gesture. The trajectory on the LEFT is a direct path to the face, which correctly embodies the iconic movement of the cue.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The LEFT side is significantly more appropriate. The defining action of a facepalm is bringing the hand to the face. The LEFT motion executes this core component by moving the entire arm forward, placing the gripper in front of the robot&#x27;s &#x27;face&#x27; area. The RIGHT motion only rotates the wrist in place, which does not convey a facepalm at all and looks more like a &#x27;so-so&#x27; or twisting gesture. The trajectory on the LEFT is a direct path to the face, which correctly embodies the iconic movement of the cue.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+<section id="c13">
+  <h2>13. point_self</h2>
+  <div class="answer">VLM should pick <code>left</code> (GT component on LEFT, neg on RIGHT)</div>
+  <p class="note">Layout: LEFT=gt, RIGHT=axis</p>
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="013_point_self_pair_extra.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="013_point_self_pair_extra.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: point_self
+- description: From a resting position behind its back, the robot arm swings around to the front, pauses, and then points sharply at its own chest.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=back, gripper_orientation=vertical
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement shoulder (x-)
+- RIGHT: movement shoulder (z-)
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out ok">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 0.9</p>
+      <p class="assess">The left side&#x27;s motion is more appropriate for the cue &#x27;point_self&#x27;. It executes a direct, horizontal swing from behind its back to the front, ending in a clear point at its own chest. This trajectory directly matches the description &#x27;swings around to the front&#x27;. The motion on the right side is a high, looping vertical arc. While it also ends by pointing at the chest, this trajectory is unnecessarily exaggerated and less natural for this specific gesture. A human would typically swing their arm around their side, as shown on the left, not over their shoulder.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The left side&#x27;s motion is more appropriate for the cue &#x27;point_self&#x27;. It executes a direct, horizontal swing from behind its back to the front, ending in a clear point at its own chest. This trajectory directly matches the description &#x27;swings around to the front&#x27;. The motion on the right side is a high, looping vertical arc. While it also ends by pointing at the chest, this trajectory is unnecessarily exaggerated and less natural for this specific gesture. A human would typically swing their arm around their side, as shown on the left, not over their shoulder.&quot;,
+  &quot;confidence&quot;: 0.9
+}</pre></details>
+    </div>
+    <div class="out ok">
+      <div class="out-hdr"><b>mp4</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The cue is &quot;point_self&quot;, described as swinging the arm from behind the back to the front to point at the chest. The LEFT side executes a horizontal swing, bringing the arm around the robot&#x27;s body in a plane roughly parallel to the floor. This is a very natural and direct motion that closely mimics how a human would perform this gesture. The RIGHT side executes a high, vertical arc, lifting the arm up and over the shoulder. This &quot;up-and-over&quot; trajectory is less iconic and less recognizable for the gesture of pointing at oneself; the horizontal swing on the LEFT is far more appropriate.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The cue is \&quot;point_self\&quot;, described as swinging the arm from behind the back to the front to point at the chest. The LEFT side executes a horizontal swing, bringing the arm around the robot&#x27;s body in a plane roughly parallel to the floor. This is a very natural and direct motion that closely mimics how a human would perform this gesture. The RIGHT side executes a high, vertical arc, lifting the arm up and over the shoulder. This \&quot;up-and-over\&quot; trajectory is less iconic and less recognizable for the gesture of pointing at oneself; the horizontal swing on the LEFT is far more appropriate.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+<section id="c15">
+  <h2>15. beckon_come_here</h2>
+  <div class="answer">VLM should pick <code>left</code> (GT component on LEFT, neg on RIGHT)</div>
+  
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="015_beckon_come_here_pair_sample.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="015_beckon_come_here_pair_sample.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: beckon_come_here
+- description: From an extended forward position, the robot curls its wrist inward twice with a distinct rhythm to beckon someone closer.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=front, gripper_orientation=horizontal
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement wrist (z-)
+- RIGHT: movement shoulder (y-)
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out ok">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The cue specifies a motion that &quot;curls its wrist inward twice&quot;. The LEFT side executes this precisely by using wrist rotation to perform two small, distinct curling motions, which is the iconic human gesture for beckoning. The RIGHT side uses a large shoulder rotation to swing the entire arm inward in a single, sweeping arc. This motion lacks the characteristic wrist curl and the specified repetition, making it a much less recognizable interpretation of the cue.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The cue specifies a motion that \&quot;curls its wrist inward twice\&quot;. The LEFT side executes this precisely by using wrist rotation to perform two small, distinct curling motions, which is the iconic human gesture for beckoning. The RIGHT side uses a large shoulder rotation to swing the entire arm inward in a single, sweeping arc. This motion lacks the characteristic wrist curl and the specified repetition, making it a much less recognizable interpretation of the cue.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+    <div class="out ok">
+      <div class="out-hdr"><b>mp4</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The left side is better because it correctly interprets the cue &quot;curls its wrist inward&quot;. The motion is isolated to the wrist joint, creating the characteristic small, repeated beckoning gesture. The right side incorrectly moves the entire arm from the shoulder, which is a much larger and different type of beckoning motion, not the specific wrist curl described.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The left side is better because it correctly interprets the cue \&quot;curls its wrist inward\&quot;. The motion is isolated to the wrist joint, creating the characteristic small, repeated beckoning gesture. The right side incorrectly moves the entire arm from the shoulder, which is a much larger and different type of beckoning motion, not the specific wrist curl described.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+<section id="c45">
+  <h2>45. slow_down_request_palm_down</h2>
+  <div class="answer">VLM should pick <code>right</code> (GT component on RIGHT, neg on LEFT)</div>
+  
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="045_slow_down_request_palm_down_pair_sample.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="045_slow_down_request_palm_down_pair_sample.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: slow_down_request_palm_down
+- description: From a high forward position with the gripper horizontal (palm down), the robot performs two gentle, slow, downward pats in the air to request &#x27;slow down&#x27;.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=front, gripper_orientation=horizontal
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement shoulder (y-)
+- RIGHT: movement shoulder (z-)
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out miss">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>left</code> · GT <code>right</code> · <span class="badge miss">MISS</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The cue requires two gentle, slow, downward pats. The motion on the LEFT side shows the arm moving downwards from its initial position, consistent with a patting gesture. The shoulder rotation around the y-axis creates this vertical movement. In contrast, the RIGHT side shows the arm sweeping horizontally, which is inconsistent with a downward pat. The right side&#x27;s motion is more akin to a &#x27;no&#x27; or &#x27;wave away&#x27; gesture, not &#x27;slow down&#x27;. Therefore, the left side&#x27;s vertical patting motion is far more appropriate for the cue.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The cue requires two gentle, slow, downward pats. The motion on the LEFT side shows the arm moving downwards from its initial position, consistent with a patting gesture. The shoulder rotation around the y-axis creates this vertical movement. In contrast, the RIGHT side shows the arm sweeping horizontally, which is inconsistent with a downward pat. The right side&#x27;s motion is more akin to a &#x27;no&#x27; or &#x27;wave away&#x27; gesture, not &#x27;slow down&#x27;. Therefore, the left side&#x27;s vertical patting motion is far more appropriate for the cue.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+    <div class="out ok">
+      <div class="out-hdr"><b>mp4</b> · pred <code>right</code> · GT <code>right</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 1.0</p>
+      <p class="assess">The right side is more appropriate because it performs two clear, vertical, downward &#x27;patting&#x27; motions. This directly matches the cue description of &#x27;two gentle, slow, downward pats&#x27;. The left side performs a horizontal, side-to-side sweeping motion, which does not convey the &#x27;downward pat&#x27; meaning and looks more like a &#x27;no&#x27; or &#x27;stop&#x27; gesture.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;The right side is more appropriate because it performs two clear, vertical, downward &#x27;patting&#x27; motions. This directly matches the cue description of &#x27;two gentle, slow, downward pats&#x27;. The left side performs a horizontal, side-to-side sweeping motion, which does not convey the &#x27;downward pat&#x27; meaning and looks more like a &#x27;no&#x27; or &#x27;stop&#x27; gesture.&quot;,
+  &quot;confidence&quot;: 1.0
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+<section id="c104">
+  <h2>104. scale_expand</h2>
+  <div class="answer">VLM should pick <code>left</code> (GT component on LEFT, neg on RIGHT)</div>
+  
+  <div class="grid2">
+    <div>
+      <h3>Input · alpha (stitched PNG)</h3>
+      <img class="media" src="104_scale_expand_pair_sample.png" alt="alpha pair"/>
+    </div>
+    <div>
+      <h3>Input · mp4 (stitched, 1 file)</h3>
+      <video class="media" src="104_scale_expand_pair_sample.mp4" controls loop muted playsinline></video>
+    </div>
+  </div>
+  <details class="prompt-box" open><summary>Input · text prompt (sent with image/video)</summary>
+    <pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: scale_expand
+- description: From an arm extended to the left, the robot pushes its hand further outward in a straight line with a firm hold, defining an expanded boundary.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=left, gripper_orientation=vertical
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: path arc plane xy sweep 60° ccw
+- RIGHT: path arc plane yz sweep 60° ccw
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre>
+  </details>
+  <h3>Output · Gemini</h3>
+  <div class="grid2">
+    <div class="out ok">
+      <div class="out-hdr"><b>alpha_frame_trajectory</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 0.9</p>
+      <p class="assess">The cue &#x27;scale_expand&#x27; describes pushing outward in a straight line to define an expanded boundary. The motion on the LEFT is an arc in the horizontal (XY) plane, which moves the hand further outward and away from the robot&#x27;s center. This aligns well with the concept of horizontal expansion. The motion on the RIGHT is an arc in the vertical (YZ) plane, moving the hand upwards. This reads more like &#x27;raising&#x27; or &#x27;scaling up&#x27; rather than a general expansion from the side. Although the left-side motion is an arc and not a perfect straight line, its primary direction is outward and horizontal, making it a much better match for the cue&#x27;s description.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The cue &#x27;scale_expand&#x27; describes pushing outward in a straight line to define an expanded boundary. The motion on the LEFT is an arc in the horizontal (XY) plane, which moves the hand further outward and away from the robot&#x27;s center. This aligns well with the concept of horizontal expansion. The motion on the RIGHT is an arc in the vertical (YZ) plane, moving the hand upwards. This reads more like &#x27;raising&#x27; or &#x27;scaling up&#x27; rather than a general expansion from the side. Although the left-side motion is an arc and not a perfect straight line, its primary direction is outward and horizontal, making it a much better match for the cue&#x27;s description.&quot;,
+  &quot;confidence&quot;: 0.9
+}</pre></details>
+    </div>
+    <div class="out ok">
+      <div class="out-hdr"><b>mp4</b> · pred <code>left</code> · GT <code>left</code> · <span class="badge ok">OK</span></div>
+      <p><b>confidence:</b> 0.8</p>
+      <p class="assess">The cue is &#x27;scale_expand&#x27;, described as pushing &#x27;further outward in a straight line... defining an expanded boundary&#x27; from a start pose extended to the left. Neither motion is a straight line, as both are arcs. However, the motion on the left is a horizontal sweep forward (in the XY plane), which reads as expanding a boundary or defining a larger area on a plane. This is a common way to gesture &#x27;expand&#x27;. The motion on the right is a vertical sweep (in the YZ plane) that also moves the hand slightly inward horizontally. This upward motion is less associated with general expansion, and the inward component actively contradicts the idea of pushing &#x27;outward&#x27; to expand a boundary. Therefore, the horizontal sweep on the left is a more appropriate and recognizable gesture for &#x27;scale_expand&#x27;.</p>
+      <details><summary>raw JSON</summary><pre>{
+  &quot;better_side&quot;: &quot;left&quot;,
+  &quot;motion_assessment&quot;: &quot;The cue is &#x27;scale_expand&#x27;, described as pushing &#x27;further outward in a straight line... defining an expanded boundary&#x27; from a start pose extended to the left. Neither motion is a straight line, as both are arcs. However, the motion on the left is a horizontal sweep forward (in the XY plane), which reads as expanding a boundary or defining a larger area on a plane. This is a common way to gesture &#x27;expand&#x27;. The motion on the right is a vertical sweep (in the YZ plane) that also moves the hand slightly inward horizontally. This upward motion is less associated with general expansion, and the inward component actively contradicts the idea of pushing &#x27;outward&#x27; to expand a boundary. Therefore, the horizontal sweep on the left is a more appropriate and recognizable gesture for &#x27;scale_expand&#x27;.&quot;,
+  &quot;confidence&quot;: 0.8
+}</pre></details>
+    </div>
+  </div>
+</section>
+
+</body></html>

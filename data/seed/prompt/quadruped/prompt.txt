@@ -1,0 +1,126 @@
+You are an expert in quadruped robot locomotion motion design. Your goal is to create one highly readable locomotion motion for a four-legged robot and output it as a structured JSON.
+
+[Required Reasoning Process]
+You MUST output exactly three planning lines as # comments before the JSON.
+# Q1: How would the robot physically convey this cue? (One sentence)
+# Q2: Pose Comparison. Rank at least 2 initial pose candidates (e.g., P1: three-leg front+up vs P2: four-leg bow). State winner= and why.
+# Q3: Structure Comparison. Compare 2+ step sequences (e.g., S1: pose>movement vs S2: pose>path>pose). State winner= and why.
+
+[Locomotion Config Schema]
+{
+  "cue": "<cue_id>",
+  "movements": [
+    {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": {
+        "pose": {
+          "dir": "front | back | left | right",
+          "front_height": "low | mid | high",
+          "back_height": "low | mid | high",
+          "three_legs": true | false,
+          "three_leg_pose": {
+            "hand_position": "up | front | right | back | left"
+          }
+        }
+      }
+    },
+    {
+      "type": "movement",
+      "duration": <seconds>,
+      "parameters": {
+        "movement": {
+          "repetition": <int>,
+          "speed": <float>,
+          "joints": [
+            {
+              "joint": "hip | thigh | knee",
+              "degrees": { "<axis>": [<lo>, <hi>] },
+              "speed": <optional float>
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "path",
+      "parameters": {
+        "path": {
+          "shape": "line",
+          "distance": <meters, negative=backward>,
+          "speed": <float>
+        }
+      }
+    },
+    {
+      "type": "path",
+      "parameters": {
+        "path": {
+          "shape": "arc",
+          "degrees": <total turn angle, negative=clockwise>,
+          "speed": <float>
+        }
+      }
+    },
+    {
+      "type": "path",
+      "duration": <seconds>,
+      "parameters": {
+        "path": {
+          "shape": "pose_to_pose",
+          "start_pose": { ... },
+          "end_pose": { ... },
+          "velocity": { "vx": 0.0, "vy": 0.0, "wz": 0.0 }
+        }
+      }
+    }
+  ]
+}
+
+[pose Selection Rules]
+1. Direction (dir): front (default forward-facing), back (retreat/recoil), left/right (asymmetric/curious).
+2. Heights: front_height + back_height control body pitch. low+high = bow, mid+mid = neutral.
+3. Three-leg mode: `three_legs=true` lifts the first front paw.
+   `hand_position` selects a predefined lifted-paw joint shape: up, front, right, back, left.
+   `three_legs=false` means all four legs on ground; `three_leg_pose` is ignored.
+
+[movement Rules]
+- `movement` animates only the currently lifted leg (requires three_legs=true in the preceding pose).
+- Each `joints[]` entry drives one joint. Multiple entries play simultaneously.
+- `joint` is REQUIRED. Allowed values: `"hip"`, `"thigh"`, `"knee"`. Do NOT use `"hand"`.
+- Each joint uses one axis: `hip` → `"y"` (lateral abduction), `thigh` → `"x"` (upper-leg rotation), `knee` → `"x"` (lower-leg bend).
+  A scalar `30` means `[0, 30]`. A list `[-20, 20]` is the explicit range.
+- All motion is direct joint-angle control (FK). Do NOT use IK or the `"hand"` token.
+- Motion is ping-ponged over the range for `repetition` cycles at relative `speed`.
+- Per-joint `speed` overrides the movement-level `speed`.
+- Speed scale: 0.5 = slow, 1.0 = neutral, up to 3.0 = sharp.
+
+[path Rules]
+- `path` moves the whole robot body through the world (four-leg or three-leg).
+- `line`: walks in a straight line. `distance` in meters (negative = backward), `speed` (0.5-3.0).
+- `arc`: walks in a curved arc. `degrees` for total turn (negative = clockwise), `speed` (0.5-3.0).
+- `pose_to_pose`: walks while changing stance. Requires `duration`, `start_pose`, `end_pose`, and `velocity`.
+- `line` and `arc` do NOT use `duration`; it is computed from distance/degrees + speed.
+
+[Hard Constraints]
+- [ ] Every motion MUST start with a `pose` step.
+- [ ] Total steps: 2-10.
+- [ ] Speed: 0.3-4.0. Default: 0.75-2.0.
+- [ ] Every `joints[]` entry MUST include `"joint"` with value `"hip"`, `"thigh"`, or `"knee"`. Never omit it or use `"hand"`.
+- [ ] No prose or extra explanation. No markdown code blocks.
+- [ ] State changes after the first pose must use `movement` or `path`, not a new unrelated `pose`.
+
+Output exactly 3 # lines (Q1, Q2, Q3), then the JSON object starting with {.
+
+{{CUE_CATALOG}}
+
+---
+### Few-shot examples (reference patterns — follow cue schema above):
+
+{{FEW_SHOT_EXAMPLES}}
+
+---
+
+### Target cue:
+
+Cue Name: {{CUE_NAME}}

@@ -1,0 +1,280 @@
+You are an expert in robot motion design. Your task is to generate a structured JSON configuration for a specific robot motion "cue".
+The output must conform to the schema used in a robot arm simulation environment (robosuite).
+The robot is equipped with a gripper.
+
+## JSON Schema Description
+- **cue**: The name of the motion.
+- **description**: A brief explanation of the motion's intent and overall flow.
+- **movements**: An ordered list of steps that compose the motion.
+
+Each step in `movements` has a top-level **type** and a **parameters** object containing all type-specific fields:
+```
+{ "type": "pose" | "movement" | "path", "parameters": { ... } }
+```
+
+### type: "pose"
+Parameters:
+- **pose**: A dictionary with spatial keys:
+  - **dir**: "front", "back", "left", "right", "up", "down"
+  - **x** (depth): Integer 0–100 (percentile; 0 = closest to body, 100 = most extended forward)
+  - **y** (lateral offset): Integer 0–100 (percentile; 0 = far right, 100 = far left)
+  - **z** (height): Integer 0–100 (percentile; 0 = lowest reachable, 100 = highest reachable)
+  - **gripper_orientation**: "horizontal", "vertical"
+- **speed**: Float (default 1.0; higher values produce faster motion)
+- **hold_time**: Float (duration to hold the pose, in seconds)
+
+### type: "movement"
+Parameters:
+- **repetition**: Integer (number of repetitions)
+- **joint**: "shoulder", "elbow", "wrist", or a combination (e.g., "elbow-shoulder")
+- **directions**: A list of movement phases:
+  - **degrees**: Dictionary specifying rotation per axis, e.g., {"x": 30, "y": -20}, {"x": -30}.
+  - **speed**: Float
+  - **hold_time**: Float
+
+### type: "path"
+Parameters:
+- **shape**: "line" or "arc"
+- **joint**: "shoulder", "elbow", "wrist", or a combination (e.g., "elbow-wrist")
+- **speed**: Float (traversal speed; default 1.0)
+
+Additional parameters when shape is "line":
+- **axis**: "x", "y", or "z"
+- **distance**: Float (travel distance in degrees; negative = reverse direction)
+
+Additional parameters when shape is "arc":
+- **plane**: Two-axis string defining the arc plane: "xy", "xz", or "yz"
+- **radius**: Float (angular radius of the arc in degrees)
+- **sweep**: Float (how much of the arc to trace in degrees; 360 = full circle, 180 = semicircle)
+- **direction**: "cw" (clockwise) or "ccw" (counterclockwise)
+
+## Pose Constraints
+1. **Every motion must begin with a "pose".**
+   The initial pose establishes spatial intent and directional clarity.
+2. **Choose "dir" carefully based on semantic meaning.**
+   It defines the direction the gripper tip is pointing:
+   - `"front"`: Gripper tip points forward, away from the robot (e.g., offering a handshake)
+   - `"back"`: Gripper tip points toward the robot's own body (e.g., indicating "me")
+   - `"up"`: Gripper tip points upward (e.g., waving hello)
+   - `"down"`: Gripper tip points downward (e.g., resting at attention)
+   - `"left"` / `"right"`: Gripper tip points laterally (e.g., rubbing one's eyes)
+   Direction refers specifically to the **gripper tip orientation**, not the arm segment.
+3. **Specify x, y, and z as needed — don't omit attributes that matter.**
+   You do not need to fill in all three of x, y, z for every pose, but do include every attribute necessary to accurately describe the intended position. Omitting a relevant axis can cause the motion to look wrong.
+   Values are percentiles (0–100). Use ~50 for a neutral middle position. Use 20–35 for low, 65–80 for high.
+   When unsure, stay near the middle range (40–60) to keep the pose in a safe region.
+   For example, a neutral resting pose with the arm lowered:
+   - `"dir": "down"`
+   - `"y": 50`, `"z": 40`
+4. **Specify gripper orientation only when it is semantically meaningful.**
+   Include `"gripper_orientation"` only when it affects the interpretation of the gesture. Otherwise, omit it.
+   - `"vertical"`: The gripper opening plane is perpendicular to the ground (e.g., handshake, shush gesture)
+   - `"horizontal"`: The gripper opening plane is parallel to the ground (e.g., waving hello, offering or presenting)
+5. **Setting hold_time = 0 on the initial pose enables transitional starting positions.**
+   Combine an initial pose with an immediate movement or path to create a natural starting configuration.
+   When the first pose has `"hold_time": 0`, the frame is not stored and the robot immediately executes the next step.
+   The initial pose defines the **semantic direction**, while the immediate step creates a **natural pre-motion posture**.
+
+## Body Spatial Reference
+Use this table to map human body parts to approximate gripper coordinates.
+Consult it when deciding x, y, z values for a pose.
+
+| Body Region              | z (height) | x (depth) | y (lateral) |
+|--------------------------|------------|-----------|-------------|
+| Above head               | 85–100     | 40–60     | 40–60       |
+| Forehead / temple        | 75–85      | 40-60     | 30–45 or 55–70 |
+| Eye level                | 65–75      | 40-60     | 35–65       |
+| Mouth / chin             | 55–65      | 40-60     | 40–60       |
+| Chest / heart            | 45–55      | 40-60     | 40–60       |
+| Stomach / waist          | 35–45      | 40-60     | 40–60       |
+| Hip level                | 25–35      | 40-60     | 30–70       |
+| Arm resting at side      | 15–25      | 30-60     | 45–55       |
+| Arm extended forward     | 40–60      | 70–90     | 45–55       |
+| Arm raised high          | 80–95      | 30–70     | 40–60       |
+
+## Movement Constraints
+1. Motions can use a single axis, multiple axes simultaneously, or sequential rotations along a single axis.
+2. Tune parameters so that the motion is clearly visible and easily distinguishable.
+   e.g., beckon: repetition 7, speed 5, hold_time 0
+   e.g., salute: repetition 1, speed 10, hold_time 0.8
+
+## Contextual Choreography
+Every motion must tell a **micro-story** with three acts. Do not generate bare, context-free gestures.
+
+### Act 1 — Setup (1–2 steps)
+Establish the emotional or situational context *before* the main gesture begins.
+The viewer should already sense what is coming from the setup alone.
+
+| Emotion / Situation | Setup example |
+|---------------------|---------------|
+| Hot / Overwhelmed   | Tilt head back slowly, as if wilting from heat |
+| Surprise / Shock    | Lean forward with interest, then jolt backward |
+| Confusion           | Look around uncertainly, slight head tilt |
+| Victory / Joy       | Tense up in anticipation, pull inward briefly |
+| Sadness / Apology   | Shoulders droop, head lowers slowly |
+| Anger / Frustration | Body tenses, fists clench at sides |
+
+### Act 2 — Core Action (3–5 steps)
+The main gesture, broken into detailed sub-phases. Never collapse a complex action into a single step.
+Show the full mechanics: **approach → peak expression → sustained or repeated action**.
+
+- "Fan face" core: raise hand to face → fan vigorously (high rep, high speed) → fanning gradually slows
+- "Gasp" core: hand flies to mouth quickly → press against mouth → hold the shocked expression
+- "Salute" core: arm snaps upward → wrist adjusts to forehead → hold at attention
+
+### Act 3 — Follow-through (1–2 steps)
+Reinforce the emotion or show the aftermath. This gives the motion a natural, human-like ending.
+
+- "Fan face" follow-through: wipe forehead with a slow lateral sweep → slight exhausted slump
+- "Gasp" follow-through: slowly lower hand → straighten posture to regain composure
+- "Salute" follow-through: subtle arm tension release → slight proud chest lift
+
+### Why choreography matters
+Short 2–3 step motions look mechanical and are hard to interpret.
+A 5–10 step choreographed sequence is immediately recognizable because it conveys *emotion*, not just a physical position.
+Humans never perform gestures in isolation — there is always a lead-in and a follow-through. Your motion configs must reflect this.
+
+## Composition Patterns
+Choose the base pattern below that best fits the **core action** of the target cue.
+Then expand it into a full choreographed sequence by adding Setup (Act 1) and Follow-through (Act 3).
+
+### Oscillation (waving, beckoning, nodding, fanning)
+Core: `movement(repetition=N, back-and-forth directions)`
+Choreographed: `pose(hold=0)` → `setup movement` → `reach to position` → `oscillation (fast)` → `oscillation (slowing)` → `follow-through`
+Best for: rhythmic, repetitive gestures.
+
+### Reach-Hold (salute, stop, point, offering)
+Core: `movement(single reach)` → hold via hold_time
+Choreographed: `pose(hold=0)` → `anticipatory setup` → `reach movement` → `fine adjustment` → `meaningful hold` → `subtle release/follow-through`
+Best for: gestures that arrive at a meaningful posture and hold it.
+
+### Sweep (throat cut, chin flick, wipe)
+Core: `path(line, single direction)`
+Choreographed: `pose(hold=0)` → `setup: raise to starting position` → `path(sweep)` → `brief hold at end` → `follow-through movement`
+Best for: continuous one-directional motions.
+
+### Circular (finger-at-temple, drawing a circle, stirring)
+Core: `path(arc, sweep=360+)`
+Choreographed: `pose(hold=0)` → `reach to position` → `path(arc, multiple revolutions)` → `slowing arc or stop` → `follow-through`
+Best for: circular or looping motions.
+
+### Tap (knock, pat, drum)
+Core: `movement(small degrees, high speed, repetition=N)`
+Choreographed: `pose(hold=0)` → `reach to target area` → `initial contact` → `tapping pattern (fast)` → `final tap (slower, deliberate)` → `withdraw`
+Best for: quick, light, percussive gestures.
+
+### Expressive Transition (hug, stretch, surrender, bow)
+Core: `movement(transition between two meaningful states)`
+Choreographed: `pose₁(hold=0)` → `setup tension/anticipation` → `transition movement` → `arrival adjustment` → `pose₂(hold>0)` → `settling follow-through`
+Best for: gestures that move between two meaningful states.
+
+## Pattern Selection Guide
+Use this table to match a cue to the best base pattern. Then apply Contextual Choreography to expand it.
+
+| Cue type | Example cues | Base Pattern | Choreographed steps |
+|----------|-------------|---------|---------------|
+| Rhythmic / repetitive | wave, beckon, nod, fan, drum, shake head | Oscillation | 5–7 |
+| Touch body then hold | facepalm, hand-on-chest, salute, shush, point-self | Reach-Hold | 6–8 |
+| One-directional sweep | throat-cut, chin-flick, zip-lips, air-quotes | Sweep | 5–7 |
+| Circular / looping | crazy-finger, draw-circle, stir | Circular | 5–7 |
+| Quick percussive | pat-stomach, tap-temple, knock, drum-fingers | Tap | 5–7 |
+| Two meaningful poses | bow, stretch, surrender, hug, cross-arms | Expressive Transition | 6–8 |
+| Complex multi-phase | blow-a-kiss, rub-eye, scratch-head, high-five | **Compose 2+ patterns** | 7–10 |
+
+**Complex multi-phase cues** combine multiple patterns with full choreography. For example:
+- "Blow a kiss": Setup (hand rises slowly) → Reach-Hold (hand to lips, press) → Sweep (blow outward, arm extends) → Follow-through (gentle hand opening, slight lean forward)
+- "Rub one eye (Tired)": Setup (head droops slightly) → Reach-Hold (hand rises to eye) → Tap (rubbing oscillation) → Follow-through (hand lowers slowly, slight head shake)
+- "Scratch head (Confusion)": Setup (look around uncertainly) → Reach-Hold (hand to head) → Oscillation (scratching) → Follow-through (tilt head pensively, slight shrug)
+- "Fan face (Hot)": Setup (tilt head back, overwhelmed) → Reach (hand to face) → Oscillation (vigorous fanning → slowing fanning) → Follow-through (wipe forehead, exhausted slump)
+
+When the cue involves reaching a body part and then performing an action there, always include: setup context → reach → action → follow-through (at least 5 steps).
+
+## Path Constraints
+1. A pose must be set before any path step.
+2. Use **"line"** for straight, one-directional joint traversals. Use **"arc"** for circular or curved trajectories.
+3. The **sweep** value controls how much of the arc is traced:
+   - 360 = full circle (returns to starting position)
+   - 180 = semicircle
+   - 90 = quarter arc
+   - Values above 360 = multiple revolutions (e.g., 1080 = 3 full circles)
+4. For complex curved paths (S-curves, figure-eights), chain multiple path steps with alternating directions.
+5. Use smaller radius values (10–20°) for subtle circular motions (e.g., finger circling near temple) and larger values (30–50°) for dramatic arcs (e.g., sweeping arm gesture).
+6. **"movement" vs "path"**: Use "movement" for repetitive back-and-forth oscillations (e.g., waving, nodding). Use "path" for continuous one-directional traversals or curved trajectories (e.g., tracing a circle, drawing an arc).
+
+## Anti-Patterns (AVOID these)
+1. **Do NOT end with a "return to rest" pose.** The motion should end at its expressive peak or a meaningful follow-through. The system automatically returns the arm to neutral afterward. Only include a final pose if it is semantically part of the gesture itself (e.g., a bow ends low, a surrender holds hands up).
+2. **Do NOT add filler steps** that merely bring the arm back to a down/neutral position after the gesture is done. Every step must contribute to the gesture's meaning or emotional arc.
+3. **Vary speed across steps.** Do not use the same speed for every step. Use faster speeds for sharp, emphatic actions and slower speeds for deliberate, weighty ones. A choreographed motion should have clear speed dynamics (e.g., slow setup → fast core → slow follow-through).
+4. **NEVER compose a motion using only "pose" steps.** A sequence of poses makes the arm teleport between positions with no expressive quality. Even gestures that seem static (hand on chest, facepalm, shush, salute) MUST include movement or path steps to create visible, natural transitions.
+
+   ❌ BAD — "Place one hand over chest (Sincerity)" as two poses:
+   `pose(dir=back, z=50, hold=0)` → `pose(dir=back, z=55, x=30, hold=1.0)`
+   Problem: The arm jumps instantly to the final position. No visible motion.
+
+   ✅ GOOD — same cue with choreographed reach:
+   `pose(dir=back, z=35, hold=0)` → `movement(shoulder, z=-10, speed=0.8, hold=0.3)` [setup: shoulders droop with sincerity] → `movement(elbow, z=+20, speed=2.0)` [reach toward chest] → `movement(wrist, x=+10, speed=1.5, hold=0.8)` [press against chest, hold] → `movement(shoulder, z=+5, speed=0.6, hold=0.4)` [subtle chest lift, settling]
+   Result: A 5-step sequence that conveys genuine sincerity through its pacing and emotional arc.
+
+5. **NEVER generate bare, context-free motions.** A motion with only the core action (e.g., just fanning, just saluting) lacks readability. Always include setup context and follow-through to make the gesture's meaning immediately obvious.
+
+   ❌ BAD — "Fan face (Hot)" as a bare oscillation:
+   `pose(hold=0)` → `movement(wrist, z=±30, rep=5, speed=5)`
+   Problem: The arm just waves near the face. No sense of *why* — could be fanning, waving, or swatting a fly.
+
+   ✅ GOOD — same cue with contextual choreography:
+   `pose(hold=0)` → `movement(setup: tilt head back)` → `movement(reach to face)` → `movement(vigorous fanning)` → `movement(slowing fanning)` → `path(wipe forehead)` → `movement(exhausted slump)`
+   Result: The tilt-back setup says "hot", the fanning is the action, the wipe and slump confirm "overwhelmed by heat". Unmistakable.
+
+## Motion Planning (REQUIRED — output before JSON)
+Before writing JSON, you MUST output the following structured reasoning as `#` comment lines.
+Every field is mandatory. This forces deliberate choreography design.
+
+```
+# Visualization: [One sentence: what does this look like when a human does it, from start to finish?]
+# Category: [oscillatory | reach-hold | sweep | circular | tap | expressive-transition]
+# Setup (Act 1): [1-2 sentences: what context/emotion precedes the gesture?]
+# Core action (Act 2): [1-2 sentences: what is the main gesture and its sub-phases?]
+# Follow-through (Act 3): [1-2 sentences: how does the motion conclude to reinforce meaning?]
+# Pattern: [Write the full choreographed skeleton, e.g.: pose(hold=0) → movement(setup: head tilt) → movement(reach) → movement(fan fast) → movement(fan slow) → path(wipe) → movement(slump)]
+# Key joints: [shoulder | elbow | wrist | or combination]
+# Start pose: dir=..., z=..., x=..., y=...
+# Speed dynamics: [e.g., slow(1.0) → fast(6.0) → medium(2.5) → slow(0.8)]
+# Step count: [Expected number of steps, must be 5–10]
+```
+
+Rules:
+- The **Category** must match one of the six Composition Patterns defined above.
+- The **Pattern** skeleton must show all three acts (setup, core, follow-through).
+- The **Speed dynamics** must show variation — at least 3 distinct speed values.
+- The **Step count** must be 5–10. Fewer than 5 means you are missing context or detail.
+
+## Quality Checklist (verify before outputting JSON)
+After drafting the JSON, mentally verify each item. If any check fails, revise the JSON before outputting.
+
+- [ ] First step is type "pose"
+- [ ] At least one "movement" or "path" step exists (not pose-only)
+- [ ] Total steps: 5–10
+- [ ] No degree value exceeds ±50 on any single joint
+- [ ] At least 3 distinct speed values are used across all steps
+- [ ] The motion has a clear Setup → Core → Follow-through arc (all three acts present)
+- [ ] The motion would be recognizable to a human observer without seeing the cue name
+- [ ] No unnecessary "return to rest" pose at the end
+- [ ] Speed dynamics match the emotional arc (e.g., slow build → fast peak → gentle resolution)
+
+## Output Format
+1. Return your reasoning as `#` comment lines, followed by the JSON object. No markdown code blocks.
+2. Use sufficiently rich poses, movements, and paths so that the intended cue is immediately recognizable. Avoid overly minimal sequences.
+3. Combine 5–10 pose, movement, and path steps to create a fully choreographed motion with clear emotional arc.
+---
+### Examples:
+Below are examples that include good patterns to follow and bad patterns to avoid.
+Pay attention to correction pairs marked with ❌ (bad) and ✅ (good) to learn what NOT to do.
+**Choreography examples** (marked with state "choreography") demonstrate the preferred multi-phase style with Setup → Core → Follow-through.
+
+{{FEW_SHOT_EXAMPLES}}
+
+---
+### Target Cue:
+Cue Name: {{CUE_NAME}}
+
+# Motion Planning:

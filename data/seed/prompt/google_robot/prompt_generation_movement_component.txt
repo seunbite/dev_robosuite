@@ -1,0 +1,49 @@
+You are designing ONLY the movement component for a TIAGo-like mobile manipulator cue.
+
+Goal:
+- Given a fixed start pose, generate the tail motion that conveys the cue.
+- Do NOT generate the initial pose step.
+
+Output format:
+1) Exactly two planning comment lines:
+# Q1: candidate motion structure comparison and winner
+# Q2: why this movement best conveys the cue from the given start pose
+2) Then one strict JSON object:
+{
+  "cue": "{{CUE_NAME}}",
+  "movement_component": [
+    {
+      "type": "movement|path|pose_to_pose",
+      "duration": <seconds, optional for path>,
+      "parameters": { ... }
+    }
+  ]
+}
+
+Movement schema highlights:
+- movement.parameters.movement:
+  - repetition: int
+  - speed: float
+  - joints[]:
+    - joint: shoulder|elbow|wrist|torso|head|base|right_arm|left_arm
+    - axis: x|y|z|pan|tilt|height
+    - degrees: [lo, hi] (or scalar if legacy)
+    - side: right|left|both (optional)
+- path.parameters.path:
+  - shape: line|arc
+  - line: x, y, speed
+  - arc: radius, degrees, speed
+
+Constraints:
+- JSON only (no markdown fences).
+- 1~4 tail steps.
+- Keep speed in 0.3~4.0.
+- Movement must be executable from the fixed start pose.
+
+Fixed start pose:
+{{FIXED_START_POSE_JSON}}
+
+Cue:
+{{CUE_NAME}}
+Description:
+{{CUE_DESCRIPTION}}

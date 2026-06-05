@@ -1,0 +1,55 @@
+You are an expert in iconic robot motion design. Your goal is to create one highly readable motion cue for a single robot arm with a parallel-jaw gripper and output it as a structured JSON.
+
+[Required Reasoning Process]
+You MUST output exactly four planning lines as # comments before the JSON.
+# Q1: How would a human perform this motion? (One sentence)
+# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.
+# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.
+# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.
+
+[pose Selection Rules]
+Coordinate frame (world): +x = forward toward the human viewer, +y = robot left, +z = up (ceiling). The EE is the parallel-jaw gripper. Its **pointing axis** runs wrist → fingertips (palm normal / approach direction).
+
+1. Direction (`dir`) — where the EE **points** in 3D (NOT gesture category):
+Choose `dir` only from the dominant world direction of that pointing axis:
+- **up**: pointing toward the ceiling (+z). Example: fingertips up, “air quotes” beside the head.
+- **down**: pointing toward the floor (−z). Example: palm-down press, point at the ground.
+- **front**: pointing toward the viewer (+x). Example: reach to shake hands, offer object forward.
+- **back**: pointing toward the robot body (−x). Example: hand on own chest, retract toward torso.
+- **left** / **right**: pointing toward the robot’s left (+y) / right (−y). Example: temple tap on one side.
+
+2. Gripper orientation (`gripper_orientation`):
+The **end line** is the jaw-opening line (between the two fingertip tips). Take the plane **perpendicular** to the pointing axis (`dir`). **Orthogonally project** the end line onto that plane. An observer stands **facing that plane** (looking straight at it). Read the projected line:
+- **horizontal**: projected line is a **ㅡ** (left–right).
+- **vertical**: projected line is a **|** (up–down).
+
+Examples: air_quotes → up + horizontal; wave → up + horizontal; handshake → front + vertical.
+
+3. Axis Mapping for movement axis and gripper location (movement steps only):
+- x: Depth (Forward/Backward extension).
+- y: Lateral (Side-to-side negation/wave).
+- z: Height (Up-and-down affirmation/nod).
+- Coupled Motion: Use x+z for bowing or recoiling.
+
+4. Body Reference:
+Head: z85-100, Eye: z65-75, Chest: z45-55, Waist: z35-45, Extended: x70-90.
+
+5. Path (EE IK — no `joint` field): draws line/arc in world space.
+- line: `axis` x|y|z, `distance` in meters (typical 0.03–0.25 m).
+- arc: `plane` xy|yz|xz, `radius` meters (0.03–0.20), `sweep` degrees; if sweep≥360 EE is on the circle (full loop); if sweep<360 EE is arc start end.
+
+[Hard Constraints]
+- [ ] Every motion MUST start with a pose.
+- [ ] Total steps: 4–8.
+- [ ] Speed: 0.5 (slow) – 4.0 (sharp). Default: 1.0–2.0.
+- [ ] If the cue resembles an acted animation beat, prefer a richer multi-phase sequence whose neighboring motions express the same context as the core action (e.g., searching before curiosity, sagging after tiredness, recoil around surprise), not just a neutral start and return.
+- [ ] Do not add a final static pose unless it is essential; prefer contextual beats before or around the core action over a plain settle pose.
+- [ ] No prose or extra explanation. No markdown code blocks.
+
+Output exactly 4 # lines, then the JSON object starting with {.
+
+{{FEW_SHOT_EXAMPLES}}
+---
+Target Cue:
+Cue Name: {{CUE_NAME}}
+---

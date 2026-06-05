@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Mobile Manip Few-shots</title>
+<style>
+body{margin:0;font-family:system-ui;background:#f6f8fb;color:#1f2328}
+.wrap{max-width:1400px;margin:0 auto;padding:24px}
+h1{font-size:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+.card{background:#fff;border:1px solid #d0d7de;border-radius:12px;overflow:hidden}
+.card-header{padding:12px;border-bottom:1px solid #d0d7de;background:#eef2f7;font-weight:600}
+.card-header .idx{color:#0969da;margin-right:8px}
+.card-body{padding:14px}
+.steps{display:flex;gap:6px;margin:0 0 12px}
+.step{padding:3px 8px;border-radius:999px;font-size:13px;background:#1f6feb22;color:#0969da}
+.step.movement{background:#2ea04322;color:#1a7f37}
+.step.path{background:#bc8cff22;color:#8250df}
+.label{font-size:12px;font-weight:700;color:#59636e;text-transform:uppercase;margin:12px 0 4px}
+.cot{padding:10px;border-left:3px solid #8250df;background:#eef2f7;border-radius:6px;white-space:pre-wrap;font-size:13px;max-height:150px;overflow:auto}
+.json{padding:10px;background:#eef2f7;border-radius:6px;font-family:monospace;font-size:12px;white-space:pre-wrap;max-height:300px;overflow:auto}
+</style></head><body>
+<div class="wrap">
+<h1>Mobile Manipulator Few-Shot Configs (11 examples)</h1>
+<div class="grid">
+    <article class="card">
+      <div class="card-header"><span class="idx">c00</span> wave_hi</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step movement">movement</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: A wave needs a raised arm with visible repetitive side-to-side motion at the end effector.
+# Q2: winner=P1 torso high + arm up + horizontal gripper (palm faces outward — floor projection is a flat surface, matching the open-palm wave gesture). P2 vertical gripper would look like a handshake pose, wrong for waving.
+# Q3: winner=S1 pose then Cartesian y via elbow for lateral forearm swing; S2 shoulder roll moves the whole arm too broadly.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 0,
+  &quot;group&quot;: &quot;iconic&quot;,
+  &quot;cue&quot;: &quot;wave_hi&quot;,
+  &quot;cue_text&quot;: &quot;Wave one hand side to side (Hello / Hi)&quot;,
+  &quot;description&quot;: &quot;The robot raises its right arm and waves by oscillating the forearm laterally via elbow Cartesian y.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.5,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;up&quot;,
+          &quot;gripper_orientation&quot;: &quot;horizontal&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 2.0,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;elbow&quot;,
+              &quot;axis&quot;: &quot;y&quot;,
+              &quot;degrees&quot;: [
+                -0.06,
+                0.06
+              ]
+            }
+          ],
+          &quot;repetition&quot;: 4,
+          &quot;speed&quot;: 1.5
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c01</span> nod_yes</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step movement">movement</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: A nod is a vertical head oscillation; the body stays neutral.
+# Q2: winner=P1 torso high + arm down + head center as clean neutral baseline. P2 with arm front distracts from head motion.
+# Q3: winner=S1 head tilt movement with 3 repetitions for clear yes signal; S2 single nod is too subtle.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 1,
+  &quot;group&quot;: &quot;contextual&quot;,
+  &quot;cue&quot;: &quot;nod_yes&quot;,
+  &quot;cue_text&quot;: &quot;Nod head up and down (Yes)&quot;,
+  &quot;description&quot;: &quot;The robot nods by tilting its head down and back up repeatedly, confirming agreement.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.3,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;down+right&quot;,
+          &quot;gripper_orientation&quot;: &quot;vertical&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 1.8,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;head&quot;,
+              &quot;axis&quot;: &quot;tilt&quot;,
+              &quot;degrees&quot;: [
+                -30,
+                15
+              ]
+            }
+          ],
+          &quot;repetition&quot;: 3,
+          &quot;speed&quot;: 1.2
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c02</span> shake_head_no</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step movement">movement</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: A head shake is a horizontal head oscillation.
+# Q2: winner=P1 neutral stance so head is the only moving part.
+# Q3: winner=S1 head pan oscillation with 3 reps; S2 single sweep is too ambiguous.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 2,
+  &quot;group&quot;: &quot;contextual&quot;,
+  &quot;cue&quot;: &quot;shake_head_no&quot;,
+  &quot;cue_text&quot;: &quot;Shake head side to side (No)&quot;,
+  &quot;description&quot;: &quot;The robot shakes its head side to side repeatedly, signaling disagreement or refusal.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.3,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;down+right&quot;,
+          &quot;gripper_orientation&quot;: &quot;vertical&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 1.8,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;head&quot;,
+              &quot;axis&quot;: &quot;pan&quot;,
+              &quot;degrees&quot;: [
+                -40,
+                40
+              ]
+            }
+          ],
+          &quot;repetition&quot;: 3,
+          &quot;speed&quot;: 1.4
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c03</span> beckon_come_here</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step movement">movement</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: Beckoning needs a forward-extended arm with repeated inward curls.
+# Q2: winner=P1 arm front + horizontal grip because the palm-down curl is the classic beckon. P2 arm up would look like waving.
+# Q3: winner=S1 Cartesian z via elbow for upward curling with 3 reps; S2 shoulder pitch would move the whole arm instead of curling.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 3,
+  &quot;group&quot;: &quot;iconic&quot;,
+  &quot;cue&quot;: &quot;beckon_come_here&quot;,
+  &quot;cue_text&quot;: &quot;Turn palm downward and curl fingers inward repeatedly (Come here / Beckon)&quot;,
+  &quot;description&quot;: &quot;The robot extends its arm forward and repeatedly curls the hand upward via elbow Cartesian z, creating a beckoning gesture.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.4,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;front&quot;,
+          &quot;gripper_orientation&quot;: &quot;horizontal&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 1.8,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;elbow&quot;,
+              &quot;axis&quot;: &quot;z&quot;,
+              &quot;degrees&quot;: [
+                0,
+                0.15
+              ]
+            }
+          ],
+          &quot;repetition&quot;: 3,
+          &quot;speed&quot;: 1.6
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c04</span> salute</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step movement">movement</span> → <span class="step pose">pose</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: A salute requires the hand raised crisply to forehead height.
+# Q2: winner=P1 torso high + arm up + vertical grip for a tall, formal look. P2 arm front doesn&#x27;t reach the forehead.
+# Q3: winner=S1 pose(up) then Cartesian z via shoulder for precise upward hand placement; S2 direct pose only lacks the dynamic motion.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 4,
+  &quot;group&quot;: &quot;iconic&quot;,
+  &quot;cue&quot;: &quot;salute&quot;,
+  &quot;cue_text&quot;: &quot;Bring one hand to forehead in salute position (Salute)&quot;,
+  &quot;description&quot;: &quot;The robot raises its arm and moves the hand upward via shoulder Cartesian z to forehead level, holding a crisp salute.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.3,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;right&quot;,
+          &quot;gripper_orientation&quot;: &quot;vertical&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 1.5,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;shoulder&quot;,
+              &quot;axis&quot;: &quot;z&quot;,
+              &quot;degrees&quot;: [
+                0,
+                0.2
+              ]
+            }
+          ],
+          &quot;repetition&quot;: 1,
+          &quot;speed&quot;: 1.2
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.5,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;up&quot;,
+          &quot;gripper_orientation&quot;: &quot;vertical&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c05</span> bow_greeting</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step movement">movement</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: A bow is a downward body motion; torso lowering is the clearest expression.
+# Q2: winner=P1 torso high + head center as the neutral starting point for contrast. P2 starting mid reduces the bow depth.
+# Q3: winner=S1 torso height oscillation + head tilt synchronised for a smooth bow-and-rise; S2 only torso without head lacks expressiveness.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 5,
+  &quot;group&quot;: &quot;contextual&quot;,
+  &quot;cue&quot;: &quot;bow_greeting&quot;,
+  &quot;cue_text&quot;: &quot;Bow slightly from the waist (Respect / Greeting)&quot;,
+  &quot;description&quot;: &quot;The robot lowers its torso smoothly and tilts its head down, then rises back up in a respectful bow.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.3,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;down+right&quot;,
+          &quot;gripper_orientation&quot;: &quot;vertical&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 2.0,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;torso&quot;,
+              &quot;axis&quot;: &quot;height&quot;,
+              &quot;degrees&quot;: [
+                0.05,
+                0.34
+              ]
+            },
+            {
+              &quot;joint&quot;: &quot;head&quot;,
+              &quot;axis&quot;: &quot;tilt&quot;,
+              &quot;degrees&quot;: [
+                -40,
+                10
+              ],
+              &quot;speed&quot;: 0.8
+            }
+          ],
+          &quot;repetition&quot;: 1,
+          &quot;speed&quot;: 0.5
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c06</span> stop_palm_out</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step movement">movement</span> → <span class="step pose">pose</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: Stop signal needs a decisive forward arm extension with open palm.
+# Q2: winner=P1 arm front + vertical grip shows palm clearly. P2 arm up would read as waving.
+# Q3: winner=S1 pose then Cartesian x via shoulder for forward push; S2 path movement is unnecessary for a static gesture.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 6,
+  &quot;group&quot;: &quot;iconic&quot;,
+  &quot;cue&quot;: &quot;stop_palm_out&quot;,
+  &quot;cue_text&quot;: &quot;Extend palm forward flat (Stop)&quot;,
+  &quot;description&quot;: &quot;The robot thrusts its arm forward via shoulder Cartesian x with a vertical grip, signaling stop.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.3,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;down+right&quot;,
+          &quot;gripper_orientation&quot;: &quot;horizontal&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 1.2,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;shoulder&quot;,
+              &quot;axis&quot;: &quot;x&quot;,
+              &quot;degrees&quot;: [
+                0,
+                0.3
+              ]
+            }
+          ],
+          &quot;repetition&quot;: 1,
+          &quot;speed&quot;: 1.8
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.8,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;front&quot;,
+          &quot;gripper_orientation&quot;: &quot;horizontal&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c07</span> lean_forward_interest</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step path">path</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: Interest is conveyed by forward approach + attentive head tilt.
+# Q2: winner=P1 torso mid + head slightly tilted for a curious look. P2 torso high is too neutral.
+# Q3: winner=S1 pose then line(x=0.8) with concurrent head tilt; S2 arc would imply circling rather than direct interest.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 7,
+  &quot;group&quot;: &quot;iconic&quot;,
+  &quot;cue&quot;: &quot;lean_forward_interest&quot;,
+  &quot;cue_text&quot;: &quot;Lean forward slightly with palms open (Interest)&quot;,
+  &quot;description&quot;: &quot;The robot drives forward slowly while tilting its head slightly, showing engaged curiosity.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.3,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;mid&quot;,
+          &quot;arm_position&quot;: &quot;down+right&quot;,
+          &quot;gripper_orientation&quot;: &quot;vertical&quot;,
+          &quot;head&quot;: &quot;right&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;path&quot;,
+      &quot;parameters&quot;: {
+        &quot;path&quot;: {
+          &quot;shape&quot;: &quot;line&quot;,
+          &quot;x&quot;: 0.8,
+          &quot;y&quot;: 0.0,
+          &quot;speed&quot;: 0.6
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c08</span> self_hug</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step movement">movement</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: A self-hug needs both arms crossing over the chest symmetrically.
+# Q2: winner=P1 both arms front + head down for a comforting look. P2 one arm only is not a hug.
+# Q3: winner=S1 pose(front,mirror) then Cartesian y movement (elbow-only via Jacobian); S2 shoulder roll lacks the natural elbow-bending hug look.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 8,
+  &quot;group&quot;: &quot;contextual&quot;,
+  &quot;cue&quot;: &quot;self_hug&quot;,
+  &quot;cue_text&quot;: &quot;Wrap both arms around yourself (Hug / Comfort)&quot;,
+  &quot;description&quot;: &quot;The robot extends both arms forward, then folds them inward using Cartesian y-axis movement. The Jacobian selects the best elbow DOF to move the end-effector inward.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.3,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;mid&quot;,
+          &quot;arm_position&quot;: &quot;front&quot;,
+          &quot;gripper_orientation&quot;: &quot;horizontal&quot;,
+          &quot;head&quot;: &quot;down&quot;,
+          &quot;left_arm&quot;: &quot;mirror&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 2.0,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;elbow&quot;,
+              &quot;axis&quot;: &quot;y&quot;,
+              &quot;degrees&quot;: [
+                0,
+                0.4
+              ],
+              &quot;side&quot;: &quot;both&quot;
+            }
+          ],
+          &quot;repetition&quot;: 1,
+          &quot;speed&quot;: 0.6
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c09</span> rub_arms_cold</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step movement">movement</span> → <span class="step movement">movement</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: Rubbing arms for warmth needs arms crossed then repeated bilateral motion.
+# Q2: winner=P1 both arms front + horizontal gripper + torso low for a huddled cold look. Horizontal grip ensures the elbow bends naturally inward (same as self_hug). P2 vertical grip changes the Jacobian and prevents proper elbow bending.
+# Q3: winner=S1 Cartesian y via elbow (fold) then Cartesian z via elbow (rub); S2 shoulder pitch oscillation doesn&#x27;t look like rubbing.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 9,
+  &quot;group&quot;: &quot;contextual&quot;,
+  &quot;cue&quot;: &quot;rub_arms_cold&quot;,
+  &quot;cue_text&quot;: &quot;Rub both upper arms (Cold)&quot;,
+  &quot;description&quot;: &quot;The robot folds both arms inward (Cartesian y via elbow), then oscillates along z-axis to mimic rubbing upper arms when cold.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.2,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;low&quot;,
+          &quot;arm_position&quot;: &quot;front&quot;,
+          &quot;gripper_orientation&quot;: &quot;horizontal&quot;,
+          &quot;head&quot;: &quot;down&quot;,
+          &quot;left_arm&quot;: &quot;mirror&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 2.5,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;elbow&quot;,
+              &quot;axis&quot;: &quot;y&quot;,
+              &quot;degrees&quot;: [
+                0,
+                0.4
+              ],
+              &quot;side&quot;: &quot;both&quot;
+            }
+          ],
+          &quot;repetition&quot;: 1,
+          &quot;speed&quot;: 0.8
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: 2.0,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;elbow&quot;,
+              &quot;axis&quot;: &quot;z&quot;,
+              &quot;degrees&quot;: [
+                -0.04,
+                0.04
+              ],
+              &quot;side&quot;: &quot;both&quot;
+            }
+          ],
+          &quot;repetition&quot;: 4,
+          &quot;speed&quot;: 1.8
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article>
+    <article class="card">
+      <div class="card-header"><span class="idx">c10</span> deep_bow_apology</div>
+      <div class="card-body">
+        <div class="steps"><span class="step pose">pose</span> → <span class="step pose_to_pose">pose_to_pose</span> → <span class="step pose">pose</span> → <span class="step pose_to_pose">pose_to_pose</span></div>
+        <div class="label">Reasoning</div>
+        <pre class="cot"># Q1: A deep apology bow should be slow and deliberate, not oscillatory.
+# Q2: winner=P1 start high then go low with head down. P2 starting mid reduces the emotional range.
+# Q3: winner=S1 pose_to_pose from high→low then low→high for a continuous smooth motion; S2 movement-based torso oscillation feels mechanical.</pre>
+        <div class="label">Config</div>
+        <pre class="json">{
+  &quot;idx&quot;: 10,
+  &quot;group&quot;: &quot;contextual&quot;,
+  &quot;cue&quot;: &quot;deep_bow_apology&quot;,
+  &quot;cue_text&quot;: &quot;Bow deeply while hands at sides (Apology)&quot;,
+  &quot;description&quot;: &quot;The robot smoothly transitions from standing tall to a deep bow with lowered torso and head, then slowly rises back, expressing a sincere apology.&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.3,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;down+right&quot;,
+          &quot;gripper_orientation&quot;: &quot;vertical&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;pose_to_pose&quot;,
+      &quot;duration&quot;: 1.5,
+      &quot;parameters&quot;: {
+        &quot;start_pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;down+right&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        },
+        &quot;end_pose&quot;: {
+          &quot;torso_height&quot;: &quot;low&quot;,
+          &quot;arm_position&quot;: &quot;down+front&quot;,
+          &quot;head&quot;: &quot;down&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: 0.6,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;torso_height&quot;: &quot;low&quot;,
+          &quot;arm_position&quot;: &quot;down+front&quot;,
+          &quot;gripper_orientation&quot;: &quot;vertical&quot;,
+          &quot;head&quot;: &quot;down&quot;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;pose_to_pose&quot;,
+      &quot;duration&quot;: 1.5,
+      &quot;parameters&quot;: {
+        &quot;start_pose&quot;: {
+          &quot;torso_height&quot;: &quot;low&quot;,
+          &quot;arm_position&quot;: &quot;down+front&quot;,
+          &quot;head&quot;: &quot;down&quot;
+        },
+        &quot;end_pose&quot;: {
+          &quot;torso_height&quot;: &quot;high&quot;,
+          &quot;arm_position&quot;: &quot;down+right&quot;,
+          &quot;head&quot;: &quot;center&quot;
+        }
+      }
+    }
+  ]
+}</pre>
+      </div>
+    </article></div>
+</div></body></html>

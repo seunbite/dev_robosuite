@@ -1,0 +1,3011 @@
+{
+  "time": "2026-05-30T11:36:59",
+  "model": "gemini-2.5-pro",
+  "mode": "round2_cascade_from_round1_pose",
+  "n": 40,
+  "accuracy": {
+    "round1_VLM": "17/40",
+    "round1_Text": "21/40",
+    "round2_VLM": "15/40",
+    "round2_Text": "15/40",
+    "round1_VLM_rate": 0.425,
+    "round1_Text_rate": 0.525,
+    "round2_VLM_rate": 0.375,
+    "round2_Text_rate": 0.375
+  },
+  "rows": [
+    {
+      "cue_idx": 8,
+      "cue": "fist_pump",
+      "groundtruth": "o (front, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=up) represents the peak or end-state of the fist pump action as described. To perform the gesture, which is fundamentally an upward thrust, the robot needs to start from a lower, coiled position. Starting at the very top makes it impossible to perform the primary upward motion.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The cue 'fist_pump' requires an upward thrusting motion. The provided pose is the end of this motion. To create the gesture, we must change the starting pose to a lower, coiled position. A 'front' direction with a bent elbow allows the robot to gather energy and then execute the upward punch, matching the cue description.",
+          "recommended_movement_plan_after_change": [
+            "First, pull the arm down and slightly back to 'coil' and build anticipation.",
+            "Then, execute a sharp, fast upward thrust by extending the shoulder and elbow.",
+            "End in a crisp hold at the peak of the motion (the originally provided pose) to emphasize the celebration."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 2,
+        "tile_group": "up_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with `dir=up` is inappropriate as it represents the *end* of the 'fist pump' motion, not the start. The description explicitly states the motion begins with a downward coil before thrusting upward.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To execute the described motion of 'coiling down' and 'thrusting upward', the robot needs a preparatory starting pose. A neutral pose with `dir=front` and `gripper_orientation=vertical` (a natural fist orientation) allows for the full expressive range of the fist pump action.",
+          "recommended_movement_plan_after_change": [
+            "From the forward-facing fist position, coil the arm inward and down to gather potential energy.",
+            "Thrust the fist upward in a sharp, celebratory punch.",
+            "End in a crisp hold at the peak, with the fist pointing up, to convey a sense of victory."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 9,
+      "cue": "flex_bicep",
+      "groundtruth": "x (left, horizontal)",
+      "generation": {
+        "dir": "down",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The labels dir=up and gripper_orientation=horizontal correctly describe the pose in the image. However, this pose represents the *end* of a bicep curl, not the start. The cue's description specifies moving 'from a low ready position into a powerful upward curl', which is impossible to perform if the robot is already in the final flexed position.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The provided pose is the final 'flexed' position. To perform the cue as described, the robot needs to start from a lower, more extended 'ready position' (e.g., arm hanging down) to be able to execute the 'powerful upward curl' motion.",
+          "recommended_movement_plan_after_change": [
+            "Perform a strong upward curl by rotating the elbow joint, bringing the gripper up towards the shoulder.",
+            "Hold the peak flexed position to emphasize the pose.",
+            "Execute a small, sharp shake by quickly rotating the wrist back and forth to simulate a tensed muscle."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "round2_VLM_tile": {
+        "tile_index": 9,
+        "tile_group": "up_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose `dir=up` describes the peak or end state of the bicep curl, not the start. The description explicitly states the motion begins from a 'low ready position' and moves into an 'upward curl', which is impossible to perform if the arm is already pointing up.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The original pose describes the end of the motion. A bicep curl must start from a lower, uncurled position to be recognizable. A `dir=front` allows the arm to be positioned low and in front of the body, and `gripper_orientation=vertical` better mimics a human fist in this context, setting up a clear 'upward curl' motion.",
+          "recommended_movement_plan_after_change": [
+            "Start from the corrected pose (dir=front, gripper=vertical) at a low ready position.",
+            "Perform a powerful upward curl, bringing the gripper toward the robot's shoulder.",
+            "At the peak of the motion, execute a small, sharp shake to convey muscle tension."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 11,
+      "cue": "self_scratch_head_confused",
+      "groundtruth": "o (left, vertical)",
+      "generation": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The labels dir=left and gripper_orientation=vertical are correct for the displayed pose. This pose is a suitable starting point for a 'scratching head' gesture, as the arm is raised to an appropriate height and can be brought inward towards the 'head' with a simple elbow and shoulder movement.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, slowly move the hand towards the robot's 'head' by bending the elbow inwards.",
+            "Once the gripper is near the head, perform a few small, repetitive up-and-down or back-and-forth scratching motions using the wrist.",
+            "Finish by holding the hand near the head for a moment, then letting it drift slightly away to complete the puzzled expression."
+          ]
+        },
+        "if_not_appropriate": null,
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "left_vertical"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose `dir=left`, `gripper_orientation=vertical` is highly appropriate. For a robot to scratch the side of its head (e.g., its right side with its right hand), the hand must approach with the fingertips pointing inward, which corresponds to the 'left' world direction. A 'vertical' gripper orientation ensures the 'palm' is facing the head, allowing the fingertips to make contact in a naturalistic way for a scratching motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "From the starting pose, slowly translate the hand inwards and slightly up to make contact with the side of the head.",
+            "Perform small, repetitive back-and-forth or circular motions at the point of contact to simulate scratching.",
+            "Pause the hand motion and actuate the neck to perform a slight head tilt, solidifying the confused expression."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "",
+          "recommended_gripper_orientation": "",
+          "why_change": "",
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 12,
+      "cue": "facepalm",
+      "groundtruth": "x (up, horizontal) / (down, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The direction 'back' is appropriate, as the end-effector needs to move towards the robot's body to perform a facepalm. However, the 'horizontal' gripper orientation is incorrect. In the image, the gripper jaws are oriented one above the other, which corresponds to a 'vertical' orientation. This vertical orientation is also what's needed for the flat 'palm' of the gripper to make contact with the 'face'.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To perform a facepalm, the flat inner surface of the gripper (the 'palm') should contact the robot's 'face'. The current 'horizontal' label is not only inconsistent with the image but would also cause the edge of the gripper to strike the face. Correcting to 'vertical' orientation aligns the 'palm' correctly for the gesture.",
+          "recommended_movement_plan_after_change": [
+            "First, lift the arm slightly higher in a sharp 'intake' motion.",
+            "Then, execute a quick forward movement from the shoulder/elbow to bring the 'palm' of the gripper to the robot's 'face' area.",
+            "Finally, after a brief pause, let the arm slowly sag downwards to convey resignation."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 4,
+        "tile_group": "back_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current starting pose with `dir=up` is not appropriate for a facepalm. For the palm to contact the face, it must be facing inwards (roughly in the -x direction). Starting with the hand pointing up (`dir=up`) would require a complex and unnatural wrist rotation to achieve the correct palm orientation before moving to the face. A more direct starting pose is needed.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "Changing the direction to 'front' orients the hand so that the palm naturally faces inward/backward when the elbow is bent. This allows for a simple and direct movement to the face, making the facepalm gesture clear and easily readable without complex intermediate rotations.",
+          "recommended_movement_plan_after_change": [
+            "Start with hand pointing forward and lift it sharply in an 'intake' of disbelief.",
+            "Quickly bend the elbow to bring the palm flat against the robot's face.",
+            "Hold the facepalm pose for a moment, then let the arm sag downward in resignation."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 14,
+      "cue": "point_you",
+      "groundtruth": "x (front, vertical) / (front, horizontal)",
+      "generation": {
+        "dir": "down",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with dir=front and gripper_orientation=vertical is appropriate. The end effector points directly at the viewer, which is correct for a 'point_you' cue. While a horizontal gripper orientation might be more common for a human-like index finger point, the vertical orientation is also clear and can convey a strong, emphatic pointing action.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Create anticipation with a brief recoil, pulling the arm back and slightly up.",
+            "Step 2: Execute a sharp, fast extension of the arm straight forward towards the viewer.",
+            "Step 3: Punctuate the gesture with a final, small, and crisp jab forward to add emphasis."
+          ]
+        },
+        "if_not_appropriate": null,
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "front_vertical"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The cue is to point forward at a person. The `dir=front` correctly captures the primary pointing direction toward the viewer. The `gripper_orientation=horizontal` corresponds to a natural, palm-down pointing gesture, which is perfectly suitable for an emphatic point. The pose labels accurately represent the key moment of the intended cue described.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Begin with the arm slightly retracted to build anticipation.",
+            "Sharply extend the arm forward to the main pointing pose.",
+            "Conclude with a small, sharp jab motion forward to punctuate the gesture, then hold briefly."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 15,
+      "cue": "beckon_come_here",
+      "groundtruth": "o (front, horizontal) / (front, vertical) / (up, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current labels dir=front and gripper_orientation=vertical are an accurate description of the robot's pose in the image. However, this pose is fundamentally unsuited for a 'beckon_come_here' cue. A beckoning motion requires an inward curling action, which is naturally performed from a 'palm-up' or 'palm-in' starting position, not the 'handshake' orientation shown.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "For a beckoning gesture to be clear, the robot needs to perform an inward curl. Starting with a 'palm-up' equivalent pose (gripper_orientation=horizontal) allows a simple elbow bend to create a natural, recognizable beckoning motion. The current 'vertical' orientation would make an elbow bend look like an up-and-down chopping motion, which fails to communicate 'come here'.",
+          "recommended_movement_plan_after_change": [
+            "Extend the arm forward to establish a clear starting point for the gesture.",
+            "Perform three distinct inward curls by repeatedly bending the elbow, bringing the gripper towards the robot's body.",
+            "Hold the final curled position briefly to emphasize the end of the command."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "front_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose `dir=up` is unsuitable for a 'beckon' gesture. Beckoning requires extending the arm *forward* toward the target, not upward. An upward-pointing hand is typically associated with cues like 'raise hand' or 'stop', not 'come here'.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To create a natural and recognizable beckoning gesture, the robot's arm should start extended forward (`dir=front`). The gripper should be oriented 'palm-in' (`gripper_orientation=vertical`) to prepare for the inward curling motion described in the cue.",
+          "recommended_movement_plan_after_change": [
+            "Start with arm extended forward, palm facing inward (toward the robot's body).",
+            "Perform a distinct curling motion by flexing the elbow, pulling the gripper inward.",
+            "Repeat the inward curling motion two more times to complete the beckon."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 16,
+      "cue": "stop_palm_out",
+      "groundtruth": "x (up, horizontal)",
+      "generation": {
+        "dir": "down",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The provided labels 'dir=front, gripper_orientation=horizontal' are incorrect for both the image and the 'stop_palm_out' cue. The image shows the gripper pointing generally upwards ('dir=up'). Furthermore, for a classic 'stop' gesture where the palm faces the viewer, the pointing direction should be 'up' (fingers to the ceiling), not 'front' (poking at the viewer). The provided pose is also the final state of the gesture, making it an unsuitable starting point for a motion described as a 'thrust forward'.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "A 'stop' gesture is universally understood as an upright hand with the palm facing forward. 'dir=up' achieves the upright hand (fingers pointing up). 'gripper_orientation=horizontal' presents the gripper jaws as a flat, horizontal barrier, mimicking a flat human hand. The original 'dir=front' would be a poking motion, not a stopping one. The robot must also start from a retracted position to be able to perform the described 'recoil and thrust forward' motion.",
+          "recommended_movement_plan_after_change": [
+            "Start from a neutral pose with the elbow bent and the hand closer to the robot's body.",
+            "Perform a short, sharp recoil motion by pulling the elbow back slightly.",
+            "Thrust the arm forward and upward, snapping crisply into the final 'stop' pose (dir=up, gripper_orientation=horizontal).",
+            "Hold the final pose with tension to convey authority."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "front_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with `dir=front` describes the robot pointing its fingers forward at the viewer. A 'stop_palm_out' gesture requires the palm to face forward, which is impossible if the fingers are also pointing forward. The hand orientation is fundamentally incorrect for this cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "For a 'stop' gesture, the palm must face the viewer (forward, +x). If the fingers point forward (`dir=front`), the palm cannot. By changing `dir` to `up`, the fingers point upwards, allowing the palm to correctly face forward to form the iconic 'stop' sign.",
+          "recommended_movement_plan_after_change": [
+            "From a ready position with the elbow bent, pull the hand back sharply in a small recoil for anticipation.",
+            "Thrust the hand straight forward (along +x axis) into the final 'stop' position.",
+            "Hold the extended pose rigidly to convey a firm, commanding halt."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 20,
+      "cue": "rub_eye_tired",
+      "groundtruth": "o (left, vertical) / (left, horizontal) / (right, vertical) / (right, horizontal)",
+      "generation": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The labels dir=left and gripper_orientation=vertical are correct. The robot's end-effector is pointing towards its left (+y world axis), and the line between the gripper tips is oriented vertically. This pose is an excellent starting point for the 'rub eye' cue, as the arm is already raised and positioned near the robot's 'head' area, ready to perform the rubbing motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, drift the arm slightly forward and down to position the gripper near the 'eye', conveying a sense of heaviness.",
+            "Next, execute a series of small, repetitive wrist rotations to simulate a tired rubbing motion.",
+            "Finally, let the entire arm sag slowly downward from the shoulder to express fatigue, without returning to a neutral pose."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "left_vertical"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose is highly appropriate. `dir=left` correctly positions the hand to the side of the robot's head. With this direction, `gripper_orientation=vertical` means the palm faces either forward or backward. This is the perfect orientation for rubbing an eye with the knuckles or the back of the fingers, which strongly conveys a 'tired' gesture, as described. This configuration matches the provided example [EX4] for a similar cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "From the starting pose, drift the arm heavily and slowly inward until the knuckles make contact with the robot's eye area.",
+            "Perform a small, slow, back-and-forth rubbing motion to simulate being tired.",
+            "Conclude by letting the arm sag and fall downward from the face, emphasizing fatigue."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 25,
+      "cue": "cheers_toast",
+      "groundtruth": "x (up, horizontal) / (up, vertical)",
+      "generation": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with dir=up and gripper_orientation=horizontal is perfectly suited for a 'cheers_toast' gesture. It accurately mimics holding a glass upright at the peak of the gesture, just before extending it for the 'clink'. The subsequent movements described are simple to execute from this starting position.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Extend the arm forward (positive x-direction) from the shoulder to simulate the 'clinking' of glasses.",
+            "Immediately retract the arm slightly backward (negative x-direction) to create a crisp recoil effect.",
+            "Hold the final pose briefly to complete the toast before returning to a neutral stance."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 9,
+        "tile_group": "up_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with `dir=front` is inappropriate for a toast. To simulate holding a glass, the end-effector should be pointing upwards (`dir=up`) to keep the imaginary liquid from spilling. The current pose points the gripper forward at the viewer. A vertical gripper orientation is also less natural than a horizontal one for grasping a glass.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "A toast requires the robot to simulate holding a glass upright. The `dir` must be `up`. A `horizontal` gripper orientation provides a more natural pose for grasping a cylindrical object like a glass.",
+          "recommended_movement_plan_after_change": [
+            "From the corrected starting pose (holding the 'glass' upright), perform a small preparatory dip.",
+            "Lift the end-effector to the robot's eye level.",
+            "Extend the end-effector forward for a crisp 'clink' motion.",
+            "Pull the end-effector back slightly in a recoil to punctuate the toast."
+          ]
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "cue_idx": 26,
+      "cue": "highfive_invite",
+      "groundtruth": "x (up, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with 'dir=front' and 'gripper_orientation=horizontal' is the quintessential high-five presentation. The palm (gripper) is open and facing the user, which is exactly what is needed to invite or receive a high-five. This pose serves as the perfect target for the gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, pull the arm back and slightly down in a preparatory 'wind-up' to build anticipation.",
+            "Then, swing the arm forward and upward to present the hand in the target high-five position, as shown in the image.",
+            "Finally, conclude with a small, distinct forward pulse from this presented pose to actively beckon the user."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 1.0
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "front_horizontal"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The 'up' direction and 'horizontal' gripper orientation correctly represent a classic high-five pose where the robot's palm is presented forward with fingers pointing upward. This is the correct target pose for the invitation.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Pull the arm back and slightly down in a 'wind-up' motion to build anticipation.",
+            "Swing the arm upward and forward to present the hand in the target high-five position (dir=up, grip=horizontal).",
+            "Execute a small, quick forward pulse (+x direction) to clearly signal the invitation to complete the high-five."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 30,
+      "cue": "pat_self_back",
+      "groundtruth": "x (back, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The labels are correct. The end effector is pointing back towards the robot's body ('dir=back'), and the gripper's jaw-opening line is oriented vertically ('gripper_orientation=vertical'). This pose is perfectly set up as the starting point for the actual patting motion, having already completed the arc over the shoulder.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Optionally, perform a small preparatory 'proud chest' lift by extending the base joint slightly.",
+            "Execute the patting motion by repeatedly bending and extending the elbow joint in small, quick movements.",
+            "Perform this patting motion three times to complete the self-congratulatory gesture."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "back_vertical"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=down, gripper_orientation=horizontal) is a very suitable starting position. It represents a natural, at-rest state for the arm, similar to a human arm hanging at the side. From this neutral stance, it is simple and intuitive to initiate the arcing motion up and over the shoulder to pat the back. The final patting action itself also involves a downward motion of the hand onto the back, making the 'down' direction relevant to both the start and end of the gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Initiate with a subtle 'proud chest' body lift to convey self-congratulation.",
+            "Lift the arm in a wide, clear arc, bringing it up and over the opposite shoulder.",
+            "Execute three distinct patting motions, making contact with the upper back area."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 32,
+      "cue": "throat_cut_stop",
+      "groundtruth": "x (left, horizontal) / (right, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "right",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "right",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "right",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The direction 'right' is a suitable starting position for a lateral cut across the throat. However, the 'vertical' gripper orientation is incorrect. A cutting motion requires a blade-like edge, which corresponds to a 'horizontal' orientation. With a vertical orientation, the subsequent lateral movement would look like poking or prodding, not slicing.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "right",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The 'throat cut' gesture requires a lateral slicing motion. The current 'vertical' gripper orientation would make this motion look like poking with the gripper tips. Changing to a 'horizontal' orientation presents the gripper as a flat blade, making the lateral cut clear and semantically correct.",
+          "recommended_movement_plan_after_change": [
+            "Tilt the wrist slightly to prepare for the cut, mimicking a 'neck-expose' action.",
+            "Execute a fast, sharp linear movement from the robot's right to left, across the 'throat' area.",
+            "End with a small, abrupt recoil in the opposite direction to emphasize the finality of the 'stop' cue."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 4,
+        "tile_group": "right_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with `dir=left` and `gripper_orientation=vertical` is inappropriate for a 'throat cut' gesture. The motion requires the hand to act as a blade moving laterally. To achieve this, the fingers should point forward (`dir=front`), not sideways. Furthermore, the gripper must be `horizontal` to orient the hand's edge downwards for the cutting motion, whereas `vertical` incorrectly presents the flat face of the gripper.",
+        "if_appropriate": {
+          "recommended_movement_plan": null
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To orient the hand like a blade (edge down, fingers forward) for a natural and clear lateral cutting motion across the throat. The current pose is biomechanically awkward for this gesture and does not present the correct 'cutting' edge.",
+          "recommended_movement_plan_after_change": [
+            "Starting from the corrected pose, snap the hand to a position at throat level on one side of the neck.",
+            "Execute a sharp, lateral motion across the front of the neck to the opposite side.",
+            "Conclude with a crisp stop and a slight recoil to emphasize the 'cut' and 'stop' command."
+          ]
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "cue_idx": 35,
+      "cue": "salute",
+      "groundtruth": "o (front, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The labels 'dir=up' and 'gripper_orientation=horizontal' are accurate for the provided image. The robot's end-effector is pointing towards the ceiling, and the gripper jaws are aligned horizontally. This pose serves as an excellent 'high ready' or preparatory position from which to execute the final salute motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Initiate a primary, crisp motion by flexing the elbow, bringing the hand inwards and downwards towards the 'forehead' area (top of the orange body).",
+            "As the hand nears its final position, execute a quick wrist adjustment to ensure the gripper is flat and properly aligned, mimicking the 'snap' of a military salute.",
+            "Hold the final pose rigidly for a moment to emphasize the precision and formality of the gesture."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 9,
+        "tile_group": "up_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "right",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "right",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with 'dir=up' is an inappropriate starting position for the described motion. A salute that 'snaps' to the forehead from a 'lateral lane' implies a starting pose where the arm is to the side, not pointing vertically. An upward-pointing hand would need a complex, multi-part motion to reach the salute position, contradicting the 'crisp' and 'military precision' intent.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "right",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To match the description of starting from a 'lateral lane', the direction should be sideways ('right' or 'left'). This pose allows the robot to perform a simple, sharp elbow bend to bring the hand to the forehead, which correctly models a 'crisp snap' with 'military precision'.",
+          "recommended_movement_plan_after_change": [
+            "Start with the arm extended to the robot's side, hand pointing right and palm facing down.",
+            "In a single sharp movement, bend the elbow to bring the hand in a direct path to the forehead.",
+            "Hold the final salute position rigidly to complete the gesture."
+          ]
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "cue_idx": 36,
+      "cue": "visor_search",
+      "groundtruth": "o (left, vertical)",
+      "generation": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "left",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "left",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The provided labels (dir=left, gripper_orientation=vertical) are a correct description of the robot's pose in the image. The end-effector's pointing axis (wrist to fingertips) is oriented along the robot's left (+y axis), and the line connecting the gripper tips is aligned vertically.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "For a 'visor' gesture, the hand must be held flat to mimic shielding the eyes from the sun. The current 'vertical' gripper orientation results in a 'karate chop' posture, which does not fit the cue. Changing the gripper orientation to 'horizontal' will correctly position the hand as a flat visor across the robot's 'forehead'. The 'left' direction is appropriate for placing the hand across the face.",
+          "recommended_movement_plan_after_change": [
+            "Lean the upper body slightly forward to convey a sense of looking out.",
+            "Rotate the entire arm at the base or shoulder to scan from one side to the other.",
+            "Optionally, perform the scan in segments with slight pauses to emphasize a deliberate search."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "left_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "left",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The direction `left` is correct for placing the hand across the brow. However, the `gripper_orientation=vertical` describes a 'knife-hand' or 'karate chop' pose. To form a flat visor, the gripper must be oriented to be flat against the brow, which corresponds to a `horizontal` orientation (simulating palm-down).",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The `vertical` gripper orientation results in a 'karate chop' hand shape, which cannot form a visor. Changing to `horizontal` orients the gripper flat, like a palm-down hand, which is necessary for the visor gesture.",
+          "recommended_movement_plan_after_change": [
+            "Crisply move the hand to the brow, maintaining the flat visor orientation.",
+            "Lean the robot's torso slightly forward to show anticipation.",
+            "Perform a slow, deliberate side-to-side rotation of the head and torso to enact the 'search' action."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 39,
+      "cue": "request_turn",
+      "groundtruth": "o (up, horizontal)",
+      "generation": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with dir=up and gripper_orientation=horizontal is highly appropriate. This starting pose, with the 'palm' facing the user and the arm held near the body, is a natural and clear starting point for an 'offering' or 'presenting' gesture like requesting a turn.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Sweep the arm outward in a generous arc using the shoulder joint, moving the hand away from the body to 'offer' the space or turn.",
+            "Maintain the gripper's dir=up orientation throughout the sweep to keep the 'palm' open and facing the user.",
+            "Conclude the arc with a small, polite 'dip' or nod motion from the wrist to punctuate the offer."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 9,
+        "tile_group": "up_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The 'front' direction is appropriate for a gesture that offers something to a person in front of the robot. However, the 'vertical' gripper orientation is inappropriate. The description specifies an 'open palm' to 'offer the turn', which is best represented by a 'horizontal' orientation to mimic a flat, welcoming hand. A vertical orientation looks more like a 'chop' or 'stop' gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "A 'vertical' gripper orientation does not convey an 'open palm' offering gesture as described. Changing to 'horizontal' makes the hand appear flat and open, which is essential for a welcoming, 'after you' type of cue.",
+          "recommended_movement_plan_after_change": [
+            "Start with the EE (representing an open palm) near the robot's torso, pointing forward with a horizontal gripper.",
+            "Sweep the arm outward in a smooth, generous arc away from the body, as if clearing a path.",
+            "At the end of the sweeping motion, execute a small, soft downward dip of the EE to politely punctuate the offer."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 40,
+      "cue": "guiding_arm",
+      "groundtruth": "o (front, vertical) / (left, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with `dir=front` and `gripper_orientation=vertical` is excellent. It presents the gripper in a natural, inviting 'handshake' or 'offering' orientation, which is a perfect starting point for a guiding gesture that sweeps to the side. The cue description explicitly mentions an 'offering pose' and this fits perfectly.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, perform the small preparatory 'gathering' motion by slightly pulling the elbow back and inwards to invite attention.",
+            "Next, execute the main action by smoothly sweeping the entire arm from the shoulder out to the side, clearly indicating a direction.",
+            "Finally, end the gesture with a slight downward relaxation of the arm to soften the stop and make it feel more natural."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "front_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The cue description explicitly starts with 'extends its hand forward in an offering pose'. The current starting pose `dir=left` contradicts this initial action, as the hand is already pointing to the side. The described motion cannot be performed from this starting configuration.",
+        "if_appropriate": {
+          "recommended_movement_plan": null
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The starting pose must be `dir=front` to match the initial 'offering pose' described in the cue. The current `dir=left` pose is the *end* of the guiding sweep, not the beginning.",
+          "recommended_movement_plan_after_change": [
+            "Start from the corrected forward offering pose (`dir=front`).",
+            "Make a small preparatory gathering motion inward to invite attention.",
+            "Sweep the arm smoothly from the front to the side to guide the viewer, ending with the hand pointing left (`dir=left`)."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 45,
+      "cue": "slow_down_request_palm_down",
+      "groundtruth": "x (front, horizontal)",
+      "generation": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The labels `dir=down` and `gripper_orientation=horizontal` correctly describe the robot's pose in the image, with the end-effector pointing towards the floor and the gripper jaws aligned horizontally. However, this pose is not appropriate for the intended cue.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current `dir=down` pose is too low, making the gesture appear as if it's interacting with the floor rather than communicating with a person. For a 'slow down' or 'calm down' signal, the hand should be raised into the mutual interaction space, pointing towards the human (`dir=front`) with the 'palm' facing down (`gripper_orientation=horizontal`). This makes the subsequent downward pressing motion clear, intentional, and easily understandable.",
+          "recommended_movement_plan_after_change": [
+            "Start with the hand raised to about chest height, pointing forward with the 'palm' down.",
+            "Perform a small, slow preparatory lift from the shoulder to gather attention.",
+            "Execute two distinct and gentle downward presses, primarily using the elbow or wrist, to convey the 'calm down' signal.",
+            "Briefly hold the final pose before relaxing."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 6,
+        "tile_group": "down_horizontal"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose `dir=front` with `gripper_orientation=horizontal` correctly orients the robot's palm to face downwards, which is essential for the 'palm_down' cue. This starting orientation allows for a clear and direct downward pressing motion in front of the robot, which perfectly matches the description of a gentle 'slow down' signal.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, lift the hand slightly upward from the starting pose to gather attention.",
+            "Then, perform a slow, gentle downward press, ensuring the movement is smooth and deliberate.",
+            "Repeat the press by returning to the slightly lifted position and executing the same slow downward motion to reinforce the cue."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 61,
+      "cue": "air_quotes",
+      "groundtruth": "o (front, horizontal) / (up, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=horizontal) is not appropriate for the 'air_quotes' gesture. The gesture's core expressive element is the 'twitching' of the fingers, which needs to be clearly visible to the viewer. Pointing the gripper up obscures this motion. Furthermore, the horizontal orientation of the gripper does not resemble the two fingers used in the human gesture.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "For the `air_quotes` gesture to be legible, the gripper must point towards the viewer (`dir=front`) so the twitching motion is visible. The gripper jaws should also be oriented vertically (`gripper_orientation=vertical`) to better mimic the two fingers (index and middle) used in the human version of this gesture.",
+          "recommended_movement_plan_after_change": [
+            "Raise the arm to a position roughly at shoulder or head height.",
+            "Perform two rapid, sharp wrist twists (yaw left/right) to simulate the quoting motion.",
+            "Slightly lower the arm to a more neutral position to end the cue."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 9,
+        "tile_group": "up_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The 'front' direction is appropriate, as the gesture is directed towards the viewer. However, the 'vertical' gripper orientation is not ideal. For air quotes, the gesture mimics the index and middle fingers, which are side-by-side. A horizontal gripper orientation would represent this far more effectively than a vertical one.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "A horizontal gripper orientation, where the jaws are side-to-side, provides a much clearer visual analogy to the two fingers used in a human air quotes gesture. The current vertical orientation (jaws top-and-bottom) is less intuitive for this specific cue.",
+          "recommended_movement_plan_after_change": [
+            "Move hand up to a position near the robot's head/camera, pointing forward.",
+            "Pause briefly to establish the context of the quote.",
+            "Perform two rapid, sharp open-and-close 'twitch' motions with the gripper."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 64,
+      "cue": "tilt_head_curious",
+      "groundtruth": "o (front, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose has the end-effector pointing back towards the robot's own body. While the high position is suitable for a 'head' gesture, the direction is fundamentally incorrect for a cue described as 'peeks forward' and expressing curiosity towards an external subject (the viewer). The gesture's intent is lost when the robot is looking away.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To express curiosity towards a viewer, the robot's 'head' (end-effector) must be oriented towards them. The cue description explicitly mentions 'peeks forward'. Changing the direction from 'back' to 'front' correctly orients the robot to perform this social, outward-facing gesture.",
+          "recommended_movement_plan_after_change": [
+            "First, execute a small, quick 'peek' forward by rotating the shoulder joint.",
+            "Next, introduce a slight side-to-side 'investigating' motion by wiggling the elbow.",
+            "Finally, perform the characteristic 'curious tilt' by rolling the wrist joint to one side and holding the pose briefly."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "round2_VLM_tile": {
+        "tile_index": 4,
+        "tile_group": "back_horizontal"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The cue 'tilt_head_curious' is performed by the robot's head, not its hand/end-effector. The provided pose (dir=down, gripper_orientation=horizontal) describes a neutral, resting state for the arm. This is an ideal starting pose because it does not create a conflicting focus and allows the head motion to be the primary conveyor of the cue's meaning.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Move head slightly forward, as if 'peeking' to notice something.",
+            "Shift head or upper body slightly to one side, as if investigating.",
+            "Tilt head to the opposite side and hold, conveying curiosity."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 66,
+      "cue": "shh_gesture",
+      "groundtruth": "o (up, vertical)",
+      "generation": {
+        "dir": "up",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The labels dir=back and gripper_orientation=vertical are correct. The gripper's pointing axis is directed back towards the robot's main body (-x), and the jaws open in an up-down orientation, making the end line vertical. This pose is an excellent starting point for a 'shh' gesture, as the hand is pre-oriented correctly and simply needs to be brought forward to the 'mouth' location.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Perform a small preparatory dip by lowering the shoulder slightly.",
+            "Move the gripper forward along the +x axis to bring it to the robot's 'mouth' area.",
+            "Hold the final pose briefly to emphasize the gesture."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "back_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current direction `dir=back` is incorrect. A 'shh' gesture involves bringing the hand to the robot's own 'mouth'. Starting with the hand pointing backward (away from the human and the robot's face) makes a simple, direct motion to the mouth impossible. The hand should be pointing horizontally across the front of the body.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The `dir` must be changed from `back` to `left` (or `right`) so the hand is positioned to move naturally toward the robot's face. The `gripper_orientation=vertical` is correct as it mimics a vertical finger against the lips.",
+          "recommended_movement_plan_after_change": [
+            "Start with the hand near the chest, pointing left with a vertical gripper.",
+            "Make a small preparatory dip downwards.",
+            "Raise the hand deliberately to the robot's 'mouth' location, holding the final pose."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 7,
+      "cue": "raise_fists_victory",
+      "groundtruth": "x (up, vertical) / (up, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The `dir=up` is correct for the image shown, as the end effector points straight up. However, the `gripper_orientation` appears to be `horizontal` (jaw-opening line is left-right), not `vertical` as labeled. Critically, this pose represents the absolute peak or end of a 'raise fist' gesture, making it an unsuitable starting point for the action described.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The provided pose is the culmination of the 'raise fist' action, not a starting point. To perform the cue, the robot must begin from a lower, prepared position to execute the upward thrust. A 'dir=front' pose with the elbow bent places the 'fist' in front of the robot's body, creating a natural starting position for a powerful upward movement. A 'vertical' orientation in this starting pose better mimics a human fist.",
+          "recommended_movement_plan_after_change": [
+            "Gather energy: Perform a quick, small preparatory dip downward and backward.",
+            "Thrust upward: Drive the arm in a powerful, fast arc from the 'front' starting position to a final 'up' position.",
+            "Triumphant shake: At the peak of the arc, execute two or three small, sharp shakes using the elbow or wrist to punctuate the victory."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 2,
+        "tile_group": "up_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose `dir=up` describes the peak or final state of the 'raise fists' gesture. To perform the action of raising the fist, the robot must start from a lower position. The current pose is an end-point, not a starting point.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue is 'raise_fists_victory', which implies a motion from a lower position to a higher one. Starting with the fist already up (`dir=up`) prevents the execution of this core upward thrusting motion. A starting pose with the fist pointing down (`dir=down`) allows for a full, powerful, and expressive arc.",
+          "recommended_movement_plan_after_change": [
+            "Start with the fist down and perform a quick dip, moving slightly further down and back to gather energy.",
+            "Execute a powerful, arcing motion, thrusting the fist forward and then upward to a position high above the shoulder.",
+            "At the peak of the arc, perform a small, sharp shaking motion to punctuate the triumphant gesture before relaxing."
+          ]
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "cue_idx": 10,
+      "cue": "shrug_idk",
+      "groundtruth": "x (up, vertical)",
+      "generation": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The labels dir=up and gripper_orientation=horizontal correctly describe the robot's pose in the image. However, this pose itself is not appropriate for a 'shrug' gesture.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The current pose (dir=up) is more akin to 'hands up' or surrender, not a shrug. A shrug gesture is characterized by lifting the shoulders and turning the palms up, usually with the arms slightly forward and bent. A 'front' direction with a 'vertical' gripper orientation (to simulate 'palm up') is a much more iconic and understandable representation of a shrug.",
+          "recommended_movement_plan_after_change": [
+            "Tuck the arm inward slightly as a preparatory motion.",
+            "Simultaneously lift the shoulder upward and rotate the wrist to achieve the 'palm up' (vertical) orientation.",
+            "After a brief hold at the peak of the shrug, let the arm sag slightly downward to convey uncertainty."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 9,
+        "tile_group": "up_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The `gripper_orientation=horizontal` is correct for a palm-up gesture as described. However, `dir=up` is inappropriate, as it suggests the hand is pointing straight at the ceiling, which is not characteristic of a shrug. A shrug gesture typically involves hands pointing forward.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "In a classic shrug, the palms are turned up and the hands are held out from the body, pointing primarily forward ('front'), not vertically upwards ('up'). Changing the direction to 'front' creates a natural and recognizable starting point for the shrug gesture.",
+          "recommended_movement_plan_after_change": [
+            "Start by tucking the arm slightly inward toward the body.",
+            "Lift the shoulder and raise the forearm, rotating the wrist so the palm faces up, achieving the peak shrug pose.",
+            "Hold the peak pose briefly, then allow the arm and shoulder to sag slightly downward to complete the gesture of uncertainty."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 11,
+      "cue": "scratch_head_confused",
+      "groundtruth": "x (left, vertical) / (right, vertical)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "right",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=right, gripper_orientation=vertical) is inappropriate for a 'scratch head' gesture. The gripper is pointing outward, to the side, away from the robot's body. To scratch its own 'head', the robot needs to bring its hand inward and position it near the upper part of its body.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The gripper must point inward toward the robot's body ('back') to make contact with its 'head'. A 'horizontal' gripper orientation is more natural for a scratching motion, allowing for small up-and-down movements of the wrist or fingers against the surface.",
+          "recommended_movement_plan_after_change": [
+            "Bring the gripper slowly to the side of the 'head' (upper part of the robot's main column).",
+            "Perform a few small, repetitive up-and-down scratching motions by moving the wrist.",
+            "Pause with the hand held near the head, perhaps with a slight tilt of the upper arm, to convey a pondering state."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 4,
+        "tile_group": "right_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "left",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The 'left' direction is plausible, assuming the robot is using its right hand to scratch the right side of its head (fingers pointing inward, i.e., to the robot's left). However, the 'vertical' gripper orientation is not appropriate. It would align the gripper fingers front-to-back, which is an unnatural posture for scratching. A horizontal orientation is required to mimic the motion effectively.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "A horizontal orientation aligns the gripper 'fingers' in an up/down configuration. This is crucial for creating a believable scratching motion on the side of the head, which the 'vertical' orientation fails to do.",
+          "recommended_movement_plan_after_change": [
+            "Slowly bring the hand from a rest position to the side of the head.",
+            "Perform a few small, light up-and-down motions against the head to simulate scratching.",
+            "Pull the hand back slightly and hold the pose while the head enacts a slight tilt to signify pondering."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 13,
+      "cue": "point_self",
+      "groundtruth": "x (back, vertical) / (back, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The provided labels dir=back and gripper_orientation=horizontal are a correct description of the pose in the image. The end effector's pointing axis is directed back towards the robot's central column, and the line between the gripper tips is horizontal.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose (dir=back) is the destination pose for a 'point_self' cue, not the starting pose. The cue description requires the robot to *bring* its hand to its chest, which implies starting from a position away from the body. A forward-pointing pose is a much more natural and communicative starting point for this action.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Perform a small preparatory outward gesture by slightly rotating the shoulder.",
+            "Step 2: Bend the elbow and rotate the shoulder to bring the end effector smoothly inwards to the center of the robot's base (its 'chest').",
+            "Step 3: Execute a small, quick forward-and-back motion from the shoulder to simulate a light tap on the chest."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 4,
+        "tile_group": "back_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The pose is inappropriate. The `dir=back` indicates the end-effector is already pointing at or through the robot's chest, which is the *end* of the 'point_self' motion, not the start. This starting pose makes the described preparatory 'outward' gesture impossible and removes the clear action of 'bringing the hand to the chest'.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To clearly communicate 'me', the robot must first gesture outwards before turning the hand inwards. Starting with `dir=front` enables this clear sequence: a preparatory outward gesture, a visible motion bringing the hand to the chest, and the final tap.",
+          "recommended_movement_plan_after_change": [
+            "From the `front` pointing pose, perform a small outward arc.",
+            "Rotate the wrist and retract the arm to bring the fingertips towards the robot's own chest.",
+            "Execute a light, distinct tap on the chest and hold briefly for emphasis."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 17,
+      "cue": "pat_stomach",
+      "groundtruth": "x (left, vertical) / (right, vertical)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The 'back' direction is correct, as the gripper needs to point towards the robot's body ('stomach'). However, the 'horizontal' gripper orientation is incorrect. For a patting motion, the flat 'palm' of the gripper should face the stomach. A horizontal orientation positions the gripper for a chopping motion with its edge. A 'vertical' orientation is required.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To perform a 'patting' motion, the flat surface of the gripper (the 'palm') must face the target. With the gripper pointing 'back' towards the robot's base, a 'vertical' orientation is necessary to align the palm correctly. The current 'horizontal' orientation would lead to a chopping motion, not a pat.",
+          "recommended_movement_plan_after_change": [
+            "Perform several quick patting motions by moving the arm slightly forward and backward from the shoulder.",
+            "After the last pat, hold the pose briefly to register the action.",
+            "Conclude by letting the arm sag slightly downward from the shoulder to convey contentment or fullness."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "round2_VLM_tile": {
+        "tile_index": 4,
+        "tile_group": "back_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "down",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_pose": {
+        "dir": "down",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with dir=back is inappropriate. To pat the stomach, the robot's hand must be in front of its body, not pointing towards its back. A 'back' direction would require a large, unnatural rotation to reach the target, failing the 'simple subsequent movements' criteria.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The hand needs to be positioned in front of the robot's torso with the 'palm' facing the stomach. A 'down' direction for the fingertips allows for a natural hand position against the body. When the pointing direction is 'down', the perpendicular plane is the XY plane; a 'vertical' gripper orientation on this plane correctly aligns the gripper to be flat for patting.",
+          "recommended_movement_plan_after_change": [
+            "Start with the hand near the 'stomach' area in the corrected pose (dir=down, grip=vertical).",
+            "Execute several short, distinct inward movements to simulate patting the stomach.",
+            "Conclude the motion by relaxing the arm, allowing it to drift slightly down and away from the body to convey fullness."
+          ]
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "cue_idx": 18,
+      "cue": "fan_face_hot",
+      "groundtruth": "x (left, horizontal) / (right, horizontal)",
+      "generation": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=left, gripper_orientation=vertical) is not suitable. The hand is pointing sideways, away from the robot's 'face'. A fanning motion requires the hand to be positioned in front of the face to be effective and communicative.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To fan one's face, the hand must be positioned in front of it. The current 'left' direction points the hand away from the target area. Changing to 'front' places the hand correctly. A 'vertical' gripper orientation in this new pose allows for a natural side-to-side wrist pivot that mimics a fanning motion.",
+          "recommended_movement_plan_after_change": [
+            "Bring the hand up into position in front of the robot's upper body (the 'face' area).",
+            "Execute a series of quick, repeated side-to-side pivots at the wrist to create the fanning effect.",
+            "Conclude the gesture by letting the entire arm sag slowly downward, conveying exhaustion from the heat."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "left_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=left, gripper_orientation=vertical) describes a hand in a 'karate chop' orientation pointing sideways. This is unsuitable for a fanning motion, which requires a flat surface (the palm) to move air. The described 'wrist pivots' would not create a fanning effect from this starting pose. A more appropriate pose would orient the hand like an open fan, with fingers pointing up and the palm facing inward.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose orients the hand's narrow edge toward the face, making fanning with wrist pivots ineffective. The recommended pose (dir=up, grip=horizontal) positions the hand as a flat surface, like a fan, which is necessary for the intended motion.",
+          "recommended_movement_plan_after_change": [
+            "Bring the fan-shaped hand to a position in front of the robot's face.",
+            "Execute quick side-to-side wrist pivots to simulate fanning the face.",
+            "Conclude the motion by letting the arm sag down slowly, conveying exhaustion from heat."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 19,
+      "cue": "cover_yawn_sleepy",
+      "groundtruth": "x (up, horizontal)",
+      "generation": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The labels dir=back and gripper_orientation=horizontal correctly describe the pose in the image. However, this pose is inappropriate as a starting point for the 'cover_yawn_sleepy' cue because the arm is already in the final 'covering' position. The cue's description implies starting from a low-energy state and then lifting the arm.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue requires a 'sluggish lift' to the mouth, implying the gesture should start from a lower, relaxed position. The current pose is already at the peak of the action. A lower, forward-facing starting pose allows the robot to perform the complete, readable motion of raising its hand to its mouth.",
+          "recommended_movement_plan_after_change": [
+            "Slowly lift the arm in an arc towards the robot's 'mouth' area, conveying sluggishness.",
+            "Hold the gripper over the 'mouth' for a moment to signify covering the yawn.",
+            "Let the arm slowly sag downwards from fatigue to a lower resting position."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 4,
+        "tile_group": "back_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The `dir=back` is inappropriate. To cover its own 'mouth', which is on the front of the robot, the gripper should approach from the front. A 'back' direction points the gripper's fingertips away from the robot, making the gesture impossible without a complex reorientation. The `gripper_orientation=horizontal` is suitable.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The original 'back' direction points the gripper away from the robot's face. To cover a yawn, the gripper must approach the mouth, which is on the front. A 'front' direction allows for a natural and simple movement to the mouth.",
+          "recommended_movement_plan_after_change": [
+            "Start in a low-energy pose with the gripper pointing forward.",
+            "Sluggishly lift the arm, bending at the elbow to bring the gripper toward the 'mouth' area.",
+            "Gently place the gripper over the 'mouth' to simulate covering a yawn and hold briefly.",
+            "Let the arm sag and fall back down to a resting position to convey fatigue."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 21,
+      "cue": "tap_temple_think",
+      "groundtruth": "x (left, horizontal) / (right, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "right",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "right",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with dir=right and gripper_orientation=vertical is an excellent starting position. The end-effector is correctly oriented to bring the 'fingertips' to the side of the robot's 'head' for a tapping motion, which is the core of the cue. The arm is raised and ready to be brought inward to the target location.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, slowly bring the hand to the temple area with a smooth, arcing motion, primarily by bending the elbow joint inward.",
+            "Once at the temple, perform a series of gentle taps (e.g., 3 repetitions) by making small, quick rotations of the wrist.",
+            "Finally, let the arm drift slowly downward from the shoulder to convey a state of ongoing contemplation."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 4,
+        "tile_group": "right_vertical"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose is appropriate. The direction 'left' correctly orients the hand so the fingertips point toward the temple (assuming the robot's right hand is used for its right temple). The 'vertical' gripper orientation corresponds to a hand posture where the palm faces forward or back, allowing the robot to tap its temple with the side of its index finger. This is a valid and clear way to perform a 'thinking' gesture, and the core action can be achieved with simple subsequent movements.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "From the starting pose, move the hand inward to make gentle contact with the side of the temple.",
+            "Perform several small, brief inward pulses against the temple to simulate a gentle tapping.",
+            "After the final tap, allow the arm to relax slightly and drift a short distance away from the head, holding the pose to convey ongoing contemplation."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "",
+          "recommended_gripper_orientation": "",
+          "why_change": "",
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "cue_idx": 22,
+      "cue": "circle_temple_crazy",
+      "groundtruth": "x (left, vertical) / (right, vertical)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "left",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with `dir=front` and `gripper_orientation=horizontal` is an excellent starting point for the 'crazy' gesture. It directly accomplishes the first part of the cue's description, which is to point outward at a target ('you'). From this pointing position, moving to the temple for the subsequent parts of the gesture is a natural and simple transition.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Retract the arm to bring the pointing hand to the side of the robot's 'head', near the temple.",
+            "Perform a quick, small tapping motion (e.g., using the wrist) to indicate the 'temple' location.",
+            "Trace a small, smooth circle near the temple using the wrist to complete the 'crazy' sign."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "front_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with `dir=left` is inappropriate. The gesture's description explicitly starts with 'points outward to establish a target,' which requires a 'front' direction to point at the viewer. Starting by pointing to the side is unnatural for this cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue begins by pointing at the viewer. A `dir` of 'front' is essential for this initial action. The original 'left' direction would require a large, awkward reorientation before the main gesture could even begin. A 'horizontal' gripper orientation is a common and stable way to represent pointing.",
+          "recommended_movement_plan_after_change": [
+            "Start by pointing forward at the viewer to establish the target.",
+            "Retract the arm to bring the hand to the side of the head (temple).",
+            "Perform a small circular motion with the hand near the temple to complete the gesture."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 23,
+      "cue": "lean_forward_interest",
+      "groundtruth": "o (front, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The labels 'dir=front, gripper_orientation=horizontal' are inconsistent with the image. The image clearly shows the gripper's pointing axis as 'dir=right' and its jaw-opening line as 'gripper_orientation=vertical'. Furthermore, the pose shown in the image (pointing to the side) is not a suitable starting point for a 'lean forward' gesture, which implies forward-directed attention.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue 'lean_forward_interest' requires the robot's focus to be directed forward, toward the subject of interest (the viewer). A starting pose with the gripper pointing forward ('dir=front') establishes this line of engagement. The subsequent leaning motion then reinforces this established focus. The pose in the image, pointing to the side, is thematically disconnected from the forward-leaning motion and does not effectively convey interest toward the viewer.",
+          "recommended_movement_plan_after_change": [
+            "First, perform a slight recoil motion with the shoulder, moving the arm back and down to build anticipation.",
+            "Then, execute the main gesture by thrusting the arm forward and slightly upward to simulate the body leaning in with interest.",
+            "Conclude with a small, crisp upward tilt of the wrist to signify focused attention, and hold the final pose."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "front_horizontal"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The cue 'lean_forward_interest' is primarily a torso movement, not a specific hand or arm gesture. The provided pose (dir=front, gripper_orientation=horizontal) describes a neutral, attentive hand position. This pose does not conflict with the main action of leaning forward; in fact, having the hand forward can enhance the sense of focus. Therefore, it is an appropriate starting pose from which the body motion can be executed.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "From the initial pose with the hand pointing forward, pull the entire torso and arm back slightly to signal anticipation.",
+            "Thrust the torso forward quickly and with a slight upward tilt, allowing the arm to follow the body's motion.",
+            "Hold the final leaned-in position, keeping the hand oriented forward to maintain a strong sense of focused attention."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "cue_idx": 24,
+      "cue": "cover_mouth_gasp",
+      "groundtruth": "x (up, horizontal) / (left, vertical) / (right, vertical)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with dir=back and gripper_orientation=vertical is highly suitable. The end-effector is already pointing towards the robot's own body, which is the correct general direction for a self-referential gesture like covering the mouth. From this starting position, a simple forward and downward motion can bring the gripper to the 'mouth' area.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, execute a sharp, fast recoil movement, pulling the arm slightly further back and up to mime a sudden intake of breath.",
+            "Immediately follow with a direct path movement, bringing the gripper forward and down to the 'mouth' position on the robot's torso.",
+            "Hold the final position and introduce a slight, rapid, repetitive tremor at the wrist to convey the shock or surprise of the gasp."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "back_vertical"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "back",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose is highly appropriate. 'dir=back' correctly orients the hand's pointing axis (wrist-to-fingertips) toward the robot's own mouth. 'gripper_orientation=horizontal' correctly aligns the gripper's jaws to span the mouth horizontally. This pose serves as the perfect target for the described action.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Initiate with a sharp recoil of the upper body and arm to convey a startled gasp.",
+            "Immediately and quickly move the hand to the mouth, arriving at the specified target pose.",
+            "Hold the hand over the mouth and add a subtle, high-frequency tremor to complete the expression of shock."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "cue_idx": 27,
+      "cue": "highfive_imitation",
+      "groundtruth": "x (up, horizontal)",
+      "generation": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is ideal for a high-five. The gripper is positioned like an open hand facing the user, which is the standard starting position for this gesture. The height and orientation are correct to begin the slapping motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Pull the arm back slightly away from the user to create a clear anticipatory wind-up.",
+            "Execute a quick, sharp forward thrust to simulate the slap against a hand.",
+            "Immediately after the forward thrust, perform a small, fast recoil to sell the idea of impact."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "",
+          "recommended_gripper_orientation": "",
+          "why_change": "",
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.98
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "front_horizontal"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose `dir=up` and `gripper_orientation=horizontal` is highly appropriate. For a high-five, the hand should be raised (dir=up) with the palm facing the viewer (+x direction). A horizontal gripper orientation, when the pointing axis is up, correctly orients the palm to be vertical and face forwards or backwards. This setup is perfect for the described forward slapping motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "From the starting pose, pull the hand back slightly (-x direction) as an anticipatory wind-up.",
+            "Execute a sharp, fast movement forward (+x direction) to the point of impact.",
+            "Immediately perform a small, quick retraction (-x direction) to simulate the recoil from the slap."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 28,
+      "cue": "fistbump_invite",
+      "groundtruth": "x (front, horizontal) / (front, vertical)",
+      "generation": {
+        "dir": "down",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose dir=front and gripper_orientation=vertical is perfectly suited for a fistbump invitation. It correctly mimics a human presenting a fist for a bump, with the knuckles aligned vertically and the fist pointing towards the interaction partner.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Pull the arm back slightly (towards the robot body) to create anticipation.",
+            "Thrust the arm forward and slightly upward to present the 'fist' in a clear, invitational manner.",
+            "Hold the final extended pose to give the user time to react and complete the fistbump."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "front_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The `dir=front` is appropriate, as a fist bump is offered forward towards the user. However, `gripper_orientation=horizontal` is inappropriate. A standard fist bump gesture is performed with the fist held upright (like a handshake with a closed fist), which corresponds to a `vertical` gripper orientation.",
+        "if_appropriate": {
+          "recommended_movement_plan": null
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "A standard fist bump requires a vertical fist orientation to be clearly and immediately recognizable. A horizontal orientation is unnatural for this social gesture and could be confusing.",
+          "recommended_movement_plan_after_change": [
+            "With the gripper in the corrected `vertical` orientation, move the fist to a ready position.",
+            "Pull the fist back slightly along the forward axis to create anticipation.",
+            "Extend the fist forward with a slight upward arc and hold the final pose as an invitation."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 37,
+      "cue": "yield_turn",
+      "groundtruth": "x (front, horizontal)",
+      "generation": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "back",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose, with the hand held near the robot's 'chest' (dir=back, gripper_orientation=vertical), is an excellent and natural starting position for a 'yield turn' gesture. It allows for a clear, expansive outward motion as described in the cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Perform a small, preparatory upward lift of the arm by slightly rotating the shoulder, signaling the start of the gesture.",
+            "Sweep the arm outward in a generous, smooth arc, moving from the chest towards the side and front.",
+            "Conclude the movement in an open, extended pose and hold it briefly to clearly offer the turn."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "back_vertical"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is an ideal *final* pose for a 'yield turn' gesture, but not an appropriate *starting* pose. The description specifies a motion that begins near the chest and sweeps outward. Starting with the hand already pointing forward would require an awkward retraction before the main gesture can even begin.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The described motion is a sweep from the chest outward. The starting pose should therefore be near the chest with the hand pointing up, ready to perform the sweep. The provided 'front' direction represents the end state of the gesture, not the start.",
+          "recommended_movement_plan_after_change": [
+            "From the starting pose near the chest (dir=up), perform the small preparatory lift.",
+            "Sweep the arm outward and forward in a generous, welcoming arc toward the final offering position.",
+            "Hold the final pose (dir=front, gripper_orientation=horizontal) to clearly offer the turn."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 41,
+      "cue": "protective_arm_out",
+      "groundtruth": "x (up, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The `dir=front` is conceptually correct, as a protective barrier should be directed towards the user. However, the `gripper_orientation=horizontal` is inappropriate. A classic 'stop' or 'barrier' gesture is made with the palm facing forward. For a parallel-jaw gripper, this corresponds to a `vertical` orientation. A `horizontal` orientation presents the top or bottom of the hand, which is ambiguous and lacks the assertive, protective meaning of the cue.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To create an unambiguous 'stop' or protective barrier gesture, the flat palm surface must face the viewer. A `vertical` gripper orientation achieves this. The `horizontal` orientation is semantically weak for this cue and could be misinterpreted as 'give me' or 'press down'.",
+          "recommended_movement_plan_after_change": [
+            "Start with the arm partially bent and the gripper in a vertical orientation.",
+            "Perform a small, sharp recoil movement, pulling the arm slightly back toward the body.",
+            "Thrust the arm forward in a firm, straight path toward the user to establish the 'barrier'.",
+            "End with a crisp stop and hold the pose assertively to signify a firm boundary."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "front_horizontal"
+      },
+      "round2_Text_bool": false,
+      "round2_Text_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose `dir=up` is incorrect. A 'protective_arm_out' gesture, described as extending the arm 'forward into a firm, protective barrier', requires the hand to point forward (`dir=front`) toward the entity being stopped, not upward.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The core action is extending the arm 'forward' to create a 'barrier' or 'stop' pose. The direction must be 'front'. A 'horizontal' gripper orientation is appropriate for a classic 'stop' gesture where the palm faces forward and fingers point up, creating a vertical palm surface.",
+          "recommended_movement_plan_after_change": [
+            "Perform a small, sharp recoil, pulling the arm back slightly from a neutral start.",
+            "Extend the arm directly forward into the final 'stop' pose.",
+            "Brace slightly upon reaching full extension to hold the pose assertively."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 50,
+      "cue": "firm_accept_forward_reach",
+      "groundtruth": "o (front, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is perfectly appropriate. The arm is positioned in a neutral, ready state, pointing towards the user. This allows for both the initial recoil and the subsequent decisive forward thrust, which are the core components of the 'firm_accept_forward_reach' cue. The horizontal gripper orientation is standard and suitable for this type of interaction.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, execute a small, sharp recoil by pulling the shoulder back and slightly down to build tension.",
+            "Immediately follow with a fast, decisive thrust forward along the x-axis, extending the arm towards the user.",
+            "Conclude the motion with a crisp upward flick of the wrist to punctuate the gesture of firm acceptance."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "front_horizontal"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The 'dir=front' is ideal as the core motion is a 'thrusts its arm forward decisively'. Starting with the end-effector already pointing in the direction of the main action makes the subsequent movement direct and clear. The 'gripper_orientation=horizontal' suits the 'firm acceptance' intent, resembling a decisive hand-over-table gesture or a firm handshake-like proffer, which is more assertive and conclusive than a vertical, chop-like orientation.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "From the starting pose, perform a short, sharp recoil (move slightly backward) to gather intent.",
+            "Thrust the arm forward with conviction along the +x world axis.",
+            "At the end of the thrust, execute a crisp upward flick of the wrist to punctuate the acceptance."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "",
+          "recommended_gripper_orientation": "",
+          "why_change": "",
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "cue_idx": 59,
+      "cue": "nod_yes",
+      "groundtruth": "o (front, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": true,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is a suitable and conventional starting position for a 'nod_yes' cue. The end-effector is positioned like a hand or head facing the user, which is an ideal setup for a nodding motion performed by the wrist joint.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Preparatory lift: Rotate the wrist slightly upward (pitch up) to signal the beginning of the gesture, as per the description.",
+            "Downward nod: Execute a crisp, decisive downward rotation (pitch down) of the wrist to form the primary affirmative action.",
+            "Return: Rotate the wrist back upward to its initial position to complete the nod cleanly."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 5,
+        "tile_group": "front_horizontal"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The cue 'nod_yes' is a vertical motion (down then up). While typically a head gesture, it can be effectively mimicked by an end-effector. The provided starting pose (dir=front, gripper_orientation=horizontal) is a neutral, communicative stance. From this forward-pointing position, the robot can easily articulate its wrist to perform the down-up nodding motion without needing to reposition the entire arm, making it an appropriate starting pose.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Perform the 'preparatory lift' by translating the end-effector slightly up along the world +z axis.",
+            "Step 2: Execute the 'crisp down' part of the nod by quickly pitching the end-effector downward.",
+            "Step 3: Immediately complete the nod by pitching the end-effector back up to its starting orientation."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "cue_idx": 60,
+      "cue": "shake_head_no",
+      "groundtruth": "x (front, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": true,
+      "round2_VLM_fix": null,
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with dir=front and gripper_orientation=vertical is perfectly appropriate. It positions the gripper to act as a proxy for a head, facing the user. This is an ideal starting configuration for a 'shake head no' gesture, which can be achieved through simple rotations.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Perform a small anticipatory rotation to one side (e.g., yaw the elbow/wrist joint).",
+            "Execute two or three clear side-to-side shaking motions by rotating the joint back and forth.",
+            "Return to the initial forward-facing position to complete the gesture."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "front_vertical"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The 'up' direction correctly positions the end-effector as a proxy for a head on a neck. A 'horizontal' gripper orientation presents a flat, visible surface to the human, similar to an open hand or face, which is well-suited for a clear side-to-side shaking motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "From the starting pose, make a small, quick anticipatory shift to one side (e.g., robot right).",
+            "Execute two distinct side-to-side shakes along the horizontal (world Y) axis to clearly signal negation.",
+            "Return to the initial centered position to complete the gesture."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "",
+          "recommended_gripper_orientation": "",
+          "why_change": "",
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 74,
+      "cue": "hands_up_surrender",
+      "groundtruth": "x (up, horizontal)",
+      "generation": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": true,
+      "round1_Text_correct": true,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The labels dir=up and gripper_orientation=horizontal accurately describe the pose in the image. However, this pose represents the *end state* of the 'hands up, surrender' gesture. It is not an appropriate *starting* pose from which to perform the cue, as the key action described is the motion of raising the hands.",
+        "if_appropriate": {
+          "recommended_movement_plan": null
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue 'hands_up_surrender' describes the action of raising one's hands, often from a neutral or lowered position, as a reaction. The provided pose is the final, held position after this action is complete. To effectively communicate the entire cue, which includes surprise and the act of raising the hand, the robot must start from a lower, more neutral pose.",
+          "recommended_movement_plan_after_change": [
+            "Start from a lower, neutral pose (e.g., pointing front).",
+            "Perform a sharp backward recoil motion at the shoulder to show surprise.",
+            "Execute a rapid upward linear path to raise the arm high.",
+            "Hold the final 'hands up' pose (dir=up) to signal compliance."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 9,
+        "tile_group": "up_horizontal"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "up",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": true,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose 'dir=up' correctly captures the primary motion of raising the hands. A 'gripper_orientation=horizontal' orients the gripper so the palm faces forward (-x direction), which is the canonical human gesture for surrender. The specified pose is an excellent final state for the described cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Initiate with a sharp backward recoil of the arm/torso to express surprise.",
+            "Rapidly raise the hand from the recoiled position to a high point above the shoulder.",
+            "Hold the final pose (dir=up, gripper_orientation=horizontal) with the 'palm' facing forward, maintaining a steady position to signal compliance."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "cue_idx": 104,
+      "cue": "scale_expand",
+      "groundtruth": "x (left, vertical)",
+      "generation": {
+        "dir": "down",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "vertical"
+      },
+      "round1_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round1_VLM_correct": false,
+      "round1_Text_correct": false,
+      "round2_VLM_bool": false,
+      "round2_VLM_fix": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_VLM_correct": false,
+      "round2_VLM_raw": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The labels dir=front and gripper_orientation=vertical are an accurate description of the robot's pose in the image. However, this pose is not appropriate for the 'scale_expand' cue.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue requires the robot to delineate an 'expanding horizontal size'. A vertical gripper orientation resembles a 'karate chop', which is not intuitive for outlining a horizontal plane. Changing to a horizontal orientation, like a flat hand sweeping sideways, much more effectively communicates the concept of a growing horizontal dimension.",
+          "recommended_movement_plan_after_change": [
+            "Anticipation: Start with the hand near the robot's centerline and pull it slightly further inward to prepare for the main motion.",
+            "Sweep: Perform a smooth, broad sweep outward along a horizontal line to show the expansion from small to large.",
+            "Emphasis: End the sweep with a brief, crisp hold to clearly define the final expanded size."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "round2_VLM_tile": {
+        "tile_index": 3,
+        "tile_group": "front_vertical"
+      },
+      "round2_Text_bool": true,
+      "round2_Text_fix": null,
+      "round2_Text_pose": {
+        "dir": "front",
+        "gripper_orientation": "horizontal"
+      },
+      "round2_Text_correct": false,
+      "round2_Text_raw": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The 'front' direction is appropriate as it presents the gesture directly to the human viewer. The 'horizontal' gripper orientation is also ideal, as it aligns with the action of delineating an 'expanding horizontal size', making the sweeping motion intuitive and clear.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "From the starting pose, perform a small, quick inward motion toward the robot's centerline to create anticipation.",
+            "Smoothly sweep the hand horizontally outward, away from the centerline, to a wider position.",
+            "Briefly hold the final wide position to emphasize the concept of 'large' before returning to neutral."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    }
+  ]
+}

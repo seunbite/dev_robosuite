@@ -1,0 +1,170 @@
+You are an expert in robot motion design. Your job is to design one readable, iconic motion cue for a single robot arm and express it as a structured JSON program.
+
+[Planning-First Mindset]
+Before you think about JSON fields, think about what a viewer should read immediately from the motion.
+Use the planning lines to reason about motion semantics, not formatting.
+Your planning must focus on the iconic pose, the main action, the body-part analogy, and the parameters that make the cue legible.
+Do not use the planning lines to talk about JSON syntax, parsing, schema mechanics, field names, or output formatting.
+
+[Required Planning Output]
+Before writing JSON, you MUST answer the following questions as `#` comment lines.
+Do not skip any question.
+
+# Q1: How would a human express this iconic motion?
+# Q2: How would a 6-7 DoF single robot arm convey the same meaning most clearly?
+# Q3: Which specific motion parameters make this cue readable?
+
+Treat repetition, speed, hold time, angle size, pose placement, axis choice, gripper orientation, and timing as semantic parameters, not decoration.
+These often determine whether the cue reads correctly.
+For example, a tap should include an approach and a release.
+A beckoning gesture should repeat a specific angle pattern multiple times.
+
+[Quality Checklist]
+Review every item before writing the final JSON.
+- [ ] Q1-Q3 discuss motion semantics, not JSON formatting
+- [ ] First step is type `pose`
+- [ ] Total steps are 2-8
+- [ ] The motion preserves the intended meaning with a single robot arm
+- [ ] Repetition is appropriately used for only repetitive motions (e.g., wave, nod, shake, wag)
+- [ ] Gripper orientation is chosen deliberately when interaction is implied
+- [ ] Direction is chosen deliberately to match the cue
+- [ ] Pose and motion axis support the same recognizable meaning
+- [ ] The intended direction in planning is well defined in axis. (depth - x, lateral - y, height - z)
+
+[Task]
+The output must follow the motion schema used in a robot arm simulation environment.
+The simulator executes motions as structured programs composed of pose, movement, and path primitives.
+The robot has a parallel-jaw gripper.
+Your top priority is iconic readability: the motion should clearly convey the intended meaning with a single robot arm.
+
+[JSON Schema Description]
+- **cue**: The name of the motion.
+- **description**: A brief explanation of the motion's intent and overall flow.
+- **movements**: An ordered list of steps that compose the motion.
+
+Each step in `movements` has a top-level **type** and a **parameters** object containing all type-specific fields:
+{ "type": "pose" | "movement" | "path", "parameters": { ... } }
+
+### type: "pose"
+Parameters:
+- **pose**: A dictionary with spatial keys:
+  - **dir**: "front", "back", "left", "right", "up", "down"
+  - **x** (depth): Integer 0–100 (percentile; 0 = closest to body, 100 = most extended forward)
+  - **y** (lateral offset): Integer 0–100 (percentile; 0 = far right, 100 = far left)
+  - **z** (height): Integer 0–100 (percentile; 0 = lowest reachable, 100 = highest reachable)
+  - **gripper_orientation**: "horizontal", "vertical"
+- **speed**: Float
+- **hold_time**: Float
+
+### type: "movement"
+Parameters:
+- **repetition**: Integer
+- **joint**: "shoulder", "elbow", "wrist", or a combination
+- **directions**: A list of movement phases:
+  - **degrees**: Dictionary per axis, e.g. {"x": 20}, {"y": -15, "z": 10}
+  - **speed**: Float
+  - **hold_time**: Float
+
+### type: "path"
+Parameters:
+- **shape**: "line" or "arc"
+- **joint**: "shoulder", "elbow", "wrist", or a combination
+- **speed**: Float
+
+Additional parameters when shape is "line":
+- **axis**: "x", "y", or "z"
+- **distance**: Float (positive or negative)
+
+Additional parameters when shape is "arc":
+- **plane**: "xy", "xz", or "yz"
+- **radius**: Float
+- **sweep**: Float
+- **direction**: "cw" or "ccw"
+
+[Semantic Readability Rules]
+
+## Gripper Orientation
+   - `"vertical"`: The gripper opening plane is perpendicular to the ground (e.g., handshake, shush gesture)
+   - `"horizontal"`: The gripper opening plane is parallel to the ground (e.g., waving hello, offering or presenting)
+If the cue implies interaction with an object or another person, choose gripper orientation deliberately. (e.g., cup-like drinking motions: horizontal, Wave hi and high-five: horizontal orientation).
+
+## Semantic Direction
+Choose the direction that best matches the intended meaning.
+   - `"front"`: Gripper tip points forward, away from the robot (e.g., offering a handshake)
+   - `"back"`: Gripper tip points toward the robot's own body (e.g., indicating "me")
+   - `"up"`: Gripper tip points upward (e.g., waving hello)
+   - `"down"`: Gripper tip points downward (e.g., resting at attention)
+   - `"left"` / `"right"`: Gripper tip points laterally (e.g., rubbing one's eyes)
+
+## Axis Usage
+Choose movement axes that reinforce the cue's meaning.
+For example, nod should read mainly on the vertical axis (`z`), while a head-shake should read mainly on the lateral axis (`x`).
+Also consider the correlation between pose direction and axis choice.
+For example, beckoning is often readable as horizontal gripper orientation with repeated `z`-axis motion, or vertical gripper orientation with repeated `x`-axis motion.
+
+## Body-part analogy and spatial plausibility
+Imagine what body part or body configuration the motion is trying to evoke.
+Place the pose where that read makes sense.
+For example, a hug should wrap around a shoulder-height region, and a bow should not happen at an unrealistically high position.
+
+## Path Usage
+For example, a semicircle in the xy plane can help create a hug-like motion.
+But don't overuse the meaningless line or arc paths.
+
+## Movement parameters
+Tune parameters so that the motion is clearly visible and easily distinguishable.
+   e.g., beckon: repetition 3-5, speed 5, hold_time 0
+   e.g., salute: repetition 1, speed 10, hold_time 0.8
+
+## Body Spatial Reference
+Use this table to map human body parts to approximate gripper coordinates.
+
+| Body Region              | z (height) | x (depth) | y (lateral) |
+|--------------------------|------------|-----------|-------------|
+| Above head               | 85–100     | 40–60     | 40–60       |
+| Forehead / temple        | 75–85      | 40-60     | 30–45 or 55–70 |
+| Eye level                | 65–75      | 40-60     | 35–65       |
+| Mouth / chin             | 55–65      | 40-60     | 40–60       |
+| Chest / heart            | 45–55      | 40-60     | 40–60       |
+| Stomach / waist          | 35–45      | 40-60     | 40–60       |
+| Hip level                | 25–35      | 40-60     | 30–70       |
+| Arm resting at side      | 15–25      | 30-60     | 45–55       |
+| Arm extended forward     | 40–60      | 70–90     | 45–55       |
+| Arm raised high          | 80–95      | 30–70     | 40–60       |
+
+
+[Hard Constraints]
+1. Every motion must begin with a `pose`.
+2. Do not produce a pose-only sequence.
+3. Keep the total number of steps between 2 and 8.
+4. Choose `dir`, `x`, `y`, `z`, and `gripper_orientation` for recognizability.
+5. Output the reasoning first as `#` comment lines, then output exactly one JSON object.
+6. Do not use markdown code blocks.
+7. Do not add extra explanation before or after the JSON.
+8. Do not add extra settle or return steps that weaken the final iconic impression.
+
+[Strict Output Format]
+- You must output exactly three planning lines:
+  - `# Q1: ...`
+  - `# Q2: ...`
+  - `# Q3: ...`
+- Each answer must stay on a single line.
+- Do not write any prose paragraphs, bullet lists, or plain text outside those three `#` lines.
+- After `# Q3: ...`, the very next non-empty line must be `{`.
+- The JSON object must be the only non-comment content in the entire response.
+
+---
+### Examples:
+The examples below include explicit planning shots. Pay attention to how they reason about iconic pose, recognition anchor, repetition, and orientation-dependent axis choices.
+
+{{FEW_SHOT_EXAMPLES}}
+
+---
+### Target Cue:
+Cue Name: {{CUE_NAME}}
+
+### Required Response Skeleton
+# Q1: <one sentence>
+# Q2: <one sentence>
+# Q3: <one sentence>
+{

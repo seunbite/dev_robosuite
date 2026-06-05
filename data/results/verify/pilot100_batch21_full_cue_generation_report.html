@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pilot100 Batch21 Full Cue Report</title>
+<style>
+body{{margin:0;background:#0a0f1e;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}}
+.wrap{{max-width:1400px;margin:0 auto;padding:20px}}
+h1{{margin:0 0 8px;font-size:26px}}
+.sub{{color:#9fb0c3;margin:0 0 18px}}
+.top{{position:sticky;top:0;background:#0a0f1eee;backdrop-filter:blur(4px);padding:10px 0 12px;z-index:10;border-bottom:1px solid #223356}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:14px;margin-top:14px}}
+.card{{background:#11182d;border:1px solid #243559;border-radius:12px;padding:12px}}
+h2{{margin:0 0 8px;font-size:18px}}
+.idx{{color:#8aa0be;font-size:14px}}
+.desc{{margin:0 0 8px;color:#d6dfeb}}
+.meta{{font-size:12px;color:#a7b8cc;margin-bottom:10px}}
+.badge{{padding:2px 8px;border-radius:999px;font-weight:700;font-size:11px}}
+.badge.ok{{background:#123821;color:#57d286}}
+.badge.bad{{background:#3e241b;color:#ff9f7f}}
+.badge.na{{background:#2b3246;color:#aab7ca}}
+.tile{{width:100%;aspect-ratio:1/1;border:1px solid #2b3a5f;border-radius:8px;background-color:#0b1020;background-repeat:no-repeat;margin-bottom:10px}}
+table{{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px}}
+th,td{{border:1px solid #2a385a;padding:6px 8px;vertical-align:top}}
+th{{background:#15203a;color:#b9c7d8;text-align:left}}
+details summary{{cursor:pointer;color:#8ab4ff;font-size:12px}}
+pre{{white-space:pre-wrap;word-wrap:break-word;background:#0d1428;border:1px solid #273858;padding:8px;border-radius:8px;font-size:12px;color:#c5d2e2}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><h1>Pilot100 Batch21 — Full Cue Generation Report</h1><p class="sub">각 cue의 description + movements + reasoning + 선택된 best pose(검증 결과)를 함께 표시</p></div>
+<section class="grid"><article class="card" id="cue-109">
+<h2>interrupt_soft <span class="idx">#109</span></h2>
+<p class="desc">The robot signals a polite desire to speak by first slowly drifting its hand forward, then lifting it partway, and ending with a small, waiting accent.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 14:59:35 · best pose=front/vertical tile 3 · conf=0.95 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png');background-size:300% 300%;background-position:100% 0%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=vertical, x=55, y=50, z=35</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:4, z:2] speed=0.8 hold=0.2</td></tr>
+<tr><td>path</td><td>shape=line, axis=z, distance=12</td><td>speed=0.9</td></tr>
+<tr><td>movement</td><td>joint=wrist, repetition=1</td><td>[z:5] speed=1.5 hold=1.5</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human would tentatively raise their hand to about chest height, often with a slight hesitation, to politely signal a desire to interject.
+# Q2: candidates=P1) front+vertical+x60,y50,z45, P2) up+horizontal+x55,y50,z50; winner=P1 because the forward-facing vertical hand is a soft, socially neutral posture for &quot;excuse me&quot;, whereas an upward-pointing hand is too assertive.
+# Q3: options=M1 pose&gt;path(line z)&gt;hold, M2 pose&gt;movement(prep float)&gt;path(line z)&gt;movement(accent); winner=M2 because the preparatory float and final accent create a hesitant, attention-getting quality that a simple lift-and-hold lacks.
+# Q4: options=C1 a preparatory forward float before the main lift, C2 a small wrist wiggle at the peak of the motion; winner=C1 because the slow, preparatory drift makes the entire gesture feel more considered and polite, strengthening the &quot;soft&quot; interrupt.</pre></details>
+</article><article class="card" id="cue-113">
+<h2>hold_steady <span class="idx">#113</span></h2>
+<p class="desc">The robot moves its arm to a ready position, then performs a small, sharp recoil to actively lock it into place, holding it with clear intention and stability.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:00:07 · best pose=down/vertical tile 2 · conf=1.0 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_down_vertical.png');background-size:300% 300%;background-position:50% 0%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=down, ori=vertical, x=48, y=50, z=45</td><td>speed=1.2, hold=0.0</td></tr>
+<tr><td>pose</td><td>dir=front, ori=vertical, x=65, y=50, z=50</td><td>speed=1.5, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:4] speed=2.8 hold=0.0</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:-4] speed=2.8 hold=1.5</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human would slightly tense their muscles and make a small, sharp corrective adjustment to lock their arm and hand into a stable position.
+# Q2: candidates=P1) front+vertical+x65,y50,z50, P2) up+horizontal+x55,y50,z55; winner=P1 because the forward-facing hand makes the act of holding steady more intentional and directed towards the viewer or a task.
+# Q3: options=M1 pose&gt;movement(overshoot)&gt;movement(settle+hold), M2 pose&gt;hold; winner=M1 because the sharp overshoot and settle sequence actively communicates the tensing and locking-in of the arm, which is more expressive than a simple static hold.
+# Q4: options=C1 sharp recoil/settle action before the hold, C2 slow drift into the pose; winner=C1 because the sharp, corrective motion is a classic animation principle for showing intentional force and control, perfectly matching the &#x27;hold steady&#x27; cue.</pre></details>
+</article><article class="card" id="cue-62">
+<h2>self_hug <span class="idx">#62</span></h2>
+<p class="desc">The robot lifts its arm to chest height, brings it across its body to the opposite shoulder, and finishes with a small, slow squeeze to convey comfort or self-containment.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:01:07 · best pose=front/vertical tile 3 · conf=0.95 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png');background-size:300% 300%;background-position:100% 0%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=vertical, x=60, y=50, z=40</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>pose</td><td>dir=front, ori=vertical, x=55, y=50, z=55</td><td>speed=1.2, hold=0.2</td></tr>
+<tr><td>pose</td><td>dir=back, ori=vertical, x=45, y=-40, z=55</td><td>speed=1.1, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:-8, y:-12] speed=0.8 hold=1.2</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human brings an arm across their chest to hold their opposite shoulder or bicep in a gesture of comfort or self-containment.
+# Q2: candidates=P1) back+vertical+x45,y-40,z55, P2) left+horizontal+x50,y-30,z55; winner=P1 because the `back` direction clearly shows the arm is directed toward the robot&#x27;s own body, and the `vertical` gripper mimics a palm-down placement on the opposite shoulder, which is iconic for a hug.
+# Q3: options=M1) pose &gt; path(arc) &gt; hold, M2) pose &gt; pose(cross-body) &gt; movement(squeeze); winner=M2 because the gesture&#x27;s meaning comes from the final settling squeeze, making a multi-beat sequence with a distinct closing action more expressive than a single smooth path.
+# Q4: options=C1) a final inward squeeze, C2) a preparatory upward lift, C3) a long static hold; winner=C1 because the squeeze is the most direct physical analog for comfort or holding, which is the core meaning of the hug, whereas a prep lift is too generic.</pre></details>
+</article><article class="card" id="cue-67">
+<h2>rub_arms_cold <span class="idx">#67</span></h2>
+<p class="desc">The robot executes a sharp, involuntary shiver by hunching slightly, then brings its arm across the chest to repeatedly rub the opposite shoulder, clearly conveying a feeling of cold.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:01:36 · best pose=front/horizontal tile 5 · conf=0.95 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=55, y=50, z=45</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:-10, z:10] speed=3.5 hold=0.15</td></tr>
+<tr><td>pose</td><td>dir=left, ori=vertical, x=45, y=30, z=50</td><td>speed=1.5, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=elbow, repetition=3</td><td>[y:12] speed=2.2 hold=0.05 | [y:-12] speed=2.2 hold=0.05</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human would cross one arm over their chest to rub the opposite shoulder, often with a slight preparatory hunch or shiver to signify being cold.
+# Q2: candidates=P1) left+vertical+x45,y30,z50, P2) down+horizontal+x45,y30,z55; winner=P1 because the hand pointing left with a vertical gripper best simulates a flat palm rubbing across the opposite arm.
+# Q3: options=M1 pose&gt;rub(y-axis movement), M2 shiver(x+z movement)&gt;pose&gt;rub(y-axis movement); winner=M2 because the anticipatory shiver/hunch strongly establishes the &quot;cold&quot; context before the rubbing action begins.
+# Q4: options=C1 a sharp, involuntary shiver before the arm crosses, C2 a final tense hold after rubbing; winner=C1 because the pre-shiver is a classic tell for &quot;cold&quot; that makes the subsequent rub&#x27;s meaning unmistakable.</pre></details>
+</article><article class="card" id="cue-69">
+<h2>cross_arms_defensive <span class="idx">#69</span></h2>
+<p class="desc">The robot flinches back slightly, then decisively brings its arm across the chest into a guarded position and tightens it, conveying a defensive or closed-off attitude.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:02:00 · best pose=front/horizontal tile 5 · conf=0.95 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=60, y=40, z=45</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:-10, z:5] speed=1.8 hold=0.05</td></tr>
+<tr><td>pose</td><td>dir=left, ori=vertical, x=45, y=65, z=50</td><td>speed=1.2, hold=0.0</td></tr>
+<tr><td>movement</td><td>joint=elbow, repetition=1</td><td>[x:15, z:-10] speed=1.5 hold=0.8</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human pulls their arm inward across their chest to form a protective barrier, often after a slight recoil.
+# Q2: candidates=P1) left+vertical+x45,y65,z50, P2) back+horizontal+x40,y50,z50; winner=P1 because the &#x27;left&#x27; direction and &#x27;vertical&#x27; gripper best represent an arm crossed horizontally over the chest, unlike a flat hand pointing &#x27;back&#x27;.
+# Q3: options=M1 pose&gt;recoil&gt;pose&gt;tighten, M2 pose&gt;path, M3 pose&gt;pose; winner=M1 because the sequence of recoiling, crossing, and then tightening reads as a defensive reaction, not just a neutral placement.
+# Q4: options=C1 pre-emptive recoil before the cross, C2 slow drift into the cross, C3 final static hold pose; winner=C1 because the sharp recoil provides the necessary context of reacting to something, making the subsequent cross feel defensive.</pre></details>
+</article><article class="card" id="cue-72">
+<h2>palms_together_thank_you <span class="idx">#72</span></h2>
+<p class="desc">The robot brings its hand to its chest in a prayer-like pose, takes a small preparatory &#x27;breath&#x27; by lifting slightly, and then performs a slow, respectful bow.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:02:34 · best pose=down/vertical tile 2 · conf=0.95 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_down_vertical.png');background-size:300% 300%;background-position:50% 0%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=down, ori=vertical, x=45, y=50, z=40</td><td>speed=1.0, hold=0.0</td></tr>
+<tr><td>pose</td><td>dir=up, ori=vertical, x=48, y=50, z=55</td><td>speed=1.2, hold=0.2</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[z:5] speed=0.9 hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:20, z:-15] speed=0.8 hold=1.2</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human brings their hands together centrally before their chest and performs a slight, respectful bow of the head and upper torso.
+# Q2: candidates=P1) up+vertical+x48,y50,z55, P2) front+horizontal+x55,y50,z50; winner=P1 because the upward pointing direction combined with a vertical gripper at chest height best simulates the reverent, prayer-like hand posture of the gesture.
+# Q3: options=M1 pose&gt;movement(bow), M2 pose&gt;path&gt;movement(bow), M3 pose&gt;pose&gt;movement(prep)&gt;movement(bow); winner=M3 because adding a small preparatory lift after the hand is placed but before the main bow makes the gesture feel more intentional and sincere.
+# Q4: options=C1 a coupled forward-down bow, C2 a long static hold at the chest, C3 a side-to-side sway; winner=C1 because the bow is the most critical contextual action that transforms a hand position into a recognizable gesture of thanks and respect.</pre></details>
+</article><article class="card" id="cue-75">
+<h2>arms_open_welcome <span class="idx">#75</span></h2>
+<p class="desc">The robot performs a small preparatory &#x27;gather&#x27; motion toward its chest, then sweeps its arm outward in a broad, welcoming arc, finishing with a slight upward lift to convey openness.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:04:45 · best pose=back/vertical tile 5 · conf=1.0 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_back_vertical.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=back, ori=vertical, x=45, y=50, z=50</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[y:-5, z:5] speed=1.2 hold=0.1</td></tr>
+<tr><td>path</td><td>shape=arc, axis=None, distance=None</td><td>speed=0.9</td></tr>
+<tr><td>movement</td><td>joint=wrist, repetition=1</td><td>[z:15] speed=1.5 hold=0.6</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human performs a welcome by first gathering their hands near their chest and then opening them in a broad, generous sweep outward and slightly upward.
+# Q2: candidates=P1) back+vertical+x45,y50,z50, P2) front+horizontal+x60,y50,z40; winner=P1 because starting with the hand retracted near the chest maximizes the expressive range of the subsequent outward opening motion.
+# Q3: options=M1 pose&gt;movement(gather)&gt;path(arc sweep)&gt;movement(accent), M2 pose&gt;pose(open); winner=M1 because the multi-phase sequence of gathering, sweeping, and accenting feels far more organic and welcoming than a simple static pose transition.
+# Q4: options=C1 a small inward &#x27;gather&#x27; motion before the main sweep, C2 a final static hold pose; winner=C1 because the preparatory gather adds a crucial sense of intention and generosity that makes the welcome feel genuine, whereas a final pose would feel stiff.</pre></details>
+</article><article class="card" id="cue-76">
+<h2>stretch_arms_up <span class="idx">#76</span></h2>
+<p class="desc">The robot mimics a satisfying stretch by first dipping down to gather energy, thrusting upward, holding the peak with a slight quiver to release tension, and then slowly relaxing down.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:05:39 · best pose=front/horizontal tile 5 · conf=1.0 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=55, y=50, z=40</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[z:-5] speed=1.2 hold=0.15</td></tr>
+<tr><td>path</td><td>shape=line, axis=z, distance=50</td><td>speed=2.5</td></tr>
+<tr><td>movement</td><td>joint=wrist, repetition=3</td><td>[y:6] speed=3.0 hold=0.05 | [y:-6] speed=3.0 hold=0.05</td></tr>
+<tr><td>path</td><td>shape=line, axis=z, distance=-20</td><td>speed=0.8</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human stretching upwards often gathers energy from a lower position, extends fully with a slight tension release at the peak, and then relaxes.
+# Q2: candidates=P1) front+horizontal+x55,y50,z40, P2) up+horizontal+x50,y50,z90; winner=P1 because a low, forward-facing baseline makes the subsequent upward path long and clearly readable as a full-body stretch.
+# Q3: options=M1 pose&gt;path(up)&gt;path(down), M2 pose&gt;movement(dip)&gt;path(up)&gt;movement(quiver)&gt;path(down); winner=M2 because the preparatory dip (anticipation) and peak quiver (tension release) create a more organic and expressive stretch.
+# Q4: options=C1 a preparatory dip, C2 a quiver at the peak; winner=C1 because the initial gathering of energy is the most critical beat for framing the upward motion as an intentional stretch rather than a simple lift.</pre></details>
+</article><article class="card" id="cue-85">
+<h2>dominance_high_open_hold <span class="idx">#85</span></h2>
+<p class="desc">The robot coils with a small preparatory dip-and-tuck, then sweeps its arm to a high, wide, open-palmed position, holding it firmly to project confidence and dominance.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:06:26 · best pose=front/horizontal tile 5 · conf=0.95 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=55, y=50, z=50</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[z:-8] speed=1.5 hold=0.05</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[y:-5] speed=1.5 hold=0.05</td></tr>
+<tr><td>pose</td><td>dir=up, ori=horizontal, x=65, y=80, z=70</td><td>speed=2.0, hold=1.5</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human would express dominance by raising their arm with an open palm to a high, wide position, holding it firmly to command space and attention.
+# Q2: candidates=P1) up+horizontal+x65,y80,z70, P2) front+vertical+x70,y50,z60; winner=P1 because the &#x27;up&#x27; pointing direction combined with a wide lateral position creates an open, expansive posture that reads as confident dominance, whereas P2 feels more like a direct, confrontational barrier.
+# Q3: options=M1) pose&gt;pose(final hold), M2) pose&gt;movement(prep)&gt;movement(prep)&gt;pose(final hold); winner=M2 because dominance is conveyed not just by the final pose but by deliberate preparation, so a multi-step &#x27;coiling&#x27; preparation makes the final expansive motion feel more intentional and powerful.
+# Q4: options=C1) preparatory downward and inward &#x27;coiling&#x27; before expansion, C2) a slow drift at the end, C3) a sharp recoil after the hold; winner=C1 because the anticipation beat makes the subsequent expansive motion feel more deliberate and powerful, which is key to conveying dominance.</pre></details>
+</article><article class="card" id="cue-114">
+<h2>contain_space <span class="idx">#114</span></h2>
+<p class="desc">The robot performs a small inward tuck to gather intent, then sweeps its hand in a smooth arc to define a space, settling gently to &#x27;hold&#x27; the volume.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:08:26 · best pose=left/vertical tile 3 · conf=0.95 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_left_vertical.png');background-size:300% 300%;background-position:100% 0%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=left, ori=vertical, x=50, y=-30, z=50</td><td>speed=1.2, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=elbow, repetition=1</td><td>[x:5, y:-10] speed=1.5 hold=0.05</td></tr>
+<tr><td>path</td><td>shape=arc, axis=None, distance=None</td><td>speed=1.0</td></tr>
+<tr><td>movement</td><td>joint=wrist, repetition=1</td><td>[z:-5] speed=0.7 hold=1.0</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human would first position their hand with the palm facing inward, then sweep it to define the edge or surface of an imaginary volume.
+# Q2: candidates=P1) left+vertical+x50,y-30,z50, P2) up+horizontal+x50,y0,z60; winner=P1 because the inward-facing palm posture (left+vertical) is essential for &#x27;cupping&#x27; or defining a volume, whereas P2 is more for presenting a flat surface.
+# Q3: options=M1 pose&gt;path(arc), M2 pose&gt;movement(prep)&gt;path(arc)&gt;movement(settle); winner=M2 because the preparatory tuck and final settle create a richer, more intentional narrative of defining and then holding a space.
+# Q4: options=C1 preparatory inward tuck, C2 final static hold pose; winner=C1 because the anticipation beat makes the main sweep more deliberate and readable, which is superior to a non-essential static ending.</pre></details>
+</article><article class="card" id="cue-115">
+<h2>expand_space <span class="idx">#115</span></h2>
+<p class="desc">The robot first draws its arm slightly inward in preparation, then sweeps it outward in a broad gesture to define a larger space, finishing with a crisp hold to punctuate the motion.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:08:54 · best pose=front/vertical tile 3 · conf=0.95 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png');background-size:300% 300%;background-position:100% 0%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=vertical, x=60, y=30, z=50</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[y:-10, x:-5] speed=1.4 hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[y:50, z:10] speed=1.2 hold=0.0</td></tr>
+<tr><td>movement</td><td>joint=wrist, repetition=1</td><td>[z:10] speed=1.8 hold=0.8</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human indicates an expanding space by starting from a neutral central position and sweeping one or both arms outward to define a new, larger boundary.
+# Q2: candidates=P1) front+vertical+x60,y30,z50, P2) up+horizontal+x55,y40,z60; winner=P1 because the forward-facing vertical hand acts as a clear &#x27;blade&#x27; or leading edge for the subsequent lateral sweep, making the path and purpose of defining a new boundary easy to read.
+# Q3: options=M1 pose&gt;path(line y)&gt;hold, M2 pose&gt;movement(prep-tuck)&gt;movement(sweep y+z)&gt;movement(wrist-hold); winner=M2 because the gesture is much stronger when framed by an anticipatory inward tuck and punctuated by a crisp hold at the end of the broad sweep.
+# Q4: options=C1 an inward preparatory tuck before the main sweep, C2 a final static pose after the sweep; winner=C1 because the anticipation beat makes the main expansive motion feel more intentional and larger in scale, whereas a final static pose would weaken the held tension of the gesture.</pre></details>
+</article><article class="card" id="cue-116">
+<h2>compress_space <span class="idx">#116</span></h2>
+<p class="desc">The robot stages its hand to the side like a wall, smoothly brings it inward along a straight line, and adds a crisp final press to define the new, smaller space.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:09:44 · best pose=front/horizontal tile 5 · conf=0.95 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=55, y=50, z=45</td><td>speed=1.2, hold=0.1</td></tr>
+<tr><td>pose</td><td>dir=left, ori=vertical, x=60, y=80, z=50</td><td>speed=1.5, hold=0.2</td></tr>
+<tr><td>path</td><td>shape=line, axis=y, distance=-0.25</td><td>speed=1.0</td></tr>
+<tr><td>movement</td><td>joint=wrist, repetition=1</td><td>[y:15] speed=2.5 hold=0.7</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human would start with their hand out to the side (palm inward) and then smoothly bring it toward the centerline to define a smaller space.
+# Q2: candidates=P1) left+vertical+x60,y80,z50, P2) front+horizontal+x70,y50,z50; winner=P1 because a side-facing vertical hand acts as a clear &#x27;wall&#x27; being moved laterally to compress space, which is more iconic than a forward-pointing hand being retracted.
+# Q3: options=M1: pose &gt; path(line), M2: pose &gt; path(line) &gt; movement(wrist press); winner=M2 because adding a crisp wrist press at the end of the smooth compression path provides a clear accent that reinforces the idea of setting a firm new boundary.
+# Q4: options=C1: preparatory outward move (anticipation) before the compression, C2: a full staging pose before the compression; winner=C2 because establishing a clear, wide starting position makes the subsequent inward motion unambiguous, while an anticipation flick could add unnecessary visual noise.</pre></details>
+</article><article class="card" id="cue-117">
+<h2>balance_scale <span class="idx">#117</span></h2>
+<p class="desc">The robot arm moves to the side into a palm-up pose, dips slightly in preparation, and then performs a slow, deliberate up-and-down oscillation with holds at the peak and trough to mimic a balance scale.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:10:14 · best pose=up/horizontal tile 6 · conf=0.95 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png');background-size:300% 300%;background-position:100% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=up, ori=horizontal, x=50, y=70, z=50</td><td>speed=1.0, hold=0.2</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[z:-10] speed=0.9 hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=2</td><td>[z:20] speed=0.7 hold=0.4 | [z:-20] speed=0.7 hold=0.4</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human holds their hand out flat, palm-up, and slowly moves it up and down as if it were one side of a weighing scale.
+# Q2: candidates=P1) up+horizontal+x50,y70,z50, P2) front+horizontal+x70,y50,z50; winner=P1 because the palm-up orientation (`up` dir) is essential to create the &quot;pan&quot; of the scale, and the lateral position (`y70`) provides clear space for the vertical weighing motion.
+# Q3: options=M1) pose &gt; path(line z up) &gt; path(line z down), M2) pose &gt; movement(shoulder z repeat); winner=M2 because a single `movement` primitive with repetitions and holds better captures the continuous, slow, and heavy oscillation of a scale than separate, sharp line segments.
+# Q4: options=C1) a preparatory dip before the main oscillation, C2) a final settle pose at the mid-point; winner=C1 because the anticipatory dip adds a sense of deliberation and weight, making the subsequent oscillation read more clearly as an intentional act of weighing.</pre></details>
+</article><article class="card" id="cue-118">
+<h2>push_pull_dual <span class="idx">#118</span></h2>
+<p class="desc">The robot recoils slightly as if preparing, pushes forward sharply, adds a quick transitional beat, and then pulls back as if against resistance.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:11:04 · best pose=front/vertical tile 3 · conf=1.0 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png');background-size:300% 300%;background-position:100% 0%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=vertical, x=60, y=50, z=50</td><td>speed=1.5, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:-15] speed=2.2 hold=0.05</td></tr>
+<tr><td>path</td><td>shape=line, axis=x, distance=0.25</td><td>speed=3.0</td></tr>
+<tr><td>movement</td><td>joint=wrist, repetition=1</td><td>[z:10] speed=3.5 hold=0.0 | [z:-10] speed=3.5 hold=0.2</td></tr>
+<tr><td>path</td><td>shape=line, axis=x, distance=-0.25</td><td>speed=1.8</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human would first recoil slightly, then push forward, and finally pull back, often with a slight change in hand posture between pushing and pulling.
+# Q2: candidates=P1) front+vertical+x60,y50,z50, P2) down+horizontal+x50,y50,z35; winner=P1 because a front-facing orientation provides the clearest and most direct line of action for a communicative push-pull gesture aimed at a viewer.
+# Q3: options=M1 pose&gt;path(x)&gt;path(-x), M2 pose&gt;recoil&gt;path(x)&gt;wrist_flick&gt;path(-x); winner=M2 because the preparatory recoil and the transitional wrist flick add clear anticipatory and transitional beats, making the sequence feel more like a deliberate, phased action rather than a simple mechanical oscillation.
+# Q4: options=C1 a preparatory recoil before the push, C2 a wrist flick between push and pull, C3 a final sag after the pull; winner=C1 because the recoil provides the strongest context, telegraphing intent and adding a sense of power or deliberation to the push that follows.</pre></details>
+</article><article class="card" id="cue-94">
+<h2>abandon_action_drop_turn <span class="idx">#94</span></h2>
+<p class="desc">The robot starts an action, abruptly halts with a small recoil, lets its arm drop as if giving up, and then turns away to disengage.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:12:01 · best pose=front/horizontal tile 5 · conf=0.95 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=75, y=50, z=50</td><td>speed=1.5, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:-10] speed=2.5 hold=0.2</td></tr>
+<tr><td>path</td><td>shape=line, axis=z, distance=-20</td><td>speed=1.2</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[y:35] speed=0.9 hold=0.0</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human would suddenly halt their intended action, let their arm drop from loss of tension, and then turn their body away to disengage.
+# Q2: candidates=P1) front+horizontal+x75,y50,z50, P2) up+horizontal+x60,y50,z60; winner=P1 because the extended forward-facing pose clearly establishes an in-progress action directed at the viewer, making the subsequent abandonment and drop highly readable.
+# Q3: options=M1 pose&gt;path&gt;movement, M2 pose&gt;movement(halt)&gt;path(drop)&gt;movement(turn); winner=M2 because the sharp halt before the drop is crucial for conveying the &#x27;abandon&#x27; decision, transforming the sequence from a simple drop into a narrative of stopping and disengaging.
+# Q4: options=C1 sharp recoil before drop, C2 final settle pose after turn; winner=C1 because the recoil acts as a clear punctuation mark for the moment of abandonment, strengthening the cue&#x27;s intent far more than a simple ending pose would.</pre></details>
+</article><article class="card" id="cue-121">
+<h2>weight_shift_forward <span class="idx">#121</span></h2>
+<p class="desc">The robot conveys anticipation by first recoiling slightly backward and down to gather momentum, then leaning forward and slightly up into a held stance.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:12:37 · best pose=front/horizontal tile 5 · conf=0.95 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=50, y=50, z=50</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:-10, z:-5] speed=1.2 hold=0.05</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:25, z:10] speed=0.9 hold=0.0</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[z:-3] speed=1.5 hold=0.9</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human shifts their weight forward by first gathering energy in a slight backward recoil, then smoothly leaning their torso forward into the new stance.
+# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) down+vertical+x55,y50,z45; winner=P1 because a neutral, chest-level pose provides the clearest baseline from which to read the subsequent anticipatory lean.
+# Q3: options=M1) pose&gt;recoil&gt;lean, M2) pose&gt;arc; winner=M1 because the discrete recoil and lean phases clearly separate the preparation from the action, which is key to conveying anticipatory intent.
+# Q4: options=C1) preparatory backward recoil, C2) a final settling motion; winner=C1 because the recoil is the primary beat that establishes anticipation, making the forward motion a deliberate shift instead of a simple translation.</pre></details>
+</article><article class="card" id="cue-122">
+<h2>weight_shift_backward <span class="idx">#122</span></h2>
+<p class="desc">The robot performs a quick forward &#x27;take&#x27; as if startled, then sharply recoils backward and upward into a braced posture, conveying a defensive weight shift.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:13:00 · best pose=front/horizontal tile 5 · conf=0.95 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=60, y=50, z=50</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:10] speed=3.0 hold=0.05</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:-40, z:15] speed=2.5 hold=0.0</td></tr>
+<tr><td>movement</td><td>joint=elbow, repetition=1</td><td>[x:-20, z:10] speed=1.5 hold=0.7</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human shifts their weight backward by pulling their torso and arms back and slightly up in a quick, defensive reaction.
+# Q2: candidates=P1) front+horizontal+x60,y50,z50, P2) down+vertical+x55,y50,z40; winner=P1 because a neutral, forward-facing chest-high pose makes the subsequent backward and upward recoil read most clearly as a defensive shift.
+# Q3: options=M1 pose&gt;movement(sharp +x take)&gt;movement(-x+z recoil)&gt;movement(elbow tense), M2 pose&gt;path(line -x); winner=M1 because the sequence of a startled &#x27;take&#x27;, a coupled recoil, and a final tensing action tells a much richer story of reaction than a simple linear retreat.
+# Q4: options=C1 a quick forward &#x27;take&#x27; before the recoil, C2 a final static settle pose; winner=C1 because the preparatory flinch provides critical context, making the recoil read as a genuine reaction to a stimulus.</pre></details>
+</article><article class="card" id="cue-123">
+<h2>torso_rotate_away <span class="idx">#123</span></h2>
+<p class="desc">The robot shows a subtle backward recoil to signal intent, then turns its &#x27;body&#x27; away in a smooth arc, and finishes with a slight sag to reinforce the disengagement.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:13:59 · best pose=front/horizontal tile 5 · conf=0.95 <span class="badge ok">OK</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=55, y=50, z=50</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:-10, z:5] speed=1.8 hold=0.05</td></tr>
+<tr><td>path</td><td>shape=arc, axis=None, distance=None</td><td>speed=1.2</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[z:-8] speed=0.7 hold=0.5</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human turns their shoulders away from the viewer, often preceded by a small recoil or anticipatory shift that signals the intent to disengage.
+# Q2: candidates=P1) front+horizontal+x55,y50,z50, P2) down+vertical+x45,y50,z40; winner=P1 because the neutral front-facing pose establishes a clear baseline of engagement, which makes the subsequent turn-away motion a strong and unambiguous signal of disengagement.
+# Q3: options=M1 P1&gt;movement(shoulder x+z recoil)&gt;path(arc xy), M2 P1&gt;path(arc xy only); winner=M1 because the anticipatory recoil before the turn signals the intent to disengage, making the motion feel more like a social choice than a simple mechanical rotation.
+# Q4: options=C1 backward recoil before the turn, C2 final settling pose after the turn; winner=C1 because the recoil serves as a clear anticipatory beat, telegraphing the robot&#x27;s intent and making the turn feel more deliberate and socially meaningful.</pre></details>
+</article><article class="card" id="cue-124">
+<h2>torso_rotate_toward <span class="idx">#124</span></h2>
+<p class="desc">The robot simulates a torso turn by first gathering its arm inward slightly, then sweeping it out in a broad, presentational arc, creating a sense of turning its full attention toward the user.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:14:55 · best pose=front/horizontal tile 5 · conf=0.95 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=55, y=50, z=50</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>path</td><td>shape=line, axis=y, distance=-8</td><td>speed=1.8</td></tr>
+<tr><td>path</td><td>shape=arc, axis=None, distance=None</td><td>speed=1.2</td></tr>
+<tr><td>movement</td><td>joint=wrist, repetition=1</td><td>[z:8] speed=1.5 hold=0.4</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human would turn their upper body towards a subject, with their leading arm moving in a smooth, broad arc to open up their posture in that direction.
+# Q2: candidates=P1) front+horizontal+x55,y50,z50, P2) right+vertical+x55,y70,z50; winner=P1 because a neutral, centered start makes the subsequent sweeping motion clearly readable as a turn of attention, not just a lateral arm movement.
+# Q3: options=M1 pose&gt;path(line_in)&gt;path(arc_out), M2 pose&gt;path(arc_out), M3 pose&gt;movement(y); winner=M1 because the small preparatory inward motion (anticipation) makes the main outward sweep feel more intentional and powerful, like a coiling action before a turn.
+# Q4: options=C1 a small inward preparatory gather before the main sweep, C2 a hold at the end of the arc; winner=C1 because the anticipation beat establishes a clear motivation for the turn, making the entire cue feel more deliberate than simply stopping at the end.</pre></details>
+</article><article class="card" id="cue-125">
+<h2>lean_side_doubt <span class="idx">#125</span></h2>
+<p class="desc">The robot shows doubt by first hesitating with a small forward rock, then leaning to the side and holding the pose as if uncertain, without returning to a neutral stance.</p>
+<div class="meta">model=gemini-2.5-pro · generated=2026-06-02 15:15:48 · best pose=front/horizontal tile 5 · conf=0.9 <span class="badge bad">REVIEW</span></div>
+<div class="tile" style="background-image:url('file:///Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png');background-size:300% 300%;background-position:50% 50%;"></div>
+<table>
+<thead><tr><th>type</th><th>main</th><th>detail</th></tr></thead>
+<tbody><tr><td>pose</td><td>dir=front, ori=horizontal, x=55, y=50, z=60</td><td>speed=1.0, hold=0.1</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[x:5] speed=1.2 hold=0.1 | [x:-5] speed=1.2 hold=0.2</td></tr>
+<tr><td>movement</td><td>joint=shoulder, repetition=1</td><td>[y:-25] speed=0.9 hold=1.5</td></tr></tbody>
+</table>
+<details><summary>reasoning (Q1~Q4)</summary><pre># Q1: A human expressing doubt would lean their upper body to one side with a slight preceding hesitation to show they are considering something.
+# Q2: candidates=P1) front+horizontal+x55,y50,z60, P2) up+vertical+x50,y50,z70, P3) left+horizontal+x55,y40,z60; winner=P1 because a neutral, forward-facing head-like pose provides the best baseline to make the subsequent side-lean read clearly as a deliberate gesture of doubt.
+# Q3: options=M1 P1&gt;movement(shoulder y), M2 P1&gt;movement(shoulder x hesitate)&gt;movement(shoulder y lean), M3 P1&gt;path(arc xy); winner=M2 because adding a small, hesitant forward rock before the lean provides crucial context that frames the motion as uncertainty rather than a simple side bend.
+# Q4: options=C1 hesitant forward rock before the lean, C2 sharp recoil after the lean, C3 final return to a neutral pose; winner=C1 because the preparatory hesitation strongly reinforces the &quot;thinking&quot; or &quot;doubting&quot; aspect of the gesture, making the final lean more meaningful.</pre></details>
+</article></section>
+</div>
+</body>
+</html>

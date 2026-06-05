@@ -1,0 +1,82 @@
+[
+  {
+    "cue": "Turn palm downward and curl fingers inward repeatedly (Come here / Beckon)",
+    "description": "The robot presents a horizontal palm-down hand clearly, then performs a repeated beckoning curl that reads strongly as an invitation to come closer.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 42,
+            "x": 58,
+            "y": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": -30
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 4,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -18
+              },
+              "speed": 3.7,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "z": 18
+              },
+              "speed": 3.7,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -6
+              },
+              "speed": 1.0,
+              "hold_time": 0.6
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 0,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 01:38:21",
+    "reasoning": "# Visualization: The robot reaches the hand out, makes the palm-down presentation obvious, then repeats a visible beckoning curl several times.\n# Iconic pose: An extended horizontal palm-down beckoning hand.\n# Recognition anchor: The presented hand plus the repeated inviting curl.\n# Motion read: The viewer should read 'come here' immediately from the repeated invitation.\n# Pre-action reveal: Extend the hand first so the invitation is visible before the curls begin.\n# Primary action: A repeated beckoning curl performed 4 times.\n# Distinguishing feature: This must read as inviting someone closer, not waving hello or brushing something away.\n# Joint strategy: Use shoulder to present the hand, wrist to drive the repeated beckon.\n# Path usage: none\n# Repetition plan: Repeat the beckon curl 4 times so the invitation is unmistakable.\n# Orientation-axis plan: Use horizontal hand presentation, then place the repeated beckon on the z-axis.\n# Setup: Present hand forward in a palm-down readable pose.\n# Core action: Repeat the z-axis beckoning curl 4 times.\n# Follow-through: End in a small held invitation.\n# Pattern: pose -> present hand -> palm-down set -> repeated beckon x4 -> hold\n# Start pose: dir=front, z=42, x=58, y=50, gripper_orientation=horizontal\n# Speed dynamics: deliberate(1.0) -> turn(2.0) -> sharp_beckon(3.7) -> settle(1.0)\n# Step count: 4"
+  }
+]

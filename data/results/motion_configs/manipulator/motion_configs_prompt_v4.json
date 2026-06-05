@@ -1,0 +1,3828 @@
+[
+  {
+    "cue": "Wave one hand side to side (Hello / Hi)",
+    "description": "The robot raises an arm to eye level, extends it slightly forward with the gripper oriented vertically like a palm, and then moves the wrist side-to-side repeatedly to simulate a greeting wave.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 70,
+            "x": 60,
+            "y": 35,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 6,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 25
+              },
+              "speed": 5.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "y": -25
+              },
+              "speed": 5.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 1.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 0,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 12:13:58",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: A classic \"hello\" wave involves raising an arm and moving the hand left and right.\n# 2. Identify key joints:\n#    - Raising the arm: Shoulder and elbow.\n#    - Side-to-side hand motion: Primarily wrist.\n# 3. Decompose into phases:\n#    - Setup: Arm extends to a mid-front, slightly raised position. Gripper faces forward, vertically oriented (like a human palm facing out).\n#    - Core Action: Wrist performs repetitive lateral oscillations.\n#    - Follow-through: A slight natural lowering or pause, but not a full \"return to rest\".\n# 4. Map to 3D space:\n#    - Initial Pose: Arm raised to eye level (z: 65-75), slightly forward (x: 50-60), and off to one side (y: 30-40). `dir: \"front\"` for palm facing viewer. `gripper_orientation: \"vertical\"` for a natural wave.\n#    - Waving Movement: This is a repetitive `movement` of the `wrist` on the `y` axis (lateral movement).\n# 5. Select step types:\n#    - Use `pose` for the initial positioning. Set a small `hold_time` to establish the position.\n#    - Use `movement` for the repetitive waving action of the wrist. Choose a good `repetition` count and `speed` for a clear wave.\n#    - Add a final `movement` to slightly lower the arm for a natural conclusion."
+  },
+  {
+    "cue": "Raise one hand briefly (Greeting / Acknowledgement)",
+    "description": "The robot starts from a mid-level, neutral position, then swiftly raises its arm to eye-level for a brief acknowledgement or greeting, before lowering it partway in a controlled manner.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 30,
+                "x": 5
+              },
+              "speed": 4.5,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": -15,
+                "x": -5
+              },
+              "speed": 1.8,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 1,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:23:52",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts with its arm somewhat relaxed. It then raises its arm directly upwards, as if waving to someone or getting attention, holds it for a moment, and then lowers it partway.\n# 2. Identify key joints:\n#    - Initial lift: Primarily shoulder and elbow to articulate the arm upwards.\n#    - Hold: All joints stabilize.\n#    - Partial lower: Shoulder and elbow to bring the arm down slightly.\n# 3. Decompose into phases:\n#    - Setup: Start from a mid-level, slightly forward position with `hold_time: 0` for immediate transition.\n#    - Core Action (Lift): A quick, clear upward movement of the entire arm to a prominent, visible height.\n#    - Core Action (Hold/Acknowledgement): A brief pause at the peak of the raise to signify the greeting.\n#    - Follow-through (Partial Lower): A controlled, slower partial descent to conclude the gesture.\n# 4. Map to 3D space:\n#    - Initial Pose: Mid-chest/waist level, slightly forward. `dir: \"front\"`, `z: 45`, `x: 55`, `y: 50`. `gripper_orientation: \"horizontal\"` for an open, friendly hand.\n#    - Lift Target: Eye-level to forehead level. `z` will increase significantly from 45. `x` might decrease slightly for a more upright posture, or stay neutral.\n#    - Lower Target: A position midway between the peak and the starting point.\n# 5. Select step types:\n#    - `pose`: For the initial position and overall hand orientation.\n#    - `movement`: For the dynamic lift and partial lowering, as these are joint-driven rotations to new states.\n# Step-by-step Choreography:\n# - **Step 1 (Setup):** Initial `pose` to establish a starting position, mid-chest/stomach level, oriented forward. `hold_time: 0` to transition smoothly.\n# - **Step 2 (Core - Lift):** A `movement` to raise the `shoulder` and `elbow` quickly and emphatically upwards and slightly forward, bringing the gripper to eye/forehead level.\n# - **Step 3 (Core - Hold):** A `movement` with `hold_time` at the end, or a subsequent `pose` with `hold_time` to briefly hold the raised position. I'll integrate it into the upward movement for efficiency and natural flow.\n# - **Step 4 (Follow-through - Lower):** A `movement` to bring the `shoulder` and `elbow` down partially in a controlled manner, concluding the gesture."
+  },
+  {
+    "cue": "Bow slightly from the waist (Respect / Greeting)",
+    "description": "The robot starts in a neutral standing position, then performs a deliberate, slight bow by tilting its 'waist' (simulated by shoulder joint) forward and down, holding briefly, and then slowly returning to a respectful upright posture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 45
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 25,
+                "z": -15
+              },
+              "speed": 1.5,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25,
+                "z": 15
+              },
+              "speed": 1.0,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 2,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:24:20",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: A slight bow involves the upper torso tilting forward and downward from the waist, with arms typically remaining at the sides or slightly forward. The head would naturally follow the body's tilt.\n# 2. Identify key joints: The primary joint for simulating a \"waist bow\" in a robot arm is the \"shoulder\" joint, as it controls the overall forward/backward and up/down movement of the arm from its base. The elbow and wrist can remain relatively passive to maintain a natural arm posture.\n# 3. Decompose into phases:\n#    *   Setup (Initial Pose): Start in a neutral, slightly forward, and mid-height position to represent a standing posture ready to bow. Use `hold_time: 0` for a smooth transition.\n#    *   Core Action (Bow Down): The \"shoulder\" joint rotates to move the arm forward and slightly down, mimicking the body tilting forward. This movement should be deliberate. Hold this bowed position briefly.\n#    *   Follow-through (Return Upright): The \"shoulder\" joint rotates back to bring the arm to a respectful, upright standing posture. This return should be graceful and controlled.\n# 4. Map to 3D space:\n#    *   Initial Pose: `dir: \"front\"`, `x: 50` (mid-depth), `y: 50` (central), `z: 45` (mid-chest height).\n#    *   Bow Down: Rotate the shoulder. To tilt forward and down, `x` (depth) should increase (positive degrees) and `z` (height) should decrease (negative degrees). Example: `{\"x\": 25, \"z\": -15}`.\n#    *   Return Upright: To return to upright, `x` (depth) should decrease (negative degrees) and `z` (height) should increase (positive degrees). Example: `{\"x\": -25, \"z\": 15}`.\n# 5. Select step types:\n#    *   `pose` for the initial standing position.\n#    *   `movement` for both the bowing down and returning upright actions, as these are controlled joint rotations.\n# 6. Refine parameters:\n#    *   Initial pose speed: 1.0 (neutral).\n#    *   Bow down: Speed 1.5 (deliberate), hold_time 1.0 (hold the bow respectfully).\n#    *   Return up: Speed 1.0 (slower, graceful), hold_time 0.5 (briefly hold the upright composure).\n#    *   No anti-patterns violated: The return to upright is a meaningful part of the gesture's completion, not a \"return to rest\" filler. Speeds are varied."
+  },
+  {
+    "cue": "Extend one hand vertically forward as if offering a handshake (Asking for handshake)",
+    "description": "The robot positions its arm ready with the gripper vertical, then extends its arm forward and slightly upward to offer a handshake, holding the pose expectantly.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 35,
+                "z": 7
+              },
+              "speed": 2.5,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 3,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 12:14:57",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts from a neutral, slightly retracted position, then smoothly extends its arm forward and slightly upward, with the gripper opening vertically (like a human palm for a handshake). It then holds this pose.\n# 2. Identify key joints: Shoulder and elbow for the primary extension and elevation. The wrist's orientation is critical and set by the initial pose's gripper_orientation.\n# 3. Decompose into phases:\n#    a. Setup (Pre-handshake pose): Bring the arm to a mid-height, slightly forward, ready position with the gripper correctly oriented vertically. This should be transitional (hold_time: 0).\n#    b. Core Action (Extension and Hold): Extend the shoulder and elbow joints to push the gripper to the full handshake position, then hold it there.\n# 4. Map to 3D space:\n#    a. Setup Pose:\n#       - Gripper dir: \"front\" (pointing forward)\n#       - x (depth): 40 (slightly forward from body)\n#       - y (lateral): 50 (center)\n#       - z (height): 50 (mid-chest level)\n#       - gripper_orientation: \"vertical\" (palm perpendicular to ground)\n#    b. Handshake Extension (Movement):\n#       - Need to move end-effector further forward (increase x) and slightly up (increase z).\n#       - This can be achieved by coordinating shoulder and elbow `x` (forward/extension) and shoulder `z` (elevation).\n#       - Target approximate x: 75-80, z: 55-60.\n# 5. Select step types:\n#    a. Initial step: \"pose\" for the setup. `hold_time: 0` for a smooth transition.\n#    b. Second step: \"movement\" to execute the extension and hold. `joint: \"shoulder-elbow\"` for coordinated movement. `degrees` will specify the change to reach the extended position. `hold_time` within the `directions` will hold the final pose."
+  },
+  {
+    "cue": "Move one hand up and down vertically as if shaking someone’s hand (Imitating handshake)",
+    "description": "The robot extends its arm forward to a typical handshake position with the gripper oriented vertically, then rapidly moves its hand up and down from the wrist to imitate the act of shaking hands.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 5,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 25
+              },
+              "speed": 4.5,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "y": -25
+              },
+              "speed": 4.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 4,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:25:08",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot extends its arm forward, hand open and oriented vertically. Then, the wrist moves up and down rapidly to mimic a handshake.\n# 2. Identify key joints: Shoulder and elbow for extending the arm, wrist for the actual shaking motion.\n# 3. Decompose into phases:\n#    - Setup: Reach out to a handshake-ready position.\n#    - Core Action: Perform the up-and-down wrist movement.\n#    - Follow-through: The motion concludes after the shaking, no explicit \"return to rest\".\n# 4. Map to 3D space:\n#    - Initial pose: Arm extended forward (x: 75), centered (y: 50), at chest height (z: 45). Gripper tip points forward (`dir: \"front\"`), gripper opening vertical (`gripper_orientation: \"vertical\"`).\n#    - Shaking motion: A repetitive wrist rotation that causes the gripper to pitch up and down. A rotation around the wrist's y-axis (pitch) would achieve this.\n# 5. Select step types:\n#    - Step 1: `pose` for the initial handshake stance.\n#    - Step 2: `movement` for the repetitive up-and-down shaking.\n# 6. Refine parameters:\n#    - Initial pose: Speed 1.5 to reach position, hold_time 0.0 to immediately transition to shaking.\n#    - Shaking movement: Use \"wrist\" joint. Define two directions: one pitching up (e.g., {\"y\": 25}) and one pitching down (e.g., {\"y\": -25}). High speed (4.0-5.0) for a rapid shake. Repetition of 4-5 to make it clearly visible."
+  },
+  {
+    "cue": "Wrap both arms around yourself (Hug / Comfort)",
+    "description": "The robot brings one arm across its chest, reaching towards the opposite side of its body, simulating a self-hug or comforting embrace.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 50,
+            "x": 60,
+            "y": 30
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25,
+                "y": 20,
+                "z": -5
+              },
+              "speed": 1.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": 45,
+          "speed": 1.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15
+              },
+              "speed": 0.8,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 0.5,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 5,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:25:31",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot brings one arm across its chest, reaching for its opposite shoulder or arm, simulating a comforting embrace.\n# 2. Identify key joints:\n#    - Shoulder: Drives the primary sweep across the body and controls height/depth.\n#    - Elbow: Bends to allow the hand to reach across.\n#    - Wrist: Minor adjustments for the final resting position of the gripper.\n# 3. Decompose into phases:\n#    - Setup: Arm starts in a slightly extended, ready-to-move position.\n#    - Core Action: The arm sweeps inward and across the robot's torso, bending at the elbow.\n#    - Follow-through/Hold: The arm holds the final 'hug' position, perhaps with a subtle 'squeeze'.\n# 4. Map to 3D space:\n#    - Initial Pose: Mid-height, slightly forward, and to one side (e.g., right side, y=30) with gripper facing front.\n#    - Core Action Path:\n#        - First, a movement step to bring the arm inward and start bending the elbow. This reduces x (depth) and increases y (moves left).\n#        - Then, a path step to sweep the shoulder laterally across the chest (increase y).\n#    - Final Hold: Gripper resting on the opposite side of the chest (e.g., y=70-75), close to the body (x=20-30), at mid-height (z=50), possibly pointing slightly back or down.\n# 5. Select step types and tune parameters:\n#    - Pose: For initial position.\n#    - Movement: For the initial tuck/bend and for the final \"squeeze\" hold.\n#    - Path (line): For the main lateral sweep across the chest.\n#    - Vary speeds: Slower for setup and holds, slightly faster for the main sweep."
+  },
+  {
+    "cue": "Bring fingertips to lips and blow outward (Blow a kiss)",
+    "description": "The robot moves its hand to its lips, holds briefly, then gracefully extends its arm forward while opening its gripper to blow a kiss, holding the final expressive pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 40
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 25,
+            "y": 55,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 2.0,
+          "hold_time": 0.8
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 30,
+            "y": 55,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 3.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder-elbow",
+          "axis": "x",
+          "distance": 35,
+          "speed": 5.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 55,
+            "z": 60
+          },
+          "speed": 1.0,
+          "hold_time": 0.8
+        }
+      }
+    ],
+    "idx": 6,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:26:05",
+    "reasoning": "# Motion Planning:"
+  },
+  {
+    "cue": "Form a big heart shape above head (Love)",
+    "description": "The robot raises its arm and traces a large heart shape in the air above its head, symbolizing love or affection. The motion emphasizes smooth curves and a distinct point.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 65,
+            "x": 55,
+            "y": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 15,
+                "y": -20,
+                "x": -5
+              },
+              "speed": 1.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "shoulder-elbow",
+          "plane": "yz",
+          "radius": 35,
+          "sweep": 200,
+          "direction": "cw",
+          "speed": 2.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow-wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -35,
+                "y": -15,
+                "x": -10
+              },
+              "speed": 2.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10,
+                "x": 5
+              },
+              "speed": 1.0,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 7,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:27:02",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will conceptually \"draw\" a heart shape in the air above its head. This involves moving the arm up, sweeping to form the two upper lobes, then bringing the arm down to a point, and finally lifting slightly to present the completed shape.\n# 2. Identify key joints: Shoulder and elbow will be primary for the large sweeps and height changes. Wrist for finer curve details or tip orientation, though for a broad shape, shoulder/elbow are more dominant.\n# 3. Decompose into phases:\n#    - Setup: Arm moves to a high-central-forward position, ready to start drawing the top-left of the heart.\n#    - Core Action (Top): A large arc to sweep from the top-left curve, across the peak, and down to the top-right curve.\n#    - Core Action (Bottom): A sharp movement down and inward to form the heart's bottom point.\n#    - Follow-through: A slight lift and hold, presenting the formed heart.\n# 4. Map to 3D space:\n#    - Initial pose: Above head, central, slightly extended. `z: 65-70`, `x: 55`, `y: 50`. Gripper `dir: \"front\"` and `horizontal` to face the viewer.\n#    - Top-left start: Higher, more left, slightly inward.\n#    - Top arc: Sweep from top-left, up/across to top-right. This will be a `path` of `arc` type.\n#    - Bottom point: Lower, more central, slightly inward.\n#    - Final hold: Slightly lifted from the point, centered.\n# 5. Select step types:\n#    - Initial positioning: `pose` with `hold_time: 0` for a smooth transition.\n#    - Move to top-left start: `movement` to precisely shift to the arc's origin.\n#    - Top arc: `path` with `shape: \"arc\"`, `plane: \"yz\"` (lateral and height), `joint: \"shoulder-elbow\"`.\n#    - Bottom point: `movement` to create a sharp, distinct point, involving `shoulder-elbow-wrist`.\n#    - Final hold: `movement` to lift slightly and `hold_time` on the last direction."
+  },
+  {
+    "cue": "Place one hand over chest (Sincerity / Gratitude)",
+    "description": "The robot brings one arm to its chest in a deliberate, heartfelt motion, holding it there to convey sincerity or gratitude, then gently relaxes the arm.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 45,
+            "z": 45
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -30,
+                "z": 15,
+                "y": 5
+              },
+              "speed": 1.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 25,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "z": -10
+              },
+              "speed": 0.7,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 8,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:27:21",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will bring one arm to its chest, with the palm flat against the chest area, hold it there, and then gently lower it. This conveys a sense of heartfelt emotion.\n# 2. Identify key joints: Shoulder (for raising and bringing inward), Elbow (for bending to reach the chest), Wrist (for orientation).\n# 3. Decompose into phases:\n#    - Setup: Start from a slightly forward, neutral position to prepare for the motion.\n#    - Core Action: Move the arm deliberately to the chest, ensuring the gripper tip points towards the body and the gripper is horizontal (palm flat). Hold the pose to emphasize sincerity.\n#    - Follow-through: Slowly release the pose, lowering the arm slightly and moving it away from the body.\n# 4. Map to 3D space:\n#    - Initial pose: `dir: \"front\"`, `x: 55` (slightly extended), `y: 45` (slightly off-center), `z: 45` (mid-height).\n#    - Chest position: `dir: \"back\"`, `x: 25` (close to body), `y: 50` (center), `z: 50` (chest level). `gripper_orientation: \"horizontal\"`.\n# 5. Select step types:\n#    - Step 1: `pose` for the initial ready position (hold_time: 0 for transition).\n#    - Step 2: `movement` to bring the arm from the ready pose to the chest. This involves moving the shoulder (inward, up) and elbow (bending).\n#    - Step 3: `pose` to define the target chest position and hold the gesture.\n#    - Step 4: `movement` to gently lower the arm and relax, signifying the end of the gesture."
+  },
+  {
+    "cue": "Raise both fists upward (Victory / Excitement)",
+    "description": "The robot prepares by bringing its arm to a low-mid position, then quickly and powerfully thrusts it upward and slightly outward, holding at the peak with a vertical 'fist' orientation, followed by small, emphatic upward pumps to convey intense excitement and victory.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 30,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 45,
+                "y": 15,
+                "x": 10
+              },
+              "speed": 9.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 1.5,
+              "hold_time": 0.6
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 6.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 6.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 9,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:27:44",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: Imagine a person starting with arms slightly bent and lowered, then quickly thrusting both arms upwards and slightly outwards, fists clenched, holding them high, possibly with small celebratory jitters.\n# 2. Identify key joints: Primarily shoulder for the main upward lift, elbow for extending and bending, and wrist for slight adjustments if the \"fist\" needs reorientation. Assuming the gripper acts as a fist.\n# 3. Decompose into phases:\n#    - Setup: Start from a slightly lowered, neutral ready position.\n#    - Core Action: A rapid, powerful upward and slightly outward thrust of the arm. Hold at the peak.\n#    - Follow-through: Small, repeated upward pulses or shakes to emphasize triumph/excitement.\n# 4. Map to 3D space:\n#    - Initial pose: Mid-depth (x:50), slightly low (z:30), centered laterally (y:50), gripper pointing forward, vertically oriented for a fist. `hold_time: 0` for smooth transition.\n#    - Upward thrust: Increase z significantly, slight increase in y (outward), slight increase in x (forward extension). This will be fast.\n#    - Emphatic pumps: Small, rapid oscillations in the z-axis (upward) from the elbow or shoulder.\n# 5. Select step types:\n#    - Initial position: `pose`\n#    - Main thrust: `movement` (single repetition, high speed, significant joint rotation)\n#    - Hold and small adjustments: `movement` (single repetition, moderate speed, slight rotation, hold_time)\n#    - Pumps: `movement` (multiple repetitions, high speed, small joint rotations)"
+  },
+  {
+    "cue": "Pump one fist downward (Success / Yes!)",
+    "description": "The robot positions its arm, executes a brief wind-up, then performs a sharp, powerful downward fist pump, holding the final position to signal success, agreement, or strong affirmation.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10,
+                "z": 5
+              },
+              "speed": 2.0,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5,
+                "z": -30
+              },
+              "speed": 9.0,
+              "hold_time": 0.6
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 10,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:28:08",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will begin with its arm in a ready position, pull it back slightly for a wind-up, then execute a sharp, powerful downward punch/pump, ending with a firm hold. This gesture signifies triumph or strong affirmation.\n# 2. Identify key joints: The shoulder will drive the overall upward and downward motion of the arm, while the elbow will contribute to the powerful \"fist\" action and the snap.\n# 3. Decompose into phases:\n#    - Setup (Pose): Establish an initial mid-level, slightly forward position, with the gripper oriented vertically like a fist. This is the starting point.\n#    - Wind-up (Movement 1): A subtle, quick backward and slightly upward movement of the arm to gather momentum for the pump.\n#    - Core Action (Movement 2): The main, forceful downward pump, driven by both shoulder and elbow, ending decisively with a brief hold.\n# 4. Map to 3D space:\n#    - Initial Pose: Around chest level (z: 55), slightly extended forward (x: 55), centered (y: 50). Gripper pointing front, vertically.\n#    - Wind-up: Pulling back (decreasing x) and slightly raising (increasing z) the arm.\n#    - Downward Pump: A large decrease in z (down to waist/hip level, z: 20-30 range relative to initial, so target around 30-40 absolute) and potentially a slight forward push (increase x) for impact.\n# 5. Select step types:\n#    - Use \"pose\" for the initial setup. Set hold_time to 0 for a smooth transition into the wind-up.\n#    - Use \"movement\" for both the wind-up and the main pump, as these are controlled joint rotations.\n#    - Speeds will vary: moderate for the wind-up, very fast for the pump.\n#    - The final movement will have a hold_time to emphasize the conclusive posture."
+  },
+  {
+    "cue": "Flex one arm to show bicep (Strength)",
+    "description": "The robot positions its arm forward and to the side, then performs a strong, rapid bicep flex, holding the peak before a small celebratory pump, and finally slowly relaxing into a proud stance.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 35,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 45,
+                "x": -5
+              },
+              "speed": 5.0,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 4.0,
+              "hold_time": 0.2
+            },
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10,
+                "x": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 11,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:28:41",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will start with its arm slightly extended forward. Then, it will sharply bend its elbow to bring the gripper (representing a fist) close to its shoulder, holding the flex. Finally, it will perform a small, emphatic pump before slowly relaxing the arm to a proud, slightly lowered position.\n# 2. Identify key joints: The primary joint is the elbow for the bicep flex. The shoulder will also be used for initial positioning and a subtle adjustment during the flex and follow-through.\n# 3. Decompose into phases:\n#    - Setup: Arm positioned slightly forward and to the side, preparing for the flex.\n#    - Core Action: Rapid, powerful elbow flexion, holding the peak of the bicep display. Followed by a small, quick \"pump\" to emphasize the strength.\n#    - Follow-through: Slow, controlled relaxation of the arm to a slightly lowered, proud stance.\n# 4. Map to 3D space:\n#    - Initial pose: Mid-chest height (`z: 40`), slightly extended (`x: 60`), a bit to the side (`y: 35`). Gripper pointing `front` with `vertical` orientation (like a fist).\n#    - Flex: Elbow rotates to bring the gripper up and back towards the shoulder. This corresponds to a positive `z` rotation for the elbow, and a slight `x` pull-back for the shoulder.\n#    - Pump: Small, quick additional `z` rotation of the elbow.\n#    - Relax: Shoulder moves slightly down and out, elbow slightly extends.\n# 5. Select step types: `pose` for initial setup, `movement` for the flex, pump, and relaxation phases.\n#\n# Constraint check:\n# - Initial pose has `hold_time: 0.0` for a transitional start.\n# - `dir` is `front`, and `gripper_orientation` is `vertical` for a \"fist\" visual, which is semantically meaningful.\n# - x, y, z are specified for the initial pose.\n# - Speeds are varied for different phases (fast flex, slower relaxation).\n# - Ends at an expressive peak/follow-through, not a 'return to rest'.\n# - Maximum `z` degree values for `movement` are within the `±50` recommended range (45, 5, -5, -10)."
+  },
+  {
+    "cue": "Nod head up and down (Yes)",
+    "description": "The robot positions its gripper at a neutral face-level, then performs a series of distinct forward and backward tilts, mimicking a human 'yes' nod.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": -20
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 12,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:28:56",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: A \"nod\" is a clear up-and-down motion of the head. For the robot, this will be represented by the gripper tilting forward and backward.\n# 2. Identify key joints: The primary joint for a \"nod\" is the wrist, as it provides the rotational motion similar to a head tilting. The arm itself should remain relatively static at a \"face-level\" position.\n# 3. Decompose into phases:\n#    - Setup: Position the gripper at a neutral, face-level height and depth, pointing slightly forward. This establishes the context for the nod.\n#    - Core Action: Perform the repetitive forward-backward tilt using the wrist joint. This signifies the \"yes\" gesture.\n# 4. Map to 3D space:\n#    - Initial Pose:\n#        - dir: \"front\" (gripper tip pointing forward, like a face looking ahead)\n#        - x: 50 (neutral depth, arm slightly extended)\n#        - y: 50 (center lateral)\n#        - z: 60 (mouth/chin level)\n#        - gripper_orientation: \"horizontal\" (gripper opening plane parallel to the ground, like a chin)\n#        - hold_time: 0.3 (a brief pause to establish the starting posture)\n#    - Nodding Movement:\n#        - joint: \"wrist\" (for head-like tilt)\n#        - repetition: 3 (for a clear, emphatic nod)\n#        - directions:\n#            - First movement (downward tilt): Positive rotation around the wrist's x-axis will typically make the gripper tip point further down. Degrees: {\"x\": 20}\n#            - Second movement (upward tilt/return to neutral): Negative rotation around the wrist's x-axis will bring it back up. Degrees: {\"x\": -20}\n#        - speed: 2.5 (moderate, clear, and distinct)\n#        - hold_time: 0.0 (for smooth, continuous motion between tilts)\n# 5. Select step types:\n#    - Step 1: \"pose\" for initial positioning.\n#    - Step 2: \"movement\" for the repetitive up-and-down nodding action."
+  },
+  {
+    "cue": "Shake head side to side (No)",
+    "description": "The robot raises its gripper to a head-like position and then rapidly moves it from side to side to signal 'no'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 65,
+            "x": 45,
+            "y": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": 25
+              },
+              "speed": 5.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "y": -50
+              },
+              "speed": 5.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 13,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:29:12",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will bring its gripper up to an approximate head height, centered. Then, it will rapidly swing the gripper from side to side, mimicking a human head shaking \"no\".\n# 2. Identify key joints: The primary motion will be a lateral swing, which is best achieved by rotating the shoulder joint. The elbow will maintain its relative angle to keep the gripper facing forward.\n# 3. Decompose into phases:\n#    - Setup: Position the gripper near the robot's \"face\" area, pointing forward. This will be a \"pose\" step.\n#    - Core Action: Perform the repetitive side-to-side motion using the shoulder joint. This will be a \"movement\" step.\n# 4. Map to 3D space:\n#    - Initial Pose:\n#      - dir: \"front\" (gripper tip points forward, like a face)\n#      - z: 65 (eye level)\n#      - x: 45 (slightly forward from body)\n#      - y: 50 (center)\n#      - gripper_orientation: \"vertical\" (makes the gripper opening look like a vertical slit, more \"face-like\")\n#      - hold_time: 0.0 to immediately transition into the shake.\n#    - Side-to-Side Movement:\n#      - joint: \"shoulder\" to get a broad lateral swing.\n#      - repetitions: 3 (means 3 full left-right-left cycles of the defined directions).\n#      - directions:\n#        - First phase: Rotate the shoulder to move the gripper to the robot's left (e.g., {\"y\": 25} degrees).\n#        - Second phase: Rotate the shoulder to move the gripper to the robot's right, passing the center (e.g., {\"y\": -50} degrees).\n#      - speed: Fast (5.0) for an emphatic \"no\".\n#      - hold_time: 0.0 for continuous, fluid motion."
+  },
+  {
+    "cue": "Shrug shoulders with palms up (I don’t know)",
+    "description": "The robot moves its arm from a neutral position to a raised, bent-elbow posture with the gripper opening facing upwards, mimicking a human shrug of 'I don't know', then slightly settles.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 35
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 30,
+            "y": 60,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 2.5,
+          "hold_time": 0.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 0.8,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 14,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:29:41",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: A human shrugs by raising shoulders, bending elbows to bring hands up, and turning palms upwards. The motion conveys uncertainty.\n# 2. Identify key joints: Shoulder (raises arm), Elbow (bends arm), Wrist (rotates for palm orientation).\n# 3. Decompose into phases:\n#    - Phase 1 (Setup): Start from a neutral, relaxed, slightly forward position.\n#    - Phase 2 (Core Action - Shrug & Palms Up): Quickly move to the peak shrug position where the arm is raised, elbow bent, and gripper opening is horizontal (palms up). Hold this pose briefly.\n#    - Phase 3 (Follow-through - Settle): Slightly lower the shoulder after the peak to show a subtle release or settling into the \"I don't know\" expression.\n# 4. Map to 3D space:\n#    - Initial Pose: Mid-height, neutral depth/lateral. `dir: front`, `x: 50`, `y: 50`, `z: 35`. Transitional `hold_time: 0`.\n#    - Shrug Peak Pose: Arm raised, elbow bent, hand at chest/shoulder level, slightly to one side. `dir: front` (general arm direction), `x: 30` (closer to body), `y: 60` (slightly to robot's left), `z: 60` (chest/shoulder height). Crucially, `gripper_orientation: horizontal` for \"palms up\". Moderate-fast speed, brief hold.\n#    - Settle Movement: Small `shoulder` movement, lowering `z` by a few degrees. Slower speed, brief hold.\n# 5. Select step types: `pose` for the initial and peak positions (allowing `gripper_orientation`), and `movement` for the subtle follow-through."
+  },
+  {
+    "cue": "Scratch head lightly (Confusion)",
+    "description": "The robot brings its hand to the side of its head (temple/scalp), performs a light, repetitive scratching motion to convey confusion or contemplation, and then slightly lowers the arm.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 45,
+            "x": 50,
+            "y": 50
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "z": 70,
+            "x": 35,
+            "y": 65,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 2.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 4,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 1.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 15,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:30:01",
+    "reasoning": "# Motion Planning for \"Scratch head lightly (Confusion)\":\n# 1. Visualize: A robot brings its hand up to the side of its head (temple/scalp area), performs a small, quick rubbing/scratching motion, then slightly lowers the arm in thought.\n# 2. Identify key joints: Shoulder and elbow to bring the arm up; wrist for the scratching motion; shoulder for the final slight drop.\n# 3. Decompose into phases:\n#    - Setup (Pose to head): Arm moves from a neutral ready position to the side of the head.\n#    - Core Action (Scratch): Wrist performs small, rapid oscillations to simulate scratching.\n#    - Follow-through (Relax): Arm slightly lowers from the head, holding a contemplative posture.\n# 4. Map to 3D space:\n#    - Initial Pose: Neutral, ready position. (dir: \"front\", z: 45, x: 50, y: 50). hold_time: 0.0 for immediate transition.\n#    - Pose at Head: Gripper tip points left (towards robot's own head). Height at temple (z: 70), slightly back (x: 35), to the side (y: 65 for left side). Gripper vertical for a natural scratch.\n#    - Scratch Movement: Wrist joint, small degrees on the x-axis (in/out motion relative to the head). Repetitive, fast.\n#    - Relax Movement: Shoulder joint, slight negative z-axis (lowering). Slower speed, hold at the end.\n# 5. Select step types: Pose for positioning, movement for the scratch and relaxation."
+  },
+  {
+    "cue": "Tilt head slightly (Curiosity)",
+    "description": "The robot extends its arm slightly forward and lowers it, then subtly shifts its gripper to one side as if cocking its head in curiosity or to listen more intently.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8,
+                "z": -7,
+                "y": 8
+              },
+              "speed": 1.2,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 16,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:30:33",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot should move its gripper slightly forward and down, mimicking a human tilting their head to listen or observe intently. It's a subtle, sustained motion.\n# 2. Identify key joints: The primary joint for this overall body-like lean and tilt will be the shoulder, as it controls the arm's global position.\n# 3. Decompose into phases:\n#    - Setup: Start from a neutral, slightly forward-facing pose, ready to observe. This initial pose will transition immediately (`hold_time: 0`).\n#    - Core Action: A smooth, deliberate movement where the shoulder joint adjusts to bring the gripper slightly forward, down, and potentially slightly to one side (like a head cock). This is a single, sustained movement.\n# 4. Map to 3D space:\n#    - Initial Pose: Neutral, front-facing. `dir: \"front\"`, `x: 55` (slightly forward), `y: 50` (center), `z: 50` (eye/mouth level).\n#    - Core Movement: Shift `x` slightly more forward, `z` slightly down, and `y` slightly to one side. This is a subtle adjustment from the initial pose.\n# 5. Select step types:\n#    - First step: \"pose\" for initial positioning.\n#    - Second step: \"movement\" for the actual \"tilt\" by adjusting shoulder joint degrees."
+  },
+  {
+    "cue": "Place palm over face (Facepalm / Frustration)",
+    "description": "The robot arm starts in a neutral position, then quickly moves its hand to cover its face in a classic facepalm gesture, holding the pose to express frustration or exasperation, before slowly lowering its arm in resignation.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 50,
+            "x": 40,
+            "y": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 28,
+                "y": -18
+              },
+              "speed": 2.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 50
+              },
+              "speed": 2.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.0,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -35
+              },
+              "speed": 0.7,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -25,
+                "y": 12
+              },
+              "speed": 0.5,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 17,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:31:02",
+    "reasoning": "# Motion Planning:\n# 1. Visualize:\n#    - Start: Arm relaxed, slightly in front of the body.\n#    - Phase 1 (Setup): Arm quickly raises and moves towards one side of the robot's face (e.g., right side for human facepalm).\n#    - Phase 2 (Core Action): Elbow bends sharply to bring the palm against the forehead/eye area. Hold this facepalm pose for a noticeable duration.\n#    - Phase 3 (Follow-through): Arm slowly lowers from the face, slightly slumping, conveying resignation or lingering frustration.\n# 2. Identify key joints:\n#    - Shoulder: For raising the arm and lateral movement towards the face.\n#    - Elbow: For bending the arm to bring the hand to the face.\n#    - Wrist: For fine-tuning the palm's orientation against the face.\n# 3. Decompose into phases and map to 3D space:\n#    - Initial Pose:\n#        - `dir`: \"front\" (neutral, ready position)\n#        - `z`: 50 (mid-height)\n#        - `x`: 40 (slightly extended)\n#        - `y`: 50 (center)\n#        - `gripper_orientation`: \"horizontal\" (palm open, ready to move)\n#        - `hold_time`: 0 (transitional start)\n#    - Raise Arm to Face Level:\n#        - `joint`: \"shoulder\"\n#        - `degrees`: `z` up (e.g., 25), `y` left (e.g., -15, for robot's right side/human's left temple)\n#        - `speed`: Fast (expression of quick frustration)\n#    - Bend Elbow to Facepalm:\n#        - `joint`: \"elbow\"\n#        - `degrees`: `x` positive (bends elbow, brings hand in) (e.g., 45)\n#        - `speed`: Moderate (deliberate placement)\n#    - Hold Facepalm:\n#        - `joint`: \"wrist\" (small adjustment for contact)\n#        - `degrees`: `x` slightly positive (e.g., 10, for fine-tuning palm alignment)\n#        - `hold_time`: Long (e.g., 1.5 seconds, emphasizing frustration)\n#        - At this point, the gripper tip should implicitly be pointing \"back\" (towards the robot's body/face).\n#    - Release and Lower Arm:\n#        - `joint`: \"elbow\" (start straightening)\n#        - `degrees`: `x` negative (e.g., -30)\n#        - `speed`: Slow\n#    - Slumped Finish:\n#        - `joint`: \"shoulder\" (lower arm)\n#        - `degrees`: `z` down (e.g., -20), `y` right (e.g., 10, to return slightly to center)\n#        - `speed`: Very slow (conveying resignation)\n#        - `hold_time`: Moderate (e.g., 0.8 seconds, for lingering expression)\n# 4. Select step types and tune parameters:\n#    - Use `pose` for initial setup.\n#    - Use `movement` for all subsequent joint rotations to achieve the dynamic gesture.\n#    - Vary `speed` and `hold_time` for expressiveness."
+  },
+  {
+    "cue": "Point to chest with index finger (Me)",
+    "description": "The robot arm moves from a ready position to precisely point at its chest, holding the gesture to signify 'me' or 'I', then performs a subtle emphasizing 'poke'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 35,
+            "y": 45,
+            "z": 55,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15,
+                "y": 5,
+                "z": -10
+              },
+              "speed": 2.5,
+              "hold_time": 0.7
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 5.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 5.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 18,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:31:24",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot arm should start from a neutral position, move swiftly to the chest, point directly at the chest with the gripper tip, hold briefly, and perhaps make a small, sharp emphasis.\n# 2. Identify key joints: Shoulder, elbow, and wrist will be involved for positioning. A small emphasis might use the elbow or wrist.\n# 3. Decompose into phases:\n#    - Setup: Arm moves from a general position to a preparatory stance slightly in front of the chest.\n#    - Core Action: Arm precisely moves to touch/point at the chest.\n#    - Follow-through: A subtle, sharp 'poke' or emphasis at the chest.\n# 4. Map to 3D space:\n#    - Initial pose: Mid-height, mid-depth, slightly off-center laterally. Gripper tip pointing back (towards body).\n#      - dir: \"back\"\n#      - z: 55 (upper chest)\n#      - x: 35 (slightly extended)\n#      - y: 45 (slightly left of center)\n#      - gripper_orientation: \"vertical\" (like a pointing finger)\n#    - Core action movement: Inward, slightly down, and center to precisely hit the chest area.\n#      - Adjust x (inward), y (center), z (down) with shoulder and elbow.\n#    - Follow-through: Small, quick movement in depth (x-axis) for emphasis.\n# 5. Select step types:\n#    - Initial setup: \"pose\" with `hold_time: 0` for smooth transition.\n#    - Core action: \"movement\" to articulate the arm to the specific chest point.\n#    - Follow-through: \"movement\" for the quick, emphatic gesture."
+  },
+  {
+    "cue": "Point forward with index finger (You)",
+    "description": "The robot extends its arm directly forward from a neutral position, with the gripper tip pointing straight ahead, mimicking an index finger pointing to indicate 'you' or 'that direction'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 35,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 40
+              },
+              "speed": 6.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 19,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:31:47",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will extend its arm directly forward from a slightly retracted position, with the gripper forming a pointing gesture.\n# 2. Identify key joints: Primarily shoulder and elbow for the main extension. The wrist might be used for minor adjustments, but for a direct point, shoulder and elbow are sufficient.\n# 3. Decompose into phases:\n#    - Setup: Start in a neutral, slightly bent arm position, ready to extend. (Initial pose)\n#    - Core Action: Rapidly extend the arm forward. (Movement)\n#    - Hold: Briefly hold the extended pointing pose. (Hold time on movement)\n# 4. Map to 3D space:\n#    - Initial pose: Mid-height (z: 50), centered laterally (y: 50), slightly retracted (x: 35), gripper pointing forward (\"front\") and vertically (like a finger).\n#    - Core action: Extend forward significantly along the x-axis. This translates to positive `x` rotation for shoulder and elbow.\n# 5. Select step types:\n#    - `pose` for the initial stance.\n#    - `movement` to execute the arm extension. No `path` is needed for a straight pointing motion.\n# 6. Tune parameters:\n#    - Initial pose: `hold_time: 0` for a smooth, immediate transition. Moderate speed.\n#    - Movement: Use a single repetition. Combine `shoulder` and `elbow` for a full arm extension. A positive degree for `x` will extend forward. Use a fast speed for emphasis and a decent `hold_time` at the end of the movement to signify holding the point."
+  },
+  {
+    "cue": "Turn palm downward and curl fingers inward repeatedly (Come here / Beckon)",
+    "description": "The robot extends its arm forward, positions its palm downward, and then repeatedly curls its gripper inward towards its body in a beckoning gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 4,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25
+              },
+              "speed": 5.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": 25
+              },
+              "speed": 3.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 20,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:32:31",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will extend its arm forward, then turn its palm downward. From this position, it will repeatedly \"curl\" its hand inwards towards its body, as if beckoning.\n# 2. Identify key joints:\n#    - Shoulder and Elbow for arm extension.\n#    - Wrist for turning the palm and the repeated \"beckoning\" motion.\n# 3. Decompose into phases:\n#    - Phase 1 (Setup): Move to an initial pose with the arm extended forward, hand positioned at a reasonable height and lateral offset, and palm already oriented downward. This will be a \"pose\" step.\n#    - Phase 2 (Core Action): Execute the repetitive \"curling\" or \"beckoning\" motion. This will be a \"movement\" step targeting the wrist joint.\n# 4. Map to 3D space:\n#    - Initial Pose: Arm extended forward (high x), centered (y), at chest height (z). Gripper tip points forward (`dir: \"front\"`). Palm down means the gripper opening is parallel to the ground (`gripper_orientation: \"horizontal\"`).\n#      - x: 75 (extended forward)\n#      - y: 50 (center)\n#      - z: 50 (chest level)\n#      - dir: \"front\" (gripper tip points forward)\n#      - gripper_orientation: \"horizontal\" (palm down)\n#    - Beckoning Movement: This involves the wrist moving the gripper tip inward (towards the robot) and then slightly outward to reset for the next beckon. A rotation around the wrist's local X-axis can achieve this 'nodding' or 'curling' motion.\n#      - joint: \"wrist\"\n#      - directions:\n#        - Inward movement: `degrees: {\"x\": -25}` (pulling gripper tip back), fast speed.\n#        - Outward movement: `degrees: {\"x\": 25}` (returning to start), slightly slower speed.\n# 5. Select step types: One \"pose\" for setup, one \"movement\" for the repetitive action.\n# 6. Tune parameters: Use a few repetitions (e.g., 4) and varying speeds to make the beckon clear and natural. Hold time on the initial pose is short to allow immediate transition to the movement.",
+    "validation_warnings": [
+      "Beckon cue with horizontal hand should use z-axis in the repeated beckon motion"
+    ]
+  },
+  {
+    "cue": "Extend palm forward flat (Stop)",
+    "description": "The robot retracts its arm slightly, then rapidly extends it forward and slightly upward, orienting its open palm to face forward, signaling to halt or stop.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 50,
+            "z": 45
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 35,
+                "z": 10
+              },
+              "speed": 5.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 75,
+            "y": 50,
+            "z": 65,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 2.0,
+          "hold_time": 1.2
+        }
+      }
+    ],
+    "idx": 21,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:33:15",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The gesture involves extending the arm forward, with the palm open and facing the recipient, fingers pointing upwards, like a human 'stop' sign. It's a quick, decisive movement.\n# 2. Identify key joints: Shoulder for forward extension (x-axis) and vertical positioning (z-axis). Elbow for straightening the arm. Wrist for orienting the palm.\n# 3. Decompose into phases:\n#    - Setup (Pose): Arm starts slightly retracted and mid-height, ready to thrust.\n#    - Core Action (Movement): Rapid, forceful extension of the arm forward, primarily driven by the shoulder.\n#    - Final Stance (Pose): Lock into the precise 'stop' pose with the palm oriented correctly and hold.\n# 4. Map to 3D space:\n#    - Setup Pose:\n#        - dir: \"front\" (general forward direction of the arm)\n#        - x: 40 (slightly retracted)\n#        - y: 50 (centered)\n#        - z: 45 (mid-chest height)\n#        - hold_time: 0 (transitional)\n#    - Extension Movement:\n#        - joint: \"shoulder\" to primarily push the arm forward (x) and slightly up (z).\n#        - degrees: { \"x\": 35, \"z\": 10 } for a noticeable extension.\n#        - speed: Fast (5.0) for a decisive thrust.\n#        - hold_time: 0 (immediate transition to final pose).\n#    - Final Stop Pose:\n#        - dir: \"up\" (gripper tip/fingers point upwards, crucial for 'stop' hand gesture)\n#        - x: 75 (fully extended forward, based on 'Arm extended forward' table)\n#        - y: 50 (centered)\n#        - z: 65 (shoulder/eye level, based on 'Eye level' table)\n#        - gripper_orientation: \"vertical\" (this, combined with 'dir: \"up\"', makes the palm face forward).\n#        - speed: Moderate (2.0) for a final adjustment and lock into pose.\n#        - hold_time: 1.2 (hold the gesture for emphasis).\n# 5. Select step types: Pose for initial setup, Movement for the dynamic extension, and another Pose for the final, precise, and held gesture. This avoids \"only poses\" and incorporates a dynamic action."
+  },
+  {
+    "cue": "Raise index finger upright (One moment / Important point)",
+    "description": "The robot arm moves from a neutral ready position, lifts deliberately upwards and inwards, settling into a pose where the gripper tip points straight up at eye/forehead level, holding for emphasis.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 40
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 35,
+                "x": -15
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 35,
+            "y": 50,
+            "z": 75,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 1.5
+        }
+      }
+    ],
+    "idx": 22,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:33:41",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The gesture involves raising an arm and extending the index finger upwards, typically to eye or forehead level, with the hand's palm facing forward or slightly to the side. It's a clear, deliberate action.\n# 2. Identify key joints:\n#    - Shoulder: To lift the entire arm.\n#    - Elbow: To bend the arm and position the wrist at the correct height and depth.\n#    - Wrist: To ensure the gripper (representing the finger) points directly upwards.\n# 3. Decompose into phases:\n#    - Setup: Start from a neutral, slightly lowered position, preparing for the upward movement.\n#    - Core Action: Lift the arm, extending it upwards, and adjust the gripper orientation to point straight up.\n#    - Hold: Hold the final pose for emphasis.\n# 4. Map to 3D space:\n#    - Initial Pose (Setup): Mid-chest level, slightly extended forward, gripper tip generally forward.\n#      - dir: \"front\", x: 50, y: 50, z: 40. Speed: 1.0, hold_time: 0.0 (transitional).\n#    - Movement (Core Action - Raise Arm): Lift the arm up and slightly inward towards the body.\n#      - joint: \"shoulder-elbow\", degrees: {\"z\": 35, \"x\": -15} (up and closer). Speed: 2.5 (deliberate lift).\n#    - Final Pose (Hold Point): Eye/forehead level, closer to the body, gripper tip pointing directly up. Gripper opening perpendicular to the ground (like a human hand with palm facing forward, finger up).\n#      - dir: \"up\", x: 35, y: 50, z: 75. gripper_orientation: \"vertical\". Speed: 1.5 (settle), hold_time: 1.5 (emphasis).\n# 5. Select step types:\n#    - Step 1: \"pose\" for initial position.\n#    - Step 2: \"movement\" for the main upward action.\n#    - Step 3: \"pose\" for the final, held expressive position."
+  },
+  {
+    "cue": "Place index finger on lips (Shh / Be quiet)",
+    "description": "The robot's arm moves from a relaxed position, raises and bends to bring the gripper close to the mouth, then places it at the lips in a 'shhh' gesture, holding briefly before a subtle release.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 30,
+            "y": 50,
+            "z": 25
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 35,
+                "x": 15
+              },
+              "speed": 1.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25,
+                "z": 15
+              },
+              "speed": 2.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 20,
+            "y": 45,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 1.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 0.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 23,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:34:08",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts from a neutral, relaxed position. The arm then raises and bends to bring the gripper (representing the index finger) close to the mouth/lips. It makes contact with the lips and holds the \"shhh\" position for a moment, then subtly retreats.\n# 2. Identify key joints:\n#    - Shoulder: For raising the arm (z-axis) and bringing it forward/back (x-axis).\n#    - Elbow: For bending the arm to bring the hand closer to the face (x, z-axes).\n#    - Wrist: For final fine-tuning of hand orientation and position at the lips.\n# 3. Decompose into phases:\n#    - Setup (Preparation):\n#      - Initial relaxed pose.\n#      - Arm raises and moves inward towards the body.\n#    - Core Action:\n#      - Hand positions itself precisely at the lips.\n#      - Holds the \"shhh\" position.\n#    - Follow-through:\n#      - Slight release from the lips (the motion ends here, not returning to full rest).\n# 4. Map to 3D space:\n#    - Initial Pose: Low, centered, slightly forward, `dir: \"down\"`. (z: 25, x: 30, y: 50)\n#    - Arm Raise (Movement): Shoulder lifts `z`, pulls back `x`.\n#    - Hand to Face (Movement): Elbow bends, hand moves back `x` and up `z`.\n#    - Final Lip Pose: High `z`, close `x`, slightly off-center `y`, `dir: \"back\"` (tip points towards robot), `gripper_orientation: \"vertical\"`. (z: 60, x: 20, y: 45)\n#    - Subtle Release (Movement): Wrist moves slightly `x`.\n# 5. Select step types: `pose` for initial and final positions, `movement` for controlled joint rotations to transition and hold."
+  },
+  {
+    "cue": "Pat stomach lightly (Hungry / Full)",
+    "description": "The robot brings its arm to its stomach area, performs a few light patting motions to express hunger or fullness, and then slightly lowers its arm.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "z": 40,
+            "x": 25,
+            "y": 50
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -8
+              },
+              "speed": 2.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 1.0,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 24,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:34:26",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will bring its hand to its stomach area, then perform a gentle up-and-down patting motion several times, and finally relax the arm slightly.\n# 2. Identify key joints:\n#    - Bringing the arm to the stomach: Shoulder, Elbow.\n#    - Patting motion: Elbow (primarily for vertical movement), possibly Wrist for fine local movement.\n#    - Relaxing the arm: Shoulder.\n# 3. Decompose into phases:\n#    - Setup: Move the gripper to the stomach region.\n#    - Core Action: Execute the repetitive patting motion.\n#    - Follow-through: Slightly lower and relax the arm.\n# 4. Map to 3D space:\n#    - Initial Pose (Setup):\n#      - dir: \"back\" (gripper tip points towards the robot's body for stomach interaction).\n#      - z: 40 (stomach/waist level, 35-45 range).\n#      - x: 25 (close to body, 15-30 range).\n#      - y: 50 (center, 40-60 range).\n#      - gripper_orientation: Omit, \"dir\" handles the semantic orientation.\n#    - Patting (Core Action): Small, rapid up-and-down movements.\n#      - Joint: Elbow, manipulating the Z axis for vertical patting.\n#      - Degrees: +/- 10 degrees for a noticeable but light pat.\n#      - Repetition: 3-4 times for \"lightly\".\n#    - Follow-through: Slight lowering of the arm.\n#      - Joint: Shoulder, manipulating the Z axis.\n#      - Degrees: -5 degrees.\n# 5. Select step types:\n#    - Step 1: \"pose\" for initial positioning. hold_time: 0.0 for a fluid transition.\n#    - Step 2: \"movement\" for a slight adjustment of the elbow to refine the patting position.\n#    - Step 3: \"movement\" for the repetitive patting action.\n#    - Step 4: \"movement\" for the final relaxation."
+  },
+  {
+    "cue": "Rub both upper arms (Cold)",
+    "description": "The robot pulls its arm inward, then brings its gripper to its own upper arm and performs a rubbing motion, as if trying to warm itself, ending in a slightly hunched posture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 30,
+            "y": 40,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5,
+                "x": -5
+              },
+              "speed": 1.0,
+              "hold_time": 0.4
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "z": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10,
+                "x": -5
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "z": -10,
+                "x": 5
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "shoulder-wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5,
+                "x": -2
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "z": -5,
+                "x": 2
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5,
+                "x": -5
+              },
+              "speed": 0.8,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 25,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:34:48",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: A person feeling cold often pulls their arms in, hunches slightly, and rubs their upper arms. For a single-arm robot, this means bringing its gripper to its own upper arm area and simulating the rubbing. The robot should convey a sense of 'huddling'.\n# 2. Identify key joints:\n#    - Shoulder: For overall arm positioning, hunching, and main vertical rubbing motion.\n#    - Elbow: For bending the arm to reach its own upper arm.\n#    - Wrist: For subtle changes in rubbing angle or finishing touches.\n# 3. Decompose into phases:\n#    - Setup (Initial Cold Posture): Arm pulled inward, slightly lowered, ready to reach its own arm.\n#    - Core Action (Rubbing): The gripper moves to the upper arm region, then performs a repetitive up-and-down motion, possibly with varying intensity.\n#    - Follow-through (Lingering Cold): The arm settles into a slightly hunched, static position, still conveying cold.\n# 4. Map to 3D space:\n#    - Initial Pose: gripper `dir: \"back\"` (towards body), `x: 30` (pulled back), `y: 40` (slightly to the right to rub its own right arm), `z: 45` (mid-chest height). `gripper_orientation: \"horizontal\"` (like an open palm).\n#    - Hunch: `shoulder` moves `z: -5` (lower), `x: -5` (pull further back).\n#    - Reach Upper Arm: `elbow` bends `x: 20` (inward), `z: 10` (upward) to position gripper.\n#    - Rubbing: `shoulder-elbow` combination for main vertical rub (`z` axis movement), small `x` adjustment for forward/backward rub. Repetitive `movement` steps. Faster speeds for the main rub, slower for the fade.\n#    - Final Posture: `shoulder` moves `z: -5`, `x: -5` to hold a slightly hunched, still pose.\n# 5. Select step types:\n#    - Initial position: `pose`\n#    - Hunching: `movement` (small, deliberate joint rotation)\n#    - Reaching: `movement` (joint rotation to target position)\n#    - Rubbing: `movement` (repetitive joint rotation for back-and-forth action)\n#    - Lingering cold: `movement` (final posture adjustment with hold)"
+  },
+  {
+    "cue": "Fan face with one hand (Hot)",
+    "description": "The robot quickly raises a hand to the side of its face and rapidly moves it back and forth to simulate fanning, conveying discomfort from heat.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 25,
+            "y": 30,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5,
+                "z": -5,
+                "y": 5
+              },
+              "speed": 2.0,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 8,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 35
+              },
+              "speed": 7.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "z": -35
+              },
+              "speed": 7.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 3.0,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 3.0,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10,
+                "x": 10
+              },
+              "speed": 1.0,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 26,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:35:10",
+    "reasoning": "# Motion Planning: \"Fan face with one hand (Hot)\"\n# 1. Visualize: The robot lifts one hand to the side of its face and rapidly waves it back and forth as if fanning itself due to heat. The motion should feel quick and somewhat urgent.\n# 2. Identify key joints:\n#    - Shoulder: To raise the entire arm to face height.\n#    - Elbow: To bend the arm and position the hand close to the face.\n#    - Wrist: The primary joint for the fanning motion itself (back-and-forth movement).\n# 3. Decompose into phases:\n#    - Setup (Positioning): The arm moves from a neutral state to a pose where the hand is near the side of the robot's face, ready to fan. This should be a quick, direct movement.\n#    - Core Action (Fanning): The wrist performs rapid, repetitive rotations to simulate fanning. This is the most energetic part of the motion.\n#    - Follow-through (Easing): The fanning slows down, and the arm slightly relaxes from the face, indicating the end of the fanning action.\n# 4. Map to 3D space:\n#    - Initial Pose: Hand near the left side of the face.\n#      - `dir`: \"left\" (gripper tip pointing towards the left side of the face)\n#      - `z`: 70 (eye/forehead level)\n#      - `y`: 30 (left lateral position)\n#      - `x`: 25 (close to the body/face)\n#      - `gripper_orientation`: \"vertical\" (like a human hand fanning)\n#      - `hold_time`: 0.0 (transition immediately)\n#    - Positioning Movement: Fine-tune the arm to bring the hand into the optimal fanning position, slightly adjusting height and depth.\n#      - `joint`: \"elbow-shoulder\" for coordinated arm movement.\n#      - `degrees`: Slight adjustments to `z` (height) and `x` (depth).\n#    - Fanning Movement: Rapid wrist movement.\n#      - `joint`: \"wrist\"\n#      - `degrees`: Significant `z` rotation for lateral fanning.\n#      - `repetition`: Multiple times (e.g., 7-8).\n#      - `speed`: High for urgency.\n#    - Easing Movement: Reduce fanning speed and slightly pull the arm back.\n#      - `joint`: \"wrist\" for slower fan, then \"elbow-shoulder\" to retract.\n# 5. Select step types:\n#    - Initial `pose` to establish the starting region and orientation.\n#    - `movement` steps for both the precise positioning and the repetitive fanning.\n# Reasoning for specific values:\n# - Initial pose `hold_time: 0` for smooth transition.\n# - High `speed` for the main fanning movement to convey urgency/heat.\n# - Multiple `repetition` for the fanning to make it clearly recognizable.\n# - A final, slightly slower movement phase for the wrist to show the action winding down, followed by a slight retraction of the arm, creating a natural conclusion without a full \"return to rest\" which is an anti-pattern.\n# - `gripper_orientation: \"vertical\"` is crucial for the \"fanning\" visual."
+  },
+  {
+    "cue": "Open mouth wide and cover it (Sleepy / Yawn)",
+    "description": "The robot begins in a relaxed, slightly slumped posture, then slowly raises its hand to cover its mouth as if yawning, holds it there briefly, and gently lowers the arm back to a relaxed position.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "z": 38,
+            "x": 48,
+            "y": 50
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5,
+                "x": 5
+              },
+              "speed": 0.7,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 35,
+                "y": -10,
+                "x": -15
+              },
+              "speed": 1.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10,
+                "x": -5
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "z": 60,
+            "x": 25,
+            "y": 45
+          },
+          "speed": 1.0,
+          "hold_time": 1.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": -20,
+                "x": 5
+              },
+              "speed": 0.7,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -25,
+                "x": 10
+              },
+              "speed": 0.6,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 27,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:35:30",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts in a relaxed, slightly slumped posture, then slowly brings one hand up to cover its mouth as if yawning, holding it there briefly, and finally lowering the hand slowly back to a relaxed state.\n# 2. Identify key joints:\n#    - Shoulder: For the overall arm position and subtle body lean/slump.\n#    - Elbow: For bending the arm to bring the hand to the face.\n#    - Wrist: For fine positioning of the hand over the mouth and slight relaxation.\n# 3. Decompose into phases:\n#    - Setup (Relaxed Start): Initial relaxed pose, followed by a subtle slump.\n#    - Core Action (Cover Mouth): Arm raises smoothly, hand positions over the mouth.\n#    - Follow-through (Post-Yawn Relaxation): Hand held briefly, then slowly lowers, returning to a relaxed posture.\n# 4. Map to 3D space:\n#    - Initial relaxed: Gripper tip `down`, slightly forward and low. `z: 35-40`, `x: 45-50`, `y: 50`.\n#    - Slump: Slight `z` decrease, `x` increase (lean forward).\n#    - Hand to mouth: Gripper tip `back`, at mouth level. `z: 55-65`, `x: 25-35`, `y: 40-50`.\n#    - Lowering: Reverse of raising, back to relaxed position.\n# 5. Select step types:\n#    - `pose` for initial and holding over mouth.\n#    - `movement` for subtle slump, raising arm, fine-tuning, and lowering arm.\n#    - Speeds will vary: Slower for setup/follow-through, slightly faster but still smooth for the core action of raising the hand."
+  },
+  {
+    "cue": "Rub one eye (Tired)",
+    "description": "The robot raises its arm to the side of its head, near the eye, and performs a gentle, slow rubbing motion, conveying a sense of tiredness or weariness, then slightly lowers the arm.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "z": 70,
+            "x": 30,
+            "y": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "wrist",
+          "plane": "yz",
+          "radius": 10.0,
+          "sweep": 720.0,
+          "speed": 2.0,
+          "direction": "cw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10,
+                "x": -5
+              },
+              "speed": 0.7,
+              "hold_time": 0.6
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 28,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:35:53",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will raise its arm to its face, specifically near one eye. The hand will then make small, gentle rubbing motions, followed by a slight lowering of the arm, conveying a sense of weariness.\n# 2. Identify key joints:\n#    - Shoulder: To lift and position the arm at eye level.\n#    - Elbow: To bend the arm and bring the hand close to the face.\n#    - Wrist: To perform the localized rubbing motion.\n# 3. Decompose into phases:\n#    - Setup (Pose): Arm moves to a position near the robot's right eye, with the gripper facing towards the body, ready to rub.\n#    - Core Action (Path): The wrist performs a small, slow circular motion to simulate rubbing the eye.\n#    - Follow-through (Movement): The arm slightly lowers and pulls back, indicating the end of the tired gesture.\n# 4. Map to 3D space:\n#    - Initial Pose: Near the robot's right eye/temple.\n#      - dir: \"back\" (gripper tip points towards the robot's head/body)\n#      - z: 70 (eye level)\n#      - x: 30 (close to face)\n#      - y: 35 (on the robot's right side)\n#      - gripper_orientation: \"horizontal\" (for a 'palm-like' contact, opening parallel to the ground)\n#    - Rubbing Action: Small, gentle circle.\n#      - joint: \"wrist\" (localized motion)\n#      - plane: \"yz\" (circular motion across the face's vertical plane)\n#      - radius: 10 (small circle)\n#      - sweep: 720 (two full circles for a clear rub)\n#    - Follow-through: Slight slump/lower.\n#      - joint: \"shoulder\" (affecting overall arm position)\n#      - degrees: {\"z\": -10, \"x\": -5} (lower height, pull back slightly)\n# 5. Select step types and tune parameters:\n#    - Step 1 (Pose): Set initial position with a moderate speed and no hold_time for immediate transition.\n#    - Step 2 (Path): Implement the circular rub using an arc. Use a slower speed for a tired feeling, and ensure enough sweep for visibility.\n#    - Step 3 (Movement): Apply a slight shoulder movement to convey a tired follow-through, using a slow speed and a brief hold."
+  },
+  {
+    "cue": "Bow deeply while hands at sides (Apology)",
+    "description": "The robot starts with hands at its sides, then slowly bends forward in a deep bow, holding briefly before returning upright, conveying apology or deference.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "z": 25,
+            "x": 25,
+            "y": 50
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 45
+              },
+              "speed": 0.8,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -45
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 29,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:36:15",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts upright with arms at its sides. It then slowly bends forward at the 'waist' (simulated by shoulder joint motion), keeping its hands generally in place relative to its body. It holds the deep bow, then slowly straightens back up.\n# 2. Identify key joints: The primary joint for a bow is the shoulder, controlling the forward/backward tilt of the 'torso' (and thus the arm).\n# 3. Decompose into phases:\n#    - Phase 1 (Setup): Start in an upright position with hands at sides, pointing down. (Initial `pose`)\n#    - Phase 2 (Core Action - Bow Down): Execute a slow, deep forward bend using the shoulder joint. (First `movement`)\n#    - Phase 3 (Hold Bow): Hold at the deepest point of the bow. (Achieved by `hold_time` in the first `movement`'s direction).\n#    - Phase 4 (Follow-through - Return Up): Slowly straighten the arm/body to return to an upright posture. (Second `movement`)\n# 4. Map to 3D space:\n#    - Initial Pose:\n#      - Gripper `dir`: \"down\" (hands at sides, pointing towards the floor).\n#      - `z`: 25 (arm resting at side, hip level).\n#      - `x`: 25 (close to body, not extended forward).\n#      - `y`: 50 (centered laterally).\n#      - `hold_time`: 0.0 to transition immediately.\n#    - Bow Down Movement:\n#      - `joint`: \"shoulder\" (simulates torso bend).\n#      - `degrees`: `{\"x\": 45}` (positive `x` for shoulder should bend the arm forward/down, creating the bow effect). This is a significant bend for a deep bow.\n#      - `speed`: 0.8 (slow, deliberate).\n#      - `hold_time`: 1.0 (hold the deep bow for a moment).\n#    - Return Up Movement:\n#      - `joint`: \"shoulder\".\n#      - `degrees`: `{\"x\": -45}` (negative `x` to reverse the bend and straighten up).\n#      - `speed`: 1.0 (controlled return, slightly faster than the bow down).\n#      - `hold_time`: 0.0 (end the motion).\n# 5. Select step types: `pose` for the starting position, `movement` for the dynamic bowing and returning actions."
+  },
+  {
+    "cue": "Raise both hands and flex index and middle fingers twice (Air quotes)",
+    "description": "The robot raises one arm to a forward, eye-level position, then performs two rapid, small wrist flexes to simulate the 'air quotes' gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15
+              },
+              "speed": 6.0,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "x": -15
+              },
+              "speed": 6.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15
+              },
+              "speed": 6.0,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "x": -15
+              },
+              "speed": 6.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 30,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:36:34",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot arm will extend forward, slightly elevated. The gripper, representing the hand, will then make two small, quick \"flexing\" motions, mimicking fingers forming air quotes.\n# 2. Identify key joints: Primarily the shoulder for positioning, and the wrist for the \"flexing\" action.\n# 3. Decompose into phases:\n#    - Setup: Arm moves to an initial, extended pose, ready for the gesture.\n#    - Core Action: Two rapid, small wrist movements simulating the finger flexes.\n# 4. Map to 3D space:\n#    - Initial pose: Eye-level to chest-level (z: 60), extended forward (x: 65), centered (y: 50). Gripper points forward (dir: \"front\") and is horizontal to imply an open hand for quoting.\n#    - Flexes: Small, sharp rotations of the wrist around an axis (e.g., x or z) to simulate the opening and closing of fingers.\n# 5. Select step types:\n#    - Initial positioning: \"pose\"\n#    - Flexing action: \"movement\" with wrist joint, small degrees, high speed, and brief hold_time."
+  },
+  {
+    "cue": "Tap temple with index finger (Think / Smart)",
+    "description": "The robot raises its arm to the side of its head, positions its 'finger' near the temple, then performs a tapping motion, as if deep in thought or indicating intelligence.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "z": 78,
+            "y": 40,
+            "x": 30,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 2.0,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -7
+              },
+              "speed": 7.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": 7
+              },
+              "speed": 7.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 1.5,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 31,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:37:02",
+    "reasoning": "# Motion Planning for \"Tap temple with index finger (Think / Smart)\":\n# 1. Visualize: The robot brings its right arm up, positions the gripper (simulating an index finger) near its right temple. It then performs several quick tapping motions against the temple before finally holding the position briefly with a slight withdrawal.\n# 2. Identify key joints:\n#    - Shoulder and elbow for raising and positioning the arm.\n#    - Elbow (primarily) for the forward/backward tapping motion.\n# 3. Decompose into phases:\n#    - Setup (Pose): The arm moves to a thoughtful, preparatory position alongside the head, near the temple.\n#    - Pre-tap adjustment (Movement): A subtle forward movement to ensure the gripper tip is correctly aligned and touches the temple.\n#    - Tapping action (Movement): Repeated, sharp forward-and-backward motions to simulate tapping.\n#    - Post-tap hold (Movement): A slight backward movement and a brief pause, signifying the conclusion of the thought or gesture.\n# 4. Map to 3D space:\n#    - Setup Pose:\n#        - dir: \"back\" (gripper tip points towards the robot's head/body for tapping its own temple)\n#        - z: 78 (high, eye/temple level)\n#        - y: 40 (lateral position for the robot's right temple, assuming the robot's right arm is used)\n#        - x: 30 (depth for the temple region, close to the head)\n#        - gripper_orientation: \"vertical\" (appropriate for a finger-like tap)\n#    - Pre-tap adjustment: A small positive `x` joint rotation for the \"elbow\" to bring the gripper slightly forward and into contact.\n#    - Tapping action: Repeated sequence of small negative `x` (pull back) and positive `x` (tap forward) rotations for the \"elbow\" joint.\n#    - Post-tap hold: A final small negative `x` rotation for the \"elbow\" to withdraw slightly, followed by a brief hold.\n# 5. Select step types: Pose for initial placement, Movement for all subsequent dynamic actions.\n# Anti-patterns check:\n# - Starts with a \"pose\".\n# - Ends at an expressive peak (slight hold near temple), not a \"return to rest\".\n# - No filler steps. Each step contributes to the gesture.\n# - Speeds are varied: setup is moderate, adjustment is deliberate, tapping is fast, and the final hold is slower."
+  },
+  {
+    "cue": "Rotate index finger near temple (Crazy)",
+    "description": "The robot raises its arm to the side of its head near the temple, then traces small circles with its gripper to signal 'crazy' or 'thinking too hard'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 30,
+            "y": 35,
+            "z": 75
+          },
+          "speed": 1.5,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "wrist",
+          "plane": "xz",
+          "radius": 15,
+          "sweep": 1080,
+          "speed": 3.0,
+          "direction": "cw"
+        }
+      }
+    ],
+    "idx": 32,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:37:24",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will bring its hand to the side of its head (temple area) and then rotate its wrist to simulate a finger circling.\n# 2. Identify key joints:\n#    - Initial positioning: Shoulder and elbow to raise the arm.\n#    - Circling motion: Primarily the wrist.\n# 3. Decompose into phases:\n#    - Setup: Move the gripper to the temple area.\n#    - Core Action: Perform the circular motion.\n# 4. Map to 3D space:\n#    - Temple pose:\n#      - `dir`: \"left\" to indicate the gripper tip is pointing towards the left side of the robot's head/temple.\n#      - `z` (height): 75 (for forehead/temple, based on Body Spatial Reference).\n#      - `y` (lateral): 35 (placing it to the robot's left side).\n#      - `x` (depth): 30 (close to the body/head).\n#      - `speed`: 1.5 for a deliberate move.\n#      - `hold_time`: 0.3 to establish the position before the motion.\n#    - Circular path:\n#      - `shape`: \"arc\" for a circular movement.\n#      - `joint`: \"wrist\" for the finger-like rotation.\n#      - `plane`: \"xz\" to create a circle that is somewhat vertical on the side of the head.\n#      - `radius`: 15 (small circle for a finger gesture).\n#      - `sweep`: 1080 (3 full circles for clear emphasis).\n#      - `speed`: 3.0 (moderately fast for the \"crazy\" gesture).\n#      - `direction`: \"cw\" (clockwise).\n# 5. Select step types:\n#    - First step: \"pose\" for the initial placement.\n#    - Second step: \"path\" for the continuous circular motion."
+  },
+  {
+    "cue": "Slide index finger across lips like zipping (Secret / Won’t tell)",
+    "description": "The robot brings its gripper to one side of its mouth, slides it across horizontally like zipping its lips, holds briefly, and then performs a small pull-back to signify 'my lips are sealed'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 30,
+            "y": 65,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 30,
+            "y": 35,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 3.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -8
+              },
+              "speed": 1.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 33,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:37:51",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will bring its index-finger-like gripper to one corner of its mouth, trace a horizontal line across the mouth, and then briefly hold or \"zip\" its lips, possibly with a small pull-back motion.\n# 2. Identify key joints: Shoulder and elbow for overall arm positioning, wrist for fine-tuning the finger orientation, or end-effector interpolation via poses for the main sliding motion.\n# 3. Decompose into phases:\n#    - Setup: Position the gripper near the robot's mouth on one side.\n#    - Core Action: Slide the gripper linearly across the mouth to the other side.\n#    - Follow-through: A subtle pull-back or a brief hold to emphasize the \"sealed\" aspect.\n# 4. Map to 3D space:\n#    - Setup Pose:\n#      - Gripper tip points \"back\" towards the robot's face.\n#      - Height (z): Mouth level, ~60.\n#      - Depth (x): Close to body, ~30.\n#      - Lateral (y): Start on the robot's right side (higher y-value), ~65.\n#      - Gripper orientation: \"vertical\" to simulate a single finger.\n#      - hold_time: 0.0 for immediate transition.\n#    - Core Action (Sliding):\n#      - This will be achieved by a second \"pose\" step, letting the system interpolate a linear path between the start and end mouth positions.\n#      - End Pose: Same z, x as start. Lateral (y): move to the robot's left side (lower y-value), ~35.\n#      - Speed: Faster for the \"zip\" motion.\n#      - hold_time: A short hold to emphasize the sealed lips.\n#    - Follow-through (Optional):\n#      - A small \"movement\" step that pulls the hand slightly back (negative x-direction on elbow/shoulder) to detach cleanly from the \"zipped\" position.\n# 5. Select step types:\n#    - Two `pose` steps for the start and end points of the slide across the lips, allowing for end-effector interpolation.\n#    - One `movement` step for the final subtle pull-back."
+  },
+  {
+    "cue": "Cross arms over chest (Defensive)",
+    "description": "The robot brings one arm across its chest, bending the elbow to form a defensive, closed posture, holding it firmly.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 50,
+            "x": 60,
+            "y": 65
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "y": -30,
+                "x": -15,
+                "z": 55
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10,
+                "y": -10
+              },
+              "speed": 1.0,
+              "hold_time": 1.8
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 34,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:38:13",
+    "reasoning": "# Motion Planning:"
+  },
+  {
+    "cue": "Place both hands on hips (Confidence / Annoyed)",
+    "description": "The robot arm moves from a neutral, ready position to a firm stance with the gripper placed on its hip. The gripper tip points towards the robot's body and is oriented horizontally, holding the pose to convey confidence or annoyance. (This configuration describes the movement for one arm; a dual-arm robot would mirror this for both sides).",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 30,
+            "y": 35,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.8,
+          "hold_time": 2.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 0.7,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 35,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:38:38",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot needs to bring its arm from a neutral position down to its hip, bending the elbow so the gripper rests near the hip with the palm facing inward. The final pose should be held to convey confidence or annoyance.\n# 2. Identify key joints: Shoulder for overall arm position (height, lateral), Elbow for bending and bringing the hand close to the body (depth), Wrist for fine-tuning orientation.\n# 3. Decompose into phases:\n#    - Setup: Start from a neutral, mid-level pose (pose).\n#    - Core Action: Move the arm decisively to the hip position, establishing the target pose (pose).\n#    - Follow-through: A subtle reinforcing downward push to emphasize the assertiveness (movement).\n# 4. Map to 3D space:\n#    - Initial Pose: Mid-height (z=50), mid-depth (x=50), center-ish lateral (y=50), dir=\"front\". Hold_time=0 for smooth transition.\n#    - Hip Pose: Hip level (z=35), close to body (x=30), right hip lateral (y=35), gripper tip pointing back (dir=\"back\"), gripper opening horizontal (gripper_orientation=\"horizontal\").\n#    - Emphasis Movement: Slight downward movement of the shoulder (z=-5 degrees).\n# 5. Select step types:\n#    - Two \"pose\" steps: one for the initial ready state, one for the final assertive hip pose.\n#    - One \"movement\" step: for the subtle emphasis at the end.\n#    This combination satisfies the constraint of not only using poses and having 2-7 steps.\n#    Speeds will be varied for emphasis."
+  },
+  {
+    "cue": "Lean forward slightly with palms open (Interest)",
+    "description": "The robot leans its arm slightly forward and presents its gripper with an open, palm-up orientation, signaling curiosity, readiness, or interest.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15,
+                "z": -5
+              },
+              "speed": 1.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 70,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 1.5
+        }
+      }
+    ],
+    "idx": 36,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:38:57",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts in a relatively neutral, slightly forward-facing pose. It then smoothly pushes its arm (and implicitly its 'body' represented by the arm's base) forward, extending its gripper slightly with an open, palm-up gesture.\n# 2. Identify key joints: The 'lean forward' aspect is primarily driven by the shoulder joint, especially its x-axis rotation (depth). The 'palms open' is expressed through the gripper's orientation and the overall `dir` of the pose.\n# 3. Decompose into phases:\n#    - Setup (Initial Pose): Establish a mid-height, mid-depth, front-facing position with palms horizontal (up), ready to lean. `hold_time: 0` for a smooth transition.\n#    - Core Action (Lean Forward): Use a `movement` step targeting the `shoulder` to physically lean the arm forward and slightly lower, indicating engagement.\n#    - Follow-through (Hold Interest): A final `pose` to hold the \"interested\" posture with the arm extended and palms open, for a duration.\n# 4. Map to 3D space:\n#    - Initial Pose: `dir: \"front\"`, `x: 55` (slightly forward), `y: 50` (center), `z: 55` (mid-chest height). `gripper_orientation: \"horizontal\"` (palms up).\n#    - Lean Forward (Movement): `shoulder` joint, `degrees: {\"x\": 15, \"z\": -5}`. This will move the arm forward (`x` positive rotation) and slightly down (`z` negative rotation) in joint space, translating to a forward and slightly lowered end-effector position. Speed moderate to deliberate.\n#    - Hold Interest (Final Pose): `dir: \"front\"`, `x: 70` (more extended forward), `y: 50` (center), `z: 50` (slightly lower than start). `gripper_orientation: \"horizontal\"`. Speed slower for a deliberate hold.\n# 5. Select step types:\n#    - First step: `pose` for initial setup.\n#    - Second step: `movement` for the dynamic lean.\n#    - Third step: `pose` for holding the final expressive posture."
+  },
+  {
+    "cue": "Step back slightly with both palms raised outward (Shock / Surprise)",
+    "description": "The robot starts in a neutral position, then executes a sharp, quick backward movement simulating a step back or flinch. Immediately following, it raises its arm to a 'palms-out' position at eye level and holds it, conveying shock or surprise.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 45
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25
+              },
+              "speed": 5.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "gripper_orientation": "horizontal",
+            "x": 30,
+            "y": 65,
+            "z": 70
+          },
+          "speed": 3.5,
+          "hold_time": 1.0
+        }
+      }
+    ],
+    "idx": 37,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:39:19",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts in a neutral, slightly forward position. It then performs a sudden, quick backward motion, akin to flinching or stepping back. Simultaneously or immediately after, the arm raises to shoulder/eye level, with the gripper (palm) facing forward, and holds this position to convey shock or surprise.\n# 2. Identify key joints:\n#    - \"Step back slightly\": Primarily the shoulder joint along the X-axis (depth).\n#    - \"Palms raised outward\": Involves shoulder (Z for height, Y for lateral position) and elbow joints to position the hand, with the gripper's orientation set to point forward and be horizontal.\n# 3. Decompose into phases:\n#    - Phase 1 (Setup): A neutral, slightly extended starting pose.\n#    - Phase 2 (Core Action - Recoil): A rapid, sharp backward movement of the arm to simulate stepping back.\n#    - Phase 3 (Core Action - Raise Palms): A swift transition to the \"palms raised outward\" pose, held briefly for emphasis.\n# 4. Map to 3D space:\n#    - Initial Pose: Mid-height (z:45), centered (y:50), moderately extended (x:60), gripper facing front. (hold_time=0 for smooth transition).\n#    - Recoil Movement: Shoulder joint, move -25 degrees in X (inward/backward). High speed for a startled reaction.\n#    - Final Pose (Palms Raised): Higher (z:70), pulled back (x:30), slightly lateral (y:65) to suggest an open, outward gesture for a single arm. Gripper tip pointing \"front\" (palms out), and \"horizontal\" (palm flat). Moderate speed to get into position, then hold for a second.\n# 5. Select step types:\n#    - \"pose\" for initial position.\n#    - \"movement\" for the \"step back\" recoil.\n#    - \"pose\" for the final \"palms raised outward\" stance."
+  },
+  {
+    "cue": "Cover mouth with palm (Gasp / Oops)",
+    "description": "The robot quickly brings a hand to cover its mouth, signifying a gasp, shock, or a sudden realization of a mistake, holds briefly, then slowly lowers its arm.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20,
+                "x": -25,
+                "y": -5
+              },
+              "speed": 7.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 30,
+            "y": 45,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 1.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -15,
+                "x": 15
+              },
+              "speed": 1.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 50,
+            "z": 30
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      }
+    ],
+    "idx": 38,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:39:43",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts from a neutral or slightly curious stance. Then, one arm swiftly moves upward and inward to cover the gripper opening over the mouth region. It holds this position for a moment, conveying surprise or a mistake, then slowly lowers the arm.\n# 2. Identify key joints:\n#    - Shoulder: For raising/lowering the entire arm and moving it forward/backward.\n#    - Elbow: For bending the arm to bring the hand closer to the face.\n#    - Wrist: Minor adjustments for hand orientation, but the gripper direction is more critical here.\n# 3. Decompose into phases:\n#    - Setup: A slightly forward, ready pose.\n#    - Core Action (Gasp/Oops): A rapid movement to bring the hand to the mouth.\n#    - Hold: The hand stays covering the mouth.\n#    - Follow-through: The hand slowly lowers to a more neutral position.\n# 4. Map to 3D space:\n#    - Initial Ready Pose:\n#        - `dir`: \"front\" (ready stance)\n#        - `x`: 55 (slightly extended), `y`: 50 (center), `z`: 45 (mid-height)\n#        - `gripper_orientation`: \"vertical\" (prepares for covering)\n#    - Movement to Mouth:\n#        - Involves `shoulder` and `elbow` joints.\n#        - `z` increase (arm up), `x` decrease (arm back towards body), `y` slight shift (arm inward).\n#        - Target region (mouth): `z`: 55-65, `x`: 20-35, `y`: 40-60.\n#    - Hold at Mouth:\n#        - `dir`: \"back\" (gripper tip towards robot body/face)\n#        - `x`: 30, `y`: 45 (for right arm covering mouth), `z`: 60 (mouth height)\n#        - `gripper_orientation`: \"vertical\" (palm covering mouth)\n#    - Lower Hand:\n#        - Involves `shoulder` and `elbow` joints.\n#        - `z` decrease (arm down), `x` increase (arm forward).\n# 5. Select step types:\n#    - Step 1: `pose` for initial ready position (hold_time: 0.0 for immediate transition).\n#    - Step 2: `movement` for the rapid, dynamic action of bringing the hand to the mouth (high speed).\n#    - Step 3: `pose` to establish the final \"hand over mouth\" position and hold it (meaningful hold_time).\n#    - Step 4: `movement` for slowly withdrawing the hand (lower speed).\n#    - Step 5: `pose` for a relaxed, slightly lowered final posture (brief hold_time)."
+  },
+  {
+    "cue": "Press palms together and bow slightly (Thank you / Respect)",
+    "description": "The robot brings its gripper to a central position in front of its chest, simulating clasped hands with fingers pointing upwards, then performs a polite bow by lowering the arm slightly before returning to a composed posture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 45,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": -15,
+                "x": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5,
+                "x": -3
+              },
+              "speed": 0.8,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 39,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:40:01",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will bring its gripper (representing hands) together in front of its chest, palms touching and fingers pointing upward. Then, it will lower its arm slightly to simulate a bow.\n# 2. Identify key joints:\n#    - For bringing \"palms together\" and defining initial position: Affects shoulder, elbow, and wrist to get to the desired pose.\n#    - For the bow: Primarily affects shoulder and possibly elbow to lower the entire upper arm assembly.\n# 3. Decompose into phases:\n#    - Phase 1 (Setup): Establish a pose where the gripper is centered, in front of the chest, with its tip pointing upward, simulating clasped hands. This will be the starting point for the bow. `hold_time: 0` for smooth transition.\n#    - Phase 2 (Core Action - Bow): Execute a downward movement (decreasing Z) and a slight forward movement (increasing X) from the shoulder and elbow to simulate a respectful bow. Hold this bowed position briefly.\n#    - Phase 3 (Follow-through): Slightly raise the arm from the deepest point of the bow to convey completion, but remain in a respectful, slightly lowered posture.\n# 4. Map to 3D space:\n#    - Setup Pose:\n#      - Gripper tip pointing up (`dir: \"up\"`).\n#      - Position: Centered (`y: 50`), in front of the chest (`x: 40-50`), at chest/heart level (`z: 45-55`).\n#      - Gripper orientation: \"vertical\" (to simulate palms pressing together, fingers pointing up).\n#    - Bow Movement:\n#      - Lower arm (`degrees: {\"z\": -15}`).\n#      - Lean forward slightly (`degrees: {\"x\": 10}`).\n#    - Return from Bow:\n#      - Lift arm slightly (`degrees: {\"z\": 5}`).\n#      - Pull back slightly (`degrees: {\"x\": -3}`).\n# 5. Select step types:\n#    - Initial position: `pose`\n#    - Bow: `movement` affecting \"shoulder-elbow\"\n#    - Return from bow: `movement` affecting \"shoulder-elbow\""
+  },
+  {
+    "cue": "Raise one hand as if holding an invisible glass (Cheers)",
+    "description": "The robot positions its arm as if holding a glass near its chest, then lifts it smoothly upwards and slightly forwards for a toast, culminating in a brief, subtle upward flick.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 45,
+            "y": 40,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 35,
+                "x": 20
+              },
+              "speed": 2.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 5.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 40,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:40:19",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: A person brings their arm up from a relaxed position, holds an imaginary glass, lifts it, and holds it up for a toast. There might be a slight upward flick at the very end.\n# 2. Identify key joints: Shoulder and elbow for the main lift. Wrist for the final flick.\n# 3. Decompose into phases:\n#    - Setup: Arm starts in a \"ready to lift\" position, as if grasping a glass.\n#    - Core Action: Arm lifts smoothly upwards and slightly forwards.\n#    - Follow-through: A brief hold at the peak, possibly with a small upward wrist motion for emphasis.\n# 4. Map to 3D space:\n#    - Setup (Pose): Gripper near stomach/chest level, pointing slightly forward. (z: 40-50, x: 40-50, y: 40-50). Gripper vertical for holding.\n#    - Core Action (Movement): Lift the arm primarily with shoulder and elbow, increasing z and x. (z: +35, x: +20).\n#    - Follow-through (Movement): A subtle upward flick of the wrist. (z: +10 on wrist).\n# 5. Select step types: `pose` for initial setup, `movement` for the lift, `movement` for the final flick."
+  },
+  {
+    "cue": "Raise one palm upward as if inviting a high five (Asking for high five)",
+    "description": "The robot extends its arm forward and upward, presenting an open, palm-up hand as an invitation for a high five.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 25,
+                "z": 25
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 80,
+            "y": 50,
+            "z": 70,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 1.2
+        }
+      }
+    ],
+    "idx": 41,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:40:40",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: Imagine a human inviting a high five. The arm starts somewhat relaxed, then extends forward and upward, opening the palm towards the other person. It holds this pose briefly.\n# 2. Identify key joints: Shoulder and elbow for overall arm positioning (height and depth), wrist for gripper orientation.\n# 3. Decompose into phases:\n#    - Phase 1 (Setup): A preparatory pose, slightly forward and mid-height, with a horizontal palm. This allows for a smooth, natural transition.\n#    - Phase 2 (Core Action): A dynamic movement phase where the arm extends further forward and upward, finalizing the high-five gesture. This will use joint movements.\n#    - Phase 3 (Follow-through): A brief hold of the final high-five pose to signify the invitation.\n# 4. Map to 3D space:\n#    - Initial Pose: Mid-height (z: 45), moderately forward (x: 55), centered (y: 50). Gripper facing front, horizontal. hold_time: 0 for transition.\n#    - Movement to High Five: From this pose, the arm needs to go higher (z) and more extended (x). Target roughly eye-level (z: 70-75), fully extended (x: 70-80). The \"up\" dir will make the gripper tip point up, which, with horizontal orientation, achieves the palm-up effect.\n#    - Final Hold Pose: The target of the movement, held for ~1 second.\n# 5. Select step types:\n#    - `pose` for the initial setup.\n#    - `movement` to dynamically extend and raise the arm to the high-five position.\n#    - `pose` for the final hold.\n# Constraints check:\n# - Starts with a pose: Yes.\n# - dir carefully chosen: \"front\" for initial intent, \"up\" for final high-five.\n# - x, y, z specified: Yes, based on body regions.\n# - gripper_orientation for semantic meaning: Yes, \"horizontal\" is crucial for palm-up.\n# - hold_time = 0 for initial pose: Yes, for smooth transition.\n# - Not ending with \"return to rest\": Yes, ends at expressive peak.\n# - No filler steps: Yes.\n# - Vary speed: Yes, faster for the main action, slower for setup/hold.\n# - Not only poses: Combines pose and movement."
+  },
+  {
+    "cue": "Swing one raised palm downward as if high-fiving air (Imitating high five)",
+    "description": "The robot quickly raises its arm to a high-five ready position with the palm forward, then executes a swift, powerful downward swing, ending with a slight rebound and hold.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 45,
+            "z": 75,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": -45,
+                "x": -10,
+                "y": 5
+              },
+              "speed": 10.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5,
+                "x": 3
+              },
+              "speed": 2.5,
+              "hold_time": 0.4
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 42,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:41:00",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The gesture involves raising the arm, then a swift downward swing of the palm as if hitting an imaginary hand. It's a quick, emphatic movement.\n# 2. Identify key joints:\n#    - Shoulder: Raises and lowers the entire arm, provides the main vertical motion.\n#    - Elbow: Bends to position the hand, then extends during the swing, contributing to the downward force.\n#    - Wrist: Controls the palm orientation.\n# 3. Decompose into phases:\n#    - Setup: Arm quickly moves to a raised, ready position, palm facing forward/down.\n#    - Core Action: Fast, powerful downward swing of the arm.\n#    - Follow-through: A brief hold at the bottom of the swing, perhaps a slight recoil.\n# 4. Map to 3D space:\n#    - Setup Pose:\n#      - Gripper tip pointing \"front\" with palm open (vertical orientation).\n#      - High `z` (around eye/head level, 70-75).\n#      - Extended `x` (forward, 60-70).\n#      - Slightly off-center `y` (e.g., 40-45 for a right arm).\n#    - Downward Swing:\n#      - Primarily shoulder and elbow movement, moving the end effector downwards and slightly backward/inward.\n#      - Large negative `z` rotation for shoulder/elbow.\n#      - Some negative `x` and positive `y` rotation for shoulder/elbow to bring it slightly inward and back.\n#    - Follow-through:\n#      - Slight upward `z` movement as a recoil.\n#      - Hold briefly.\n# 5. Select step types:\n#    - Step 1: `pose` for initial raised position. `hold_time: 0` for smooth transition.\n#    - Step 2: `movement` for the rapid downward swing. `repetition: 1` for a single, impactful action. High speed.\n#    - Step 3: `movement` for a subtle recoil and hold. Slower speed, brief hold_time."
+  },
+  {
+    "cue": "Extend one fist forward (Asking for fist bump)",
+    "description": "The robot arm extends forward decisively, presenting a vertically oriented gripper as if requesting a fist bump, then holds the position.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 35,
+                "z": 10
+              },
+              "speed": 6.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 43,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:41:18",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot arm starts slightly retracted, then performs a sharp, direct extension forward, ending with the gripper facing front, ready for a fist bump.\n# 2. Identify key joints: Primarily the shoulder and elbow for the forward thrust.\n# 3. Decompose into phases:\n#    - Setup: A initial, slightly retracted pose, ensuring the gripper is vertically oriented for a fist bump.\n#    - Main Action: A quick, decisive forward extension of the arm.\n#    - Follow-through: Hold the extended pose briefly.\n# 4. Map to 3D space:\n#    - Initial Pose: Mid-height (z:45), slightly forward (x:40), centered (y:50), gripper facing front and vertical. Hold_time 0 for smooth transition.\n#    - Extended Pose (implicit in movement end): Higher mid-height (z:55), well extended forward (x:75), centered (y:50), gripper still front and vertical.\n# 5. Select step types:\n#    - \"pose\" for the starting position and orientation.\n#    - \"movement\" to execute the forward extension using coordinated shoulder and elbow rotation."
+  },
+  {
+    "cue": "Tap one fist lightly against your other palm (Imitating fist bump)",
+    "description": "The robot uses its gripper to simulate a fist. It positions the 'fist' above an imagined open palm, then performs a quick, light downward tap, followed by a slight recoil, mimicking a gentle fist bump or a decisive tap.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 60,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -12
+              },
+              "speed": 6.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 3.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 44,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:41:45",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will use its gripper as the \"fist\". It needs to move to a preparatory position above an imagined \"palm\" (a flat plane in front of it), then execute a quick downward tap, and finally recoil slightly.\n# 2. Identify key joints: Shoulder, elbow, and wrist will be involved for positioning and the tapping motion. The Z-axis (height) will be crucial for the tap itself.\n# 3. Decompose into phases:\n#    - Phase 1: Setup - Arm moves to a mid-height, slightly forward position, ready to tap. Gripper orientation should be like a fist (vertical opening plane). This is the initial \"above palm\" position.\n#    - Phase 2: Core Action - Perform the light tap downwards. This needs to be fast and precise.\n#    - Phase 3: Follow-through - Recoil slightly after the tap and hold briefly.\n# 4. Map to 3D space:\n#    - Initial Pose (Pre-tap position): Mid-chest/stomach height (`z: 50`), slightly forward (`x: 60`), centered (`y: 50`). Gripper orientation vertical to simulate a fist. `dir: \"down\"` to imply the striking motion will be downwards.\n#    - Tap Down: A sharp movement downwards from this position, primarily `z` axis movement in the elbow/wrist.\n#    - Recoil: A smaller, quicker movement upwards.\n# 5. Select step types:\n#    - `pose` for the initial \"above palm\" position.\n#    - `movement` steps for the downward tap and upward recoil, as these are relative joint rotations."
+  },
+  {
+    "cue": "Pat your own back (Encouragement)",
+    "description": "The robot starts in a neutral pose, reaches its arm back and across its body to pat its own back twice, and then settles into a relaxed, slightly forward posture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 25,
+            "y": 65,
+            "z": 60
+          },
+          "speed": 2.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "y": -5
+              },
+              "speed": 7.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": -10,
+                "y": 5
+              },
+              "speed": 7.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8,
+                "y": -4
+              },
+              "speed": 6.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": -8,
+                "y": 4
+              },
+              "speed": 6.0,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 55,
+            "z": 45
+          },
+          "speed": 1.5,
+          "hold_time": 0.5
+        }
+      }
+    ],
+    "idx": 45,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:42:12",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will start in a neutral posture. Then, it will bring its arm up and backward, reaching across its body to simulate patting its own shoulder/back area. It will perform a couple of distinct 'pat' motions, then lower its arm to a more relaxed position.\n# 2. Identify key joints:\n#    - Shoulder: Primary joint for reaching back and across the body.\n#    - Elbow: Used to bend the arm for precise patting motion.\n#    - Wrist: Minor role in the actual 'pat' movement, mostly controlled by elbow/shoulder.\n# 3. Decompose into phases:\n#    - Setup (Phase 1): Initial pose to define starting point. Move the arm to the target position for patting the back.\n#    - Core Action (Phase 2): Perform the patting motion (1-2 distinct pats) using quick joint movements.\n#    - Follow-through (Phase 3): Transition from the patting position to a more relaxed, slightly forward posture.\n# 4. Map to 3D space (estimates for right arm patting its own left shoulder/upper back):\n#    - Initial Pose: Neutral, slightly forward. dir: \"front\", x: 50, y: 50, z: 50.\n#    - Patting Position: Gripper behind and slightly to the left of the robot's centerline, at upper back/shoulder height. dir: \"back\" (gripper tip towards robot's back). z: 60-65 (chest/shoulder height), x: 20-25 (close to body), y: 60-70 (reaching across to left side).\n#    - Patting Motion: Small, quick movements (x for depth, y for lateral, z for height) to simulate impact.\n#    - Relaxed End Pose: Slightly lowered and forward from the patting position, but not fully at rest. dir: \"down\", z: 45, x: 40, y: 55.\n# 5. Select step types:\n#    - `pose` for initial setup and the target patting location.\n#    - `movement` for the dynamic patting actions and for the transition to the final relaxed pose."
+  },
+  {
+    "cue": "Draw a circle in the air with index finger (Repeat / Around)",
+    "description": "The robot extends its arm forward and slightly up, then uses its wrist to draw two continuous circles in the air, mimicking a 'repeat' or 'around' gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 60,
+            "x": 65,
+            "y": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "wrist",
+          "plane": "xz",
+          "radius": 25,
+          "sweep": 720,
+          "speed": 2.5,
+          "direction": "cw"
+        }
+      }
+    ],
+    "idx": 46,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:42:28",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will extend its arm forward, then make a circular motion with its wrist, as if tracing a circle in the air with an imaginary finger. This motion should repeat to convey \"repeat\" or \"around\".\n# 2. Identify key joints: Initial positioning will involve the shoulder and elbow implicitly to reach the general area. The actual circular drawing motion will primarily use the wrist joint.\n# 3. Decompose into phases:\n#    - Setup: Move the arm to a prominent position in front of the robot, slightly above waist/chest level, with the gripper pointing forward.\n#    - Core Action: Execute the circular path using the wrist joint, repeating it a couple of times.\n# 4. Map to 3D space:\n#    - Initial Pose:\n#      - dir: \"front\" (gripper tip points forward, like drawing on a vertical surface)\n#      - z: 55-65 (chest/eye level)\n#      - x: 60-75 (arm extended forward)\n#      - y: 50 (centered)\n#      - gripper_orientation: \"vertical\" (as if holding a pen to draw)\n#    - Circle Path: The wrist will articulate in the XZ plane (vertical plane in front of the robot) to draw the circle.\n# 5. Select step types:\n#    - Step 1: \"pose\" for the initial setup. Set hold_time to 0 to transition smoothly into the path.\n#    - Step 2: \"path\" with \"arc\" shape for the circular motion. Use `joint: \"wrist\"` for a precise finger-like motion. Set `sweep` to a multiple of 360 to ensure repetition."
+  },
+  {
+    "cue": "Slice flat hand horizontally across throat (Cut / Stop it)",
+    "description": "The robot positions a flat, horizontally oriented hand to one side of its throat, then performs a swift, decisive slicing motion horizontally across the throat to signal 'cut it out' or 'stop'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "z": 60,
+            "x": 25,
+            "y": 70,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": -40,
+          "speed": 7.0
+        }
+      }
+    ],
+    "idx": 47,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:42:46",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot's arm quickly moves to position a flat, horizontally oriented hand near one side of its throat. Then, it performs a swift, linear motion across the throat to the other side.\n# 2. Identify key joints: Shoulder and elbow to position the arm and maintain a flat hand. Shoulder primarily for the lateral slicing motion.\n# 3. Decompose into phases:\n#    - Setup: Arm moves to the right side of the throat, hand flat and horizontal.\n#    - Core Action: Hand slices sharply horizontally across the throat towards the left side.\n# 4. Map to 3D space:\n#    - Initial Pose (Setup):\n#        - Gripper tip pointing \"left\" (across the throat)\n#        - Z (height): 60 (mouth/chin level)\n#        - X (depth): 25 (close to body)\n#        - Y (lateral): 70 (start on the right side of the throat)\n#        - Gripper orientation: \"horizontal\" (flat hand)\n#    - Slicing Motion (Core Action):\n#        - Path type: \"line\"\n#        - Axis: \"y\" (lateral movement)\n#        - Distance: -40 (move 40 percentile units to the left, from y=70 to y=30)\n# 5. Select step types:\n#    - `pose` for initial positioning with `hold_time: 0` for immediate transition.\n#    - `path` of type \"line\" for the decisive slicing motion."
+  },
+  {
+    "cue": "Swipe back of fingers outward from under chin (Dismissive / Whatever)",
+    "description": "The robot positions the back of its hand under its chin, then performs a swift, linear swipe outward and slightly upward, finishing with a sharp wrist flick to convey dismissal or indifference.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 25,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "x",
+          "distance": 40,
+          "speed": 7.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 8.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 48,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:43:05",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: A human places the back of their hand under their chin, then swiftly pushes their hand outward and slightly upward, flicking the wrist at the end, as if pushing something away or showing disdain.\n# 2. Identify key joints:\n#    - Initial position: Shoulder and elbow to bring the hand to the chin area.\n#    - Swipe: Primarily shoulder and elbow for the forward/upward motion.\n#    - Flick: Wrist for the final dismissive snap.\n# 3. Decompose into phases:\n#    - Setup: Position the back of the hand/fingers under the chin.\n#    - Core Action: Execute a fast, linear swipe outward and slightly upward.\n#    - Follow-through: A final, quick wrist rotation (flick) to emphasize dismissal.\n# 4. Map to 3D space:\n#    - Initial pose (under chin):\n#      - dir: \"back\" (gripper tip points towards body as the back of the hand is outward)\n#      - x: 25 (close to body)\n#      - y: 50 (centered)\n#      - z: 55 (mouth/chin level)\n#      - gripper_orientation: \"horizontal\" (back of hand faces out, gripper opening is horizontal)\n#      - hold_time: 0.3 (brief pause to establish position)\n#    - Swipe outward (path):\n#      - Shape: \"line\"\n#      - Joint: \"shoulder\" (to move the entire arm segment forward)\n#      - Axis: \"x\" (forward/depth) and implied z (upward). A single-axis path will move the joint's end effector along that axis. Let's start with `x` for outward.\n#      - Distance: 40 (significant outward movement)\n#      - Speed: Fast (7.0) for a dismissive gesture.\n#    - Final flick (movement):\n#      - Joint: \"wrist\"\n#      - Directions: A small rotation around the `z` axis (like a flick sideways).\n#      - Degrees: {\"z\": 20}\n#      - Speed: Very fast (8.0)\n#      - Hold time: 0.0 (just a quick snap)"
+  },
+  {
+    "cue": "Drum fingers on table or in air (Waiting / Bored)",
+    "description": "The robot positions its gripper as if resting on a surface or in mid-air, then performs a repetitive, rhythmic 'drumming' motion with the wrist, conveying impatience or boredom.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 65,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 1.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 5,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": -10
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 1.5,
+              "hold_time": 0.2
+            },
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 1.0,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 49,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:43:29",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will bring its gripper hand to a position over a hypothetical table (or just in front of its body, at waist height, slightly extended). Then, it will make a repetitive, rhythmic tapping motion with its wrist, mimicking fingers drumming. The motion should feel somewhat subtle and continuous, not overly dramatic.\n# 2. Identify key joints: Shoulder and Elbow for initial positioning. Wrist for the actual drumming motion (pitch/roll).\n# 3. Decompose into phases:\n#    - Phase 1 (Setup): Move the arm to a \"ready\" position at waist height, slightly forward, with the gripper oriented as if resting palm-down on a surface.\n#    - Phase 2 (Core Action - Drumming): Perform repetitive, small, quick up-and-down motions with the wrist to simulate drumming.\n#    - Phase 3 (Follow-through): The motion ends after the drumming, perhaps with a slight, final settling pause, emphasizing the bored waiting.\n# 4. Map to 3D space:\n#    - Initial pose: `z: 40` (stomach/waist), `x: 65` (moderately extended), `y: 50` (center). `dir: \"down\"` to point the gripper tip downwards, and `gripper_orientation: \"horizontal\"` to have the 'palm' parallel to the ground, ready to tap. `hold_time: 0` for smooth transition.\n#    - Drumming motion: Small pitch changes (`x` axis) of the wrist, relative to the gripper's current orientation.\n# 5. Select step types: `pose` for initial positioning, `movement` for repetitive drumming."
+  },
+  {
+    "cue": "Turn palm upward and curl fingers inward (Give me)",
+    "description": "The robot arm moves from a neutral position to an extended, mid-height stance with the palm facing upward, then performs a rapid series of small, inward-curling motions with the wrist to beckon or signal 'give me'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 40
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 2.5,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 4,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": -20
+              },
+              "speed": 6.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 6.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 50,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:44:21",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot arm starts in a neutral, slightly forward and low position. It then smoothly transitions to an active 'receiving' stance: the arm lifts slightly, extends forward, and the wrist rotates to present the palm upward. From this position, the hand performs small, quick inward-curling movements, like beckoning or asking someone to \"give me\" something.\n#\n# 2. Identify key joints:\n#    - Shoulder and Elbow: Primarily for positioning the arm (lifting and extending).\n#    - Wrist: Crucial for rotating the palm upward and for the rapid beckoning motion.\n#\n# 3. Decompose into phases:\n#    - Setup (Initial Posture): A transitional pose to bring the arm into a 'ready' state. (pose, hold_time: 0)\n#    - Core Action 1 (Palm Up): The main expressive pose where the arm is extended, and the palm is facing upward. The system handles the complex joint interpolation to reach this target orientation. (pose)\n#    - Core Action 2 (Beckon): Repetitive, quick inward motions of the wrist to signal \"come here\" or \"give me\". (movement)\n#\n# 4. Map to 3D space:\n#    - Initial Pose: `dir: \"front\"`, `x: 50` (mid-forward), `y: 50` (centered), `z: 40` (lower-mid height). This is a preparatory stance.\n#    - Palm Up Pose: `dir: \"front\"`, `x: 65` (more extended), `y: 50` (centered), `z: 55` (mid-high), `gripper_orientation: \"horizontal\"` (palm up). This is the key \"give me\" position.\n#    - Beckon Movement: Small rotation of the `wrist` joint. A backward rotation around the wrist's local `x` axis would simulate the 'curl inward' part of the beckon. Let's use `degrees: {\"x\": -20}` for the inward pull and `{\"x\": 10}` for the slight release, making the movement asymmetric and more natural.\n#\n# 5. Select step types:\n#    - The first step is a `pose` for initial positioning with `hold_time: 0` for smooth entry.\n#    - The second step is a `pose` to establish the \"palm up\" configuration, letting the system manage the complex multi-joint movement and rotation to reach the target `dir` and `gripper_orientation`. This avoids using large `degrees` values in a `movement` step, adhering to the +/-50 degree recommendation for explicit joint rotations.\n#    - The third step is a `movement` for the repetitive beckoning, using small `degrees` values.\n#\n# Addressing previous feedback: The constraint about \"Extreme degree value x=90 (max ±50 recommended)\" is handled by using a target `pose` with `gripper_orientation: \"horizontal\"` for the primary palm-up action. This allows the simulation to compute the necessary 90-degree (or more) wrist rotation without me explicitly setting a `degrees` value outside the recommended range for a `movement` step. For the subsequent `movement` (beckoning), the `degrees` values are kept small (e.g., -20, 10) to reflect subtle hand gestures."
+  },
+  {
+    "cue": "Extend open palm upward steadily (Offering)",
+    "description": "The robot extends its arm forward and upward with its palm open and facing up, as if offering or presenting something in a steady, deliberate manner.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 35,
+                "z": 30
+              },
+              "speed": 0.9,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 51,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:44:40",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will start with its arm slightly bent and in a neutral forward position. Then, it will slowly and smoothly extend its arm forward and upward, ensuring the palm is open and facing upwards throughout the motion, as if presenting an object.\n# 2. Identify key joints: Shoulder (for forward/upward reach) and Elbow (for extending the forearm). The wrist will implicitly maintain the gripper orientation.\n# 3. Decompose into phases:\n#    - Setup: Arm starts in a slightly retracted, mid-height position with the gripper already oriented horizontally (palm up). This is a transitional pose.\n#    - Core Action: A single, smooth, and controlled motion where the shoulder and elbow joints extend the arm forward and upward to its final offering position, holding briefly.\n# 4. Map to 3D space:\n#    - Initial Pose: Mid-chest height (`z: 35`), slightly in front of the body (`x: 40`), centered laterally (`y: 50`). Gripper tip points `front` initially, but the `gripper_orientation: \"horizontal\"` ensures the palm is up.\n#    - Extension: The arm will move to a higher (`z: ~60-70`) and more extended forward (`x: ~70-80`) position.\n# 5. Select step types:\n#    - The initial position will be a `pose` with `hold_time: 0` for a smooth start.\n#    - The core extension will be a `movement` step, coordinating both `shoulder` and `elbow` joints to achieve the smooth, deliberate upward and forward motion. This will also have a `hold_time` at the end to signify the offering gesture."
+  },
+  {
+    "cue": "Raise both hands beside head (I give up / Surrender)",
+    "description": "The robot arm starts in a neutral position, then rapidly raises to a high position near the side of its head, holding the gripper with its opening plane vertical, as if showing open palms in a gesture of surrender or 'I give up'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 45,
+            "x": 50,
+            "y": 50
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 40,
+                "y": -10
+              },
+              "speed": 8.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 30,
+                "x": -15
+              },
+              "speed": 7.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "z": 88,
+            "x": 30,
+            "y": 38,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 2.0
+        }
+      }
+    ],
+    "idx": 52,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:23:01",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot arm should start from a neutral position, then swiftly move upward and slightly inward, with the gripper ending near the head, oriented as if palms are facing forward/outward. It will hold this final pose.\n# 2. Identify key joints: Shoulder (for overall height and lateral position), Elbow (to bend the arm and bring the hand closer to the head). Wrist/gripper orientation is critical for the \"surrender\" look.\n# 3. Decompose into phases:\n#    - Setup: Start from a relaxed, neutral mid-chest position.\n#    - Core Action (Raise): Quickly lift the arm using shoulder and elbow articulation.\n#    - Core Action (Final Hold): Position the gripper precisely near the head, adjust its orientation, and hold the pose.\n# 4. Map to 3D space:\n#    - Initial Pose (Setup):\n#      - dir: \"front\" (neutral)\n#      - z: 45 (mid-chest), x: 50 (mid-depth), y: 50 (center)\n#      - hold_time: 0.0 (transitional)\n#    - Raising Arm (Movement):\n#      - Shoulder: Increase z (up), slight adjustment in y (outwards)\n#      - Elbow: Increase z (bend upwards), decrease x (bring hand back/inward)\n#      - Speed: Fast for a decisive \"raise\".\n#    - Final Surrender Pose (Pose Hold):\n#      - dir: \"up\" (gripper tip points upward)\n#      - z: 88 (above head), x: 30 (near head), y: 38 (left side, representing one of \"both hands\")\n#      - gripper_orientation: \"vertical\" (simulates palm facing forward/outward)\n#      - hold_time: 2.0 (hold the surrender gesture)\n# 5. Select step types: Use an initial \"pose\" for setup, followed by \"movement\" steps to articulate the arm quickly, and a final \"pose\" for the expressive, held gesture."
+  },
+  {
+    "cue": "Cover both ears (Too loud / Don’t want to hear)",
+    "description": "The robot raises its arm to one side of its head to cover an ear, holding the pose to indicate discomfort with noise or unwillingness to listen, then subtly relaxes.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "z": 50,
+            "y": 40,
+            "x": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 30,
+                "x": -10,
+                "y": -15
+              },
+              "speed": 2.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "z": 70,
+            "y": 28,
+            "x": 25,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 3
+              },
+              "speed": 0.5,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5,
+                "x": 5,
+                "y": 5
+              },
+              "speed": 1.0,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 53,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:23:36",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: A human would raise both hands to the sides of their head, pressing palms or fingertips against the ears. For a single-arm robot, this will be interpreted as covering one ear with the available arm. The arm moves up, bends inward, and the gripper settles over the ear area, holding in place.\n# 2. Identify key joints: Shoulder and elbow for raising and positioning the arm, wrist for fine-tuning the hand's orientation and contact with the ear.\n# 3. Decompose into phases:\n#    *   Setup (Pose): Establish an initial upward motion, preparing to move towards the head.\n#    *   Core Action (Movement + Pose): Bring the arm up and inward towards the ear, then hold the gripper firmly over the ear.\n#    *   Follow-through (Movement): A slight relaxation/pull-back from the ear.\n# 4. Map to 3D space:\n#    *   Initial Setup (Pose 1): Arm slightly raised, mid-chest level. `dir: \"up\"`, `z: 50`, `y: 40`, `x: 40`. `hold_time: 0.0` for smooth transition.\n#    *   Move to Ear (Movement 1): Shoulder and elbow drive the arm up and in towards the head. Adjust `z` (up), `x` (slightly back/in), `y` (inward).\n#    *   Cover Ear (Pose 2): Gripper at ear level, positioned over the ear. `dir: \"back\"` (gripper tip pointing towards robot's body/ear). `z: 70` (ear level), `y: 28` (close to head, right side), `x: 25` (aligned with ear depth). `gripper_orientation: \"vertical\"`. Hold for a significant duration.\n#    *   Subtle Press (Movement 2): A small, slow wrist movement to simulate a subtle \"press\" or adjustment against the ear.\n#    *   Relax (Movement 3): A gentle pull-back, signaling the end of the gesture without returning to a full rest position.\n# 5. Select step types: Two \"pose\" steps for precise positioning and holding, and three \"movement\" steps for dynamic transitions and subtle actions. Vary speeds for naturalness."
+  },
+  {
+    "cue": "Open both arms wide outward (Welcome)",
+    "description": "The robot extends its arm from a neutral forward position, sweeping it wide outward and slightly upward as if to embrace or welcome, concluding with a full extension and a brief hold.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": 40,
+                "z": 20
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20
+              },
+              "speed": 1.8,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 54,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:54:52",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts from a relatively neutral, slightly forward position. It then sweeps its arm outward and slightly upward, as if embracing someone or presenting something. The gripper should appear open, like an open palm. The motion should be deliberate and welcoming.\n# 2. Identify key joints: Shoulder for the primary outward sweep and upward lift. Elbow for extending the arm and fine-tuning the reach. Wrist orientation (gripper) is important for conveying \"openness.\"\n# 3. Decompose into phases:\n#    - Setup: Initial pose with the arm slightly forward and gripper ready to open.\n#    - Core Action: Primary outward and upward sweep driven by the shoulder.\n#    - Follow-through: Final extension by the elbow to complete the wide-open gesture, holding the pose briefly.\n# 4. Map to 3D space:\n#    - Initial Pose: Chest/heart level (z: 45), slightly forward (x: 55), centered (y: 50). Gripper pointing \"front\" with \"horizontal\" orientation to imply an open palm.\n#    - Outward Sweep (Shoulder): Move the arm laterally (increase Y) and slightly lift (increase Z) to create an expansive gesture.\n#    - Final Extension (Elbow): Extend the elbow to push the hand further outwards, completing the open arm gesture.\n# 5. Select step types:\n#    - \"pose\" for the initial setup.\n#    - Two \"movement\" steps to clearly separate the shoulder sweep from the elbow extension, allowing for distinct speeds and a clear, composed finish.\n#\n# Constraints Check:\n# - Begins with \"pose\": Yes.\n# - \"dir\" carefully chosen: \"front\" with \"horizontal\" gripper for open, welcoming hand.\n# - x, y, z specified as needed: Yes, for initial pose.\n# - gripper_orientation only when meaningful: Yes, \"horizontal\" is crucial for \"open palm\".\n# - hold_time=0 on initial pose: Yes, for smooth transition.\n# - No \"return to rest\": Yes, ends at the expressive peak.\n# - No filler steps: Yes.\n# - Vary speed: Yes, initial pose, shoulder movement, and elbow movement have different speeds/hold_times.\n# - Sufficiently rich (2-7 steps): 3 steps."
+  },
+  {
+    "cue": "Stretch both arms upward (Relief / Stretch)",
+    "description": "The robot extends its single arm broadly upwards, reaching high and slightly to the side to convey the feeling of a wide, full-body stretch for relief. It holds at the peak, then settles gently.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 40
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 45,
+                "y": -15
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow-wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "z": 10
+              },
+              "speed": 1.8,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 0.7,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 10
+              },
+              "speed": 0.6,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 55,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:24:40",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot starts from a neutral, slightly lowered position. It then extends its single arm broadly upwards, reaching high and slightly to the side to convey the feeling of a wide, full-body stretch and relief. It holds at the peak of the stretch, then settles gently.\n# 2. Identify key joints:\n#    - Shoulder: Primary driver for raising the arm to a high position and contributing to the \"breadth\" of the stretch.\n#    - Elbow: Extends the arm to make it straight.\n#    - Wrist: Orients the gripper (hand) upward at the peak of the stretch.\n# 3. Decompose into phases:\n#    - Setup: Start from a relaxed, neutral forward-facing pose, ready to initiate the stretch. (Initial pose with hold_time: 0)\n#    - Core Action (Upward Stretch):\n#        - Lift the arm forcefully upwards and slightly laterally (shoulder movement).\n#        - Straighten the arm fully and orient the gripper to point upwards (elbow and wrist movement).\n#        - Hold this extended position to emphasize the stretch.\n#    - Follow-through: A subtle relaxation or gentle sway after the main stretch, signifying release.\n# 4. Map to 3D space:\n#    - Initial Pose: Near stomach/chest level (z: 40-50), mid-depth (x: 50), center (y: 50). Gripper pointing front.\n#    - Peak Stretch: Above head (z: 85-95), slightly forward (x: 40-50), slightly off-center to one side (y: 35-45) to convey breadth. Gripper pointing up.\n# 5. Select step types and parameters:\n#    - Step 1: Initial pose (type: \"pose\"). `dir: \"front\"`, `x: 50`, `y: 50`, `z: 40`. `hold_time: 0`.\n#    - Step 2: Main upward lift (type: \"movement\", joint: \"shoulder\"). Raise high and slightly outwards. Fast.\n#    - Step 3: Arm extension and gripper orientation (type: \"movement\", joint: \"elbow-wrist\"). Extend arm, point gripper up, hold the stretch. Deliberate speed.\n#    - Step 4: Gentle relaxation after peak (type: \"movement\", joint: \"shoulder\"). Small downward movement. Slow.\n#    - Step 5: Final slight lateral drift/sway (type: \"movement\", joint: \"wrist\"). Slow, settling."
+  },
+  {
+    "cue": "Bring one hand to forehead in salute position (Salute)",
+    "description": "The robot quickly raises its arm from a neutral, mid-height position to its forehead, holding the gripper in a flat, horizontal orientation to signify a salute.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "z": 50,
+            "x": 35,
+            "y": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 30,
+                "y": -15,
+                "x": 45
+              },
+              "speed": 10.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 56,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:59:27",
+    "reasoning": "# Motion Planning:\n# 1. Visualize: The robot will raise one arm (right arm for a human equivalent) quickly to the forehead, with the 'hand' (gripper) flat.\n# 2. Identify key joints: Shoulder for lifting and lateral movement, Elbow for bending to bring the hand to the face.\n# 3. Decompose into phases:\n#    - Setup: Start from a neutral, slightly forward, mid-height position. This needs an initial pose. `hold_time: 0` for a smooth start.\n#    - Core Action: Rapidly move the arm from the setup position to the forehead. This will be a single, fast movement step.\n#    - Hold: Briefly hold the salute position. This will be part of the core action's `hold_time`.\n# 4. Map to 3D space:\n#    - Initial Pose:\n#      - dir: \"front\" (gripper points forward)\n#      - z: 50 (mid-chest/stomach height)\n#      - x: 35 (slightly forward)\n#      - y: 50 (center)\n#      - gripper_orientation: \"horizontal\" (palm down/flat, crucial for salute)\n#    - Target Salute Position (achieved via joint movement):\n#      - Hand roughly at temple/forehead level (z: 75-85, x: 20-40, y: 30-45 for right side)\n#      - This pose is not explicit, but the `movement` step will drive the arm to this approximate location.\n# 5. Select step types:\n#    - First step: \"pose\" for initial positioning and gripper orientation.\n#    - Second step: \"movement\" to define the rapid joint rotation to the salute position and hold. The example specifies `repetition: 1, speed: 10, hold_time: 0.8` for a salute.\n# 6. Refine parameters:\n#    - Initial pose speed: 1.0 (moderate to establish starting point).\n#    - Movement speed: 10.0 (fast, crisp salute).\n#    - Movement hold_time: 0.8 (brief, clear hold).\n#    - Joint: \"shoulder-elbow\" for coordinated lift, lateral movement, and bend.\n#    - Degrees: Estimate joint changes: `z` positive for shoulder to lift, `y` negative for shoulder to move right, `x` positive for elbow to bend."
+  },
+  {
+    "cue": "Place one hand above eyebrows as visor and look far (Searching distance)",
+    "description": "The robot moves its arm to position its hand above its forehead, forming a visor, then performs a subtle lateral scanning motion as if searching the horizon, and holds the final pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 40
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 30,
+            "y": 65,
+            "z": 75,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 2.0,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": -15,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": 30,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": -15,
+          "speed": 1.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 30,
+            "y": 65,
+            "z": 75,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 0.5,
+          "hold_time": 1.5
+        }
+      }
+    ],
+    "idx": 57,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-18 21:59:51",
+    "reasoning": "# Reasoning:\n# 1. Visualize: The robot will begin from a neutral, slightly extended position. It will then raise its arm, bending at the elbow to position its hand horizontally above its forehead, mimicking a visor. From this 'visor' position, it will perform a subtle side-to-side scanning motion, and finally hold the pose as if looking intently into the distance.\n# 2. Identify key joints:\n#    - Shoulder: For raising the arm and broad lateral scanning movements.\n#    - Elbow: For bending the arm to bring the hand close to the face.\n#    - Wrist: To ensure the hand maintains a horizontal \"visor\" orientation.\n# 3. Decompose into phases:\n#    - Phase 1 (Setup): Move the arm from a ready position to the \"visor\" pose above the forehead.\n#    - Phase 2 (Core Action): Execute a lateral scanning motion while maintaining the visor pose.\n#    - Phase 3 (Follow-through): Hold the final \"searching\" pose to convey a sustained action.\n# 4. Map to 3D space:\n#    - Initial pose: A mid-level, slightly forward position (`z: 40, x: 50, y: 50, dir: \"front\"`). This is a transitional starting point (`hold_time: 0`).\n#    - Visor pose: Hand brought to forehead/eye level (`z: 75`), slightly closer to the body (`x: 30`), and to one side (e.g., `y: 65` for the robot's right side). The gripper tip faces `front`, and the opening is `horizontal` to act as a visor.\n#    - Scanning motion: Small `y`-axis movements using the `shoulder` joint to sweep the arm horizontally. A total sweep of about 30 degrees (e.g., -15 then +30 then -15) for a clear, observable scan.\n#    - Final hold: The visor pose with a significant `hold_time` to emphasize the 'looking far' aspect.\n# Step-by-step plan:\n# 1. Initial Pose: Set a neutral, slightly forward starting point for a smooth transition. `hold_time: 0`.\n# 2. Visor Pose: Move the arm to the forehead, with the hand flat and horizontal, forming the visor. This is a deliberate, moderate-speed movement.\n# 3. Path (Scan Left): Perform a small linear sweep of the shoulder to the left (decreasing `y` for robot's right arm).\n# 4. Path (Scan Right): Sweep the shoulder back across the center and slightly to the right (increasing `y`).\n# 5. Path (Return to Center): Move the shoulder back to the approximate center of the scan range.\n# 6. Final Hold Pose: Hold the visor position with a slight pause to convey sustained searching."
+  }
+]

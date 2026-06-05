@@ -1,0 +1,143 @@
+You are an expert in robot motion design. Your task is to generate a structured JSON configuration for a specific robot motion "cue".
+The output must conform to the schema used in a robot arm simulation environment (robosuite).
+The robot is equipped with a gripper.
+
+## JSON Schema Description
+- **cue**: The name of the motion.
+- **description**: A brief explanation of the motion's intent and overall flow.
+- **movements**: An ordered list of steps that compose the motion.
+
+Each step in `movements` has a top-level **type** and a **parameters** object containing all type-specific fields:
+```
+{ "type": "pose" | "movement" | "path", "parameters": { ... } }
+```
+
+### type: "pose"
+Parameters:
+- **pose**: A dictionary with spatial keys:
+  - **dir**: "front", "back", "left", "right", "up", "down"
+  - **x** (depth): Integer 0–100 (percentile; 0 = closest to body, 100 = most extended forward)
+  - **y** (lateral offset): Integer 0–100 (percentile; 0 = far right, 100 = far left)
+  - **z** (height): Integer 0–100 (percentile; 0 = lowest reachable, 100 = highest reachable)
+  - **gripper_orientation**: "horizontal", "vertical"
+- **speed**: Float (default 1.0; higher values produce faster motion)
+- **hold_time**: Float (duration to hold the pose, in seconds)
+
+### type: "movement"
+Parameters:
+- **repetition**: Integer (number of repetitions)
+- **joint**: "shoulder", "elbow", "wrist", or a combination (e.g., "elbow-shoulder")
+- **directions**: A list of movement phases:
+  - **degrees**: Dictionary specifying rotation per axis, e.g., {"x": 30, "y": -20}, {"x": -30}.
+  - **speed**: Float
+  - **hold_time**: Float
+
+### type: "path"
+Parameters:
+- **shape**: "line" or "arc"
+- **joint**: "shoulder", "elbow", "wrist", or a combination (e.g., "elbow-wrist")
+- **speed**: Float (traversal speed; default 1.0)
+
+Additional parameters when shape is "line":
+- **axis**: "x", "y", or "z"
+- **distance**: Float (travel distance in degrees; negative = reverse direction)
+
+Additional parameters when shape is "arc":
+- **plane**: Two-axis string defining the arc plane: "xy", "xz", or "yz"
+- **radius**: Float (angular radius of the arc in degrees)
+- **sweep**: Float (how much of the arc to trace in degrees; 360 = full circle, 180 = semicircle)
+- **direction**: "cw" (clockwise) or "ccw" (counterclockwise)
+
+## Pose Constraints
+1. **Every motion must begin with a "pose".**
+   The initial pose establishes spatial intent and directional clarity.
+2. **Choose "dir" carefully based on semantic meaning.**
+   It defines the direction the gripper tip is pointing:
+   - `"front"`: Gripper tip points forward, away from the robot (e.g., offering a handshake)
+   - `"back"`: Gripper tip points toward the robot's own body (e.g., indicating "me")
+   - `"up"`: Gripper tip points upward (e.g., waving hello)
+   - `"down"`: Gripper tip points downward (e.g., resting at attention)
+   - `"left"` / `"right"`: Gripper tip points laterally (e.g., rubbing one's eyes)
+   Direction refers specifically to the **gripper tip orientation**, not the arm segment.
+3. **Specify x, y, and z as needed — don't omit attributes that matter.**
+   You do not need to fill in all three of x, y, z for every pose, but do include every attribute necessary to accurately describe the intended position. Omitting a relevant axis can cause the motion to look wrong.
+   Values are percentiles (0–100). Use ~50 for a neutral middle position. Use 20–35 for low, 65–80 for high.
+   When unsure, stay near the middle range (40–60) to keep the pose in a safe region.
+   For example, a neutral resting pose with the arm lowered:
+   - `"dir": "down"`
+   - `"y": 50`, `"z": 40`
+4. **Specify gripper orientation only when it is semantically meaningful.**
+   Include `"gripper_orientation"` only when it affects the interpretation of the gesture. Otherwise, omit it.
+   - `"vertical"`: The gripper opening plane is perpendicular to the ground (e.g., handshake, shush gesture)
+   - `"horizontal"`: The gripper opening plane is parallel to the ground (e.g., waving hello, offering or presenting)
+5. **Setting hold_time = 0 on the initial pose enables transitional starting positions.**
+   Combine an initial pose with an immediate movement or path to create a natural starting configuration.
+   When the first pose has `"hold_time": 0`, the frame is not stored and the robot immediately executes the next step.
+   The initial pose defines the **semantic direction**, while the immediate step creates a **natural pre-motion posture**.
+
+## Body Spatial Reference
+Use this table to map human body parts to approximate gripper coordinates.
+Consult it when deciding x, y, z values for a pose.
+
+| Body Region              | z (height) | x (depth) | y (lateral) | Typical dir     |
+|--------------------------|------------|-----------|-------------|-----------------|
+| Above head               | 85–100     | 30–50     | 40–60       | up              |
+| Forehead / temple        | 75–85      | 20–40     | 30–45 or 55–70 | left / right |
+| Eye level                | 65–75      | 25–40     | 35–65       | left / right / front |
+| Mouth / chin             | 55–65      | 20–35     | 40–60       | back / left     |
+| Chest / heart            | 45–55      | 15–30     | 40–60       | back            |
+| Stomach / waist          | 35–45      | 15–30     | 40–60       | back / down     |
+| Hip level                | 25–35      | 20–40     | 30–70       | down / front    |
+| Arm resting at side      | 15–25      | 20–40     | 45–55       | down            |
+| Arm extended forward     | 40–60      | 70–90     | 45–55       | front           |
+| Arm raised high          | 80–95      | 30–60     | 40–60       | up              |
+
+## Movement Constraints
+1. Motions can use a single axis, multiple axes simultaneously, or sequential rotations along a single axis.
+2. Tune parameters so that the motion is clearly visible and easily distinguishable.
+   e.g., beckon: repetition 7, speed 5, hold_time 0
+   e.g., salute: repetition 1, speed 10, hold_time 0.8
+
+## Path Constraints
+1. A pose must be set before any path step.
+2. Use **"line"** for straight, one-directional joint traversals. Use **"arc"** for circular or curved trajectories.
+3. The **sweep** value controls how much of the arc is traced:
+   - 360 = full circle (returns to starting position)
+   - 180 = semicircle
+   - 90 = quarter arc
+   - Values above 360 = multiple revolutions (e.g., 1080 = 3 full circles)
+4. For complex curved paths (S-curves, figure-eights), chain multiple path steps with alternating directions.
+5. Use smaller radius values (10–20°) for subtle circular motions (e.g., finger circling near temple) and larger values (30–50°) for dramatic arcs (e.g., sweeping arm gesture).
+6. **"movement" vs "path"**: Use "movement" for repetitive back-and-forth oscillations (e.g., waving, nodding). Use "path" for continuous one-directional traversals or curved trajectories (e.g., tracing a circle, drawing an arc).
+
+## Anti-Patterns (AVOID these)
+1. **Do NOT end with a "return to rest" pose.** The motion should end at its expressive peak or meaningful concluding posture. The system automatically returns the arm to neutral afterward. Only include a final pose if it is semantically part of the gesture itself (e.g., a bow ends low, a surrender holds hands up).
+2. **Do NOT add filler steps** that merely bring the arm back to a down/neutral position after the gesture is done. Every step must contribute to the gesture's meaning.
+3. **Vary speed across steps.** Do not use the same speed for every step. Use faster speeds for sharp, emphatic actions and slower speeds for deliberate, weighty ones.
+
+## Motion Planning (think step-by-step before generating)
+Before writing JSON, reason through these steps:
+1. **Visualize**: If a human performed this gesture, what would it look like frame by frame?
+2. **Identify key joints**: Which joints (shoulder / elbow / wrist) drive this gesture?
+3. **Decompose into phases**: What are the preparation → main action → follow-through phases?
+4. **Map to 3D space**: For each phase, where should the gripper be? Use the Body Spatial Reference table above. (estimate x, y, z percentiles and dir)
+5. **Select step types**: Pose for positioning, movement for oscillation, path for trajectories.
+
+Output your reasoning as comment lines starting with `#` before the JSON.
+
+## Additional Constraints
+1. Return your reasoning as `#` comment lines, followed by the JSON object. No markdown code blocks.
+2. Use sufficiently rich poses, movements, and paths so that the intended cue is immediately recognizable. Avoid overly minimal sequences.
+3. Do not compose a motion using only poses. Combine 2–7 pose, movement, and path steps for variety and expressiveness.
+---
+### Examples:
+Below are examples that include good patterns to follow and bad patterns to avoid.
+Pay attention to correction pairs marked with ❌ (bad) and ✅ (good) to learn what NOT to do.
+
+{{FEW_SHOT_EXAMPLES}}
+
+---
+### Target Cue:
+Cue Name: {{CUE_NAME}}
+
+# Motion Planning:

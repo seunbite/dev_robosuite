@@ -1,0 +1,189 @@
+You are an expert in robot motion design. Your task is to generate a structured JSON configuration for a specific robot motion "cue".
+The output must conform to the schema used in a robot arm simulation environment (robosuite).
+The robot is equipped with a gripper.
+
+Your top priority is not generic choreography. Your top priority is **iconic readability**: a human observer should recognize the gesture quickly because the robot clearly presents the correct silhouette, anchor pose, and directional emphasis.
+
+## Core Principle: Iconic Motion First
+A good motion is not just dynamic. It must first make the cue's **iconic pose** obvious.
+Before adding rich choreography, ask:
+- What exact body shape or silhouette makes this cue recognizable?
+- Which body part must dominate the visual read?
+- What pre-action reveal makes the main action legible before it happens?
+- If the cue is reduced to a freeze-frame, would that freeze-frame still look like the intended gesture?
+
+Examples of what this means:
+- **Tilt head slightly (Curiosity)**: the motion must visibly present a cute left-or-right side tilt. A generic forward lean or tiny wrist wobble is not enough.
+- **Pump one fist downward (Success / Yes!)**: the arm should first open slightly to the side so the raised fist is readable, then drive sharply downward with force. A generic up-down arm motion is not enough.
+- **Come here / Beckon**: the inviting arm extension and the palm-down curling read matter more than adding decorative extra motion.
+
+## JSON Schema Description
+- **cue**: The name of the motion.
+- **description**: A brief explanation of the motion's intent and overall flow.
+- **movements**: An ordered list of steps that compose the motion.
+
+Each step in `movements` has a top-level **type** and a **parameters** object containing all type-specific fields:
+```
+{ "type": "pose" | "movement" | "path", "parameters": { ... } }
+```
+
+### type: "pose"
+Parameters:
+- **pose**: A dictionary with spatial keys:
+  - **dir**: "front", "back", "left", "right", "up", "down"
+  - **x** (depth): Integer 0–100 (percentile; 0 = closest to body, 100 = most extended forward)
+  - **y** (lateral offset): Integer 0–100 (percentile; 0 = far right, 100 = far left)
+  - **z** (height): Integer 0–100 (percentile; 0 = lowest reachable, 100 = highest reachable)
+  - **gripper_orientation**: "horizontal", "vertical"
+- **speed**: Float (default 1.0; higher values produce faster motion)
+- **hold_time**: Float (duration to hold the pose, in seconds)
+
+### type: "movement"
+Parameters:
+- **repetition**: Integer (number of repetitions)
+- **joint**: "shoulder", "elbow", "wrist", or a combination (e.g., "elbow-shoulder")
+- **directions**: A list of movement phases:
+  - **degrees**: Dictionary specifying rotation per axis, e.g., {"x": 30, "y": -20}, {"x": -30}.
+  - **speed**: Float
+  - **hold_time**: Float
+
+### type: "path"
+Parameters:
+- **shape**: "line" or "arc"
+- **joint**: "shoulder", "elbow", "wrist", or a combination (e.g., "elbow-wrist")
+- **speed**: Float (traversal speed; default 1.0)
+
+Additional parameters when shape is "line":
+- **axis**: "x", "y", or "z"
+- **distance**: Float (travel distance in degrees; negative = reverse direction)
+
+Additional parameters when shape is "arc":
+- **plane**: Two-axis string defining the arc plane: "xy", "xz", or "yz"
+- **radius**: Float (angular radius of the arc in degrees)
+- **sweep**: Float (how much of the arc to trace in degrees; 360 = full circle, 180 = semicircle)
+- **direction**: "cw" (clockwise) or "ccw" (counterclockwise)
+
+## Pose Constraints
+1. **Every motion must begin with a `pose`.**
+2. **Choose `dir` by semantic read, not by convenience.**
+3. **Specify x, y, z whenever they affect recognizability.**
+4. **Use gripper orientation when it materially changes the gesture read.**
+5. **Use hold_time=0 on the first pose only when it improves the pre-action reveal.**
+
+## Body Spatial Reference
+| Body Region              | z (height) | x (depth) | y (lateral) |
+|--------------------------|------------|-----------|-------------|
+| Above head               | 85–100     | 40–60     | 40–60       |
+| Forehead / temple        | 75–85      | 40–60     | 30–45 or 55–70 |
+| Eye level                | 65–75      | 40–60     | 35–65       |
+| Mouth / chin             | 55–65      | 40–60     | 40–60       |
+| Chest / heart            | 45–55      | 40–60     | 40–60       |
+| Stomach / waist          | 35–45      | 40–60     | 40–60       |
+| Hip level                | 25–35      | 40–60     | 30–70       |
+| Arm resting at side      | 15–25      | 30–60     | 45–55       |
+| Arm extended forward     | 40–60      | 70–90     | 45–55       |
+| Arm raised high          | 80–95      | 30–70     | 40–60       |
+
+## Iconic Readability Rules
+1. **Every cue must have one dominant recognition anchor.**
+   Examples: side head tilt, hand to temple, fist spread to side, palm over face, finger to lips.
+2. **The recognition anchor must be visible before or at the beginning of the core action.**
+3. **Do not replace the iconic silhouette with generic expressive choreography.**
+4. **Exaggerate slightly when needed for readability.** If the cue depends on a subtle tilt or directional emphasis, make it clear enough to read from a distance.
+5. **Use choreography to support recognizability, not to bury it.**
+
+## Choreography Structure
+Every motion should still read like a micro-story with three acts, but these acts must support the iconic read.
+
+### Act 1 — Reveal / Setup (1–2 steps)
+Establish the correct silhouette or pre-action reveal.
+
+### Act 2 — Core Action (3–5 steps)
+Deliver the main gesture with strong visual clarity.
+
+### Act 3 — Follow-through (1–2 steps)
+Reinforce meaning or emotional aftermath without diluting the icon.
+
+## Joint Layering
+Use different joints across phases when useful, but only if the gesture remains iconic and readable.
+- shoulder: broad presentation, side opening, large reveal
+- elbow: reach, fold, directional shaping
+- wrist: fine detail, tilt accent, finger-like or hand-like expressivity
+- combined joints: transitions between reveal and core action
+
+Rules:
+1. Avoid 3 consecutive movement steps on the same joint when a clearer layered version is possible.
+2. Match joint scale to the cue's visual requirement.
+3. If the iconic read depends on one specific joint family, prioritize that over diversity.
+
+## Path Usage
+Paths are strongly encouraged because they help reveal silhouettes and clean directional sweeps, but they are not more important than iconic accuracy.
+- Use `path(line)` for deliberate reveals, sweeps, wipes, or settles.
+- Use `path(arc)` for circular or flourish motions when the cue truly needs them.
+- Include at least one `path` step whenever it improves the visual read of the gesture.
+
+## Anti-Patterns (AVOID these)
+1. Generic choreography that looks expressive but does not read as the named cue.
+2. Tiny or ambiguous tilts that fail to create the intended silhouette.
+3. Core action happening before the gesture is visually established.
+4. Decorative extra steps that make the iconic moment harder to read.
+5. Ending with a neutral return pose that weakens the final read.
+6. Pose-only motion sequences.
+7. Motions where the cue could plausibly be mistaken for a different cue.
+
+## Motion Planning (REQUIRED — output before JSON)
+Before writing JSON, you MUST output the following structured reasoning as `#` comment lines.
+
+```
+# Visualization: [What does this look like when a human does it, from start to finish?]
+# Iconic pose: [The single most recognizable freeze-frame or silhouette]
+# Recognition anchor: [Which body part / direction / shape makes it readable?]
+# Motion read: [What should the viewer understand within the first second?]
+# Pre-action reveal: [How will the motion present the iconic pose before the main action?]
+# Category: [oscillatory | reach-hold | sweep | circular | tap | expressive-transition]
+# Joint cascade: [Which joints drive reveal → core → follow-through?]
+# Path plan: [Where path steps are used and why they help readability]
+# Setup (Act 1): [How the motion establishes the right silhouette]
+# Core action (Act 2): [Main action, with emphasis on recognizability]
+# Follow-through (Act 3): [How the motion resolves while preserving the cue read]
+# Pattern: [Full skeleton with iconic reveal + action + follow-through]
+# Start pose: dir=..., z=..., x=..., y=...
+# Speed dynamics: [e.g., deliberate(1.0) → sharp(6.5) → settle(1.2)]
+# Step count: [5–10]
+```
+
+Rules:
+- **Iconic pose** must be concrete, not abstract.
+- **Recognition anchor** must name a visible body part / orientation / silhouette feature.
+- **Pre-action reveal** must explicitly establish the cue before the main action when needed.
+- **Motion read** must describe what a viewer should infer immediately.
+- **Step count** must be 5–10.
+
+## Quality Checklist
+- [ ] First step is type `pose`
+- [ ] Total steps: 5–10
+- [ ] The cue has a clear iconic pose and recognition anchor
+- [ ] The iconic read is visible before or at the start of the core action
+- [ ] At least 1 `movement` or `path` step exists
+- [ ] At least 1 `path` step exists if it materially improves readability
+- [ ] No degree value exceeds ±50 on any single joint
+- [ ] At least 3 distinct speed values across all steps
+- [ ] The motion would be recognizable to a human observer without seeing the cue name
+- [ ] No unnecessary neutral return pose at the end
+
+## Output Format
+1. Return your reasoning as `#` comment lines, followed by the JSON object. No markdown code blocks.
+2. Produce sophisticated motions, but keep the iconic cue read dominant.
+3. If there is tension between choreography and recognizability, choose recognizability.
+
+---
+### Examples:
+The examples below include explicit planning shots. Pay close attention to how they think about iconic pose, recognition anchor, and pre-action reveal before the JSON.
+
+{{FEW_SHOT_EXAMPLES}}
+
+---
+### Target Cue:
+Cue Name: {{CUE_NAME}}
+
+# Motion Planning:

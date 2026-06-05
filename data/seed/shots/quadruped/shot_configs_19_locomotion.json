@@ -1,0 +1,478 @@
+[
+  {
+    "idx": 0,
+    "group": "iconic",
+    "cue": "wave_hi",
+    "cue_text": "Wave one hand side to side (Hello / Hi)",
+    "description": "The quadruped keeps the front paw in the up pose and adds only a tiny hip-abduction accent; unspecified joints are treated as zero delta from the pose baseline.",
+    "reasoning": "# Q1: The wave must stay anchored to the up silhouette with no branch jump.\n# Q2: winner=three-leg front + hand=up anchor.\n# Q3: winner=single explicit joint command hip.y [2,-2]; retrieval infers pose baseline joints when base_rad is omitted.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.45,
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "front_height": "high",
+            "back_height": "mid",
+            "three_legs": true,
+            "three_leg_pose": {
+              "hand_position": "up"
+            }
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 1.8,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "hip",
+                "degrees": {
+                  "y": [
+                    -20,
+                    20
+                  ]
+                }
+              }
+            ],
+            "repetition": 3,
+            "speed": 0.75
+          }
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "handmade-locomotion-v2",
+    "time": "2026-04-16 02:12:37"
+  },
+  {
+    "idx": 1,
+    "group": "iconic",
+    "cue": "handshake_offer",
+    "cue_text": "Extend one hand vertically forward as if offering a handshake (Asking for handshake)",
+    "description": "The quadruped raises one front paw in a forward-folded shape and extends the leg forward through a small thigh/knee x motion like a handshake offer.",
+    "reasoning": "# Q1: A handshake should read as an offering reach, not a wave.\n# Q2: winner=three-leg pose with hand=front keeps the paw aimed to partner.\n# Q3: winner=joint-space thigh/knee x forward so the foreleg extends without IK branch changes.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.45,
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "front_height": "high",
+            "back_height": "mid",
+            "three_legs": true,
+            "three_leg_pose": {
+              "hand_position": "front"
+            }
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 1.15,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "thigh",
+                "degrees": {
+                  "x": [
+                    0,
+                    10
+                  ]
+                }
+              },
+              {
+                "joint": "knee",
+                "degrees": {
+                  "x": [
+                    0,
+                    10
+                  ]
+                },
+                "speed": 0.9
+              }
+            ],
+            "repetition": 1,
+            "speed": 1.2
+          }
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "handmade-locomotion-v2",
+    "time": "2026-04-16 02:12:37"
+  },
+  {
+    "idx": 2,
+    "group": "iconic",
+    "cue": "highfive_invite",
+    "cue_text": "Raise one palm upward as if inviting a high five (Asking for high five)",
+    "description": "The quadruped pops a front paw upward with a back-folded knee and an upward-facing paw, then accents the paw higher for a high-five invitation.",
+    "reasoning": "# Q1: A high-five needs an obviously raised target, not just a forward reach.\n# Q2: winner=three-leg pose with knee=back and hand=up because it makes the lifted paw look presented and open.\n# Q3: winner=hand+z with slight knee+z assist because the cue is about raising the target paw higher.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.4,
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "front_height": "high",
+            "back_height": "mid",
+            "three_legs": true,
+            "three_leg_pose": {
+              "hand_position": "up"
+            }
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 0.95,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "thigh",
+                "degrees": {
+                  "x": [
+                    -18,
+                    18
+                  ]
+                }
+              },
+              {
+                "joint": "knee",
+                "degrees": {
+                  "x": [
+                    -12,
+                    12
+                  ]
+                },
+                "speed": 0.8
+              }
+            ],
+            "repetition": 1,
+            "speed": 1.2
+          }
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "handmade-locomotion-v2",
+    "time": "2026-04-16 02:12:37"
+  },
+  {
+    "idx": 3,
+    "group": "iconic",
+    "cue": "beckon_come_here",
+    "cue_text": "Turn palm downward and curl fingers inward repeatedly (Come here / Beckon)",
+    "description": "The quadruped lifts one front paw, tucks the knee slightly forward, and repeatedly curls the paw back toward itself in a beckoning motion.",
+    "reasoning": "# Q1: A beckon needs repeated inward curls once the paw is already visible.\n# Q2: winner=three-leg pose with knee=front and hand=parallel because the lifted paw starts in a communicative position.\n# Q3: winner=hand-x with knee-x assistance because the motion should feel like repeated pulling inward.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.45,
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "front_height": "high",
+            "back_height": "mid",
+            "three_legs": true,
+            "three_leg_pose": {
+              "hand_position": "front"
+            }
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 1.45,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "thigh",
+                "degrees": {
+                  "x": [
+                    -22,
+                    22
+                  ]
+                }
+              },
+              {
+                "joint": "knee",
+                "degrees": {
+                  "x": [
+                    -14,
+                    14
+                  ]
+                },
+                "speed": 1.1
+              }
+            ],
+            "repetition": 3,
+            "speed": 1.6
+          }
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "handmade-locomotion-v2",
+    "time": "2026-04-16 02:12:37"
+  },
+  {
+    "idx": 4,
+    "group": "contextual",
+    "cue": "bow_greeting",
+    "cue_text": "Bow slightly from the waist (Respect / Greeting)",
+    "description": "The quadruped lowers its front in a respectful bow and then walks back toward a neutral stance.",
+    "reasoning": "# Q1: Bowing is a body-level motion, so the lifted-leg schema is not needed.\n# Q2: winner=front-low back-high body pose because it reads as a clear bow silhouette.\n# Q3: winner=pose_to_pose with slow forward velocity because the return should look like a polite recovery rather than a teleport.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.5,
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "front_height": "low",
+            "back_height": "high",
+            "three_legs": false
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "shape": "pose_to_pose",
+            "start_pose": {
+              "dir": "front",
+              "front_height": "low",
+              "back_height": "high",
+              "three_legs": false
+            },
+            "end_pose": {
+              "dir": "front",
+              "front_height": "mid",
+              "back_height": "mid",
+              "three_legs": false
+            },
+            "velocity": {
+              "vx": 0.06,
+              "vy": 0.0,
+              "wz": 0.0
+            }
+          }
+        },
+        "duration": 1.8
+      }
+    ],
+    "state": "fewshot",
+    "model": "handmade-locomotion-v2",
+    "time": "2026-04-16 02:12:37"
+  },
+  {
+    "idx": 5,
+    "group": "contextual",
+    "cue": "nod_yes",
+    "cue_text": "Nod head up and down (Yes)",
+    "description": "The quadruped does two short front-body dips from neutral, creating a body-level yes-like nod.",
+    "reasoning": "# Q1: Without a separate head joint, the body dip is the clearest nod analogue.\n# Q2: winner=neutral front-facing body pose because it gives a clean baseline.\n# Q3: winner=two short pose-to-pose cycles because repetition makes the assent readable.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.35,
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "front_height": "mid",
+            "back_height": "mid",
+            "three_legs": false
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "shape": "pose_to_pose",
+            "start_pose": {
+              "dir": "front",
+              "front_height": "mid",
+              "back_height": "mid",
+              "three_legs": false
+            },
+            "end_pose": {
+              "dir": "front",
+              "front_height": "low",
+              "back_height": "high",
+              "three_legs": false
+            },
+            "velocity": {
+              "vx": 0.03,
+              "vy": 0.0,
+              "wz": 0.0
+            }
+          }
+        },
+        "duration": 0.7
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "shape": "pose_to_pose",
+            "start_pose": {
+              "dir": "front",
+              "front_height": "low",
+              "back_height": "high",
+              "three_legs": false
+            },
+            "end_pose": {
+              "dir": "front",
+              "front_height": "mid",
+              "back_height": "mid",
+              "three_legs": false
+            },
+            "velocity": {
+              "vx": 0.03,
+              "vy": 0.0,
+              "wz": 0.0
+            }
+          }
+        },
+        "duration": 0.65
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "shape": "pose_to_pose",
+            "start_pose": {
+              "dir": "front",
+              "front_height": "mid",
+              "back_height": "mid",
+              "three_legs": false
+            },
+            "end_pose": {
+              "dir": "front",
+              "front_height": "low",
+              "back_height": "high",
+              "three_legs": false
+            },
+            "velocity": {
+              "vx": 0.03,
+              "vy": 0.0,
+              "wz": 0.0
+            }
+          }
+        },
+        "duration": 0.7
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "shape": "pose_to_pose",
+            "start_pose": {
+              "dir": "front",
+              "front_height": "low",
+              "back_height": "high",
+              "three_legs": false
+            },
+            "end_pose": {
+              "dir": "front",
+              "front_height": "mid",
+              "back_height": "mid",
+              "three_legs": false
+            },
+            "velocity": {
+              "vx": 0.03,
+              "vy": 0.0,
+              "wz": 0.0
+            }
+          }
+        },
+        "duration": 0.65
+      }
+    ],
+    "state": "fewshot",
+    "model": "handmade-locomotion-v2",
+    "time": "2026-04-16 02:12:37"
+  },
+  {
+    "idx": 9,
+    "group": "contextual",
+    "cue": "show_interest_approach",
+    "cue_text": "The quadruped leans forward with a slightly lowered front and walks a few steps toward the target, showing curiosity.",
+    "description": "The quadruped leans forward with a slightly lowered front and walks a few steps toward the target, showing curiosity.",
+    "reasoning": "# Q1: Approaching with interest means walking forward while keeping a slightly lowered, attentive posture.\n# Q2: winner=P1 four-leg front-low back-mid because the forward lean reads as engaged curiosity. P2 neutral mid+mid lacks intent.\n# Q3: winner=S1 pose then line with positive distance for a clear forward approach. S2 arc would imply circling rather than direct interest.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.4,
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "front_height": "low",
+            "back_height": "mid",
+            "three_legs": false
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "shape": "line",
+            "distance": 0.3,
+            "speed": 0.8
+          }
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "handmade-locomotion-v2",
+    "time": "2026-04-16 02:12:37"
+  },
+  {
+    "idx": 10,
+    "group": "contextual",
+    "cue": "happy_circular_run",
+    "cue_text": "The quadruped sprints in a tight arc, circling happily like an excited dog.",
+    "description": "The quadruped sprints in a tight arc, circling happily like an excited dog.",
+    "reasoning": "# Q1: An excited dog runs in fast tight circles; the body stays neutral and low for stability.\n# Q2: winner=P1 four-leg mid+mid neutral stance because all legs are needed for running. P2 three-leg would topple at speed.\n# Q3: winner=S1 pose then arc with high speed giving a full-circle sprint. S2 pose_to_pose is too slow and stiff.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.3,
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "front_height": "mid",
+            "back_height": "mid",
+            "three_legs": false
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "shape": "arc",
+            "degrees": 360,
+            "speed": 1.5
+          }
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "handmade-locomotion-v2",
+    "time": "2026-04-16 02:12:37"
+  }
+]

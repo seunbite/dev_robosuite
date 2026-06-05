@@ -1,0 +1,553 @@
+{
+  "time": "2026-06-02T14:23:16",
+  "mode": "single_selected_tile",
+  "model": "gemini-2.5-pro",
+  "config_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/manipulator/motion_configs_prompt_v19_sophisticated_ee_pilot100_batch20.json",
+  "tile_dir": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12",
+  "tile_pick_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/verify/pose_tile_pick_by_group.json",
+  "tile_pick": {
+    "back_horizontal": 4,
+    "back_vertical": 5,
+    "down_horizontal": 6,
+    "down_vertical": 2,
+    "front_horizontal": 5,
+    "front_vertical": 3,
+    "left_horizontal": 2,
+    "left_vertical": 3,
+    "right_horizontal": 5,
+    "right_vertical": 4,
+    "up_horizontal": 6,
+    "up_vertical": 2
+  },
+  "selected_tile_dir": null,
+  "total": 20,
+  "results": [
+    {
+      "idx": 31,
+      "cue": "draw_circle_repeat",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose is correctly labeled as dir=front and gripper_orientation=vertical. The end-effector points directly at the viewer, and the jaw-opening line is oriented vertically. This starting pose is excellent for the 'draw_circle_repeat' cue, as it positions the 'pen' to draw a circle directly in front of the viewer in the y-z plane.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, poke forward slightly along the pointing axis (+x) to establish the center of the circle.",
+            "Next, recoil slightly back along the same axis (-x) to create space for the drawing motion.",
+            "Finally, trace two full, clear circles in the y-z plane, likely originating from the wrist or elbow, to convey the 'repeat' action."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 44,
+      "cue": "clarification_request_palm_tilt",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose labels (dir=front, gripper_orientation=horizontal) are not the best fit for the cue or the image. The image itself shows the end-effector pointing predominantly 'up', not 'front'. For a 'clarification request' gesture, which involves turning the palm up, starting with the gripper pointing 'front' with a 'horizontal' orientation (palm sideways) is less natural than starting from a more neutral or downward pose.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "A 'clarification request' or 'palm tilt' gesture is most clearly conveyed by starting from a neutral or resting state and turning the palm up. A starting pose of 'dir=down' with 'gripper_orientation=vertical' (palm facing inward/sideways) provides a neutral starting point. From here, the robot can lift its arm and rotate its wrist into the final 'palm up' questioning pose, making the communicative intent much clearer.",
+          "recommended_movement_plan_after_change": [
+            "Lift the shoulder and elbow to bring the hand up into the gesture space.",
+            "Rotate the wrist to turn the palm face of the gripper to point upwards and slightly towards the user.",
+            "Add a slight shrug motion by lifting the shoulder briefly to emphasize the questioning nature of the gesture."
+          ]
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 46,
+      "cue": "speed_up_circular_cue",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose is correctly labeled as dir=front and gripper_orientation=vertical. The end-effector points directly at the viewer, and the gripper jaws are stacked one above the other. This configuration is excellent for the 'speed_up_circular_cue' because it naturally sets up the initial 'poke' towards the human and allows for the subsequent circular motions to be drawn on a plane directly in front of the viewer, making the gesture very clear.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Initiate with a short, sharp linear push forward from the shoulder to execute the 'poke' for getting attention.",
+            "Immediately begin tracing a small circular path in the yz-plane, primarily using the wrist joint, at a base speed.",
+            "Continue tracing the circular path for at least two more revolutions, with each revolution becoming noticeably faster to convey the sense of increasing urgency as described."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 49,
+      "cue": "polite_decline_small_push",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current labels are a correct assessment of the robot's pose in the image. The end-effector's pointing axis is directed forward (+x) toward the viewer, justifying 'dir=front'. The gripper's jaws are oriented up and down, making the line between the fingertips vertical, which correctly corresponds to 'gripper_orientation=vertical'.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue 'polite_decline_small_push' requires a 'palm forward' gesture to be universally understood as a gentle 'stop' or 'no thank you'. The current 'vertical' orientation presents the side of the gripper (a 'knife-hand' pose), which is not suitable for a pushing motion. Changing to 'horizontal' orientation will present the flat inner surface of the gripper to the viewer, effectively mimicking a palm and making the decline gesture clear and appropriate.",
+          "recommended_movement_plan_after_change": [
+            "First, execute a small, brief recoil by pulling the shoulder back slightly to show hesitation.",
+            "Then, perform the main gesture: a slow, gentle push forward and slightly upward in an arc, keeping the 'palm' facing the viewer.",
+            "Finally, relax the pose slightly by letting the arm drop a small amount, softening the end of the gesture."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 51,
+      "cue": "hesitant_accept_half_reach",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The robot's end-effector is pointing directly towards the viewer, which correctly corresponds to `dir=front`. The gripper's jaws are oriented one above the other, meaning the line connecting the fingertips is vertical. This matches the `gripper_orientation=vertical` label. This pose is a natural starting point for a reaching or accepting gesture towards a person.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Start with a short, quick recoil movement backward (along -x) to signal initial hesitation.",
+            "Execute a partial reach forward (along +x), then pull back again slightly to reinforce the uncertainty.",
+            "Conclude with a final, slower forward extension, stopping short of a full reach to convey the hesitant acceptance."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 52,
+      "cue": "cancel_previous_offer_retract",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The cue 'cancel_previous_offer_retract' describes a motion that begins with extending an offer, then retracting it. The current starting pose label `dir=front` places the hand in the fully offered position, which prevents the initial 'extend' motion from being performed. The gesture should start from a more neutral, retracted pose to be clear. The pose in the image appears to be a neutral/retracted pose, but it is incorrectly labeled as `dir=front`.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The specified gesture sequence begins with an extension to make an offer, followed by a retraction. A starting pose of `dir=front` is already fully extended, making the initial part of the described motion impossible. Changing to a retracted `dir=back` pose allows the robot to perform the full, clear sequence of extend-then-retract to convey the 'cancellation of an offer'.",
+          "recommended_movement_plan_after_change": [
+            "First, smoothly extend the arm forward into an 'offer' position (moving from the neutral `dir=back` toward `dir=front`).",
+            "Then, perform a sharp, fast retraction of the arm, pulling it back past the neutral start point to strongly signal the cancellation.",
+            "Finally, execute a clear, three-part lateral shake with the wrist to reinforce the 'no' or 'nevermind' meaning."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 53,
+      "cue": "conditional_accept_pause_then_reach",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose (dir=front, gripper_orientation=vertical) is correct and highly appropriate. The robot is pointing towards the viewer, ready for interaction. The vertical gripper orientation is well-suited for a subsequent 'accept' or 'take' motion. This starting pose allows for the described sequence of recoil, thoughtful pause, and final reach.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, execute a slight recoil by moving the shoulder back and slightly down to convey hesitation.",
+            "Next, introduce a thoughtful side-tilt by rotating the elbow or wrist, followed by a distinct pause to show consideration.",
+            "Finally, perform a clear, extending forward reach along the x-axis to signify the 'accept' decision."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 54,
+      "cue": "final_decision_down_press",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_down_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The pose labels (dir=down, gripper_orientation=horizontal) accurately describe the image, where the robot's end-effector points straight down with the gripper jaws aligned horizontally. However, this pose represents the *end* of a 'down press' action, not a suitable starting point. To perform a downward press, the robot must begin from a higher position.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue requires a 'decisive downward press'. The current 'down' pose is the destination, not the origin. Starting from a 'front' pose (hand pointing toward the user, palm down) provides the necessary space and context to perform a meaningful downward striking motion.",
+          "recommended_movement_plan_after_change": [
+            "From the corrected forward-pointing pose, perform a small preparatory lift (shoulder z-axis up) to telegraph the action.",
+            "Execute a single, swift downward press by rotating the shoulder down (negative z-axis) and slightly forward (positive x-axis).",
+            "End the motion abruptly and hold the final 'down' position to convey firmness and finality."
+          ]
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 55,
+      "cue": "resume_speaking_pull",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose is correctly labeled. The gripper's pointing axis is directed forward towards the viewer (+x), making `dir=front` accurate. The line between the gripper's fingertips is aligned left-to-right, which results in a `horizontal` orientation when projected onto the plane perpendicular to the pointing axis.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Begin with a subtle, anticipatory upward lift from the shoulder, signaling a preparation to act.",
+            "Execute a crisp, distinct pull of the arm backward toward the robot's torso, primarily using the shoulder joint.",
+            "Conclude with a brief hold in the retracted position to emphasize the gesture's meaning of reclaiming the conversational turn before relaxing."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 56,
+      "cue": "emphasize_point_downbeat",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current labels (dir=front, gripper_orientation=vertical) accurately describe the pose shown in the image. However, this pose is inappropriate for the cue 'emphasize_point_downbeat'. A gesture that emphasizes a point with a 'downward jab' cannot be effectively or clearly performed starting from a pose that points directly forward at the viewer.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue's core action is a 'downward jab'. A starting pose of 'dir=front' is fundamentally misaligned with this action. By changing the direction to 'dir=down', the robot is correctly oriented to perform the required upward preparation and sharp downward emphasis movement along the vertical axis, making the gesture clear and intuitive.",
+          "recommended_movement_plan_after_change": [
+            "From a 'down' pointing pose, perform a small preparatory lift along the +z axis.",
+            "Execute a sharp, forceful downward jab along the -z axis.",
+            "Conclude with a small, quick upward recoil to show the energy of the gesture has dissipated."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 57,
+      "cue": "unsure_response_hand_hover_stop",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The `dir=front` label is correct as the gripper is pointing towards the viewer. However, the `gripper_orientation=horizontal` label is incorrect. In the image, the gripper jaws are oriented one above the other, meaning the line connecting the fingertips is vertical. Therefore, the correct orientation is `vertical`.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The image clearly shows the gripper's jaws are arranged top-and-bottom, like a handshake pose. The 'end line' connecting the fingertips is a vertical line. When projected onto the plane perpendicular to the 'front' pointing axis, this line remains vertical.",
+          "recommended_movement_plan_after_change": [
+            "Begin a hesitant reach forward and slightly up, moving from the shoulder.",
+            "Introduce a rapid, small side-to-side tremor at the wrist to signal faltering.",
+            "Retract the arm slightly and freeze, finalizing the sense of indecision."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 65,
+      "cue": "raise_index_one_moment",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The provided image shows the robot's end effector pointing almost directly upwards (+z), which is a perfect starting pose for a 'raise index finger' or 'one moment' gesture. The gripper orientation, with the jaws side-by-side, is correctly identified as 'horizontal'. However, the current 'dir' label is 'front', which contradicts both the image and the semantic meaning of the cue. The pose itself is good, but the labels are wrong.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue 'raise_index_one_moment' semantically requires the end effector to point upwards to mimic a raised finger. The current label 'dir=front' is incorrect for this cue and does not match the provided image, which clearly shows the gripper pointing up. The recommended 'dir=up' aligns the pose label with the visual evidence and the gesture's meaning.",
+          "recommended_movement_plan_after_change": [
+            "Begin from a slightly lower, more neutral arm position.",
+            "Execute a small, quick downward dip (anticipation) using the shoulder joint along the Z-axis.",
+            "Immediately follow with a crisp, larger upward movement, primarily driven by the shoulder, to reach the peak pose.",
+            "Add a sharp accent at the top of the motion with a small wrist flick to emphasize the 'point' and hold attention."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 73,
+      "cue": "curl_fingers_give_me",
+      "current_dir": "down",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_down_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose is labeled with dir=down and gripper_orientation=vertical. The image confirms the gripper's pointing axis is directed downwards (dir=down). However, the gripper's jaw-opening line appears horizontal ('ㅡ') when projected onto the perpendicular plane (the floor), making the correct label gripper_orientation=horizontal. Regardless of the label accuracy, the pose itself is fundamentally inappropriate for the cue.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The 'curl_fingers_give_me' or beckoning gesture universally requires a palm-up starting position to be understood. The current pose (dir=down) is effectively palm-down, which is semantically opposite to the intended cue. To fix this, the robot must orient its gripper upwards (dir=up) with a horizontal jawline (gripper_orientation=horizontal) to present a clear 'palm-up' gesture.",
+          "recommended_movement_plan_after_change": [
+            "From the corrected palm-up starting pose, perform several sharp wrist flexion movements, curling the gripper towards the robot's body.",
+            "This wrist motion directly simulates the 'beckoning' action described.",
+            "Finish the gesture with a small retraction of the entire arm at the shoulder or elbow to reinforce the 'drawing in' or 'come here' meaning."
+          ]
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 90,
+      "cue": "start_action_forward_snap",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_up_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The robot's arm is pointing straight up (`dir=up`), which is an excellent preparatory pose for a downward and forward slashing motion. This high starting point allows for a clear, large, and energetic gesture. The gripper's jaw-opening line is aligned front-to-back, which, when projected onto the horizontal plane (perpendicular to the 'up' direction), correctly corresponds to `gripper_orientation=vertical`. This hand shape is suitable for a 'karate chop' or slashing action.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, pull the arm back slightly in a sharp anticipatory wind-up.",
+            "Then, execute a fast, decisive slash forward and downward in a diagonal path.",
+            "Punctuate the end of the slash with a crisp downward wrist flick to add emphasis and signal the start."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 92,
+      "cue": "retry_action_reset_circle",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The labels dir=front and gripper_orientation=vertical are correct. The end-effector points directly towards the viewer, and the gripper jaws are aligned vertically. This pose is an excellent starting point for the 'retry' cue, as it places the hand in a neutral, central position, perfectly staged to perform the subsequent swipe and circle motions in the user-facing plane.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Perform a quick, sharp lateral wrist swipe (yaw motion) to signify 'clearing the air'.",
+            "Seamlessly flow from the swipe into tracing a full, smooth circle in the vertical plane (yz-plane) using the shoulder and elbow.",
+            "Ensure the circle is completed crisply at its starting point to visually complete the 'reload' icon metaphor."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 95,
+      "cue": "prepare_action_raise_hold",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current labels 'dir=front' and 'gripper_orientation=horizontal' are incorrect for the pose shown in the image. The robot's end-effector is clearly pointing primarily upwards towards the ceiling, not forwards towards the viewer. The gripper's jaw-opening line is oriented front-to-back, which for an upward-pointing direction, corresponds to a 'vertical' orientation, not 'horizontal'.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The end-effector's pointing axis (wrist to fingertips) is directed predominantly in the +z world direction (ceiling), so the `dir` should be `up`. When the pointing axis is `up`, the reference plane is the horizontal xy-plane. The gripper's jaw-opening line projects onto this plane as a line along the front-back (x-axis) direction, which is defined as a `vertical` orientation for an observer looking down onto that plane.",
+          "recommended_movement_plan_after_change": [
+            "Start with a small, sharp dip by lowering the elbow slightly, creating a preparatory downward beat.",
+            "Reverse into a quick upward and slightly forward lift, raising the arm to a slightly higher point to show anticipation.",
+            "Conclude with a crisp hold in the new, more alert position to signal readiness for the next action."
+          ]
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 97,
+      "cue": "hesitation_pause_hold",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The labels `dir=front` and `gripper_orientation=vertical` are correct. The robot's end-effector is pointing directly forward (+x) towards the viewer, and the line between the gripper jaws is oriented vertically. This pose is an excellent starting point for the 'hesitation' cue, as it represents a neutral, ready state before a tentative forward motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, perform a small preparatory lift (along +z) to signal intent.",
+            "Next, execute a smooth but tentative push forward (along +x) as if starting to reach.",
+            "Finally, perform a short, sharp recoil (along -x) and freeze in place to clearly convey hesitation and a pause."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": []
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 105,
+      "cue": "scale_compress",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_down_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The labels are correct. The robot's end-effector pointing axis (wrist to fingertips) is directed towards the floor, making 'dir=down' appropriate. The jaw-opening line (end line) is oriented left-to-right. When projected onto the plane perpendicular to the 'down' direction (the xy-plane), this line remains a horizontal 'ㅡ'. Therefore, 'gripper_orientation=horizontal' is also correct.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "First, make a subtle preparatory movement by lifting the arm slightly up and forward, as if establishing the top of a larger volume.",
+            "Next, perform the main compression by moving the arm decisively down and back toward the robot's base, conveying the action of reducing scale.",
+            "Conclude with a crisp, small downward flick of the wrist to accent the final, compressed state."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 106,
+      "cue": "uncertainty_wave",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose with dir=up and gripper_orientation=horizontal is perfectly appropriate. It correctly positions the gripper as an 'upward-facing palm', which is the central component of the 'uncertainty wave' gesture described in the cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Initiate with a slight, quick shoulder dip to create a 'shrug' effect, conveying hesitation.",
+            "From the palm-up position, perform a small, hesitant side-to-side wave by rotating the wrist back and forth.",
+            "Conclude by holding the final palm-up pose for a brief moment to let the sense of uncertainty register."
+          ]
+        },
+        "if_not_appropriate": {
+          "recommended_dir": null,
+          "recommended_gripper_orientation": null,
+          "why_change": null,
+          "recommended_movement_plan_after_change": null
+        },
+        "confidence": 0.98
+      }
+    },
+    {
+      "idx": 108,
+      "cue": "interrupt_hard",
+      "current_dir": "down",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/visualize/pose_groups_12/group_down_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current labels are `dir=down` and `gripper_orientation=vertical`. The image shows the end-effector pointing towards the floor, making `dir=down` correct. However, for a 'down' pointing direction, the perpendicular plane is the horizontal (xy) plane. The jaw-opening line of the gripper is oriented along the front-back (x) axis. When projected onto the xy-plane, this line is horizontal (ㅡ). Therefore, the `gripper_orientation` is actually `horizontal`, not `vertical` as labeled.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue 'interrupt_hard' describes an 'explosively thrusts its arm forward, snapping the gripper into a stop sign pose'. A pose pointing down is completely inappropriate for this action, which is inherently forward-facing and assertive. The representative pose should be the final, held 'stop' pose, which is `dir=front` with a `gripper_orientation=horizontal` to mimic a flat, raised palm.",
+          "recommended_movement_plan_after_change": [
+            "Execute a sharp, quick recoil movement, pulling the arm back toward the robot's body to build tension.",
+            "Immediately reverse with an explosive, high-speed thrust forward, extending the arm toward the viewer.",
+            "Abruptly halt the forward motion, snapping into the final 'stop' pose and holding it rigidly to convey authority."
+          ]
+        },
+        "confidence": 0.95
+      }
+    }
+  ]
+}

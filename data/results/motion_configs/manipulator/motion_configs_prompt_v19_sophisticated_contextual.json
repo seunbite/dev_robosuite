@@ -1,0 +1,3270 @@
+[
+  {
+    "idx": 0,
+    "cue": "nod_yes",
+    "description": "The robot performs a preparatory lift (anticipation) before the main down-up motion to create a clear, affirmative nod that is distinct from a bow or a head shake.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 58,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -12
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": 12
+              },
+              "speed": 1.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -4
+              },
+              "speed": 0.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:46:39",
+    "reasoning": "# Q1: A human performs a nod by dipping their chin down and back up, often with a slight preparatory upward lift before the main downbeat.\n# Q2: candidates=P1) front+horizontal+x58,y50,z55, P2) up+vertical+x50,y50,z70; winner=P1 because a neutral, chest-level starting pose provides the clearest baseline for an intentional up-down motion.\n# Q3: options=M1 pose>movement(z repeat), M2 pose>movement(z prep)>movement(z repeat); winner=M2 because adding a preparatory upward lift (anticipation) makes the subsequent affirmative nod feel more natural and deliberate.\n# Q4: confusable_with=[shaking_head_no, bow_slightly]; discriminative_feature=preparatory upward lift; options=C1 upward prep, C2 downward accent, C3 final hold; winner=C1 because the anticipation clearly signals a vertical motion, distinguishing it from the start of a lateral shake or a forward bow."
+  },
+  {
+    "idx": 1,
+    "cue": "shake_head_no",
+    "description": "The robot should first lean forward slightly to establish focus, then perform sharp side-to-side turns to clearly signal negation, differentiating it from a wave or a search.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 70,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -25
+              },
+              "speed": 2.8,
+              "hold_time": 0.05
+            },
+            {
+              "degrees": {
+                "y": 25
+              },
+              "speed": 2.8,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:47:03",
+    "reasoning": "# Q1: A human establishes focus with a slight forward lean before turning their head side-to-side to negate something.\n# Q2: candidates=P1) front+horizontal+x65,y50,z70, P2) up+vertical+x50,y50,z85; winner=P1 because the eye-level starting pose establishes a direct conversational line of sight for the negation.\n# Q3: options=M1 P1>movement(y repeat), M2 P1>movement(x lean)>movement(y repeat)>movement(x recoil); winner=M2 because the anticipatory lean and follow-through recoil frame the side-to-side shake as an intentional, communicative act.\n# Q4: confusable_with=[Wave hello, Look side-to-side (Searching)]; discriminative_feature=preparatory forward lean for focus; options=C1 forward lean before shake, C2 extra sharp staccato shake, C3 a final hold; winner=C1 because the lean establishes direct address, which is unique to a communicative \"no\" and absent in a generic wave or search."
+  },
+  {
+    "idx": 2,
+    "cue": "air_quotes",
+    "description": "The robot should lift its hand to head height and perform two sharp, distinct flicks to clearly signify quotation marks, using a preparatory lift and a staccato rhythm to distinguish from a generic wave or shush.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.8,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -25
+              },
+              "speed": 3.8,
+              "hold_time": 0.15
+            },
+            {
+              "degrees": {
+                "z": 25
+              },
+              "speed": 2.2,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:47:28",
+    "reasoning": "# Q1: A human raises one hand to head level and makes two quick, sharp downward flicks with their fingers to signify a quotation mark.\n# Q2: candidates=P1) front+horizontal+z55, P2) up+vertical+z70; winner=P2 because the high, head-level placement and vertical finger-like gripper orientation are iconic to the gesture and clearly link it to quoted speech.\n# Q3: options=M1) pose>movement(flick)>movement(flick), M2) pose(setup)>pose(high)>movement(2x flick); winner=M2 because staging the motion with a clear setup pose before the high position and core action makes the gesture intentional and separates it from a simple arm raise.\n# Q4: confusable_with=[Shush, Wave one hand side to side]; discriminative_feature=staccato double flick; options=C1) preparatory lift, C2) hold accent between flicks, C3) smooth arc path; winner=C2 because the staccato rhythm created by a brief hold within the repeated flick is the most unique feature of air quotes, distinguishing it from a continuous wave or a static shush."
+  },
+  {
+    "idx": 3,
+    "cue": "self_hug",
+    "description": "The robot conveys self-comfort by bringing one arm across its chest, culminating in a gentle, held squeeze to distinguish the motion from a defensive posture or a simple scratch.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 6
+              },
+              "speed": 0.9,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "right",
+            "x": 45,
+            "y": -20,
+            "z": 55,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15,
+                "z": -5
+              },
+              "speed": 0.8,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:47:47",
+    "reasoning": "# Q1: A human would wrap one arm across their chest, pulling the opposite shoulder inward for comfort.\n# Q2: candidates=P1) front+horizontal+x55,y50,z50, P2) down+vertical+x48,y50,z35; winner=P1 because the neutral chest-level start makes the inward wrapping motion clear and intentional.\n# Q3: options=M1) P1>path(arc xy), M2) P1>movement(lift)>pose(cross)>movement(squeeze); winner=M2 because the multi-phase sequence of anticipation, placement, and a final squeeze best conveys the comforting emotion of a hug over a simple path.\n# Q4: confusable_with=[Scratch opposite shoulder, Cross arms (defensive)]; discriminative_feature=soft, held inward squeeze; options=C1) anticipatory lift, C2) final gentle squeeze, C3) sharp recoil; winner=C2 because the held squeeze is the most direct expression of comfort and distinguishes the cue from a brief scratch or a rigid defensive posture."
+  },
+  {
+    "idx": 4,
+    "cue": "bow_greeting",
+    "description": "The robot performs a respectful bow, distinguished from an apology or slump by a preparatory lift, a controlled forward dip, and a brief, respectful hold at the lowest point.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.1,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 25,
+                "z": -20
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25,
+                "z": 12
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:48:09",
+    "reasoning": "# Q1: A human performs a respectful greeting bow by inclining their upper body forward from a calm, neutral stance, and pausing briefly at the lowest point.\n# Q2: candidates=P1) down+vertical+x48,y50,z35, P2) front+horizontal+x55,y50,z45; winner=P1 because a formal, at-attention starting pose makes the respectful bowing action unambiguous.\n# Q3: options=M1) pose>dip>hold, M2) pose>path(arc), M3) pose>lift(anticipation)>dip; winner=M3 because the preparatory lift makes the bow feel more deliberate and alive, separating it from a robotic or passive motion.\n# Q4: confusable_with=[Deep bow apology, Tiredness slump]; discriminative_feature=controlled speed and hold time; options=C1 fast uncontrolled drop, C2 long penitent hold, C3 short respectful hold; winner=C3 because a brief, deliberate hold at the bottom of the bow clearly signals respect without the deep sorrow of an apology or the sloppiness of a slump."
+  },
+  {
+    "idx": 5,
+    "cue": "tilt_head_curious",
+    "description": "The robot should show a questioning lean rather than a generic pose change, so a small searching motion precedes the final held tilt to signify inquisitive inspection.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 58,
+            "y": 48,
+            "z": 58,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8
+              },
+              "speed": 1.1,
+              "hold_time": 0.08
+            },
+            {
+              "degrees": {
+                "x": -6
+              },
+              "speed": 1.0,
+              "hold_time": 0.08
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8,
+                "y": -10
+              },
+              "speed": 1.3,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "x": -6,
+                "y": 12
+              },
+              "speed": 1.3,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -25
+              },
+              "speed": 0.9,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:48:29",
+    "reasoning": "# Q1: A human would slightly incline their head to one side with a subtle forward lean, holding the pose to show they are processing something.\n# Q2: candidates=P1) front+horizontal+x58,y50,z55, P2) right+vertical+x62,y48,z62; winner=P1 because the neutral front pose provides the best baseline to make a subtle, inquisitive tilt noticeable.\n# Q3: options=M1) pose > search > tilt, M2) pose > arc; winner=M1 because a multi-phase sequence with an initial \"search\" before the tilt feels more like a cognitive process of inquiry than a simple, smooth motion.\n# Q4: confusable_with=[Listening lean, Nodding]; discriminative_feature=small, preparatory search followed by a held lateral tilt; options=C1) preparatory search motion, C2) long final hold, C3) quick tilt; winner=C1 because the anticipation frames the action as a reaction to a stimulus, separating it from a simple nod or a larger listening motion."
+  },
+  {
+    "idx": 6,
+    "cue": "raise_index_one_moment",
+    "description": "The robot should perform a sharp, punctuated lift with an anticipatory dip to clearly signal 'one moment' or 'I have a point', distinguishing it from a generic hand raise.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -6
+              },
+              "speed": 1.5,
+              "hold_time": 0.02
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": 31,
+          "speed": 2.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 2.2,
+              "hold_time": 0.9
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:45:55",
+    "reasoning": "# Q1: A human would sharply raise their hand to eye level with an extended index finger and hold it briefly to emphasize a single point.\n# Q2: candidates=P1) front+horizontal+z45, P2) down+vertical+z35; winner=P1 because a conversational chest-level start makes the sharp, punctuated lift feel like a deliberate interjection rather than a formal gesture from rest.\n# Q3: options=M1) pose>path>hold, M2) pose>dip>path>accent; winner=M2 because adding a preparatory dip (anticipation) and a final sharp accent creates a much more vivid and iconic animation beat for \"one moment\".\n# Q4: confusable_with=[Raise one hand briefly, Wave one hand side to side]; discriminative_feature=sharp vertical punctuation with a hold; options=C1) anticipatory dip before lift, C2) sharp accent at the peak, C3) a slow drift down after the hold; winner=C1 because the preparatory dip most strongly reinforces the intentionality of the gesture, distinguishing it from a casual hand raise and setting up the sharp point."
+  },
+  {
+    "idx": 7,
+    "cue": "shh_gesture",
+    "description": "The robot brings a vertically-oriented hand to its 'mouth' and presses forward slightly with a hold to create a clear and iconic signal for silence.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 1.2,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": 30,
+          "speed": 1.4
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:48:46",
+    "reasoning": "# Q1: A human would bring a vertically oriented index finger up to their lips to signal for silence.\n# Q2: candidates=P1) front+vertical+x60,y50,z45, P2) down+vertical+x48,y50,z35; winner=P1 because a chest-level start provides a direct and unambiguous path to the \"mouth\" area, unlike a lower start which could be confused with other gestures.\n# Q3: options=M1) pose>path(line)>movement(press), M2) pose>path(arc)>hold; winner=M1 because the straight line is more direct and iconic, and the final forward \"press\" movement strongly mimics the human cue of a finger on lips.\n# Q4: confusable_with=[Cover mouth gasp, Rub one eye]; discriminative_feature=final forward press accent; options=C1) preparatory dip, C2) final forward press, C3) slow release; winner=C2 because the forward press is the most cue-specific action, clearly distinguishing the \"shh\" from a cupped-hand gasp or a lateral eye rub."
+  },
+  {
+    "idx": 8,
+    "cue": "rub_arms_cold",
+    "description": "The robot should first perform a slight hunch to signal 'cold', then bring its arm across the chest to rub the opposite arm, conveying a self-warming action.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 35,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": -10
+              },
+              "speed": 0.8,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": -40,
+          "speed": 1.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 15
+              },
+              "speed": 1.5,
+              "hold_time": 0.2
+            },
+            {
+              "degrees": {
+                "y": -15
+              },
+              "speed": 1.5,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -5,
+          "speed": 0.7
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:49:08",
+    "reasoning": "# Q1: A human pulls their arm across their chest to rub the opposite shoulder/bicep area, often hunching slightly for warmth.\n# Q2: candidates=P1) front+vertical+x45,y50,z50, P2) back+vertical+x35,y50,z55; winner=P2 because the arm's starting position close to the body provides a better anticipatory pose for a huddled, self-warming gesture.\n# Q3: options=M1 pose>path(cross-body)>movement(rub), M2 pose>movement(hunch)>path(cross-body)>movement(rub); winner=M2 because adding the preparatory hunch strongly reinforces the \"cold\" context before the main rubbing action begins.\n# Q4: confusable_with=[scratch_chest_itchy, cross_arms_defensive]; discriminative_feature=preparatory hunch/shiver; options=C1 preparatory hunch, C2 slow rubbing speed, C3 sagging follow-through; winner=C1 because the hunch is the most unambiguous anticipation that frames the entire motion as being about cold/discomfort, not an itch or a social stance."
+  },
+  {
+    "idx": 9,
+    "cue": "deep_bow_apology",
+    "description": "The robot should convey a sincere apology, not just a greeting, by using a preparatory dip, a deep and slow bow, a long hold at the lowest point, and a controlled rise.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 38,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 1.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 40,
+                "z": -30
+              },
+              "speed": 0.6,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -40,
+                "z": 25
+              },
+              "speed": 0.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:49:30",
+    "reasoning": "# Q1: A human performs a deep apology bow by lowering their upper body significantly from the waist, holding the low position to convey sincerity, and then slowly returning upright.\n# Q2: candidates=P1) front+horizontal+x55,y50,z50, P2) down+vertical+x48,y50,z38; winner=P2 because a lower, more formal starting pose reinforces the seriousness of the apology from the very beginning.\n# Q3: options=M1 P2>movement(bow)>hold, M2 P2>path(arc), M3 P2>movement(prep dip)>movement(deep bow)>hold; winner=M3 because the preparatory dip adds a beat of anticipation that makes the bow feel more sincere and deliberate.\n# Q4: confusable_with=[Respect / Greeting, Tired slump]; discriminative_feature=long hold at the lowest point of the bow; options=C1 preparatory dip, C2 long hold at the bottom, C3 slow, controlled rise; winner=C2 because the extended hold is the single clearest feature that communicates deep remorse over a quick greeting or an uncontrolled energy collapse."
+  },
+  {
+    "idx": 10,
+    "cue": "cross_arms_defensive",
+    "description": "The robot should pull its arm across the chest and end with a slight tensing motion to read as a guarded barrier, not a casual reach.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 45,
+            "y": 30,
+            "z": 48,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.8,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5,
+                "z": -5
+              },
+              "speed": 2.5,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -4
+              },
+              "speed": 0.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:49:54",
+    "reasoning": "# Q1: A human pulls their arm inward across their chest to form a protective barrier, often with a slight tensing of the posture.\n# Q2: candidates=P1) front+horizontal+x55,y50,z50, P2) down+vertical+x48,y50,z35; winner=P1 because a neutral, chest-high starting point makes the subsequent action of pulling the arm across the body to form a barrier clear and intentional.\n# Q3: options=M1 P1>pose(crossed)>movement(tense), M2 P1>path(line); winner=M1 because staging the cross with a pose and then adding a separate tensing accent makes the defensive intent more explicit than a single blended motion.\n# Q4: confusable_with=[Reach for opposite shoulder, Indicate self]; discriminative_feature=sharp tensing accent at the end; options=C1 recoil before crossing, C2 sharp tensing motion to lock the final pose, C3 slow release from the pose; winner=C2 because the final tensing accent is the most direct expression of defensiveness, clearly distinguishing it from a casual reach or self-indication."
+  },
+  {
+    "idx": 11,
+    "cue": "hands_on_hips",
+    "description": "The robot arm moves to the hip with a preparatory lift and a final outward elbow push to convey confidence or impatience, distinguishing it from a simple side touch.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 45,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 1.2,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 40,
+            "y": 75,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -15,
+                "x": 5
+              },
+              "speed": 2.0,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:50:16",
+    "reasoning": "# Q1: A human moves their hand from a neutral resting position to their waist, bending the elbow outwards to create an assertive pose.\n# Q2: candidates=P1) down+vertical+x45,y50,z35, P2) front+horizontal+x60,y50,z50; winner=P1 because starting from a low, neutral \"at attention\" pose makes the transition to the hip feel more deliberate and character-driven.\n# Q3: options=M1 pose>pose, M2 pose>path>pose, M3 pose>anticipation>path>accent; winner=M3 because the multi-phase sequence of a small lift (anticipation), main travel, and a final elbow push (accent) best conveys the confident or impatient attitude of the gesture.\n# Q4: confusable_with=[Indicating 'me', At attention]; discriminative_feature=final outward elbow push; options=C1 an exaggerated arc to the hip, C2 a preparatory upward lift, C3 a final outward elbow movement to 'plant' the hand; winner=C3 because the outward push creates the characteristic akimbo angle, which is the strongest signifier of confidence and clearly separates the cue from a simple side-touch or self-reference."
+  },
+  {
+    "idx": 12,
+    "cue": "step_back_surprised",
+    "description": "The robot should convey surprise by performing a sharp recoil preceded by a subtle anticipation, making the motion feel like an involuntary flinch rather than a simple dodge.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 3.5,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -30,
+                "z": 25
+              },
+              "speed": 4.0,
+              "hold_time": 0.7
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 5
+              },
+              "speed": 3.0,
+              "hold_time": 0.08
+            },
+            {
+              "degrees": {
+                "y": -5
+              },
+              "speed": 3.0,
+              "hold_time": 0.08
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:50:40",
+    "reasoning": "# Q1: A human recoils by flinching backward while raising their hands defensively in a sharp, involuntary motion.\n# Q2: candidates=P1) front+horizontal+x60,y50,z50, P2) down+vertical+x45,y50,z35; winner=P1 because an engaged forward pose creates the best contrast for a sharp backward recoil.\n# Q3: options=M1 pose>movement(recoil)>hold, M2 pose>path(arc), M3 pose>pose; winner=M1 because the single ballistic recoil-and-hold primitive best captures the sharp, frozen quality of a surprise \"take\".\n# Q4: confusable_with=[Dodge, Fear/Cower]; discriminative_feature=sharp anticipation before the recoil; options=C1 short forward anticipation before the recoil, C2 post-recoil tremble, C3 a very fast recoil speed; winner=C1 because the anticipation \"coils the spring\" and makes the subsequent recoil feel more explosive and reactive, separating it from a simple dodge."
+  },
+  {
+    "idx": 13,
+    "cue": "palms_together_thank_you",
+    "description": "The robot should first bring its hand to the chest's centerline and hold, symbolizing 'palms together', before executing a slight bow to clearly distinguish the gesture from a simple respectful bow or indicating 'me'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 65,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 0.8,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "z": -15
+              },
+              "speed": 0.7,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -20,
+                "z": 15
+              },
+              "speed": 0.9,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:51:02",
+    "reasoning": "# Q1: A human would bring one hand to their chest's centerline with a vertical orientation, accompanied by a slight deferential bow.\n# Q2: candidates=P1) down+vertical+x48,y50,z35, P2) front+horizontal+x55,y65,z45; winner=P2 because a slightly off-center start makes the deliberate motion to the centerline more readable and less rigid.\n# Q3: options=M1 P2>movement(combined path to center+bow), M2 P2>pose(centerline)>movement(bow); winner=M2 because staging the hand placement first and then the bow clearly separates the \"palms together\" setup from the \"thank you\" action.\n# Q4: confusable_with=[Bow slightly (Respect / Greeting), Indicating \"me\"]; discriminative_feature=the distinct hold at the chest's centerline before bowing; options=C1 soft entry arc, C2 centerline hold before bow, C3 slow release after bow; winner=C2 because the hold is the strongest signal for the symbolic \"palms together\" moment, preventing confusion with a simple bow or a self-referential gesture."
+  },
+  {
+    "idx": 14,
+    "cue": "curl_fingers_give_me",
+    "description": "The robot should read as beckoning or requesting by first extending its arm palm-up, making several sharp 'curling' motions with its wrist, and then pulling the arm back as a follow-through.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.4,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 35
+              },
+              "speed": 3.5,
+              "hold_time": 0.05
+            },
+            {
+              "degrees": {
+                "z": -35
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -20,
+                "z": -5
+              },
+              "speed": 0.9,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:51:34",
+    "reasoning": "# Q1: A human extends their arm palm-up and repeatedly curls their fingers inward to beckon or request something.\n# Q2: candidates=P1) front+horizontal+x75,y50,z50, P2) up+horizontal+x60,y50,z70; winner=P1 because the extended, chest-high, palm-up pose is the clearest universal baseline for a \"give me\" gesture.\n# Q3: options=M1: pose > movement(wrist curl repeat), M2: pose > movement(wrist curl repeat) > movement(shoulder pull); winner=M2 because adding the arm pull-back as a follow-through after the curls reinforces the \"drawing in\" meaning of the request.\n# Q4: confusable_with=[Presenting with open palm, Wave one hand side to side]; discriminative_feature=repeated sharp wrist curls followed by a conclusive arm pull-back; options=C1 curls only, C2 preparatory forward push, C3 pull-back follow-through; winner=C3 because the follow-through pull distinguishes the gesture from a simple wave or a static present, confirming the intent to receive."
+  },
+  {
+    "idx": 15,
+    "cue": "hands_up_surrender",
+    "description": "The robot should first show a sharp recoil to signify being startled, then quickly raise its hand to a surrender position with a slight tremble to convey compliance and vulnerability.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10,
+                "z": -5
+              },
+              "speed": 3.8,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": 55,
+          "speed": 2.8
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 70,
+            "y": 50,
+            "z": 90,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.8,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 4
+              },
+              "speed": 4.0,
+              "hold_time": 0.15
+            },
+            {
+              "degrees": {
+                "y": -4
+              },
+              "speed": 4.0,
+              "hold_time": 0.15
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:51:57",
+    "reasoning": "# Q1: A human would perform this motion with a startled, sharp upward movement of the arms to head-level, palms facing forward, expressing surprise and compliance.\n# Q2: candidates=P1) down+vertical+x48,y50,z35 (at attention), P2) front+horizontal+x55,y50,z50 (chest level); winner=P1 because starting from a low, neutral state makes the subsequent sharp, high movement more dramatic and unambiguously readable as surrender.\n# Q3: options=M1) pose(low)>path(line z up)>pose(high), M2) pose(low)>movement(recoil)>path(arc zx up)>movement(tremble); winner=M2 because the sequence of recoil, raise, and tremble tells a richer story of being startled into compliance, which is key to the gesture's meaning.\n# Q4: confusable_with=[Greeting/high-five, Raise one hand briefly]; discriminative_feature=initial sharp recoil; options=C1 an initial sharp flinch/recoil before the arm rises, C2 a trembling hold at the peak, C3 a fast, uncontrolled path; winner=C1 because the recoil anticipation beat immediately signals the motion is a reaction to an external threat, distinguishing it from a voluntary, self-initiated greeting or acknowledgement."
+  },
+  {
+    "idx": 16,
+    "cue": "arms_open_welcome",
+    "description": "The robot should start the gesture from a personal, chest-referenced space, then use a small preparatory lift before sweeping its arm outward in a broad, welcoming arc that ends with a gentle settle to convey warmth and openness.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 45,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 1.2,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "shoulder",
+          "plane": "xy",
+          "radius": 25,
+          "sweep": 90,
+          "speed": 1.5,
+          "direction": "ccw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -4
+              },
+              "speed": 0.5,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:52:23",
+    "reasoning": "# Q1: A human performs this by sweeping their arm from a neutral position outward in a broad, welcoming arc, opening up their posture to be inclusive.\n# Q2: candidates=P1) down+vertical+x45,y50,z35, P2) back+vertical+x45,y50,z50; winner=P2 because starting the motion from a chest-referenced \"me\" position makes the outward sweep feel like a more personal and genuine invitation.\n# Q3: options=M1) pose > path(arc), M2) pose > movement(anticipatory lift) > path(arc); winner=M2 because adding a small preparatory lift before the main sweep acts as anticipation, making the welcoming gesture feel more intentional and alive.\n# Q4: confusable_with=[Presenting, Shrug]; discriminative_feature=broad, welcoming arc instead of a flat presentation or a sharp vertical lift; options=C1 an anticipatory lift before the sweep, C2 a soft settle/follow-through at the end of the arc; winner=C2 because a gentle settle after the main sweep completes the emotional tone of 'welcome', distinguishing it from the abrupt end of a 'presenting' or 'shrug' gesture."
+  },
+  {
+    "idx": 17,
+    "cue": "stretch_arms_up",
+    "description": "The robot should show a satisfying stretch by performing a slow upward reach, holding the peak with a slight tremor to indicate tension, and then relaxing partway down.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 45,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": 65,
+          "speed": 0.9
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "y": 8
+              },
+              "speed": 3.0,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "y": -8
+              },
+              "speed": 3.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -20,
+          "speed": 0.7
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:52:44",
+    "reasoning": "# Q1: A human would reach high, hold the peak of the stretch with some tension, and then relax back down.\n# Q2: candidates=P1) down+vertical+z35, P2) front+horizontal+z50; winner=P1 because starting from a low, resting position creates a longer, more satisfying upward motion that clearly reads as a full-body stretch.\n# Q3: options=M1) pose>path(up)>movement(jitter)>path(down), M2) pose>path(arc); winner=M1 because the explicit reach-tension-release sequence best captures the acted beat of a satisfying stretch, unlike a simple fluid arc.\n# Q4: confusable_with=[Raise one hand briefly, Reaching for high shelf]; discriminative_feature=non-functional tension at the peak; options=C1 preparatory dip, C2 jitter at the apex, C3 slow sagging release; winner=C2 because the jitter is the most iconic sign of muscular tension in a stretch, clearly distinguishing it from a social greeting or a functional reach."
+  },
+  {
+    "idx": 18,
+    "cue": "gentle_retreat_motion",
+    "description": "The robot should convey a soft, yielding retreat by using a slow, downward arc, distinguishing it from a sharp recoil or a neutral return-to-idle motion.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 0.9,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "shoulder",
+          "plane": "xz",
+          "radius": 25.0,
+          "sweep": -60.0,
+          "speed": 0.7,
+          "direction": "ccw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 0.5,
+              "hold_time": 0.4
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:53:10",
+    "reasoning": "# Q1: A human would slowly pull their arm and upper body back with a slight downward dip to signal non-aggression and yield space.\n# Q2: candidates=P1) front+horizontal+x75,y50,z50, P2) back+vertical+x45,y50,z45; winner=P1 because an extended interactive pose provides the necessary context for a \"retreat\" to be meaningful, making the backward motion a clear act of yielding.\n# Q3: options=M1 pose>path(line)>path(arc), M2 pose>path(single arc); winner=M2 because a single, slow arc path most effectively combines the backward retreat and downward deference into one fluid, non-aggressive gesture.\n# Q4: confusable_with=[Startled Recoil, Return to Idle]; discriminative_feature=soft, yielding follow-through; options=C1 wrist-soften prep, C2 slow arc speed, C3 shoulder-settle follow-through; winner=C3 because the soft settle at the end provides a clear follow-through that reinforces gentleness and distinguishes the cue from a sharp recoil or a simple neutral stop."
+  },
+  {
+    "idx": 19,
+    "cue": "disagreement_cross_then_release",
+    "description": "The robot should first show a preparatory intake, then sharply cross its arm in a defensive posture, and finally release with a dismissive outward motion to clearly signal disagreement.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -8,
+                "z": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 45,
+            "y": 20,
+            "z": 52,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 2.8,
+          "hold_time": 1.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "shoulder",
+          "plane": "xy",
+          "radius": 20,
+          "sweep": -90,
+          "speed": 1.2,
+          "direction": "ccw"
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:53:54",
+    "reasoning": "# Q1: A human shows disagreement by first tensing up slightly, then sharply crossing their arms in a defensive posture, and finally releasing them with a dismissive air.\n# Q2: candidates=P1) down+vertical+x48,y50,z35, P2) front+horizontal+x55,y50,z50; winner=P2 because starting at chest-level provides the clearest and most direct staging for the subsequent defensive cross-body motion.\n# Q3: options=M1 pose>pose(cross)>pose(release), M2 pose>movement(cross)>movement(release), M3 pose>movement(prep_intake)>pose(cross)>path(dismissive_release); winner=M3 because the preparatory intake and dismissive follow-through create a richer, more legible narrative of disagreement rather than a simple mechanical state change.\n# Q4: confusable_with=[Self-hug, Shivering]; discriminative_feature=preparatory intake before a sharp cross; options=C1 a preparatory intake before the cross, C2 a sharp hold at the peak of the cross, C3 a dismissive outward arc on release; winner=C1 because the anticipation beat most clearly separates the intentional, sharp gesture of disagreement from the softer, self-comforting motion of a hug or shiver."
+  },
+  {
+    "idx": 20,
+    "cue": "stop_entry_cross_block",
+    "description": "The robot creates an authoritative barrier by using a quick recoil for anticipation, followed by a sharp horizontal sweep that locks into place with a firm hold.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 2.5,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": 40,
+          "speed": 2.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 3.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:54:17",
+    "reasoning": "# Q1: A human would authoritatively extend their arm horizontally across the path of entry with a vertical, palm-out hand to create a clear barrier.\n# Q2: candidates=P1) front+vertical+x50,y50,z50, P2) down+vertical+x45,y50,z35; winner=P1 because starting at chest-level allows for a direct and immediate horizontal block without a distracting preparatory lift.\n# Q3: options=M1 P1>path(line y)>movement(accent hold), M2 P1>movement(recoil)>path(line y)>movement(accent hold); winner=M2 because adding a small, sharp recoil before the main sweep (anticipation) gives the blocking motion more weight and authority.\n# Q4: confusable_with=[Wave one hand side to side (Hello / Hi), Throat cut gesture]; discriminative_feature=sharp stop and hold; options=C1 a sharp stop-and-hold accent at the end of the path, C2 a slow, deliberate sweep; winner=C1 because the firm, held accent creates the feeling of a solid barrier, contrasting with the continuous motion of a wave or the quick release of a threat gesture."
+  },
+  {
+    "idx": 21,
+    "cue": "allow_entry_open_side",
+    "description": "The robot should perform a generous, welcoming sweep to open a path, clearly distinguished from a sharp presentation or a repetitive wave by its smooth arc and settling follow-through.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 1.2,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "shoulder",
+          "plane": "xy",
+          "radius": 25,
+          "sweep": 70,
+          "speed": 0.8,
+          "direction": "cw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 0.6,
+              "hold_time": 0.4
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:54:37",
+    "reasoning": "# Q1: A human would perform a welcoming gesture by sweeping their arm smoothly from their center to the side, creating an open pathway for someone to enter.\n# Q2: candidates=P1) front+horizontal+x55,y50,z45, P2) down+vertical+x48,y50,z35; winner=P1 because a neutral, chest-level start makes the subsequent sweeping motion feel more natural and intentional than a low, \"at-rest\" position.\n# Q3: options=M1: pose > path(arc), M2: pose > pose; winner=M1 because a smooth arc is the most legible primitive for a generous, sweeping motion, whereas a pose-to-pose transition would feel abrupt and robotic.\n# Q4: confusable_with=[Wave one hand side to side, Presenting with one hand]; discriminative_feature=a single, large, slow lateral sweep with a settling follow-through; options=C1 short prep dip, C2 a slow, large arc, C3 a gentle settling motion at the end; winner=C3 because the final settle communicates a patient \"holding the space open\" quality, distinguishing it from a quick wave or a forward presentation."
+  },
+  {
+    "idx": 22,
+    "cue": "relief_release_drop",
+    "description": "The robot simulates an exhale of relief by first showing a moment of held tension (a slight lift), followed by a clear, gravity-driven drop of the arm.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 6
+              },
+              "speed": 0.8,
+              "hold_time": 0.6
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": -20
+              },
+              "speed": 2.2,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 0.7,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:55:00",
+    "reasoning": "# Q1: A human would exhale, visibly relaxing their shoulders and letting their arms fall limply to their sides.\n# Q2: candidates=P1) front+horizontal+x60,y50,z50, P2) down+vertical+x48,y50,z35; winner=P1 because starting from an engaged, chest-level pose provides the clearest contrast for the subsequent release of tension.\n# Q3: options=M1 pose>movement(lift)>movement(drop)>movement(settle), M2 pose>path(line); winner=M1 because the multi-phase sequence with an anticipation lift and follow-through settle more accurately portrays the emotional quality of relief than a simple, controlled path.\n# Q4: confusable_with=[shrug_shoulders_idk, at_attention_drop]; discriminative_feature=preparatory lift before the drop; options=C1 preparatory lift (anticipation), C2 limp wrist settle (follow-through), C3 very fast drop (accent); winner=C1 because the \"inhale\" lift before the \"exhale\" drop is the most explicit sign of releasing held tension, which defines relief."
+  },
+  {
+    "idx": 23,
+    "cue": "frustration_down_throw",
+    "description": "The robot expresses frustration by first building tension with a sharp upward lift, then releasing it in a fast downward throw, followed by a slight sagging recoil to show dissipated energy.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 15
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -30,
+          "speed": 3.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": -5
+              },
+              "speed": 0.8,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:55:42",
+    "reasoning": "# Q1: A human would perform this motion by first tensing and raising their arm in an anticipatory build-up, followed by a sharp, fast downward throw to release the frustration.\n# Q2: candidates=P1) front+horizontal+x60,y50,z50 (chest-level), P2) up+vertical+x50,y50,z70 (head-level); winner=P1 because a neutral chest-level start provides a clear baseline to show the anticipatory upward tension build before the main downward action.\n# Q3: options=M1) pose > movement(z-lift/tension) > path(z-down/throw) > movement(recoil/slump), M2) pose > path(z-down/throw); winner=M1 because the explicit anticipation (lift) and follow-through (recoil) phases frame the core throw, making the emotional context of frustration far more readable than a simple throw.\n# Q4: confusable_with=[pound_table, drop_object]; discriminative_feature=preparatory tension-building lift; options=C1) sharp anticipatory lift before the throw, C2) a shaky hold at the peak, C3) a sagging recoil after the throw; winner=C1 because the upward lift is the clearest contextual beat that charges the subsequent downward motion with frustrated energy, distinguishing it from a simple drop or a direct pound."
+  },
+  {
+    "idx": 24,
+    "cue": "disbelief_hold_then_drop",
+    "description": "The robot shows a sharp moment of shock by recoiling, bringing a hand to its mouth, holding it, and then letting the arm fall limply, communicating a release of tension.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10,
+                "z": 5
+              },
+              "speed": 3.0,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 68,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 2.5,
+          "hold_time": 1.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -25,
+          "speed": 3.5
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:56:08",
+    "reasoning": "# Q1: A human would perform this motion by sharply bringing a hand to their mouth in shock, freezing for a moment, and then letting the arm drop limply from the release of tension.\n# Q2: candidates=P1) front+horizontal+x65,y50,z55 (mouth), P2) left+vertical+x70,y45,z65 (head); winner=P1 because covering the mouth is a more direct and unambiguous sign of initial shock than a generic hand-to-head gesture.\n# Q3: options=M1) recoil > pose > drop, M2) pose > drop; winner=M1 because adding a small, sharp recoil before the hand rises to the mouth creates an anticipation beat that sells the emotional shock more effectively.\n# Q4: confusable_with=[Cover mouth gasp, Rub one eye (Tired)]; discriminative_feature=the limp, ballistic drop after the hold; options=C1 a sharp recoil before the hand-raise, C2 a tense hold at the mouth, C3 a limp, gravity-driven drop after the hold; winner=C3 because the limp drop provides the essential follow-through that signals a release of shock into resignation, distinguishing it from a simple gasp that might just hold and return to neutral."
+  },
+  {
+    "idx": 25,
+    "cue": "submission_lowered_open_palm",
+    "description": "The robot should convey a clear state of submission by slowly pushing its open gripper forward from a low position and holding it there, emphasizing a passive and non-threatening offering.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 0.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "x",
+          "distance": 15,
+          "speed": 0.6
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {},
+              "speed": 1.0,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:56:26",
+    "reasoning": "# Q1: A human would present a low, open, upward-facing palm with a slow and deliberate forward motion to signify deference and vulnerability.\n# Q2: candidates=P1) down+horizontal+x50,y50,z40, P2) front+vertical+x55,y50,z50; winner=P1 because starting low with the \"palm\" already open/horizontal immediately establishes a non-threatening baseline, making the submissive intent clear from the outset.\n# Q3: options=M1 P1>path(line x)>movement(hold), M2 P1>pose(extended)>hold, M3 P1>path(arc); winner=M1 because a slow, continuous push (path) followed by a static hold best conveys the deliberate, stable, and passive nature of submission, which a simple pose change or a more dynamic arc would not.\n# Q4: confusable_with=[Begging / 'Gimme', Presenting an object low]; discriminative_feature=slow, non-retracting hold; options=C1 a preparatory dip before the push, C2 an extra slow core push, C3 a long static hold at the end; winner=C3 because the long, unmoving hold is the strongest signal of a stable offered state (submission) versus a transactional one (presenting) or a repetitive one (begging)."
+  },
+  {
+    "idx": 26,
+    "cue": "dominance_high_open_hold",
+    "description": "The robot should project unshakable confidence by using a preparatory lift before expanding into a high, wide, and steady hold, emphasizing control and occupation of space.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 75,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 65,
+            "y": 80,
+            "z": 85,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 0.7,
+          "hold_time": 2.0
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:56:46",
+    "reasoning": "# Q1: A human would assert dominance by deliberately taking up space with a slow, controlled, high, and open posture, holding it steadily to project unshakable confidence.\n# Q2: candidates=P1) up+horizontal+x50,y50,z75, P2) front+horizontal+x60,y50,z55; winner=P1 because starting high (eye-level) frames the motion as a power-pose expansion rather than a greeting-like lift from the chest.\n# Q3: options=M1) P1 > pose(high-wide) > hold, M2) P1 > path(arc out) > hold, M3) P1 > movement(prep-lift) > pose(high-wide) > hold; winner=M3 because the preparatory lift (like an inhale) adds an anticipatory beat that makes the subsequent expansion feel more deliberate and powerful.\n# Q4: confusable_with=[Stretching, Waving hello]; discriminative_feature=the deliberate preparatory lift followed by a slow, unwavering hold; options=C1) a preparatory lift before expanding, C2) an extremely slow expansion path, C3) a shaky hold to show effort; winner=C1 because the prep-lift is a classic animation principle for broadcasting intent, clearly separating this power display from a casual stretch or social wave."
+  },
+  {
+    "idx": 27,
+    "cue": "apology_forward_lowered_hold",
+    "description": "The robot conveys a deep apology by performing a slow, deliberate, and deep bow, holding the lowest point to signify sincerity and distinguish the gesture from a simple greeting.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 0.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 35,
+                "z": -25
+              },
+              "speed": 0.5,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10,
+                "z": 8
+              },
+              "speed": 0.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:57:07",
+    "reasoning": "# Q1: A human would perform a sincere apology by slowly lowering their upper body and head forward, holding the deferential position to convey deep regret.\n# Q2: candidates=P1) front+horizontal+x55,y50,z50, P2) down+vertical+x48,y50,z35; winner=P1 because a neutral chest-level start provides the necessary contrast to make the subsequent deep, slow lowering motion read clearly as a deliberate act of apology.\n# Q3: options=M1 P1>movement(shoulder x+z bow with long hold), M2 P1>path(arc xz)>hold; winner=M1 because a direct multi-axis movement best captures the dedicated action of bowing, and embedding the long hold within this core movement makes the apologetic intent clearer than separating them.\n# Q4: confusable_with=[Bow slightly from the waist (Respect / Greeting), Rub one eye (Tired)]; discriminative_feature=slow speed and long hold at the lowest point of the bow; options=C1 add a preparatory 'breath' lift, C2 make the bow motion extremely slow and deep with a long hold, C3 add a sagging follow-through; winner=C2 because exaggerating the slowness, depth, and duration is the most direct way to distinguish sincere apology from a quick, formal respect bow."
+  },
+  {
+    "idx": 28,
+    "cue": "gratitude_small_bow_hold",
+    "description": "The robot expresses sincere gratitude by taking a small preparatory 'breath' before a controlled bow, then holding the lowest point to differentiate the motion from a simple greeting or a deep apology.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 0.8,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -28,
+                "z": 10
+              },
+              "speed": 0.9,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:57:27",
+    "reasoning": "# Q1: A human expresses gratitude by performing a controlled, sincere bow, holding the lowered position to convey heartfelt thanks.\n# Q2: candidates=P1) down+vertical+x48,y50,z45, P2) front+horizontal+x55,y50,z35; winner=P1 because a neutral, chest-level starting pose provides the best baseline for a deferential and respectful bow, avoiding any sense of offering.\n# Q3: options=M1 pose>movement(prep-lift)>movement(bow-dip)>hold, M2 pose>path(arc); winner=M1 because the discrete preparatory lift and deliberate, held dip reads as sincere and intentional, which is crucial for gratitude.\n# Q4: confusable_with=[Respect/Greeting bow, Deep apology bow]; discriminative_feature=preparatory breath and extended hold at the bottom; options=C1 small pre-bow lift, C2 long hold at the lowest point, C3 simple dip-return; winner=C1+C2 because the combination of a preparatory \"breath\" and a long, sincere hold adds emotional weight that distinguishes gratitude from a quick greeting or a deep apology."
+  },
+  {
+    "idx": 29,
+    "cue": "disappointment_slow_fold",
+    "description": "The robot should convey disappointment by starting from a neutral-to-hopeful pose, then slowly folding inward and downward, finishing with a final sag to show a loss of energy. This distinguishes the cue from targeted gestures like rubbing an eye (tired) or covering the face (sad).",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25,
+                "z": -20
+              },
+              "speed": 0.6,
+              "hold_time": 0.4
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -15,
+          "speed": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 0.5,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:57:49",
+    "reasoning": "# Q1: A human would slowly fold their arm inward and down towards their chest, letting their posture sag as if from a loss of energy.\n# Q2: candidates=P1) front+horizontal+x55,y50,z55 (chest level), P2) up+vertical+x50,y50,z70 (raised); winner=P2 because starting from a slightly raised, hopeful position makes the subsequent collapse of disappointment more poignant and easier to read.\n# Q3: options=M1 P2>movement(x+z fold)>path(z sag), M2 P2>path(arc xz); winner=M1 because separating the inward fold from the final downward sag creates a two-beat emotional expression that better captures the feeling of withdrawal followed by energy drain.\n# Q4: confusable_with=[Tired (Rub one eye), Sad (Cover face)]; discriminative_feature=unfocused energy collapse; options=C1 initial hopeful lift before the fold, C2 a final sag after the main fold, C3 a wrist-break accent during the fold; winner=C2 because the final follow-through sag is the strongest confirmation of a general energy loss, distinguishing it from the targeted actions of rubbing an eye or covering a face."
+  },
+  {
+    "idx": 30,
+    "cue": "satisfaction_small_clench_release",
+    "description": "The robot should convey quiet satisfaction by first pulling the hand in to savor the moment, executing a small, tight clench, and then letting the arm drift down in a slow, resolved release.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10,
+                "z": 5
+              },
+              "speed": 0.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": -15
+              },
+              "speed": 2.5,
+              "hold_time": 0.4
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8,
+                "z": -12
+              },
+              "speed": 0.7,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:58:11",
+    "reasoning": "# Q1: A human performs this motion by subtly pulling their hand towards their chest, tightening it into a small fist to savor the moment, and then slowly relaxing the arm as the feeling resolves.\n# Q2: candidates=P1) front+horizontal+x55,y50,z45 (chest), P2) down+vertical+x48,y50,z35 (waist); winner=P1 because the chest-level position makes the internal, contained feeling of satisfaction more legible than a low, resting position.\n# Q3: options=M1) pose>clench>release, M2) pose>pull-in>clench>drift-release; winner=M2 because the anticipation (pull-in) and follow-through (drift-release) frame the core clench, creating an emotional arc of savoring and resolving satisfaction.\n# Q4: confusable_with=[fist_pump_power, frustration_fist_clench]; discriminative_feature=the slow, resolving drift after the clench; options=C1) sharp pull-in, C2) slow downward drift on release, C3) sharp rebound after clench; winner=C2 because this slow relaxation clearly distinguishes the pleasant finality of satisfaction from the aggressive energy of a power pump or the lingering tension of frustration."
+  },
+  {
+    "idx": 31,
+    "cue": "start_action_forward_snap",
+    "description": "The robot signals 'Go!' with a sharp forward motion, distinguished from pointing or offering by a preparatory pullback and a crisp, ballistic snap at the apex.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 45,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "x",
+          "distance": 30,
+          "speed": 3.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 4.0,
+              "hold_time": 0.05
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 4.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 1.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:46:14",
+    "reasoning": "# Q1: A human would perform this motion by pulling their hand back slightly before thrusting it forward and making a sharp, crisp finger snap to signal \"Go!\".\n# Q2: candidates=P1) front+horizontal+x55,y50,z50, P2) back+horizontal+x45,y50,z50; winner=P2 because starting with a preparatory pullback creates anticipation and makes the subsequent forward thrust much more dynamic and intentional.\n# Q3: options=M1 P2>path(line x)>movement(wrist z snap), M2 P2>movement(shoulder x); winner=M1 because the separate path for the thrust and movement for the snap accent makes the two key phases of the action—the \"go\" and the \"snap\"—explicitly readable.\n# Q4: confusable_with=[Pointing, Offering hand]; discriminative_feature=ballistic speed with a sharp terminal accent; options=C1 smooth forward motion, C2 sharp snap at the end of a fast thrust, C3 gentle hold after a forward push; winner=C2 because the terminal snap is the most unique feature that distinguishes this imperative \"start\" signal from a directional point or a social offer."
+  },
+  {
+    "idx": 32,
+    "cue": "stop_action_freeze_palm",
+    "description": "The robot should create a commanding stop signal by using a sharp recoil to anticipate a powerful forward thrust, ending in a firm, held pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -8
+              },
+              "speed": 3.0,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "x",
+          "distance": 30,
+          "speed": 4.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 2.0,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:58:31",
+    "reasoning": "# Q1: A human would sharply extend their arm forward with their palm facing out and hold it firmly to command an immediate halt.\n# Q2: candidates=P1) front+vertical+x70,y50,z55, P2) down+vertical+x45,y50,z40; winner=P1 because a \"stop\" command is urgent and a neutral chest-level start allows for the most direct and fastest forward thrust without preparatory lifting.\n# Q3: options=M1) pose(start)>path(line forward)>hold, M2) pose(start)>movement(recoil)>path(thrust); winner=M2 because adding a small backward recoil as anticipation makes the subsequent forward thrust much sharper and more commanding.\n# Q4: confusable_with=[Handshake / offering, Raise one hand briefly]; discriminative_feature=sharp preparatory recoil before a percussive forward thrust; options=C1) preparatory recoil, C2) final hand shudder, C3) slow release; winner=C1 because the recoil is the strongest signal of an impending sharp action, distinguishing it from the slower, softer motions of an offering or greeting."
+  },
+  {
+    "idx": 33,
+    "cue": "retry_action_reset_circle",
+    "description": "The robot draws a clear symbolic circle in the air, followed by a small forward push to clearly communicate a 'reset and go again' instruction.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "shoulder",
+          "plane": "yz",
+          "radius": 15,
+          "sweep": 370,
+          "speed": 1.8,
+          "direction": "cw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15
+              },
+              "speed": 2.2,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:58:48",
+    "reasoning": "# Q1: A human would draw a circle in the air with their hand to signify 'do it again' and then add a small push forward to indicate 'go'.\n# Q2: candidates=P1) front+horizontal+x65,y50,z50, P2) up+vertical+x50,y50,z70; winner=P1 because the neutral front-facing space provides the clearest 'canvas' for drawing the symbolic circle.\n# Q3: options=M1 pose>path(arc), M2 pose>path(arc)>movement(forward push); winner=M2 because the follow-through push is crucial to distinguish 'retry' from just drawing a circle or the 'crazy' sign.\n# Q4: confusable_with=[Rotate finger near temple (Crazy), Stirring motion]; discriminative_feature=a forward push accent after the circle; options=C1 a wind-up before the circle, C2 a forward push after the circle, C3 a longer hold after the circle; winner=C2 because the forward push adds the specific 're-initiate action' meaning that separates this cue from its neighbors."
+  },
+  {
+    "idx": 34,
+    "cue": "finish_action_down_release",
+    "description": "The robot should signal a clean end to an action with a small recoil before a controlled release downward, distinguishing it from a tired droop or a careful placement motion.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 70,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10,
+                "z": 5
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -25,
+          "speed": 0.9
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-04-05 03:59:35",
+    "reasoning": "# Q1: A human would signal the end of a task with a small, sharp wrist flick or backward arm recoil before letting the arm fall controllably to a resting position.\n# Q2: candidates=P1) front+horizontal+x70,y50,z55 (working pose), P2) up+vertical+x50,y50,z70 (greeting pose); winner=P1 because a forward chest-level working pose is a more common starting point for a task-completion cue, making the subsequent release motion more universally understandable.\n# Q3: options=M1 P1>path(arc down), M2 P1>movement(wrist flick)>path(line down), M3 P1>movement(shoulder recoil)>path(line down); winner=M3 because the recoil acts as a clear punctuation or follow-through from the preceding action, crisply separating the task from the release and preventing the motion from looking like a simple, ambiguous transition.\n# Q4: confusable_with=[Tiredness/Droop, Putting something down carefully]; discriminative_feature=deliberate recoil before release; options=C1 a sharp backward recoil before the drop, C2 a slow, even speed for the entire downward motion, C3 a limp bounce at the bottom; winner=C1 because the recoil is an intentional act that signals a controlled end-of-task, distinguishing it from an uncontrolled tired droop or the sustained tension of a careful placement."
+  },
+  {
+    "idx": 35,
+    "cue": "abandon_action_drop_turn",
+    "description": "The robot shows frustration with a small shake, lifts the object in a 'giving up' gesture, abruptly drops it, and sharply turns away in dismissal.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "gripper_state": "closed",
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 5
+              },
+              "speed": 3.0,
+              "hold_time": 0.05
+            },
+            {
+              "degrees": {
+                "y": -5
+              },
+              "speed": 3.0,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "gripper",
+        "parameters": {
+          "action": "open",
+          "speed": 4.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -25
+              },
+              "speed": 1.8,
+              "hold_time": 0.7
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:22:55",
+    "reasoning": "# Q1: A human would show frustration by shaking the object slightly, lifting it in a final 'giving up' gesture, then dropping it and turning their head away in dismissal.\n# Q2: candidates=P1) front+horizontal+x65,y50,z45, P2) down+vertical+x40,y50,z35; winner=P1 because the forward, chest-height working pose makes the context of abandoning a task much clearer than a passive, low pose.\n# Q3: options=M1 pose>movement(shake)>movement(lift)>gripper>movement(turn), M2 pose>gripper>pose; winner=M1 because the sequence of struggle (shake), decision (lift), action (drop), and dismissal (turn) tells a complete, expressive story.\n# Q4: options=C1 a frustrated shake before the drop, C2 a sag after the turn; winner=C1 because the pre-drop shake establishes the 'why' (struggle/failure), making the subsequent abandonment a logical and more impactful emotional beat."
+  },
+  {
+    "idx": 36,
+    "cue": "prepare_action_raise_hold",
+    "description": "To signal readiness, the robot executes a small preparatory dip, rises sharply, and then crisply locks its elbow to hold with tension, telegraphing its intent to act.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -6
+              },
+              "speed": 1.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": 25,
+          "speed": 2.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": 5
+              },
+              "speed": 3.0,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:23:24",
+    "reasoning": "# Q1: A human would telegraph their intent to act by deliberately raising their arm to a ready position and holding it with slight tension.\n# Q2: candidates=P1) down+vertical+x48,y50,z35, P2) front+horizontal+x55,y50,z55; winner=P1 because the low, neutral starting pose makes the subsequent \"raise\" and \"hold\" highly readable as a deliberate preparation.\n# Q3: options=M1 P1>path(z up)>hold, M2 P1>movement(z dip)>path(z up)>movement(elbow lock); winner=M2 because the preparatory dip and final locking motion create a sense of tension and intent, not just a simple lift.\n# Q4: options=C1 preparatory dip before the raise, C2 a sharp elbow lock at the peak of the raise; winner=C2 because the final lock is what sells the tension and readiness of the \"hold,\" distinguishing it from a casual pause."
+  },
+  {
+    "idx": 37,
+    "cue": "tempo_cue",
+    "description": "The robot gets into a conductor's stance, gives a sharp preparatory upbeat, and marks a clear tempo with rhythmic side-to-side wrist flicks, ending on a final, held beat.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 25
+              },
+              "speed": 2.2,
+              "hold_time": 0.15
+            },
+            {
+              "degrees": {
+                "y": -25
+              },
+              "speed": 2.2,
+              "hold_time": 0.15
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 25
+              },
+              "speed": 2.2,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:24:05",
+    "reasoning": "# Q1: A human conductor first raises their hand into a ready position, gives a small preparatory upbeat, and then begins a clear, rhythmic side-to-side motion to establish the tempo.\n# Q2: candidates=P1) front+horizontal+x60,y50,z55, P2) up+vertical+x50,y50,z70; winner=P1 because the chest-height, forward-facing pose is the most iconic and unambiguous starting point for conducting, whereas a high pose is for a grander gesture.\n# Q3: options=M1 P1>movement(shoulder z upbeat)>movement(wrist y repeat), M2 P1>path(arc y); winner=M1 because the discrete upbeat and sharp wrist flicks clearly delineate each beat, which is essential for a tempo cue, while a smooth arc would read as a generic wave.\n# Q4: options=C1 preparatory upbeat before the rhythm starts, C2 final 'cut-off' pose; winner=C1 because the upbeat is a classic conductor's anacrusis that signals \"get ready\" and firmly establishes the context of setting time, making the subsequent motion instantly readable."
+  },
+  {
+    "idx": 38,
+    "cue": "hesitation_pause_hold",
+    "description": "The robot shows intent with a tiny lift, begins to move forward, then abruptly recoils backward and down, freezing in a held pose of uncertainty.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 4
+              },
+              "speed": 1.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "x",
+          "distance": 10,
+          "speed": 0.7
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15,
+                "z": -5
+              },
+              "speed": 2.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:24:46",
+    "reasoning": "# Q1: A human would start to move forward, then suddenly stop and retract slightly, holding the pose while thinking.\n# Q2: candidates=P1) front+horizontal+x60,y50,z50, P2) down+vertical+x48,y50,z45; winner=P1 because starting from a neutral 'reaching' pose makes the subsequent interruption and recoil read clearly as hesitation.\n# Q3: options=M1 P1>path(long x)>path(back), M2 P1>path(short x)>movement(sharp x-z recoil/hold); winner=M2 because the aborted short reach followed by a sharp, coupled recoil and hold tells a much clearer story of uncertainty than a simple back-and-forth.\n# Q4: options=C1 add a preparatory wobble, C2 use a sharp backward-and-downward recoil; winner=C2 because the coupled recoil (x-z) strongly communicates a sudden loss of momentum and confidence, which is the core of hesitation."
+  },
+  {
+    "idx": 39,
+    "cue": "commit_action_fast_reach",
+    "description": "The robot first recoils with a quick backward pull to telegraph intent, then thrusts forward in a fast, committed reach, punctuating the end with a sharp hold.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15,
+                "z": -5
+              },
+              "speed": 2.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "x",
+          "distance": 35,
+          "speed": 4.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 2.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:25:25",
+    "reasoning": "# Q1: A human would perform a fast reach by first pulling back slightly for anticipation, then thrusting the arm forward with conviction.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) down+vertical+x45,y50,z35; winner=P1 because a neutral, mid-chest start makes the preparatory recoil and forward thrust clearer and more readable than starting from a low resting state.\n# Q3: options=M1 pose>movement(recoil)>path(thrust), M2 pose>path(arc); winner=M1 because the explicit recoil-then-thrust sequence makes the action feel decisive and committed, embodying the animation principle of anticipation.\n# Q4: options=C1 preparatory recoil before the thrust, C2 final sharp hold after the thrust; winner=C1 because the recoil is the primary contextual beat that telegraphs intent and power, turning a simple movement into a committed action."
+  },
+  {
+    "idx": 40,
+    "cue": "disengage_step_back_release",
+    "description": "The robot signals disengagement with a small preparatory lift, performs a sharp recoil to pantomime the release, and then smoothly retreats its arm back and down to create space.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 1.5,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10
+              },
+              "speed": 3.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25,
+                "z": -15
+              },
+              "speed": 0.9,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:29:07",
+    "reasoning": "# Q1: A human would first signal the end of an interaction, then physically open their hand and pull their arm back towards their body to create space.\n# Q2: candidates=P1) front+horizontal+x75,y50,z50 (extended, chest-level), P2) down+horizontal+x70,y50,z35 (waist-level); winner=P1 because the chest-level extended pose is a stronger iconic starting point for a social disengagement like ending a handshake.\n# Q3: options=M1 P1>path(line x- z-), M2 P1>movement(lift z+)>movement(recoil x-)>movement(retreat x- z-); winner=M2 because the multi-phase sequence with a preparatory lift and a sharp recoil makes the release feel intentional and readable, not just a simple retreat.\n# Q4: options=C1 a sharp recoil to mark the release, C2 a slow sag after the retreat, C3 a preparatory lift before any backward motion; winner=C1 and C3 combined because the preparatory lift followed by a sharp recoil creates a clear animation arc of anticipation, action, and follow-through."
+  },
+  {
+    "idx": 41,
+    "cue": "small_rhythmic_bounce",
+    "description": "The robot performs a small preparatory lift, then settles into a gentle, rhythmic bounce with a slight weight shift, suggesting light anticipation or listening to a beat.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 6
+              },
+              "speed": 0.9,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10,
+                "x": 2
+              },
+              "speed": 1.4,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10,
+                "x": -2
+              },
+              "speed": 1.1,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": -10,
+                "x": 2
+              },
+              "speed": 1.4,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:29:43",
+    "reasoning": "# Q1: A human might start a light, rhythmic bounce with a small preparatory lift before settling into a gentle, repeating up-and-down motion.\n# Q2: candidates=P1) down+vertical+x48,y50,z40, P2) front+horizontal+x60,y50,z50; winner=P1 because the low, neutral starting position makes the small z-axis bounce feel like a full-body rhythmic movement rather than an isolated hand gesture.\n# Q3: options=M1 P1>movement(prep lift)>movement(repeat bounce), M2 P1>path(arc z); winner=M1 because the preparatory lift acts as an anticipation that makes the subsequent rhythmic bounce feel more natural and intentional.\n# Q4: options=C1 a preparatory lift to initiate the rhythm, C2 a final static pose to end the rhythm; winner=C1 because the anticipation strengthens the cue's natural feel, while a final pose would abruptly kill the sense of an ongoing rhythm."
+  },
+  {
+    "idx": 42,
+    "cue": "laughter_substitute",
+    "description": "The robot recoils slightly as if catching its breath, then bursts into a series of sharp vertical shakes, and finally sags slightly as the 'laugh' subsides.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10,
+                "z": 5
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 4,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 12
+              },
+              "speed": 3.5,
+              "hold_time": 0.05
+            },
+            {
+              "degrees": {
+                "z": -12
+              },
+              "speed": 3.5,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -15
+              },
+              "speed": 0.7,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:30:17",
+    "reasoning": "# Q1: A human laugh substitute often involves a rhythmic shaking of the shoulders, sometimes preceded by a small intake of breath and followed by a relaxing sag.\n# Q2: candidates=P1) front+horizontal+x55,y50,z50, P2) down+vertical+x48,y50,z45; winner=P1 because the chest-level position is more socially engaged and makes the subsequent shoulder shakes read clearly as a full-body reaction.\n# Q3: options=M1 P1>movement(z recoil)>movement(z shake)>movement(z sag), M2 P1>movement(z shake only); winner=M1 because the three-part structure of recoil, shake, and sag creates a more believable and organic emotional arc for laughter.\n# Q4: options=C1 preparatory recoil before the shake, C2 sagging motion after the shake; winner=C1 because the pre-laugh recoil acts as an anticipatory beat that makes the subsequent shake read as a burst of amusement rather than a generic shudder."
+  },
+  {
+    "idx": 43,
+    "cue": "shame_shy_substitute",
+    "description": "The robot shows shame by first hesitating with a slight tremor, then slowly arcing its hand up to cover its 'face', and finally turning slightly away to complete the gesture of avoidance.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 4
+              },
+              "speed": 1.8,
+              "hold_time": 0.05
+            },
+            {
+              "degrees": {
+                "z": -4
+              },
+              "speed": 1.8,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "shoulder",
+          "plane": "xz",
+          "radius": 40,
+          "sweep": -50,
+          "speed": 0.7,
+          "direction": "ccw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "y": -20
+              },
+              "speed": 0.9,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:30:47",
+    "reasoning": "# Q1: A human would show shame by hesitating, slowly bringing a hand up to hide their face, and turning their head slightly away.\n# Q2: candidates=P1) down+vertical+x48,y50,z35, P2) front+horizontal+x60,y50,z50; winner=P1 because the low starting point creates a longer, more readable journey of reluctance as the hand rises to cover the face.\n# Q3: options=M1 P1>movement(tremor)>path(arc to face)>movement(turn away), M2 P1>pose(face)>hold; winner=M1 because the sequence tells a story of hesitation, covering, and avoidance, which is far more expressive than a static pose.\n# Q4: options=C1 a pre-lift tremor, C2 a final sag after covering; winner=C1 because the initial hesitation/tremor clearly signals the internal conflict of shame before the main action begins, making the entire gesture more legible."
+  },
+  {
+    "idx": 44,
+    "cue": "listening_lean_substitute",
+    "description": "The robot moves its hand to its 'ear', cups the gripper to catch sound, and then leans in slightly to show it is listening intently, holding the final lean.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "right",
+            "x": 65,
+            "y": 45,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "gripper",
+          "directions": [
+            {
+              "degrees": {
+                "value": 40
+              },
+              "speed": 1.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 12
+              },
+              "speed": 0.8,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-03-31 16:21:50",
+    "reasoning": "# Q1: A human would cup their hand beside their ear and lean forward slightly to signal that they are listening intently.\n# Q2: candidates=P1) right+vertical+x65,y45,z70, P2) front+horizontal+x55,y50,z50; winner=P2 because starting from a neutral, forward-facing chest pose makes the subsequent move to the head-side \"ear\" a more deliberate and readable gesture of listening.\n# Q3: options=M1 P2>pose(ear lane)>movement(gripper cup)>movement(shoulder lean), M2 P2>path(arc to ear)>movement(lean); winner=M1 because staging the motion by first placing the hand, then forming the cup, and finally leaning in tells a clearer story than a single blended movement.\n# Q4: options=C1 forward lean after cupping the hand, C2 head tilt before cupping the hand; winner=C1 because the forward lean is a direct physical metaphor for \"paying closer attention\" and strongly reinforces the listening context established by the hand-to-ear gesture."
+  }
+]

@@ -1,0 +1,36 @@
+You are verifying ONLY the pose component (text-only, no image).
+
+Task:
+- Judge whether the provided first pose is an appropriate start keyframe for the cue.
+- If not appropriate, propose corrected pose component.
+
+Return strict JSON only:
+{
+  "pose_is_appropriate": true/false,
+  "assessment": "string",
+  "if_not_appropriate": {
+    "corrected_pose_component": {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": {
+        "pose": {
+          "torso_height": "...",
+          "arm_position": "...",
+          "gripper_orientation": "...",
+          "head": "...",
+          "left_arm": "...",
+          "x": <0..100 optional>,
+          "y": <0..100 optional>,
+          "z": <0..100 optional>
+        }
+      }
+    },
+    "why_change": "string"
+  },
+  "confidence": 0.0
+}
+
+Cue: {{CUE_NAME}}
+Description: {{CUE_DESCRIPTION}}
+Current pose component:
+{{POSE_COMPONENT_JSON}}

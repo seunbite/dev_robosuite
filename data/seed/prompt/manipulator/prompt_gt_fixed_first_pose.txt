@@ -1,0 +1,81 @@
+You are an expert in iconic robot motion design. Create one highly readable motion cue for a single robot arm with a parallel-jaw gripper.
+
+The **first pose is FIXED** (human ground truth). You must NOT change its `dir`, `gripper_orientation`, or x/y/z.
+**Read that fixed pose first** — how the arm extends and how the gripper points — then design **1–3 follow-on steps** that only make sense from that configuration.
+
+Example (beckon): fixed start `front` + `horizontal`. Mostly **wrist** beats along **z**, `repetition` 3–5 — not a large shoulder reposition.
+Example (air_quotes): fixed start `front` + `horizontal` near the head. Prefer: small wrist beat → **pause** (`hold_time` 0.3–0.6s) → two more beats (separate steps or `directions[]` with holds). Speed ~1.5–2.5; pauses matter more than max speed.
+
+[Required Reasoning Process]
+Output exactly three planning lines as # comments before the JSON.
+# Q1: Given the fixed start pose (dir + gripper_orientation), what small joint motion reads the cue? (One sentence)
+# Q2: Structure Comparison. Compare 2+ tail sequences (e.g., wrist-only z beats vs shoulder arc). State winner= and why for THIS fixed pose.
+# Q3: Context Reinforcement. Compare 2+ micro-actions (speed, repetition, hold). State winner= and why.
+
+[Fixed Start Pose — DO NOT EDIT]
+{{FIXED_FIRST_POSE_JSON}}
+
+[Movement / Path Rules]
+Coordinate frame: +x forward (viewer), +y robot left, +z up.
+- movement `joint`: shoulder, elbow, wrist.
+- movement `directions[].degrees`: keys x, y, and/or z (world axes).
+- path: shape line or arc; joint shoulder/elbow/wrist; axis x/y/z or plane xy/xz/yz as in examples.
+
+[Movement steps — joint-space beats]
+Use `type: "movement"` for discrete beats (shoulder / elbow / wrist).
+
+3. Axis mapping for `directions[].degrees`:
+- x: Depth (forward/backward).
+- y: Lateral (side-to-side / wave).
+- z: Height (up/down / nod).
+- Coupled: x+z for bow or recoil.
+
+4. Speed (per `directions[]` beat):
+- Range: 0.5 (slow) – 4.0 (sharp). Default: 1.0–2.0.
+- Vary: setup 0.8–1.5, core 2.0–3.5, settle 0.5–1.2. Avoid all beats at 3–4 unless one sharp strike.
+
+5. Pause / hold (`hold_time` seconds, per direction beat):
+- Use 0.2–0.8s so the viewer sees move → hold → move.
+- Multi-beat cues (air_quotes, beckon, shh): at least one hold ≥ 0.25s between beats.
+
+6. Repetition (`repetition` on movement):
+- Same joint/axis/angle repeated identically (beckon z-nods 3–5).
+- Asymmetric rhythms (move–pause–move–move): use separate steps or multiple `directions[]` with holds — not `repetition` 4 at speed 4.0 with hold 0.
+
+7. Angle (`directions[].degrees` per axis):
+- Typical: ±5–45° per axis (wrist ±5–20; shoulder/elbow ±15–50).
+- Hard limit: ±50° per axis.
+
+[Path steps — EE IK Cartesian draw]
+Use `type: "path"` only to draw a **straight line or arc in world space** via end-effector IK.
+**Never include `joint` on path.** (No shoulder/elbow/wrist path selection.)
+
+8. Line path (`shape: "line"`):
+- Translate EE parallel to one world axis.
+- Fields: `axis` ∈ {x, y, z}, `distance` (meters, signed), `speed`, optional `hold_time`.
+- Typical `distance`: 0.03–0.25 m (small local stroke 0.03–0.08 m; reach/slash up to ~0.25 m).
+
+9. Arc path (`shape: "arc"`):
+- Draw an arc in plane `xy`, `yz`, or `xz` (zx accepted as xz).
+- Fields: `plane`, `radius` (meters), `sweep` (degrees), `direction` cw|ccw, `speed`, optional `hold_time`.
+- Typical: `radius` 0.03–0.20 m, `sweep` 45–360 for partial arc, 360–720 for full loops.
+- Use for scratches, circles, wiping.
+
+[Hard Constraints]
+- [ ] Do NOT output a first pose step. The executor will prepend the fixed pose.
+- [ ] Output **1–3 steps** in `movements` (movement and/or path and/or pose after the fixed start).
+- [ ] At least one `movement` or `path` step is required.
+- [ ] Speed: 0.5–4.0. Default 1.0–2.0.
+- [ ] No markdown code blocks. No prose after JSON.
+
+Output exactly 3 # lines, then JSON:
+{
+  "description": "one sentence describing the full motion including the fixed start",
+  "movements": [ ... steps AFTER the fixed pose only ... ]
+}
+
+{{FEW_SHOT_EXAMPLES}}
+---
+Target Cue:
+Cue Name: {{CUE_NAME}}
+---

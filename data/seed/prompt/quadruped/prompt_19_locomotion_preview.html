@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt 19 Locomotion Preview</title>
+<style>
+:root {
+  --bg: #f6f4ef;
+  --surface: #fffdf8;
+  --surface-2: #f0ece2;
+  --border: #d8d0c2;
+  --text: #1e241f;
+  --muted: #667068;
+  --accent: #2f6f57;
+  --accent-2: #8d5a2b;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(circle at top, #fffdf8, #f1ede4 55%, #e8e2d5 100%); color: var(--text); font-family: 'Iowan Old Style', 'Palatino Linotype', serif; }
+.wrap { max-width: 1480px; margin: 0 auto; padding: 28px 22px 56px; }
+.hero { margin-bottom: 18px; padding: 18px 20px; border: 1px solid var(--border); border-radius: 18px; background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); }
+.hero h1 { margin: 0 0 8px; font-size: 32px; }
+.hero p { margin: 0; color: var(--muted); font-size: 15px; }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.chip { border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 12px; color: var(--muted); background: var(--surface); }
+details { border: 1px solid var(--border); border-radius: 16px; background: var(--surface); margin-bottom: 18px; overflow: hidden; }
+summary { cursor: pointer; padding: 14px 16px; font-weight: 700; background: var(--surface-2); }
+details pre { margin: 0; padding: 18px; white-space: pre-wrap; font-family: 'SFMono-Regular', 'Menlo', monospace; font-size: 13px; line-height: 1.55; }
+.section-title { margin: 24px 0 10px; font-size: 20px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 14px; }
+.card { border: 1px solid var(--border); border-radius: 18px; overflow: hidden; background: var(--surface); box-shadow: 0 8px 30px rgba(73, 57, 32, 0.08); }
+.card-header { display: flex; gap: 8px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, #f8f4eb, #f1eadb); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.group { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+.group.iconic { background: rgba(47,111,87,0.12); color: var(--accent); }
+.group.contextual { background: rgba(141,90,43,0.12); color: var(--accent-2); }
+.idx { color: var(--muted); font-size: 12px; }
+.cue { font-weight: 700; font-size: 14px; }
+.card-body { padding: 14px; }
+.cue-text { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.chain { margin-bottom: 10px; color: var(--accent); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; }
+.badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.badge { border: 1px solid #d7ceb9; border-radius: 999px; padding: 3px 8px; font-size: 11px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--muted); background: #fbfaf6; }
+.desc { margin: 0 0 12px; color: var(--muted); line-height: 1.5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.media { margin: 0 0 12px; border: 1px solid #e4dccf; border-radius: 12px; overflow: hidden; background: #f3efe6; min-height: 220px; display: flex; align-items: center; justify-content: center; }
+.media img { display: block; width: 100%; height: auto; }
+.media-missing { color: var(--muted); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 12px 0 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+pre { margin: 0; white-space: pre-wrap; background: #fbfaf6; border: 1px solid #e4dccf; border-radius: 12px; padding: 12px; font-family: 'SFMono-Regular', 'Menlo', monospace; font-size: 12px; line-height: 1.5; overflow: auto; }
+.catalog-section { margin-top: 24px; }
+.pill-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.pill { border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; background: rgba(255,255,255,0.72); display: flex; flex-direction: column; gap: 4px; }
+.pill.used { border-color: #b7cdbf; background: rgba(47,111,87,0.08); }
+.pill strong { font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.pill span { color: var(--muted); font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.4; }
+.mini-grid-wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 10px 0 18px; }
+.mini-card { border: 1px solid var(--border); border-radius: 16px; padding: 12px; background: rgba(255,255,255,0.76); }
+.mini-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.mini-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.mini-grid figure { margin: 0; }
+.mini-grid figcaption { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.mini-grid img { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid #e4dccf; background: #f3efe6; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Prompt 19 Locomotion Preview</h1>
+      <p>`pose / movement / path` 기반 사족보행 config 스키마와 정면 고정 카메라 렌더를 함께 정리한 미리보기입니다.</p>
+      <div class="meta">
+        <span class="chip">few-shots: 8</span>
+        <span class="chip">camera: front_fixed</span>
+        <span class="chip">source: /Users/sb/Downloads/workspace/dev_robosuite/data/seed/cues_new.yml</span>
+      </div>
+    </section>
+    <details open>
+      <summary>Prompt Text</summary>
+      <pre>You are an expert in quadruped robot locomotion motion design. Your goal is to create one highly readable locomotion motion for a four-legged robot and output it as a structured JSON.
+
+[Required Reasoning Process]
+You MUST output exactly three planning lines as # comments before the JSON.
+# Q1: How would the robot physically convey this cue? (One sentence)
+# Q2: Pose Comparison. Rank at least 2 initial pose candidates (e.g., P1: three-leg front+up vs P2: four-leg bow). State winner= and why.
+# Q3: Structure Comparison. Compare 2+ step sequences (e.g., S1: pose&gt;movement vs S2: pose&gt;path&gt;pose). State winner= and why.
+
+[Locomotion Config Schema]
+{
+  &quot;cue&quot;: &quot;&lt;cue_id&gt;&quot;,
+  &quot;movements&quot;: [
+    {
+      &quot;type&quot;: &quot;pose&quot;,
+      &quot;duration&quot;: &lt;seconds&gt;,
+      &quot;parameters&quot;: {
+        &quot;pose&quot;: {
+          &quot;dir&quot;: &quot;front | back | left | right&quot;,
+          &quot;front_height&quot;: &quot;low | mid | high&quot;,
+          &quot;back_height&quot;: &quot;low | mid | high&quot;,
+          &quot;three_legs&quot;: true | false,
+          &quot;three_leg_pose&quot;: {
+            &quot;hand_position&quot;: &quot;up | front | right | back | left&quot;
+          }
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;movement&quot;,
+      &quot;duration&quot;: &lt;seconds&gt;,
+      &quot;parameters&quot;: {
+        &quot;movement&quot;: {
+          &quot;repetition&quot;: &lt;int&gt;,
+          &quot;speed&quot;: &lt;float&gt;,
+          &quot;joints&quot;: [
+            {
+              &quot;joint&quot;: &quot;hip | thigh | knee&quot;,
+              &quot;degrees&quot;: { &quot;&lt;axis&gt;&quot;: [&lt;lo&gt;, &lt;hi&gt;] },
+              &quot;speed&quot;: &lt;optional float&gt;
+            }
+          ]
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;path&quot;,
+      &quot;parameters&quot;: {
+        &quot;path&quot;: {
+          &quot;shape&quot;: &quot;line&quot;,
+          &quot;distance&quot;: &lt;meters, negative=backward&gt;,
+          &quot;speed&quot;: &lt;float&gt;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;path&quot;,
+      &quot;parameters&quot;: {
+        &quot;path&quot;: {
+          &quot;shape&quot;: &quot;arc&quot;,
+          &quot;degrees&quot;: &lt;total turn angle, negative=clockwise&gt;,
+          &quot;speed&quot;: &lt;float&gt;
+        }
+      }
+    },
+    {
+      &quot;type&quot;: &quot;path&quot;,
+      &quot;duration&quot;: &lt;seconds&gt;,
+      &quot;parameters&quot;: {
+        &quot;path&quot;: {
+          &quot;shape&quot;: &quot;pose_to_pose&quot;,
+          &quot;start_pose&quot;: { ... },
+          &quot;end_pose&quot;: { ... },
+          &quot;velocity&quot;: { &quot;vx&quot;: 0.0, &quot;vy&quot;: 0.0, &quot;wz&quot;: 0.0 }
+        }
+      }
+    }
+  ]
+}
+
+[pose Selection Rules]
+1. Direction (dir): front (default forward-facing), back (retreat/recoil), left/right (asymmetric/curious).
+2. Heights: front_height + back_height control body pitch. low+high = bow, mid+mid = neutral.
+3. Three-leg mode: `three_legs=true` lifts the first front paw.
+   `hand_position` selects a predefined lifted-paw joint shape: up, front, right, back, left.
+   `three_legs=false` means all four legs on ground; `three_leg_pose` is ignored.
+
+[movement Rules]
+- `movement` animates only the currently lifted leg (requires three_legs=true in the preceding pose).
+- Each `joints[]` entry drives one joint. Multiple entries play simultaneously.
+- `joint` is REQUIRED. Allowed values: `&quot;hip&quot;`, `&quot;thigh&quot;`, `&quot;knee&quot;`. Do NOT use `&quot;hand&quot;`.
+- Each joint uses one axis: `hip` → `&quot;y&quot;` (lateral abduction), `thigh` → `&quot;x&quot;` (upper-leg rotation), `knee` → `&quot;x&quot;` (lower-leg bend).
+  A scalar `30` means `[0, 30]`. A list `[-20, 20]` is the explicit range.
+- All motion is direct joint-angle control (FK). Do NOT use IK or the `&quot;hand&quot;` token.
+- Motion is ping-ponged over the range for `repetition` cycles at relative `speed`.
+- Per-joint `speed` overrides the movement-level `speed`.
+- Speed scale: 0.5 = slow, 1.0 = neutral, up to 3.0 = sharp.
+
+[path Rules]
+- `path` moves the whole robot body through the world (four-leg or three-leg).
+- `line`: walks in a straight line. `distance` in meters (negative = backward), `speed` (0.5-3.0).
+- `arc`: walks in a curved arc. `degrees` for total turn (negative = clockwise), `speed` (0.5-3.0).
+- `pose_to_pose`: walks while changing stance. Requires `duration`, `start_pose`, `end_pose`, and `velocity`.
+- `line` and `arc` do NOT use `duration`; it is computed from distance/degrees + speed.
+
+[Hard Constraints]
+- [ ] Every motion MUST start with a `pose` step.
+- [ ] Total steps: 2-10.
+- [ ] Speed: 0.3-4.0. Default: 0.75-2.0.
+- [ ] Every `joints[]` entry MUST include `&quot;joint&quot;` with value `&quot;hip&quot;`, `&quot;thigh&quot;`, or `&quot;knee&quot;`. Never omit it or use `&quot;hand&quot;`.
+- [ ] No prose or extra explanation. No markdown code blocks.
+- [ ] State changes after the first pose must use `movement` or `path`, not a new unrelated `pose`.
+
+Output exactly 3 # lines (Q1, Q2, Q3), then the JSON object starting with {.
+
+
+[Available iconic cues]
+- wave_hi: Wave one hand side to side (Hello / Hi)
+- raising_hand_greeting: Raise one hand briefly (Greeting / Acknowledgement)
+- handshake_offer: Extend one hand vertically forward as if offering a handshake (Asking for handshake)
+- handshake_imitation: Move one hand up and down vertically as if shaking someone’s hand (Imitating handshake)
+- blow_kiss: Bring fingertips to lips and blow outward (Blow a kiss)
+- big_heart_above_head: Form a big heart shape above head (Love)
+- hand_over_heart: Place one hand over chest (Sincerity / Gratitude)
+- raise_fists_victory: Raise both fists upward (Victory / Excitement)
+- fist_pump: Pump one fist downward (Success / Yes!)
+- flex_bicep: Flex one arm to show bicep (Strength)
+- shrug_idk: Shrug shoulders with palms up (I don’t know)
+- scratch_head_confused: Scratch head lightly (Confusion)
+- facepalm: Place palm over face (Facepalm / Frustration)
+- point_self: Point to chest with index finger (Me)
+- point_you: Point forward with index finger (You)
+- beckon_come_here: Turn palm downward and curl fingers inward repeatedly (Come here / Beckon)
+- stop_palm_out: Extend palm forward flat (Stop)
+- pat_stomach: Pat stomach lightly (Hungry / Full)
+- fan_face_hot: Fan face with one hand (Hot)
+- cover_yawn_sleepy: Open mouth wide and cover it (Sleepy / Yawn)
+- rub_eye_tired: Rub one eye (Tired)
+- tap_temple_think: Tap temple with index finger (Think / Smart)
+- circle_temple_crazy: Rotate index finger near temple (Crazy)
+- lean_forward_interest: Lean forward slightly with palms open (Interest)
+- cover_mouth_gasp: Cover mouth with palm (Gasp / Oops)
+- cheers_toast: Raise one hand as if holding an invisible glass (Cheers)
+- highfive_invite: Raise one palm upward as if inviting a high five (Asking for high five)
+- highfive_imitation: Swing one raised palm downward as if high-fiving air (Imitating high five)
+- fistbump_invite: Extend one fist forward (Asking for fist bump)
+- fistbump_imitation: Tap one fist lightly against your other palm (Imitating fist bump)
+- pat_self_back: Pat your own back (Encouragement)
+- draw_circle_repeat: Draw a circle in the air with index finger (Repeat / Around)
+- throat_cut_stop: Slice flat hand horizontally across throat (Cut / Stop it)
+- chin_flick_dismiss: Swipe back of fingers outward from under chin (Dismissive / Whatever)
+- cover_ears_too_loud: Cover both ears (Too loud / Don’t want to hear)
+- salute: Bring one hand to forehead in salute position (Salute)
+- visor_search: Place one hand above eyebrows as visor and look far (Searching distance)
+- yield_turn: open palm offer, backward hand sweep
+- interrupt_cue: raised finger cue, palm-forward pause
+- request_turn: slight hand raise, open palm ask
+- guiding_arm: open arm guide, light directional sweep
+- protective_arm_out: side arm shield, forward block hold
+- escorting_gesture: arm-leading guide, body-turn invitation
+- turn_yield_lower_hand: hand lower release, open palm give-way
+- clarification_request_palm_tilt: palm tilt ask, finger-question curl
+- slow_down_request_palm_down: slow downward press, repeated soft push
+- speed_up_circular_cue: circular wrist roll, forward flick
+- wait_for_me_backward_palm: backward palm wave, over-shoulder stop
+- continue_on_forward_roll: rolling hand cue, forward sweep
+- polite_decline_small_push: small palm-out, soft side wave
+- firm_accept_forward_reach: direct reach, handshake initiate
+- hesitant_accept_half_reach: partial reach, pause-then-touch
+- cancel_previous_offer_retract: pull-back retract, shake-no retract
+- conditional_accept_pause_then_reach: pause hold then reach, nod-delay reach
+- final_decision_down_press: firm downward press, double press confirm
+- resume_speaking_pull: hand pull-in cue, nod-plus-pull
+- emphasize_point_downbeat: downward chop, fist beat accent
+- unsure_response_hand_hover_stop: hovering palm, half-stop freeze
+- prevent_fall_support_reach: fast reach grab, body-lunge support
+
+[Available contextual cues]
+- nod_yes: Nod head up and down (Yes)
+- shake_head_no: Shake head side to side (No)
+- air_quotes: Raise both hands and flex index and middle fingers twice (Air quotes)
+- self_hug: Wrap both arms around yourself (Hug / Comfort)
+- bow_greeting: Bow slightly from the waist (Respect / Greeting)
+- tilt_head_curious: Tilt head slightly (Curiosity)
+- raise_index_one_moment: Raise index finger upright (One moment / Important point)
+- shh_gesture: Place index finger on lips (Shh / Be quiet)
+- rub_arms_cold: Rub both upper arms (Cold)
+- deep_bow_apology: Bow deeply while hands at sides (Apology)
+- cross_arms_defensive: Cross arms over chest (Defensive)
+- hands_on_hips: Place both hands on hips (Confidence / Annoyed)
+- step_back_surprised: Step back slightly with both palms raised outward (Shock / Surprise)
+- palms_together_thank_you: Press palms together and bow slightly (Thank you / Respect)
+- curl_fingers_give_me: Turn palm upward and curl fingers inward (Give me)
+- hands_up_surrender: Raise both hands beside head (I give up / Surrender)
+- arms_open_welcome: Open both arms wide outward (Welcome)
+- stretch_arms_up: Stretch both arms upward (Relief / Stretch)
+- gentle_retreat_motion: backward palm press, step-back cue
+- disagreement_cross_then_release: brief arm cross, head shake release
+- stop_entry_cross_block: arm cross block, step-in block
+- allow_entry_open_side: open side step, arm-open allow
+- relief_release_drop: shoulder drop, hand release sigh
+- frustration_down_throw: downward fling, sharp drop throw
+- disbelief_hold_then_drop: freeze hold then drop, head-back drop
+- submission_lowered_open_palm: lowered palms show, slight bow palms
+- dominance_high_open_hold: high open palms, wide chest hold
+- apology_forward_lowered_hold: forward lean palms, chest-touch bow
+- gratitude_small_bow_hold: nod bow, hand-to-chest bow
+- disappointment_slow_fold: slow arm fold, head-down fold
+- satisfaction_small_clench_release: fist clench release, subtle nod clench
+- start_action_forward_snap: snap cue, quick forward flick
+- stop_action_freeze_palm: freeze palm, full-body stop
+- retry_action_reset_circle: reset circle, shake-out reset
+- finish_action_down_release: downward release, open drop finish
+- abandon_action_drop_turn: drop-and-turn, dismissive wave turn
+- prepare_action_raise_hold: raise-and-hold, inhale-ready lift
+- tempo_cue: rhythmic hand beat, conductor-style cue
+- hesitation_pause_hold: pause freeze, hand hover
+- commit_action_fast_reach: fast reach, step-in grab
+- disengage_step_back_release: step-back release, turn-away drop
+- small_rhythmic_bounce: heel bounce, shoulder bounce
+- laughter_substitute: shoulder bounce, open-mouth smile
+- confusion_substitute: head tilt pause, uncertain hand hover
+- thinking_substitute: inward pause, contemplative hand hover
+- attention_substitute: slight forward lean, attentive hold
+- surprise_substitute: quick recoil freeze, startled lift
+- relief_substitute: shoulder release, eased downward drop
+- embarrassment_substitute: gaze aversion dip, self-conscious shrink
+- skepticism_substitute: side tilt hold, doubtful withdraw
+- curiosity_substitute: forward lean tilt, inquisitive pause
+- agreement_substitute: soft forward dip, settled assent
+- disappointment_substitute: shoulder drop, discouraged settle
+- shame_shy_substitute: head down turn, face cover glance
+- listening_lean_substitute: ear lean, hand-to-ear cue
+
+
+[
+  {
+    &quot;idx&quot;: 0,
+    &quot;group&quot;: &quot;iconic&quot;,
+    &quot;cue&quot;: &quot;wave_hi&quot;,
+    &quot;cue_text&quot;: &quot;Wave one hand side to side (Hello / Hi)&quot;,
+    &quot;description&quot;: &quot;The quadruped keeps the front paw in the up pose and adds only a tiny hip-abduction accent; unspecified joints are treated as zero delta from the pose baseline.&quot;,
+    &quot;reasoning&quot;: &quot;# Q1: The wave must stay anchored to the up silhouette with no branch jump.\n# Q2: winner=three-leg front + hand=up anchor.\n# Q3: winner=single explicit joint command hip.y [2,-2]; retrieval infers pose baseline joints when base_rad is omitted.&quot;,
+    &quot;movements&quot;: [
+      {
+        &quot;type&quot;: &quot;pose&quot;,
+        &quot;duration&quot;: 0.45,
+        &quot;parameters&quot;: {
+          &quot;pose&quot;: {
+            &quot;dir&quot;: &quot;front&quot;,
+            &quot;front_height&quot;: &quot;high&quot;,
+            &quot;back_height&quot;: &quot;mid&quot;,
+            &quot;three_legs&quot;: true,
+            &quot;three_leg_pose&quot;: {
+              &quot;hand_position&quot;: &quot;up&quot;
+            }
+          }
+        }
+      },
+      {
+        &quot;type&quot;: &quot;movement&quot;,
+        &quot;duration&quot;: 1.8,
+        &quot;parameters&quot;: {
+          &quot;movement&quot;: {
+            &quot;joints&quot;: [
+              {
+                &quot;joint&quot;: &quot;hip&quot;,
+                &quot;degrees&quot;: {
+                  &quot;y&quot;: [
+                    -20,
+                    20
+                  ]
+                }
+              }
+            ],
+            &quot;repetition&quot;: 3,
+            &quot;speed&quot;: 0.75
+          }
+        }
+      }
+    ],
+    &quot;state&quot;: &quot;fewshot&quot;,
+    &quot;model&quot;: &quot;handmade-locomotion-v2&quot;,
+    &quot;time&quot;: &quot;2026-04-16 02:12:37&quot;
+  },
+  {
+    &quot;idx&quot;: 1,
+    &quot;group&quot;: &quot;iconic&quot;,
+    &quot;cue&quot;: &quot;handshake_offer&quot;,
+    &quot;cue_text&quot;: &quot;Extend one hand vertically forward as if offering a handshake (Asking for handshake)&quot;,
+    &quot;description&quot;: &quot;The quadruped raises one front paw in a forward-folded shape and extends the leg forward through a small thigh/knee x motion like a handshake offer.&quot;,
+    &quot;reasoning&quot;: &quot;# Q1: A handshake should read as an offering reach, not a wave.\n# Q2: winner=three-leg pose with hand=front keeps the paw aimed to partner.\n# Q3: winner=joint-space thigh/knee x forward so the foreleg extends without IK branch changes.&quot;,
+    &quot;movements&quot;: [
+      {
+        &quot;type&quot;: &quot;pose&quot;,
+        &quot;duration&quot;: 0.45,
+        &quot;parameters&quot;: {
+          &quot;pose&quot;: {
+            &quot;dir&quot;: &quot;front&quot;,
+            &quot;front_height&quot;: &quot;high&quot;,
+            &quot;back_height&quot;: &quot;mid&quot;,
+            &quot;three_legs&quot;: true,
+            &quot;three_leg_pose&quot;: {
+              &quot;hand_position&quot;: &quot;front&quot;
+            }
+          }
+        }
+      },
+      {
+        &quot;type&quot;: &quot;movement&quot;,
+        &quot;duration&quot;: 1.15,
+        &quot;parameters&quot;: {
+          &quot;movement&quot;: {
+            &quot;joints&quot;: [
+              {
+                &quot;joint&quot;: &quot;thigh&quot;,
+                &quot;degrees&quot;: {
+                  &quot;x&quot;: [
+                    0,
+                    10
+                  ]
+                }
+              },
+              {
+                &quot;joint&quot;: &quot;knee&quot;,
+                &quot;degrees&quot;: {
+                  &quot;x&quot;: [
+                    0,
+                    10
+                  ]
+                },
+                &quot;speed&quot;: 0.9
+              }
+            ],
+            &quot;repetition&quot;: 1,
+            &quot;speed&quot;: 1.2
+          }
+        }
+      }
+    ],
+    &quot;state&quot;: &quot;fewshot&quot;,
+    &quot;model&quot;: &quot;handmade-locomotion-v2&quot;,
+    &quot;time&quot;: &quot;2026-04-16 02:12:37&quot;
+  },
+  {
+    &quot;idx&quot;: 2,
+    &quot;group&quot;: &quot;iconic&quot;,
+    &quot;cue&quot;: &quot;highfive_invite&quot;,
+    &quot;cue_text&quot;: &quot;Raise one palm upward as if inviting a high five (Asking for high five)&quot;,
+    &quot;description&quot;: &quot;The quadruped pops a front paw upward with a back-folded knee and an upward-facing paw, then accents the paw higher for a high-five invitation.&quot;,
+    &quot;reasoning&quot;: &quot;# Q1: A high-five needs an obviously raised target, not just a forward reach.\n# Q2: winner=three-leg pose with knee=back and hand=up because it makes the lifted paw look presented and open.\n# Q3: winner=hand+z with slight knee+z assist because the cue is about raising the target paw higher.&quot;,
+    &quot;movements&quot;: [
+      {
+        &quot;type&quot;: &quot;pose&quot;,
+        &quot;duration&quot;: 0.4,
+        &quot;parameters&quot;: {
+          &quot;pose&quot;: {
+            &quot;dir&quot;: &quot;front&quot;,
+            &quot;front_height&quot;: &quot;high&quot;,
+            &quot;back_height&quot;: &quot;mid&quot;,
+            &quot;three_legs&quot;: true,
+            &quot;three_leg_pose&quot;: {
+              &quot;hand_position&quot;: &quot;up&quot;
+            }
+          }
+        }
+      },
+      {
+        &quot;type&quot;: &quot;movement&quot;,
+        &quot;duration&quot;: 0.95,
+        &quot;parameters&quot;: {
+          &quot;movement&quot;: {
+            &quot;joints&quot;: [
+              {
+                &quot;joint&quot;: &quot;thigh&quot;,
+                &quot;degrees&quot;: {
+                  &quot;x&quot;: [
+                    -18,
+                    18
+                  ]
+                }
+              },
+              {
+                &quot;joint&quot;: &quot;knee&quot;,
+                &quot;degrees&quot;: {
+                  &quot;x&quot;: [
+                    -12,
+                    12
+                  ]
+                },
+                &quot;speed&quot;: 0.8
+              }
+            ],
+            &quot;repetition&quot;: 1,
+            &quot;speed&quot;: 1.2
+          }
+        }
+      }
+    ],
+    &quot;state&quot;: &quot;fewshot&quot;,
+    &quot;model&quot;: &quot;handmade-locomotion-v2&quot;,
+    &quot;time&quot;: &quot;2026-04-16 02:12:37&quot;
+  },
+  {
+    &quot;idx&quot;: 3,
+    &quot;group&quot;: &quot;iconic&quot;,
+    &quot;cue&quot;: &quot;beckon_come_here&quot;,
+    &quot;cue_text&quot;: &quot;Turn palm downward and curl fingers inward repeatedly (Come here / Beckon)&quot;,
+    &quot;description&quot;: &quot;The quadruped lifts one front paw, tucks the knee slightly forward, and repeatedly curls the paw back toward itself in a beckoning motion.&quot;,
+    &quot;reasoning&quot;: &quot;# Q1: A beckon needs repeated inward curls once the paw is already visible.\n# Q2: winner=three-leg pose with knee=front and hand=parallel because the lifted paw starts in a communicative position.\n# Q3: winner=hand-x with knee-x assistance because the motion should feel like repeated pulling inward.&quot;,
+    &quot;movements&quot;: [
+      {
+        &quot;type&quot;: &quot;pose&quot;,
+        &quot;duration&quot;: 0.45,
+        &quot;parameters&quot;: {
+          &quot;pose&quot;: {
+            &quot;dir&quot;: &quot;front&quot;,
+            &quot;front_height&quot;: &quot;high&quot;,
+            &quot;back_height&quot;: &quot;mid&quot;,
+            &quot;three_legs&quot;: true,
+            &quot;three_leg_pose&quot;: {
+              &quot;hand_position&quot;: &quot;front&quot;
+            }
+          }
+        }
+      },
+      {
+        &quot;type&quot;: &quot;movement&quot;,
+        &quot;duration&quot;: 1.45,
+        &quot;parameters&quot;: {
+          &quot;movement&quot;: {
+            &quot;joints&quot;: [
+              {
+                &quot;joint&quot;: &quot;thigh&quot;,
+                &quot;degrees&quot;: {
+                  &quot;x&quot;: [
+                    -22,
+                    22
+                  ]
+                }
+              },
+              {
+                &quot;joint&quot;: &quot;knee&quot;,
+                &quot;degrees&quot;: {
+                  &quot;x&quot;: [
+                    -14,
+                    14
+                  ]
+                },
+                &quot;speed&quot;: 1.1
+              }
+            ],
+            &quot;repetition&quot;: 3,
+            &quot;speed&quot;: 1.6
+          }
+        }
+      }
+    ],
+    &quot;state&quot;: &quot;fewshot&quot;,
+    &quot;model&quot;: &quot;handmade-locomotion-v2&quot;,
+    &quot;time&quot;: &quot;2026-04-16 02:12:37&quot;
+  },
+  {
+    &quot;idx&quot;: 4,
+    &quot;group&quot;: &quot;contextual&quot;,
+    &quot;cue&quot;: &quot;bow_greeting&quot;,
+    &quot;cue_text&quot;: &quot;Bow slightly from the waist (Respect / Greeting)&quot;,
+    &quot;description&quot;: &quot;The quadruped lowers its front in a respectful bow and then walks back toward a neutral stance.&quot;,
+    &quot;reasoning&quot;: &quot;# Q1: Bowing is a body-level motion, so the lifted-leg schema is not needed.\n# Q2: winner=front-low back-high body pose because it reads as a clear bow silhouette.\n# Q3: winner=pose_to_pose with slow forward velocity because the return should look like a polite recovery rather than a teleport.&quot;,
+    &quot;movements&quot;: [
+      {
+        &quot;type&quot;: &quot;pose&quot;,
+        &quot;duration&quot;: 0.5,
+        &quot;parameters&quot;: {
+          &quot;pose&quot;: {
+            &quot;dir&quot;: &quot;front&quot;,
+            &quot;front_height&quot;: &quot;low&quot;,
+            &quot;back_height&quot;: &quot;high&quot;,
+            &quot;three_legs&quot;: false
+          }
+        }
+      },
+      {
+        &quot;type&quot;: &quot;path&quot;,
+        &quot;parameters&quot;: {
+          &quot;path&quot;: {
+            &quot;shape&quot;: &quot;pose_to_pose&quot;,
+            &quot;start_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;low&quot;,
+              &quot;back_height&quot;: &quot;high&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;end_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;mid&quot;,
+              &quot;back_height&quot;: &quot;mid&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;velocity&quot;: {
+              &quot;vx&quot;: 0.06,
+              &quot;vy&quot;: 0.0,
+              &quot;wz&quot;: 0.0
+            }
+          }
+        },
+        &quot;duration&quot;: 1.8
+      }
+    ],
+    &quot;state&quot;: &quot;fewshot&quot;,
+    &quot;model&quot;: &quot;handmade-locomotion-v2&quot;,
+    &quot;time&quot;: &quot;2026-04-16 02:12:37&quot;
+  },
+  {
+    &quot;idx&quot;: 5,
+    &quot;group&quot;: &quot;contextual&quot;,
+    &quot;cue&quot;: &quot;nod_yes&quot;,
+    &quot;cue_text&quot;: &quot;Nod head up and down (Yes)&quot;,
+    &quot;description&quot;: &quot;The quadruped does two short front-body dips from neutral, creating a body-level yes-like nod.&quot;,
+    &quot;reasoning&quot;: &quot;# Q1: Without a separate head joint, the body dip is the clearest nod analogue.\n# Q2: winner=neutral front-facing body pose because it gives a clean baseline.\n# Q3: winner=two short pose-to-pose cycles because repetition makes the assent readable.&quot;,
+    &quot;movements&quot;: [
+      {
+        &quot;type&quot;: &quot;pose&quot;,
+        &quot;duration&quot;: 0.35,
+        &quot;parameters&quot;: {
+          &quot;pose&quot;: {
+            &quot;dir&quot;: &quot;front&quot;,
+            &quot;front_height&quot;: &quot;mid&quot;,
+            &quot;back_height&quot;: &quot;mid&quot;,
+            &quot;three_legs&quot;: false
+          }
+        }
+      },
+      {
+        &quot;type&quot;: &quot;path&quot;,
+        &quot;parameters&quot;: {
+          &quot;path&quot;: {
+            &quot;shape&quot;: &quot;pose_to_pose&quot;,
+            &quot;start_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;mid&quot;,
+              &quot;back_height&quot;: &quot;mid&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;end_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;low&quot;,
+              &quot;back_height&quot;: &quot;high&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;velocity&quot;: {
+              &quot;vx&quot;: 0.03,
+              &quot;vy&quot;: 0.0,
+              &quot;wz&quot;: 0.0
+            }
+          }
+        },
+        &quot;duration&quot;: 0.7
+      },
+      {
+        &quot;type&quot;: &quot;path&quot;,
+        &quot;parameters&quot;: {
+          &quot;path&quot;: {
+            &quot;shape&quot;: &quot;pose_to_pose&quot;,
+            &quot;start_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;low&quot;,
+              &quot;back_height&quot;: &quot;high&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;end_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;mid&quot;,
+              &quot;back_height&quot;: &quot;mid&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;velocity&quot;: {
+              &quot;vx&quot;: 0.03,
+              &quot;vy&quot;: 0.0,
+              &quot;wz&quot;: 0.0
+            }
+          }
+        },
+        &quot;duration&quot;: 0.65
+      },
+      {
+        &quot;type&quot;: &quot;path&quot;,
+        &quot;parameters&quot;: {
+          &quot;path&quot;: {
+            &quot;shape&quot;: &quot;pose_to_pose&quot;,
+            &quot;start_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;mid&quot;,
+              &quot;back_height&quot;: &quot;mid&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;end_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;low&quot;,
+              &quot;back_height&quot;: &quot;high&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;velocity&quot;: {
+              &quot;vx&quot;: 0.03,
+              &quot;vy&quot;: 0.0,
+              &quot;wz&quot;: 0.0
+            }
+          }
+        },
+        &quot;duration&quot;: 0.7
+      },
+      {
+        &quot;type&quot;: &quot;path&quot;,
+        &quot;parameters&quot;: {
+          &quot;path&quot;: {
+            &quot;shape&quot;: &quot;pose_to_pose&quot;,
+            &quot;start_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;low&quot;,
+              &quot;back_height&quot;: &quot;high&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;end_pose&quot;: {
+              &quot;dir&quot;: &quot;front&quot;,
+              &quot;front_height&quot;: &quot;mid&quot;,
+              &quot;back_height&quot;: &quot;mid&quot;,
+              &quot;three_legs&quot;: false
+            },
+            &quot;velocity&quot;: {
+              &quot;vx&quot;: 0.03,
+              &quot;vy&quot;: 0.0,
+              &quot;wz&quot;: 0.0
+            }
+          }
+        },
+        &quot;duration&quot;: 0.65
+      }
+    ],
+    &quot;state&quot;: &quot;fewshot&quot;,
+    &quot;model&quot;: &quot;handmade-locomotion-v2&quot;,
+    &quot;time&quot;: &quot;2026-04-16 02:12:37&quot;
+  },
+  {
+    &quot;idx&quot;: 6,
+    &quot;group&quot;: &quot;contextual&quot;,
+    &quot;cue&quot;: &quot;show_interest_approach&quot;,
+    &quot;cue_text&quot;: &quot;The quadruped leans forward with a slightly lowered front and walks a few steps toward the target, showing curiosity.&quot;,
+    &quot;description&quot;: &quot;The quadruped leans forward with a slightly lowered front and walks a few steps toward the target, showing curiosity.&quot;,
+    &quot;reasoning&quot;: &quot;# Q1: Approaching with interest means walking forward while keeping a slightly lowered, attentive posture.\n# Q2: winner=P1 four-leg front-low back-mid because the forward lean reads as engaged curiosity. P2 neutral mid+mid lacks intent.\n# Q3: winner=S1 pose then line with positive distance for a clear forward approach. S2 arc would imply circling rather than direct interest.&quot;,
+    &quot;movements&quot;: [
+      {
+        &quot;type&quot;: &quot;pose&quot;,
+        &quot;duration&quot;: 0.4,
+        &quot;parameters&quot;: {
+          &quot;pose&quot;: {
+            &quot;dir&quot;: &quot;front&quot;,
+            &quot;front_height&quot;: &quot;low&quot;,
+            &quot;back_height&quot;: &quot;mid&quot;,
+            &quot;three_legs&quot;: false
+          }
+        }
+      },
+      {
+        &quot;type&quot;: &quot;path&quot;,
+        &quot;parameters&quot;: {
+          &quot;path&quot;: {
+            &quot;shape&quot;: &quot;line&quot;,
+            &quot;distance&quot;: 0.3,
+            &quot;speed&quot;: 0.8
+          }
+        }
+      }
+    ],
+    &quot;state&quot;: &quot;fewshot&quot;,
+    &quot;model&quot;: &quot;handmade-locomotion-v2&quot;,
+    &quot;time&quot;: &quot;2026-04-16 02:12:37&quot;
+  },
+  {
+    &quot;idx&quot;: 7,
+    &quot;group&quot;: &quot;contextual&quot;,
+    &quot;cue&quot;: &quot;happy_circular_run&quot;,
+    &quot;cue_text&quot;: &quot;The quadruped sprints in a tight arc, circling happily like an excited dog.&quot;,
+    &quot;description&quot;: &quot;The quadruped sprints in a tight arc, circling happily like an excited dog.&quot;,
+    &quot;reasoning&quot;: &quot;# Q1: An excited dog runs in fast tight circles; the body stays neutral and low for stability.\n# Q2: winner=P1 four-leg mid+mid neutral stance because all legs are needed for running. P2 three-leg would topple at speed.\n# Q3: winner=S1 pose then arc with high speed giving a full-circle sprint. S2 pose_to_pose is too slow and stiff.&quot;,
+    &quot;movements&quot;: [
+      {
+        &quot;type&quot;: &quot;pose&quot;,
+        &quot;duration&quot;: 0.3,
+        &quot;parameters&quot;: {
+          &quot;pose&quot;: {
+            &quot;dir&quot;: &quot;front&quot;,
+            &quot;front_height&quot;: &quot;mid&quot;,
+            &quot;back_height&quot;: &quot;mid&quot;,
+            &quot;three_legs&quot;: false
+          }
+        }
+      },
+      {
+        &quot;type&quot;: &quot;path&quot;,
+        &quot;parameters&quot;: {
+          &quot;path&quot;: {
+            &quot;shape&quot;: &quot;arc&quot;,
+            &quot;degrees&quot;: 360,
+            &quot;speed&quot;: 1.5
+          }
+        }
+      }
+    ],
+    &quot;state&quot;: &quot;fewshot&quot;,
+    &quot;model&quot;: &quot;handmade-locomotion-v2&quot;,
+    &quot;time&quot;: &quot;2026-04-16 02:12:37&quot;
+  }
+]
+
+---
+Target Cue:
+Cue Name: &lt;TARGET_CUE&gt;
+---</pre>
+    </details>
+    <h2 class="section-title">Hand Position Poses</h2>
+    <section class="hero">
+      <p>`retrieval.py` 에 정의된 `three_leg_pose.hand_position = up | front | right | back | left` 고정 포즈 렌더입니다. few-shot보다 먼저, config에서 고를 수 있는 기본 lifted-paw silhouette을 비교합니다.</p>
+    </section>
+    <section class="mini-grid-wrap">
+      
+                <article class="mini-card">
+                  <div class="mini-title">up</div>
+                  <div class="mini-grid">
+                    <figure>
+                      <figcaption>정면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_up_front.png" alt="up front pose">
+                    </figure>
+                    <figure>
+                      <figcaption>측면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_up_side.png" alt="up side pose">
+                    </figure>
+                  </div>
+                </article>
+                
+                <article class="mini-card">
+                  <div class="mini-title">front</div>
+                  <div class="mini-grid">
+                    <figure>
+                      <figcaption>정면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_front_front.png" alt="front front pose">
+                    </figure>
+                    <figure>
+                      <figcaption>측면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_front_side.png" alt="front side pose">
+                    </figure>
+                  </div>
+                </article>
+                
+                <article class="mini-card">
+                  <div class="mini-title">right</div>
+                  <div class="mini-grid">
+                    <figure>
+                      <figcaption>정면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_right_front.png" alt="right front pose">
+                    </figure>
+                    <figure>
+                      <figcaption>측면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_right_side.png" alt="right side pose">
+                    </figure>
+                  </div>
+                </article>
+                
+                <article class="mini-card">
+                  <div class="mini-title">back</div>
+                  <div class="mini-grid">
+                    <figure>
+                      <figcaption>정면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_back_front.png" alt="back front pose">
+                    </figure>
+                    <figure>
+                      <figcaption>측면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_back_side.png" alt="back side pose">
+                    </figure>
+                  </div>
+                </article>
+                
+                <article class="mini-card">
+                  <div class="mini-title">left</div>
+                  <div class="mini-grid">
+                    <figure>
+                      <figcaption>정면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_left_front.png" alt="left front pose">
+                    </figure>
+                    <figure>
+                      <figcaption>측면</figcaption>
+                      <img src="../../artifacts/hand_position_five/hand_left_side.png" alt="left side pose">
+                    </figure>
+                  </div>
+                </article>
+                
+    </section>
+    <h2 class="section-title">Few-shot Examples</h2>
+    <section class="grid">
+      
+            <article class="card">
+              <div class="card-header">
+                <span class="group iconic">iconic</span>
+                <span class="idx">c0</span>
+                <span class="cue">wave_hi</span>
+              </div>
+              <div class="card-body">
+                <div class="cue-text">Wave one hand side to side (Hello / Hi)</div>
+                <div class="chain">pose(front, up) → move(hip:y[-20,20])</div>
+                <div class="badges">
+                  <span class="badge">three_legs: true</span>
+                  <span class="badge">hand: up</span>
+                </div>
+                <div class="badges">
+                  <span class="badge">movement: r3@0.75: hip y[-20,20]</span>
+                </div>
+                <div class="media"><img src="../../artifacts/prompt19_locomotion_fewshots/lc19_c00_wave_hi_mjlab_earth.gif" alt="wave_hi gif"></div>
+                <p class="desc">The quadruped keeps the front paw in the up pose and adds only a tiny hip-abduction accent; unspecified joints are treated as zero delta from the pose baseline.</p>
+                <div class="label">Reasoning</div>
+                <pre># Q1: The wave must stay anchored to the up silhouette with no branch jump.
+# Q2: winner=three-leg front + hand=up anchor.
+# Q3: winner=single explicit joint command hip.y [2,-2]; retrieval infers pose baseline joints when base_rad is omitted.</pre>
+                <div class="label">JSON</div>
+                <pre>[
+  {
+    &quot;type&quot;: &quot;pose&quot;,
+    &quot;duration&quot;: 0.45,
+    &quot;parameters&quot;: {
+      &quot;pose&quot;: {
+        &quot;dir&quot;: &quot;front&quot;,
+        &quot;front_height&quot;: &quot;high&quot;,
+        &quot;back_height&quot;: &quot;mid&quot;,
+        &quot;three_legs&quot;: true,
+        &quot;three_leg_pose&quot;: {
+          &quot;hand_position&quot;: &quot;up&quot;
+        }
+      }
+    }
+  },
+  {
+    &quot;type&quot;: &quot;movement&quot;,
+    &quot;duration&quot;: 1.8,
+    &quot;parameters&quot;: {
+      &quot;movement&quot;: {
+        &quot;joints&quot;: [
+          {
+            &quot;joint&quot;: &quot;hip&quot;,
+            &quot;degrees&quot;: {
+              &quot;y&quot;: [
+                -20,
+                20
+              ]
+            }
+          }
+        ],
+        &quot;repetition&quot;: 3,
+        &quot;speed&quot;: 0.75
+      }
+    }
+  }
+]</pre>
+              </div>
+            </article>
+            
+            <article class="card">
+              <div class="card-header">
+                <span class="group iconic">iconic</span>
+                <span class="idx">c1</span>
+                <span class="cue">handshake_offer</span>
+              </div>
+              <div class="card-body">
+                <div class="cue-text">Extend one hand vertically forward as if offering a handshake (Asking for handshake)</div>
+                <div class="chain">pose(front, front) → move(thigh:x[0,10]+knee:x[0,10])</div>
+                <div class="badges">
+                  <span class="badge">three_legs: true</span>
+                  <span class="badge">hand: front</span>
+                </div>
+                <div class="badges">
+                  <span class="badge">movement: r1@1.2: thigh x[0,10]; knee x[0,10]</span>
+                </div>
+                <div class="media"><img src="../../artifacts/prompt19_locomotion_fewshots/lc19_c01_handshake_offer_mjlab_earth.gif" alt="handshake_offer gif"></div>
+                <p class="desc">The quadruped raises one front paw in a forward-folded shape and extends the leg forward through a small thigh/knee x motion like a handshake offer.</p>
+                <div class="label">Reasoning</div>
+                <pre># Q1: A handshake should read as an offering reach, not a wave.
+# Q2: winner=three-leg pose with hand=front keeps the paw aimed to partner.
+# Q3: winner=joint-space thigh/knee x forward so the foreleg extends without IK branch changes.</pre>
+                <div class="label">JSON</div>
+                <pre>[
+  {
+    &quot;type&quot;: &quot;pose&quot;,
+    &quot;duration&quot;: 0.45,
+    &quot;parameters&quot;: {
+      &quot;pose&quot;: {
+        &quot;dir&quot;: &quot;front&quot;,
+        &quot;front_height&quot;: &quot;high&quot;,
+        &quot;back_height&quot;: &quot;mid&quot;,
+        &quot;three_legs&quot;: true,
+        &quot;three_leg_pose&quot;: {
+          &quot;hand_position&quot;: &quot;front&quot;
+        }
+      }
+    }
+  },
+  {
+    &quot;type&quot;: &quot;movement&quot;,
+    &quot;duration&quot;: 1.15,
+    &quot;parameters&quot;: {
+      &quot;movement&quot;: {
+        &quot;joints&quot;: [
+          {
+            &quot;joint&quot;: &quot;thigh&quot;,
+            &quot;degrees&quot;: {
+              &quot;x&quot;: [
+                0,
+                10
+              ]
+            }
+          },
+          {
+            &quot;joint&quot;: &quot;knee&quot;,
+            &quot;degrees&quot;: {
+              &quot;x&quot;: [
+                0,
+                10
+              ]
+            },
+            &quot;speed&quot;: 0.9
+          }
+        ],
+        &quot;repetition&quot;: 1,
+        &quot;speed&quot;: 1.2
+      }
+    }
+  }
+]</pre>
+              </div>
+            </article>
+            
+            <article class="card">
+              <div class="card-header">
+                <span class="group iconic">iconic</span>
+                <span class="idx">c2</span>
+                <span class="cue">highfive_invite</span>
+              </div>
+              <div class="card-body">
+                <div class="cue-text">Raise one palm upward as if inviting a high five (Asking for high five)</div>
+                <div class="chain">pose(front, up) → move(thigh:x[-18,18]+knee:x[-12,12])</div>
+                <div class="badges">
+                  <span class="badge">three_legs: true</span>
+                  <span class="badge">hand: up</span>
+                </div>
+                <div class="badges">
+                  <span class="badge">movement: r1@1.2: thigh x[-18,18]; knee x[-12,12]</span>
+                </div>
+                <div class="media"><img src="../../artifacts/prompt19_locomotion_fewshots/lc19_c02_highfive_invite_mjlab_earth.gif" alt="highfive_invite gif"></div>
+                <p class="desc">The quadruped pops a front paw upward with a back-folded knee and an upward-facing paw, then accents the paw higher for a high-five invitation.</p>
+                <div class="label">Reasoning</div>
+                <pre># Q1: A high-five needs an obviously raised target, not just a forward reach.
+# Q2: winner=three-leg pose with knee=back and hand=up because it makes the lifted paw look presented and open.
+# Q3: winner=hand+z with slight knee+z assist because the cue is about raising the target paw higher.</pre>
+                <div class="label">JSON</div>
+                <pre>[
+  {
+    &quot;type&quot;: &quot;pose&quot;,
+    &quot;duration&quot;: 0.4,
+    &quot;parameters&quot;: {
+      &quot;pose&quot;: {
+        &quot;dir&quot;: &quot;front&quot;,
+        &quot;front_height&quot;: &quot;high&quot;,
+        &quot;back_height&quot;: &quot;mid&quot;,
+        &quot;three_legs&quot;: true,
+        &quot;three_leg_pose&quot;: {
+          &quot;hand_position&quot;: &quot;up&quot;
+        }
+      }
+    }
+  },
+  {
+    &quot;type&quot;: &quot;movement&quot;,
+    &quot;duration&quot;: 0.95,
+    &quot;parameters&quot;: {
+      &quot;movement&quot;: {
+        &quot;joints&quot;: [
+          {
+            &quot;joint&quot;: &quot;thigh&quot;,
+            &quot;degrees&quot;: {
+              &quot;x&quot;: [
+                -18,
+                18
+              ]
+            }
+          },
+          {
+            &quot;joint&quot;: &quot;knee&quot;,
+            &quot;degrees&quot;: {
+              &quot;x&quot;: [
+                -12,
+                12
+              ]
+            },
+            &quot;speed&quot;: 0.8
+          }
+        ],
+        &quot;repetition&quot;: 1,
+        &quot;speed&quot;: 1.2
+      }
+    }
+  }
+]</pre>
+              </div>
+            </article>
+            
+            <article class="card">
+              <div class="card-header">
+                <span class="group iconic">iconic</span>
+                <span class="idx">c3</span>
+                <span class="cue">beckon_come_here</span>
+              </div>
+              <div class="card-body">
+                <div class="cue-text">Turn palm downward and curl fingers inward repeatedly (Come here / Beckon)</div>
+                <div class="chain">pose(front, front) → move(thigh:x[-22,22]+knee:x[-14,14])</div>
+                <div class="badges">
+                  <span class="badge">three_legs: true</span>
+                  <span class="badge">hand: front</span>
+                </div>
+                <div class="badges">
+                  <span class="badge">movement: r3@1.6: thigh x[-22,22]; knee x[-14,14]</span>
+                </div>
+                <div class="media"><img src="../../artifacts/prompt19_locomotion_fewshots/lc19_c03_beckon_come_here_mjlab_earth.gif" alt="beckon_come_here gif"></div>
+                <p class="desc">The quadruped lifts one front paw, tucks the knee slightly forward, and repeatedly curls the paw back toward itself in a beckoning motion.</p>
+                <div class="label">Reasoning</div>
+                <pre># Q1: A beckon needs repeated inward curls once the paw is already visible.
+# Q2: winner=three-leg pose with knee=front and hand=parallel because the lifted paw starts in a communicative position.
+# Q3: winner=hand-x with knee-x assistance because the motion should feel like repeated pulling inward.</pre>
+                <div class="label">JSON</div>
+                <pre>[
+  {
+    &quot;type&quot;: &quot;pose&quot;,
+    &quot;duration&quot;: 0.45,
+    &quot;parameters&quot;: {
+      &quot;pose&quot;: {
+        &quot;dir&quot;: &quot;front&quot;,
+        &quot;front_height&quot;: &quot;high&quot;,
+        &quot;back_height&quot;: &quot;mid&quot;,
+        &quot;three_legs&quot;: true,
+        &quot;three_leg_pose&quot;: {
+          &quot;hand_position&quot;: &quot;front&quot;
+        }
+      }
+    }
+  },
+  {
+    &quot;type&quot;: &quot;movement&quot;,
+    &quot;duration&quot;: 1.45,
+    &quot;parameters&quot;: {
+      &quot;movement&quot;: {
+        &quot;joints&quot;: [
+          {
+            &quot;joint&quot;: &quot;thigh&quot;,
+            &quot;degrees&quot;: {
+              &quot;x&quot;: [
+                -22,
+                22
+              ]
+            }
+          },
+          {
+            &quot;joint&quot;: &quot;knee&quot;,
+            &quot;degrees&quot;: {
+              &quot;x&quot;: [
+                -14,
+                14
+              ]
+            },
+            &quot;speed&quot;: 1.1
+          }
+        ],
+        &quot;repetition&quot;: 3,
+        &quot;speed&quot;: 1.6
+      }
+    }
+  }
+]</pre>
+              </div>
+            </article>
+            
+            <article class="card">
+              <div class="card-header">
+                <span class="group contextual">contextual</span>
+                <span class="idx">c4</span>
+                <span class="cue">bow_greeting</span>
+              </div>
+              <div class="card-body">
+                <div class="cue-text">Bow slightly from the waist (Respect / Greeting)</div>
+                <div class="chain">pose(front) → path(pose_to_pose)</div>
+                <div class="badges">
+                  <span class="badge">three_legs: false</span>
+                  <span class="badge">hand: -</span>
+                </div>
+                <div class="badges">
+                  <span class="badge">movement: none</span>
+                </div>
+                <div class="media"><img src="../../artifacts/prompt19_locomotion_fewshots/lc19_c04_bow_greeting_mjlab_earth.gif" alt="bow_greeting gif"></div>
+                <p class="desc">The quadruped lowers its front in a respectful bow and then walks back toward a neutral stance.</p>
+                <div class="label">Reasoning</div>
+                <pre># Q1: Bowing is a body-level motion, so the lifted-leg schema is not needed.
+# Q2: winner=front-low back-high body pose because it reads as a clear bow silhouette.
+# Q3: winner=pose_to_pose with slow forward velocity because the return should look like a polite recovery rather than a teleport.</pre>
+                <div class="label">JSON</div>
+                <pre>[
+  {
+    &quot;type&quot;: &quot;pose&quot;,
+    &quot;duration&quot;: 0.5,
+    &quot;parameters&quot;: {
+      &quot;pose&quot;: {
+        &quot;dir&quot;: &quot;front&quot;,
+        &quot;front_height&quot;: &quot;low&quot;,
+        &quot;back_height&quot;: &quot;high&quot;,
+        &quot;three_legs&quot;: false
+      }
+    }
+  },
+  {
+    &quot;type&quot;: &quot;path&quot;,
+    &quot;parameters&quot;: {
+      &quot;path&quot;: {
+        &quot;shape&quot;: &quot;pose_to_pose&quot;,
+        &quot;start_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;low&quot;,
+          &quot;back_height&quot;: &quot;high&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;end_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;mid&quot;,
+          &quot;back_height&quot;: &quot;mid&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;velocity&quot;: {
+          &quot;vx&quot;: 0.06,
+          &quot;vy&quot;: 0.0,
+          &quot;wz&quot;: 0.0
+        }
+      }
+    },
+    &quot;duration&quot;: 1.8
+  }
+]</pre>
+              </div>
+            </article>
+            
+            <article class="card">
+              <div class="card-header">
+                <span class="group contextual">contextual</span>
+                <span class="idx">c5</span>
+                <span class="cue">nod_yes</span>
+              </div>
+              <div class="card-body">
+                <div class="cue-text">Nod head up and down (Yes)</div>
+                <div class="chain">pose(front) → path(pose_to_pose) → path(pose_to_pose) → path(pose_to_pose) → path(pose_to_pose)</div>
+                <div class="badges">
+                  <span class="badge">three_legs: false</span>
+                  <span class="badge">hand: -</span>
+                </div>
+                <div class="badges">
+                  <span class="badge">movement: none</span>
+                </div>
+                <div class="media"><img src="../../artifacts/prompt19_locomotion_fewshots/lc19_c05_nod_yes_mjlab_earth.gif" alt="nod_yes gif"></div>
+                <p class="desc">The quadruped does two short front-body dips from neutral, creating a body-level yes-like nod.</p>
+                <div class="label">Reasoning</div>
+                <pre># Q1: Without a separate head joint, the body dip is the clearest nod analogue.
+# Q2: winner=neutral front-facing body pose because it gives a clean baseline.
+# Q3: winner=two short pose-to-pose cycles because repetition makes the assent readable.</pre>
+                <div class="label">JSON</div>
+                <pre>[
+  {
+    &quot;type&quot;: &quot;pose&quot;,
+    &quot;duration&quot;: 0.35,
+    &quot;parameters&quot;: {
+      &quot;pose&quot;: {
+        &quot;dir&quot;: &quot;front&quot;,
+        &quot;front_height&quot;: &quot;mid&quot;,
+        &quot;back_height&quot;: &quot;mid&quot;,
+        &quot;three_legs&quot;: false
+      }
+    }
+  },
+  {
+    &quot;type&quot;: &quot;path&quot;,
+    &quot;parameters&quot;: {
+      &quot;path&quot;: {
+        &quot;shape&quot;: &quot;pose_to_pose&quot;,
+        &quot;start_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;mid&quot;,
+          &quot;back_height&quot;: &quot;mid&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;end_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;low&quot;,
+          &quot;back_height&quot;: &quot;high&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;velocity&quot;: {
+          &quot;vx&quot;: 0.03,
+          &quot;vy&quot;: 0.0,
+          &quot;wz&quot;: 0.0
+        }
+      }
+    },
+    &quot;duration&quot;: 0.7
+  },
+  {
+    &quot;type&quot;: &quot;path&quot;,
+    &quot;parameters&quot;: {
+      &quot;path&quot;: {
+        &quot;shape&quot;: &quot;pose_to_pose&quot;,
+        &quot;start_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;low&quot;,
+          &quot;back_height&quot;: &quot;high&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;end_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;mid&quot;,
+          &quot;back_height&quot;: &quot;mid&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;velocity&quot;: {
+          &quot;vx&quot;: 0.03,
+          &quot;vy&quot;: 0.0,
+          &quot;wz&quot;: 0.0
+        }
+      }
+    },
+    &quot;duration&quot;: 0.65
+  },
+  {
+    &quot;type&quot;: &quot;path&quot;,
+    &quot;parameters&quot;: {
+      &quot;path&quot;: {
+        &quot;shape&quot;: &quot;pose_to_pose&quot;,
+        &quot;start_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;mid&quot;,
+          &quot;back_height&quot;: &quot;mid&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;end_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;low&quot;,
+          &quot;back_height&quot;: &quot;high&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;velocity&quot;: {
+          &quot;vx&quot;: 0.03,
+          &quot;vy&quot;: 0.0,
+          &quot;wz&quot;: 0.0
+        }
+      }
+    },
+    &quot;duration&quot;: 0.7
+  },
+  {
+    &quot;type&quot;: &quot;path&quot;,
+    &quot;parameters&quot;: {
+      &quot;path&quot;: {
+        &quot;shape&quot;: &quot;pose_to_pose&quot;,
+        &quot;start_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;low&quot;,
+          &quot;back_height&quot;: &quot;high&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;end_pose&quot;: {
+          &quot;dir&quot;: &quot;front&quot;,
+          &quot;front_height&quot;: &quot;mid&quot;,
+          &quot;back_height&quot;: &quot;mid&quot;,
+          &quot;three_legs&quot;: false
+        },
+        &quot;velocity&quot;: {
+          &quot;vx&quot;: 0.03,
+          &quot;vy&quot;: 0.0,
+          &quot;wz&quot;: 0.0
+        }
+      }
+    },
+    &quot;duration&quot;: 0.65
+  }
+]</pre>
+              </div>
+            </article>
+            
+            <article class="card">
+              <div class="card-header">
+                <span class="group contextual">contextual</span>
+                <span class="idx">c6</span>
+                <span class="cue">show_interest_approach</span>
+              </div>
+              <div class="card-body">
+                <div class="cue-text">The quadruped leans forward with a slightly lowered front and walks a few steps toward the target, showing curiosity.</div>
+                <div class="chain">pose(front) → path(line)</div>
+                <div class="badges">
+                  <span class="badge">three_legs: false</span>
+                  <span class="badge">hand: -</span>
+                </div>
+                <div class="badges">
+                  <span class="badge">movement: none</span>
+                </div>
+                <div class="media"><div class="media-missing">GIF not rendered yet</div></div>
+                <p class="desc">The quadruped leans forward with a slightly lowered front and walks a few steps toward the target, showing curiosity.</p>
+                <div class="label">Reasoning</div>
+                <pre># Q1: Approaching with interest means walking forward while keeping a slightly lowered, attentive posture.
+# Q2: winner=P1 four-leg front-low back-mid because the forward lean reads as engaged curiosity. P2 neutral mid+mid lacks intent.
+# Q3: winner=S1 pose then line with positive distance for a clear forward approach. S2 arc would imply circling rather than direct interest.</pre>
+                <div class="label">JSON</div>
+                <pre>[
+  {
+    &quot;type&quot;: &quot;pose&quot;,
+    &quot;duration&quot;: 0.4,
+    &quot;parameters&quot;: {
+      &quot;pose&quot;: {
+        &quot;dir&quot;: &quot;front&quot;,
+        &quot;front_height&quot;: &quot;low&quot;,
+        &quot;back_height&quot;: &quot;mid&quot;,
+        &quot;three_legs&quot;: false
+      }
+    }
+  },
+  {
+    &quot;type&quot;: &quot;path&quot;,
+    &quot;parameters&quot;: {
+      &quot;path&quot;: {
+        &quot;shape&quot;: &quot;line&quot;,
+        &quot;distance&quot;: 0.3,
+        &quot;speed&quot;: 0.8
+      }
+    }
+  }
+]</pre>
+              </div>
+            </article>
+            
+            <article class="card">
+              <div class="card-header">
+                <span class="group contextual">contextual</span>
+                <span class="idx">c7</span>
+                <span class="cue">happy_circular_run</span>
+              </div>
+              <div class="card-body">
+                <div class="cue-text">The quadruped sprints in a tight arc, circling happily like an excited dog.</div>
+                <div class="chain">pose(front) → path(arc)</div>
+                <div class="badges">
+                  <span class="badge">three_legs: false</span>
+                  <span class="badge">hand: -</span>
+                </div>
+                <div class="badges">
+                  <span class="badge">movement: none</span>
+                </div>
+                <div class="media"><div class="media-missing">GIF not rendered yet</div></div>
+                <p class="desc">The quadruped sprints in a tight arc, circling happily like an excited dog.</p>
+                <div class="label">Reasoning</div>
+                <pre># Q1: An excited dog runs in fast tight circles; the body stays neutral and low for stability.
+# Q2: winner=P1 four-leg mid+mid neutral stance because all legs are needed for running. P2 three-leg would topple at speed.
+# Q3: winner=S1 pose then arc with high speed giving a full-circle sprint. S2 pose_to_pose is too slow and stiff.</pre>
+                <div class="label">JSON</div>
+                <pre>[
+  {
+    &quot;type&quot;: &quot;pose&quot;,
+    &quot;duration&quot;: 0.3,
+    &quot;parameters&quot;: {
+      &quot;pose&quot;: {
+        &quot;dir&quot;: &quot;front&quot;,
+        &quot;front_height&quot;: &quot;mid&quot;,
+        &quot;back_height&quot;: &quot;mid&quot;,
+        &quot;three_legs&quot;: false
+      }
+    }
+  },
+  {
+    &quot;type&quot;: &quot;path&quot;,
+    &quot;parameters&quot;: {
+      &quot;path&quot;: {
+        &quot;shape&quot;: &quot;arc&quot;,
+        &quot;degrees&quot;: 360,
+        &quot;speed&quot;: 1.5
+      }
+    }
+  }
+]</pre>
+              </div>
+            </article>
+            
+    </section>
+    
+            <section class="catalog-section">
+              <h2>Iconic Cues</h2>
+              <div class="pill-grid">
+                <div class="pill used"><strong>wave_hi</strong><span>Wave one hand side to side (Hello / Hi)</span></div><div class="pill"><strong>raising_hand_greeting</strong><span>Raise one hand briefly (Greeting / Acknowledgement)</span></div><div class="pill used"><strong>handshake_offer</strong><span>Extend one hand vertically forward as if offering a handshake (Asking for handshake)</span></div><div class="pill"><strong>handshake_imitation</strong><span>Move one hand up and down vertically as if shaking someone’s hand (Imitating handshake)</span></div><div class="pill"><strong>blow_kiss</strong><span>Bring fingertips to lips and blow outward (Blow a kiss)</span></div><div class="pill"><strong>big_heart_above_head</strong><span>Form a big heart shape above head (Love)</span></div><div class="pill"><strong>hand_over_heart</strong><span>Place one hand over chest (Sincerity / Gratitude)</span></div><div class="pill"><strong>raise_fists_victory</strong><span>Raise both fists upward (Victory / Excitement)</span></div><div class="pill"><strong>fist_pump</strong><span>Pump one fist downward (Success / Yes!)</span></div><div class="pill"><strong>flex_bicep</strong><span>Flex one arm to show bicep (Strength)</span></div><div class="pill"><strong>shrug_idk</strong><span>Shrug shoulders with palms up (I don’t know)</span></div><div class="pill"><strong>scratch_head_confused</strong><span>Scratch head lightly (Confusion)</span></div><div class="pill"><strong>facepalm</strong><span>Place palm over face (Facepalm / Frustration)</span></div><div class="pill"><strong>point_self</strong><span>Point to chest with index finger (Me)</span></div><div class="pill"><strong>point_you</strong><span>Point forward with index finger (You)</span></div><div class="pill used"><strong>beckon_come_here</strong><span>Turn palm downward and curl fingers inward repeatedly (Come here / Beckon)</span></div><div class="pill"><strong>stop_palm_out</strong><span>Extend palm forward flat (Stop)</span></div><div class="pill"><strong>pat_stomach</strong><span>Pat stomach lightly (Hungry / Full)</span></div><div class="pill"><strong>fan_face_hot</strong><span>Fan face with one hand (Hot)</span></div><div class="pill"><strong>cover_yawn_sleepy</strong><span>Open mouth wide and cover it (Sleepy / Yawn)</span></div><div class="pill"><strong>rub_eye_tired</strong><span>Rub one eye (Tired)</span></div><div class="pill"><strong>tap_temple_think</strong><span>Tap temple with index finger (Think / Smart)</span></div><div class="pill"><strong>circle_temple_crazy</strong><span>Rotate index finger near temple (Crazy)</span></div><div class="pill"><strong>lean_forward_interest</strong><span>Lean forward slightly with palms open (Interest)</span></div><div class="pill"><strong>cover_mouth_gasp</strong><span>Cover mouth with palm (Gasp / Oops)</span></div><div class="pill"><strong>cheers_toast</strong><span>Raise one hand as if holding an invisible glass (Cheers)</span></div><div class="pill used"><strong>highfive_invite</strong><span>Raise one palm upward as if inviting a high five (Asking for high five)</span></div><div class="pill"><strong>highfive_imitation</strong><span>Swing one raised palm downward as if high-fiving air (Imitating high five)</span></div><div class="pill"><strong>fistbump_invite</strong><span>Extend one fist forward (Asking for fist bump)</span></div><div class="pill"><strong>fistbump_imitation</strong><span>Tap one fist lightly against your other palm (Imitating fist bump)</span></div><div class="pill"><strong>pat_self_back</strong><span>Pat your own back (Encouragement)</span></div><div class="pill"><strong>draw_circle_repeat</strong><span>Draw a circle in the air with index finger (Repeat / Around)</span></div><div class="pill"><strong>throat_cut_stop</strong><span>Slice flat hand horizontally across throat (Cut / Stop it)</span></div><div class="pill"><strong>chin_flick_dismiss</strong><span>Swipe back of fingers outward from under chin (Dismissive / Whatever)</span></div><div class="pill"><strong>cover_ears_too_loud</strong><span>Cover both ears (Too loud / Don’t want to hear)</span></div><div class="pill"><strong>salute</strong><span>Bring one hand to forehead in salute position (Salute)</span></div><div class="pill"><strong>visor_search</strong><span>Place one hand above eyebrows as visor and look far (Searching distance)</span></div><div class="pill"><strong>yield_turn</strong><span>open palm offer, backward hand sweep</span></div><div class="pill"><strong>interrupt_cue</strong><span>raised finger cue, palm-forward pause</span></div><div class="pill"><strong>request_turn</strong><span>slight hand raise, open palm ask</span></div><div class="pill"><strong>guiding_arm</strong><span>open arm guide, light directional sweep</span></div><div class="pill"><strong>protective_arm_out</strong><span>side arm shield, forward block hold</span></div><div class="pill"><strong>escorting_gesture</strong><span>arm-leading guide, body-turn invitation</span></div><div class="pill"><strong>turn_yield_lower_hand</strong><span>hand lower release, open palm give-way</span></div><div class="pill"><strong>clarification_request_palm_tilt</strong><span>palm tilt ask, finger-question curl</span></div><div class="pill"><strong>slow_down_request_palm_down</strong><span>slow downward press, repeated soft push</span></div><div class="pill"><strong>speed_up_circular_cue</strong><span>circular wrist roll, forward flick</span></div><div class="pill"><strong>wait_for_me_backward_palm</strong><span>backward palm wave, over-shoulder stop</span></div><div class="pill"><strong>continue_on_forward_roll</strong><span>rolling hand cue, forward sweep</span></div><div class="pill"><strong>polite_decline_small_push</strong><span>small palm-out, soft side wave</span></div><div class="pill"><strong>firm_accept_forward_reach</strong><span>direct reach, handshake initiate</span></div><div class="pill"><strong>hesitant_accept_half_reach</strong><span>partial reach, pause-then-touch</span></div><div class="pill"><strong>cancel_previous_offer_retract</strong><span>pull-back retract, shake-no retract</span></div><div class="pill"><strong>conditional_accept_pause_then_reach</strong><span>pause hold then reach, nod-delay reach</span></div><div class="pill"><strong>final_decision_down_press</strong><span>firm downward press, double press confirm</span></div><div class="pill"><strong>resume_speaking_pull</strong><span>hand pull-in cue, nod-plus-pull</span></div><div class="pill"><strong>emphasize_point_downbeat</strong><span>downward chop, fist beat accent</span></div><div class="pill"><strong>unsure_response_hand_hover_stop</strong><span>hovering palm, half-stop freeze</span></div><div class="pill"><strong>prevent_fall_support_reach</strong><span>fast reach grab, body-lunge support</span></div>
+              </div>
+            </section>
+            
+            <section class="catalog-section">
+              <h2>Contextual Cues</h2>
+              <div class="pill-grid">
+                <div class="pill used"><strong>nod_yes</strong><span>Nod head up and down (Yes)</span></div><div class="pill"><strong>shake_head_no</strong><span>Shake head side to side (No)</span></div><div class="pill"><strong>air_quotes</strong><span>Raise both hands and flex index and middle fingers twice (Air quotes)</span></div><div class="pill"><strong>self_hug</strong><span>Wrap both arms around yourself (Hug / Comfort)</span></div><div class="pill used"><strong>bow_greeting</strong><span>Bow slightly from the waist (Respect / Greeting)</span></div><div class="pill"><strong>tilt_head_curious</strong><span>Tilt head slightly (Curiosity)</span></div><div class="pill"><strong>raise_index_one_moment</strong><span>Raise index finger upright (One moment / Important point)</span></div><div class="pill"><strong>shh_gesture</strong><span>Place index finger on lips (Shh / Be quiet)</span></div><div class="pill"><strong>rub_arms_cold</strong><span>Rub both upper arms (Cold)</span></div><div class="pill"><strong>deep_bow_apology</strong><span>Bow deeply while hands at sides (Apology)</span></div><div class="pill"><strong>cross_arms_defensive</strong><span>Cross arms over chest (Defensive)</span></div><div class="pill"><strong>hands_on_hips</strong><span>Place both hands on hips (Confidence / Annoyed)</span></div><div class="pill"><strong>step_back_surprised</strong><span>Step back slightly with both palms raised outward (Shock / Surprise)</span></div><div class="pill"><strong>palms_together_thank_you</strong><span>Press palms together and bow slightly (Thank you / Respect)</span></div><div class="pill"><strong>curl_fingers_give_me</strong><span>Turn palm upward and curl fingers inward (Give me)</span></div><div class="pill"><strong>hands_up_surrender</strong><span>Raise both hands beside head (I give up / Surrender)</span></div><div class="pill"><strong>arms_open_welcome</strong><span>Open both arms wide outward (Welcome)</span></div><div class="pill"><strong>stretch_arms_up</strong><span>Stretch both arms upward (Relief / Stretch)</span></div><div class="pill"><strong>gentle_retreat_motion</strong><span>backward palm press, step-back cue</span></div><div class="pill"><strong>disagreement_cross_then_release</strong><span>brief arm cross, head shake release</span></div><div class="pill"><strong>stop_entry_cross_block</strong><span>arm cross block, step-in block</span></div><div class="pill"><strong>allow_entry_open_side</strong><span>open side step, arm-open allow</span></div><div class="pill"><strong>relief_release_drop</strong><span>shoulder drop, hand release sigh</span></div><div class="pill"><strong>frustration_down_throw</strong><span>downward fling, sharp drop throw</span></div><div class="pill"><strong>disbelief_hold_then_drop</strong><span>freeze hold then drop, head-back drop</span></div><div class="pill"><strong>submission_lowered_open_palm</strong><span>lowered palms show, slight bow palms</span></div><div class="pill"><strong>dominance_high_open_hold</strong><span>high open palms, wide chest hold</span></div><div class="pill"><strong>apology_forward_lowered_hold</strong><span>forward lean palms, chest-touch bow</span></div><div class="pill"><strong>gratitude_small_bow_hold</strong><span>nod bow, hand-to-chest bow</span></div><div class="pill"><strong>disappointment_slow_fold</strong><span>slow arm fold, head-down fold</span></div><div class="pill"><strong>satisfaction_small_clench_release</strong><span>fist clench release, subtle nod clench</span></div><div class="pill"><strong>start_action_forward_snap</strong><span>snap cue, quick forward flick</span></div><div class="pill"><strong>stop_action_freeze_palm</strong><span>freeze palm, full-body stop</span></div><div class="pill"><strong>retry_action_reset_circle</strong><span>reset circle, shake-out reset</span></div><div class="pill"><strong>finish_action_down_release</strong><span>downward release, open drop finish</span></div><div class="pill"><strong>abandon_action_drop_turn</strong><span>drop-and-turn, dismissive wave turn</span></div><div class="pill"><strong>prepare_action_raise_hold</strong><span>raise-and-hold, inhale-ready lift</span></div><div class="pill"><strong>tempo_cue</strong><span>rhythmic hand beat, conductor-style cue</span></div><div class="pill"><strong>hesitation_pause_hold</strong><span>pause freeze, hand hover</span></div><div class="pill"><strong>commit_action_fast_reach</strong><span>fast reach, step-in grab</span></div><div class="pill"><strong>disengage_step_back_release</strong><span>step-back release, turn-away drop</span></div><div class="pill"><strong>small_rhythmic_bounce</strong><span>heel bounce, shoulder bounce</span></div><div class="pill"><strong>laughter_substitute</strong><span>shoulder bounce, open-mouth smile</span></div><div class="pill"><strong>confusion_substitute</strong><span>head tilt pause, uncertain hand hover</span></div><div class="pill"><strong>thinking_substitute</strong><span>inward pause, contemplative hand hover</span></div><div class="pill"><strong>attention_substitute</strong><span>slight forward lean, attentive hold</span></div><div class="pill"><strong>surprise_substitute</strong><span>quick recoil freeze, startled lift</span></div><div class="pill"><strong>relief_substitute</strong><span>shoulder release, eased downward drop</span></div><div class="pill"><strong>embarrassment_substitute</strong><span>gaze aversion dip, self-conscious shrink</span></div><div class="pill"><strong>skepticism_substitute</strong><span>side tilt hold, doubtful withdraw</span></div><div class="pill"><strong>curiosity_substitute</strong><span>forward lean tilt, inquisitive pause</span></div><div class="pill"><strong>agreement_substitute</strong><span>soft forward dip, settled assent</span></div><div class="pill"><strong>disappointment_substitute</strong><span>shoulder drop, discouraged settle</span></div><div class="pill"><strong>shame_shy_substitute</strong><span>head down turn, face cover glance</span></div><div class="pill"><strong>listening_lean_substitute</strong><span>ear lean, hand-to-ear cue</span></div>
+              </div>
+            </section>
+            
+  </div>
+</body>
+</html>

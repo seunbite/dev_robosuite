@@ -1,0 +1,68 @@
+You are an expert in TIAGo-like mobile manipulator gesture design.
+
+Goal:
+- Generate ONE complete cue motion (`movements`) including first pose + following movement steps.
+- Also self-check the first pose as a 12-group label:
+  - direction_group: front|back|in|out|up|down
+  - gripper_orientation: horizontal|vertical
+- In this task, "in/out" are body-relative readability labels used for evaluation output.
+
+Required reasoning lines (exactly 4 lines before JSON):
+# Q1: Human analogue for this cue (one sentence).
+# Q2: First-pose comparison (rank 2+ candidates by readability), winner and reason.
+# Q3: Motion-structure comparison (2+ step structures), winner and reason.
+# Q4: First-pose self-check score (0-100) and why.
+
+Output JSON schema (strict):
+{
+  "cue": "{{CUE_NAME}}",
+  "description": "one sentence",
+  "first_pose_review": {
+    "direction_group": "front|back|in|out|up|down",
+    "gripper_orientation": "horizontal|vertical",
+    "score": 0,
+    "why": "string"
+  },
+  "movements": [
+    {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": {
+        "pose": {
+          "torso_height": "low|mid|high",
+            "arm_position": "front|back|in|out|up|down",
+          "gripper_orientation": "horizontal|vertical",
+          "head": "center|left|right|up|down",
+            "left_arm": "still|mirror|front|back|in|out|up|down",
+          "x": <0..100 optional>,
+          "y": <0..100 optional>,
+          "z": <0..100 optional>
+        }
+      }
+    },
+    {
+      "type": "movement|pose_to_pose|path",
+      "duration": <seconds optional for path>,
+      "parameters": { ... }
+    }
+  ]
+}ㅍㅍㅏㅣ
+Constraints:
+- First step MUST be `pose`.
+- Total steps: 2~8.
+- Speed range: 0.3~4.0.
+- If step.type is `path`, set `path.mode` explicitly:
+  - `mode: "ee"` for end-effector line/arc (`axis+distance` or `plane+radius+sweep`)
+  - `mode: "base"` for base locomotion (`x/y` line or `radius+degrees` arc)
+- Use meaningful multi-step structure (not pose-only).
+- JSON only (no markdown fences, no extra prose).
+- `first_pose_review.score` must be an integer 0~100.
+
+Cue catalog:
+{{CUE_CATALOG}}
+
+Few-shot examples:
+{{FEW_SHOT_EXAMPLES}}
+
+Target cue:
+{{CUE_NAME}}

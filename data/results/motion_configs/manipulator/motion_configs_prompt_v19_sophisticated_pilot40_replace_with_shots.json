@@ -1,0 +1,962 @@
+[
+  {
+    "idx": 8,
+    "cue": "fist_pump",
+    "description": "The robot starts with a low, slightly retracted arm, then executes a powerful upward and forward pump, accentuating the peak with a sharp wrist flick, and ending with a slight dynamic recoil.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 45,
+            "y": 50,
+            "z": 25,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 25,
+                "z": 35
+              },
+              "speed": 3.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 3.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 2.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:48:43",
+    "reasoning": "# Q1: A human performs a fist pump by first lowering their arm, then powerfully thrusting it upward, and often adding a sharp accent or recoil at the peak to emphasize triumph.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) front+vertical+x60,y50,z30, P3) down+horizontal+x45,y50,z25; winner=P3 because the low, slightly retracted starting pose with a downward pointing axis and horizontal gripper orientation provides the best dynamic range for a powerful upward pump and a clear \"fist\" aesthetic.\n# Q3: options=M1 P3>movement(shoulder x+z pump)>movement(wrist z accent)>movement(shoulder z recoil), M2 P3>path(line z up)>hold, M3 P3>movement(shoulder z, fast, repetition); winner=M1 because it captures the powerful upward thrust, the sharp peak accent, and a dynamic recoil, providing a complete and expressive \"pump\" gesture.\n# Q4: options=C1 sharp accent at the peak of the pump followed by a slight recoil, C2 preparatory dip before the pump, C3 final static hold after the pump; winner=C1 because the accent and recoil at the peak enhance the sense of triumph and energy without ending in a static, unexpressive pose."
+  },
+  {
+    "idx": 9,
+    "cue": "flex_bicep",
+    "description": "The robot executes a brief preparatory lift, then sharply pulls its arm into an iconic bicep flex, punctuating the gesture with a small upward emphasis to convey strength.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 40,
+            "y": 45,
+            "z": 55,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.8,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 2.5,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:49:13",
+    "reasoning": "# Q1: A human typically raises their arm, bends the elbow to bring the hand to the shoulder, and subtly tenses their bicep with a small accent.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) back+vertical+x40,y45,z55, P3) front+vertical+x60,y50,z45; winner=P2 because the gripper pointing towards the robot's body with vertical jaws best mimics a clenched fist held against the shoulder, which is the iconic silhouette for a bicep flex.\n# Q3: options=M1 P_start>movement(shoulder prep)>pose(P_flexed)>movement(shoulder accent), M2 P_start>path(line to shoulder)>hold, M3 P_start>movement(elbow only); winner=M1 because the preparatory lift and the final accent make the gesture intentional and stronger than a simple bend or path.\n# Q4: options=C1 small upward emphasis at the peak of the flex, C2 brief retraction before the flex, C3 a final neutral return pose; winner=C1 because the upward emphasis directly reinforces the \"flex\" and \"strength\" aspect, serving as a punctuation mark for the gesture itself."
+  },
+  {
+    "idx": 10,
+    "cue": "shrug_idk",
+    "description": "The robot performs a quick shoulder raise with slightly open hands, followed by a subtle drop to convey uncertainty or indifference.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 15,
+                "x": 5,
+                "y": 5
+              },
+              "speed": 2.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 15
+              },
+              "speed": 1.8,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8,
+                "x": -3
+              },
+              "speed": 1.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:49:29",
+    "reasoning": "# Q1: A shrug indicates uncertainty or indifference by quickly raising the shoulders and often slightly opening or lifting the hands, followed by a slight release.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) front+vertical+x50,y50,z40, P3) up+vertical+x50,y50,z50; winner=P1 because the `up` pointing axis with `horizontal` gripper orientation at a neutral chest height best mimics the open-palmed, slightly upward motion of a human shrug for uncertainty.\n# Q3: options=M1 P1>movement(shoulder z+x+y lift)>movement(wrist y rotate)>movement(shoulder z+x sag), M2 P1>path(line z up)>movement(wrist y rotate), M3 P1>movement(shoulder z only); winner=M1 because it captures the primary shoulder lift with nuanced joint movement for naturalness, refines the hand gesture, and adds a natural follow-through, creating a richer \"I don't know\" expression.\n# Q4: options=C1 small, quick recoil or slight sag after the main shrug, C2 preparatory look around, C3 extended hold at the peak; winner=C1 because the subtle downward sag emphasizes the \"I don't care\" or \"giving up\" aspect, making the gesture more expressive and transient."
+  },
+  {
+    "idx": 12,
+    "cue": "facepalm",
+    "description": "The robot slowly brings one hand to its face, holds it briefly with a slight press, then slowly recoils as if overwhelmed.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 60,
+            "y": 70,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 0.9,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 1.5,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15,
+                "y": -10,
+                "z": -10
+              },
+              "speed": 0.7,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:50:17",
+    "reasoning": "# Q1: A facepalm reads best when the hand slowly and deliberately moves to the face, makes a brief slight contact, and then slowly recoils as if overwhelmed.\n# Q2: candidates=P1) back+vertical+x60,y70,z70, P2) back+horizontal+x60,y70,z70, P3) up+horizontal+x55,y60,z70; winner=P1 because the back-pointing vertical gripper best simulates a human palm covering the face.\n# Q3: options=M1 pose(neutral)>pose(face)>movement(elbow press)>movement(shoulder recoil), M2 pose(face)>movement(shoulder sway), M3 path(line to face)>hold; winner=M1 because the cue is strengthened by a deliberate approach, a brief emphatic contact, and a slow, tired recoil, rather than a single coarse movement or static hold.\n# Q4: options=C1 slow approach to the face followed by a slight press and slow recoil, C2 quick movement to the face and immediate return, C3 short jitter at the face; winner=C1 because the slow, almost reluctant approach and the tired recoil reinforce the emotion of exasperation or disbelief, making the gesture more expressive than a mere contact."
+  },
+  {
+    "idx": 13,
+    "cue": "point_self",
+    "description": "The robot starts from a ready position, pulls its arm back to point sharply at its own chest, and adds a crisp, brief accent to emphasize self-reference.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10
+              },
+              "speed": 1.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.8,
+          "hold_time": 0.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 2.2,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 2.2,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:50:45",
+    "reasoning": "# Q1: A human typically points at their own chest or shoulder with an index finger, often with the hand turned to face themselves, signaling self-reference.\n# Q2: candidates=P1) back+vertical+x45,y50,z45, P2) back+horizontal+x45,y50,z45, P3) right+vertical+x50,y20,z50; winner=P1 because pointing directly towards the robot's own chest/torso with a vertically oriented gripper best mimics the human gesture of self-reference.\n# Q3: options=M1 P1>movement(shoulder x start retract)>pose(P1 target point self)>movement(wrist z accent), M2 P1>path(line x), M3 P2>movement(elbow x+y jitter); winner=M1 because a direct and intentional multi-phase movement to the body, ending with a hold and accent, provides the clearest \"point to self\" cue.\n# Q4: options=C1 sharp retraction towards the chest and a brief hold, C2 preparatory extension forward, C3 small head tilt after point; winner=C1 because a decisive retraction to the body strongly conveys the self-referential aspect of pointing, making the intent clear and specific."
+  },
+  {
+    "idx": 15,
+    "cue": "beckon_come_here",
+    "description": "The robot first prepares its arm, extends it towards the viewer, then repeatedly curls its gripper inwards as if beckoning, and finally pulls its arm slightly back to reinforce the invitation.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": -20
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 20
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": -20
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 20
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -8
+              },
+              "speed": 1.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:51:39",
+    "reasoning": "# Q1: A human would typically start from a ready position, extend their arm slightly towards the person they are beckoning, then repeatedly curl their fingers inwards, often followed by a slight pull-back of the arm, implying \"come here.\"\n# Q2: candidates=P1) front+vertical+x75,y50,z50, P2) up+horizontal+x70,y50,z55, P3) front+horizontal+x75,y50,z50; winner=P1 because it aligns the hand's primary pointing direction and orientation for a natural \"palm-forward\" beckoning gesture towards the viewer.\n# Q3: options=M1 pose(neutral)>movement(shoulder x-extend)>pose(beckon start)>movement(wrist y-curl, repeat 2x)>movement(shoulder x-retract), M2 pose(beckon start)>path(line -x repeated), M3 pose(beckon start)>movement(wrist y-curl only, single); winner=M1 because it includes a preparatory arm extension, clearly sets the hand for beckoning, uses repeated wrist movements to simulate finger curling, and concludes with an arm retraction for emphasis, creating a rich, multi-phase gesture.\n# Q4: options=C1 preparatory arm extension and a final shoulder retraction, C2 wiggle fingers side-to-side before the curl, C3 hold the final curl for an extended period; winner=C1 because the initial extension positions the hand for interaction, and the final retraction physically reinforces the \"come here\" meaning, making the overall gesture more intentional and communicative."
+  },
+  {
+    "idx": 17,
+    "cue": "pat_stomach",
+    "description": "The robot moves from a neutral position, leans slightly into a preparatory stance, then performs several rhythmic pats on its stomach before settling slightly back.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 40,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 1.5,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:52:36",
+    "reasoning": "# Q1: A human would bring their hand to their stomach, often with the palm facing towards their body, and perform several rhythmic, light taps.\n# Q2: candidates=P1) back+vertical+x45,y50,z40, P2) down+horizontal+x50,y50,z40, P3) front+vertical+x55,y50,z40; winner=P1 because it most directly represents the gripper's approach and orientation for patting the robot's own stomach, with the pointing axis directed towards the body and the jaw-line providing a suitable flat surface.\n# Q3: options=M1 P_neutral > M_approach(shoulder) > M_pat_repeat(wrist), M2 P_stomach_contact > Path_pat_repeat(line x), M3 P_neutral > M_approach(shoulder) > M_pat_once(elbow x) > P_settle; winner=M1 because it logically breaks down the action into a clear setup (neutral pose), intentional motion to the target (approach movement), and then the core, rhythmic action (wrist repetition), providing a rich and readable gesture.\n# Q4: options=C1 small 'lean-in' movement during approach, C2 final sag after patting, C3 head nod during patting; winner=C1 because a small, focused movement to 'lean in' slightly towards the stomach during the initial approach adds intentionality and self-directedness to the gesture, making the patting feel more expressive than a mere mechanical repetition."
+  },
+  {
+    "idx": 19,
+    "cue": "cover_yawn_sleepy",
+    "description": "The robot exhibits a subtle pre-yawn slump, brings its hand to cover its mouth, performs a brief soft rub, and then slowly sags its arm downward with fatigue, conveying a sense of sleepiness.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -5
+              },
+              "speed": 0.8,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 40,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 3
+              },
+              "speed": 0.8,
+              "hold_time": 0.15
+            },
+            {
+              "degrees": {
+                "y": -3
+              },
+              "speed": 0.8,
+              "hold_time": 0.15
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10,
+                "z": -15
+              },
+              "speed": 0.6,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:53:09",
+    "reasoning": "# Q1: A sleepy yawn reads best if the robot first shows a subtle pre-yawn slump, covers its mouth, and then lets the arm slowly sag with fatigue.\n# Q2: candidates=P1) up+horizontal+x50,y50,z55, P2) front+vertical+x50,y50,z50, P3) back+horizontal+x40,y50,z55; winner=P3 because the back-pointing direction combined with a horizontal gripper best simulates a hand coming towards and covering the mouth.\n# Q3: options=M1 pose(neutral)>movement(pre-yawn slump)>pose(hand at mouth)>movement(soft rub)>movement(sleepy sag), M2 pose(hand at mouth)>path(line z down), M3 pose(neutral)>path(arc to mouth); winner=M1 because the multi-phase sequence with pre-yawn context and post-yawn fatigue best expresses the full \"cover yawn sleepy\" cue.\n# Q4: options=C1 small pre-yawn slump before raising the hand, C2 soft rub while covering the mouth, C3 slow sag after covering the mouth; winner=C3 because the slow, fatigued descent of the arm after covering the mouth most strongly reinforces the \"sleepy\" aspect of the cue."
+  },
+  {
+    "idx": 21,
+    "cue": "tap_temple_think",
+    "description": "The robot moves its hand to its temple, adds a small forward ponder, then performs repeated, crisp taps to suggest concentrated thought, holding at the final tap.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "right",
+            "x": 65,
+            "y": 85,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 3
+              },
+              "speed": 1.0,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -4
+              },
+              "speed": 3.0,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": 4
+              },
+              "speed": 2.8,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -4
+              },
+              "speed": 3.0,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": 4
+              },
+              "speed": 2.8,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:54:10",
+    "reasoning": "# Q1: A human brings a finger to their temple and taps it a few times, often with a slight ponderous expression.\n# Q2: candidates=P1) right+vertical+x65,y85,z70, P2) up+horizontal+x50,y80,z60, P3) front+vertical+x70,y70,z65; winner=P1 because it places the gripper naturally at the robot's right temple, allowing a direct lateral tap with a vertical \"finger\" orientation.\n# Q3: options=M1 pose(neutral)>pose(at temple)>movement(shoulder x ponder)>movement(shoulder y tap repeat), M2 pose(neutral)>path(arc to temple)>movement(wrist y tap), M3 pose(neutral)>movement(shoulder to temple)>path(line x tap); winner=M1 because it establishes a clear pre-tap position, adds a subtle ponder before the tap, and uses repeatable shoulder movements for crisp taps.\n# Q4: options=C1 small forward ponder after arriving at temple, C2 final recoil after tapping, C3 slight head tilt before tapping; winner=C1 because the small forward ponder after reaching the temple strengthens the 'thinking' context before the tapping begins."
+  },
+  {
+    "idx": 23,
+    "cue": "lean_forward_interest",
+    "description": "The robot executes a subtle preparatory 'breath', then leans forward with a slight dip, and finishes with a curious head-like tilt to convey active interest.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5,
+                "x": -3
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 25,
+                "z": -5
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15
+              },
+              "speed": 1.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:55:01",
+    "reasoning": "# Q1: A human leans forward to show interest by drawing their body closer, often with a subtle head tilt, conveying engagement and drawing attention to what they are focused on.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x55,y50,z55, P3) back+vertical+x45,y50,z45; winner=P1 because the neutral front-facing pose provides the best baseline for initiating a clear forward lean and subsequent expressive tilt.\n# Q3: options=M1 pose > movement(shoulder z prep) > movement(shoulder x+z lean) > movement(wrist x tilt), M2 pose > path(line x), M3 pose > movement(shoulder x only); winner=M1 because the preparatory beat, coupled forward lean, and final expressive tilt combine to create a nuanced and intentional gesture of interest rather than a simple mechanical extension.\n# Q4: options=C1 a subtle preparatory lift or \"breath\" before the forward lean, C2 a slight recoil after the lean, C3 a lateral sway before the lean; winner=C1 because the brief preparation makes the subsequent lean feel more deliberate and engaged, enhancing the overall impression of interest and intention."
+  },
+  {
+    "idx": 24,
+    "cue": "cover_mouth_gasp",
+    "description": "The robot quickly brings its arm from a neutral pose to a pre-gasp position, then snaps its hand to cover its mouth, followed by a sharp, reactive recoil to emphasize surprise.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 40,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 2.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 65,
+            "y": 45,
+            "z": 52,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 3.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -8,
+                "z": -4
+              },
+              "speed": 2.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-06-02 18:55:31",
+    "reasoning": "# Q1: A human would quickly bring their hand to their mouth, often with fingers splayed or palm flat, to cover it in surprise or shock, sometimes accompanied by a slight recoil.\n# Q2: candidates=P1) front+horizontal (flat hand approaching horizontally), P2) down+horizontal (flat hand descending), P3) back+vertical (gripper jaws vertical, pointing into mouth); winner=P3 because the `back` direction allows the gripper's \"palm\" side to face the robot's mouth, and `vertical` orientation effectively covers the mouth area like splayed fingers, clearly conveying the covering action to an observer.\n# Q3: options=M1 pose(neutral)>pose(pre-gasp)>pose(cover_mouth)>movement(recoil), M2 pose(neutral)>path(line to mouth)>movement(jitter); winner=M1 because the initial quick transition to a pre-gasp pose, followed by a sharp snap to cover the mouth, and then an immediate recoil, creates a dynamic and reactive portrayal of a gasp, stronger than a single direct path or simple local jitter.\n# Q4: options=C1 a small backward recoil before reaching the mouth, C2 a small backward recoil immediately after reaching the mouth, C3 a gradual lowering of the arm after covering the mouth; winner=C2 because the sudden recoil *after* the hand covers the mouth accentuates the shock or surprise associated with a gasp, making the reaction more explicit and impactful."
+  }
+]

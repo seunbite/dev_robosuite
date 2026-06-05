@@ -1,0 +1,36 @@
+You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?
+   "More appropriate" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.
+- Do **NOT** assume either side is labeled ground truth.
+- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: beckon_come_here
+- description: From an extended forward position, the robot curls its wrist inward twice with a distinct rhythm to beckon someone closer.
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- dir=front, gripper_orientation=horizontal
+
+Side labels (geometry / motion hints only — neither side is marked correct):
+- LEFT: movement wrist (z-)
+- RIGHT: movement shoulder (y-)
+
+Return ONLY strict JSON:
+{
+  "better_side": "left" or "right",
+  "motion_assessment": "string: which side better conveys the cue and why (trajectory, axis, repetition, hold)",
+  "confidence": 0.0
+}

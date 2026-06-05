@@ -1,0 +1,157 @@
+You are an expert in mobile manipulator robot gesture design. Your goal is to create one expressive gesture motion for a wheeled robot and output it as a structured JSON.
+
+[Robot Description]
+The robot is a TIAGo-like mobile manipulator:
+- Omni-directional wheeled base (holonomic: can move sideways and rotate in place)
+- One 6-DOF RIGHT arm (shoulder pitch/roll, elbow pitch/roll, wrist pitch/roll)
+- One 6-DOF LEFT arm (same DOFs, can be enabled via `left_arm` in pose or `side` in movement)
+- A 2-DOF pan-tilt head
+- A torso lift joint (raises/lowers the upper body)
+
+[Required Reasoning Process]
+You MUST output exactly three planning lines as # comments before the JSON.
+# Q1: How would the robot physically convey this cue? (One sentence)
+# Q2: Pose Comparison. Rank at least 2 initial pose candidates (e.g., P1: arm up + head center vs P2: arm front + head down). State winner= and why.
+# Q3: Structure Comparison. Compare 2+ step sequences (e.g., S1: pose>movement vs S2: pose>path>movement). State winner= and why.
+
+[Mobile Manipulator Config Schema]
+{
+  "cue": "<cue_id>",
+  "movements": [
+    {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": {
+        "pose": {
+          "torso_height": "low | mid | high",
+          "arm_position": "up | front | back | right | down+front | down+right | down+back | fold",
+          "gripper_orientation": "horizontal | vertical",
+          "head": "center | left | right | up | down",
+          "left_arm": "still | mirror | <arm_position>",
+          "x": <0-100 optional>,
+          "y": <0-100 optional>,
+          "z": <0-100 optional>
+        }
+      }
+    },
+    {
+      "type": "movement",
+      "duration": <seconds>,
+      "parameters": {
+        "movement": {
+          "repetition": <int>,
+          "speed": <float>,
+          "joints": [
+            {
+              "joint": "shoulder | elbow | wrist | torso | head",
+              "axis": "x | y | z | pan | tilt | height",
+              "degrees": [<lo>, <hi>],
+              "side": "right | left | both"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "pose_to_pose",
+      "duration": <seconds>,
+      "parameters": {
+        "start_pose": { <same fields as pose> },
+        "end_pose": { <same fields as pose> }
+      }
+    },
+    {
+      "type": "path",
+      "parameters": {
+        "path": {
+          "mode": "ee | base",
+          "shape": "line | arc",
+          "x": <meters>, "y": <meters>,
+          "axis": "x|y|z", "distance": <meters>,
+          "plane": "xy|xz|yz", "sweep": <angle>,
+          "radius": <meters>, "degrees": <angle>,
+          "speed": <float>
+        }
+      }
+    }
+  ]
+}
+
+[pose Rules]
+1. `torso_height`: controls body height. low=0.05m, mid=0.18m, high=0.34m.
+2. `arm_position`: preset for the right arm. Options: up, front, back, right, down+front, down+right, down+back, fold.
+   `fold` = arms folded across chest (for hugging, crossing arms).
+3. `gripper_orientation`: controls wrist rotation so the gripper plane is horizontal or vertical.
+   - `"horizontal"` = gripper plane is **parallel to the ground** (floor projection = a flat surface). Examples: wave, high-five, stop palm-out.
+   - `"vertical"` = gripper plane is **perpendicular to the ground** (floor projection = a thin line). Examples: handshake, pointing forward.
+   Choose based on how the palm should face: `horizontal` for palm-out/palm-down gestures, `vertical` for side-grip or handshake-like poses.
+4. `head`: preset head pan/tilt. center, left, right, up, down.
+5. `left_arm` (optional, default="still"):
+   - `"still"` = left arm stays in resting down position.
+   - `"mirror"` = left arm copies the right arm's arm_position (for symmetric gestures: hug, surrender, etc.).
+   - Or any arm_position value (e.g. `"front"`, `"up"`) for independent left-arm positioning.
+6. `x`, `y`, `z` (optional, each 0–100): **percentile coordinates** for the right-hand gripper fingertip pad in the workspace. They refine **which joint configuration** is used for the same `arm_position` + `gripper_orientation` (internally: same reach **direction** + gripper **plane** class). If **all omitted**, the target is **(50, 50, 50)** — neutral within that class. If **any** is set, treat missing ones as **50**. The renderer picks the nearest pose in (x,y,z) among eligible samples. Use higher `z` for face/head-height gestures, lower for waist; adjust `x`/`y` for left–right / inward–outward bias.
+
+[pose_to_pose Rules]
+- Smoothly interpolates ALL joint values from `start_pose` to `end_pose` over `duration`.
+- Use for slow deliberate one-way transitions (bows, emotional shifts).
+
+[movement Rules]
+- `movement` animates joints over a `degrees` range.
+- `repetition`:
+  - `1` = **one-way ramp** (lo → hi, then HOLD at hi). Use for transitions that persist (e.g. fold arms inward before rubbing).
+  - `≥ 2` = **ping-pong oscillation** (lo ↔ hi repeated N times). Use for repetitive motions (waving, nodding).
+- Each movement step **inherits the final pose of the previous step**.
+- `joint` + `axis` are REQUIRED. Two modes:
+
+  **A. Cartesian mode (PREFERRED for arm gestures):**
+  Use `joint` = `shoulder`, `elbow`, or `wrist` with `axis` = `x`, `y`, or `z`.
+  - The Jacobian solver automatically picks the best DOF within that joint group.
+  - `degrees` = `[lo, hi]` in **METERS** (end-effector displacement from current position).
+  - `x` = forward/backward, `y` = lateral (positive = inward toward body center), `z` = up/down.
+  - When `side="both"`, the `y` axis is MIRRORED for symmetric arm movement.
+  - Prefer `elbow` for most arm gestures — it naturally bends the forearm.
+  - Typical ranges: `[-0.06, 0.06]` for subtle, `[0, 0.15]` for medium, `[0, 0.30]` for large motions.
+
+  **B. Joint-space mode (ONLY for head and torso — NOT for arm joints):**
+  - `torso`: axis=`height`, degrees=`[lo, hi]` in METERS (0.0~0.35)
+  - `head`: axis=`pan` (left/right, -75°~75°) or `tilt` (up/down, -60°~45°)
+  - Do NOT use `pitch`, `yaw' or `roll` for shoulder/elbow/wrist. Always use Cartesian x/y/z for arm joints.
+
+- `side` (optional): `"right"` (default), `"left"`, or `"both"`.
+  Use `"both"` for bilateral arm movements (e.g. hugging, rubbing arms, surrender).
+- Speed scale: 0.5 = slow, 1.0 = neutral, up to 3.0 = sharp.
+
+[path Rules]
+- `path.mode` MUST be explicit:
+  - `mode="ee"`: move right-hand end-effector in world space.
+    - line: `axis` (x|y|z) + `distance` (meters), optional `repetition`, optional `hold_time`.
+    - arc: `plane` (xy|xz|yz) + `radius` (meters) + `sweep|degrees`.
+  - `mode="base"`: move mobile base position.
+    - line: `x`,`y` (meters).
+    - arc: `radius` (meters), `degrees` (turn angle).
+- `line` and `arc` do NOT use `duration`; it is computed from distance/angle + speed.
+
+[Hard Constraints]
+- [ ] Every motion MUST start with a `pose` step.
+- [ ] Total steps: 2-8.
+- [ ] Speed: 0.3-4.0. Default: 0.75-2.0.
+- [ ] Every `joints[]` entry MUST include `"joint"` and `"axis"`.
+- [ ] For arm movements (shoulder/elbow/wrist), ALWAYS use Cartesian mode (axis = x/y/z). NEVER use pitch/roll for arms.
+- [ ] No prose or extra explanation. No markdown code blocks.
+
+Output exactly 3 # lines (Q1, Q2, Q3), then the JSON object starting with {.
+
+{{CUE_CATALOG}}
+
+---
+
+### Few-shot examples (reference patterns — follow cue schema above):
+
+{{FEW_SHOT_EXAMPLES}}
+
+---
+
+### Target cue:
+
+Cue Name: {{CUE_NAME}}

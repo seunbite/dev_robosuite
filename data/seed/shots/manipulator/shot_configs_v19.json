@@ -1,0 +1,367 @@
+[
+  {
+    "cue": "Wave one hand side to side (Hello / Hi)",
+    "description": "The robot raises its arm to a visible waving position, then performs a repetitive, friendly side-to-side motion with its gripper, resembling a human wave.",
+    "reasoning": "# Q1: A human wave reads best when the hand is already visible and then performs a repeated side-to-side accent.\n# Q2: candidates=P1) up+horizontal+x60,y50,z65, P2) front+horizontal+x70,y50,z60, P3) back+horizontal+x55,y50,z60; winner=P1 because the raised horizontal hand gives the clearest waving silhouette before the wrist motion begins, while front/back look more like presenting than greeting.\n# Q3: options=M1 P1>movement(wrist y repeat), M2 P1>path(line y), M3 P2>movement(elbow y repeat); winner=M1 because waving is inherently repetitive local articulation, so a wrist-led repeated movement preserves the greeting read better than a path sweep or a larger elbow swing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 60,
+            "y": 50,
+            "z": 65,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 4,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": -20
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "y": 40
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "y": -20
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 0,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-20 13:41:41"
+  },
+  {
+    "idx": 1,
+    "cue": "Raise one hand briefly",
+    "description": "The robot lifts one arm into a clear acknowledgement pose, gives a small visible accent at the top, and settles slightly while preserving the greeting read.",
+    "reasoning": "# Q1: A brief acknowledgement is expressed by lifting one hand from rest into a visible raised pose, accenting at the peak, and easing down slightly.\n# Q2: candidates=P1) front+horizontal+x60,y50,z35, P2) up+horizontal+x55,y50,z55, P3) back+vertical+x45,y50,z35; winner=P1 because starting from a lower front-facing baseline makes the upward raise unmistakable, whereas an already-up pose weakens the read and a back-facing hand looks tucked instead of social.\n# Q3: options=M1 P1>path(line z up)>movement(wrist z accent)>path(line z down), M2 P1>movement(shoulder z), M3 P2>pose>movement; winner=M1 because the acknowledgement is defined by a clear lift with a tiny top accent and a compact settle, which reads better as an anchored path-plus-accent than a single joint movement.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": 28,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 6
+              },
+              "speed": 1.4,
+              "hold_time": 0.4
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -8,
+          "speed": 0.9
+        }
+      }
+    ],
+    "state": "handmade",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 3,
+    "cue": "Bring one hand to forehead in salute position (Salute)",
+    "description": "The robot moves its gripper to the forehead region with a vertical orientation, then adds a smaller coupled elbow movement to create a crisp in-between salute angle, holding that final silhouette long enough for the salute to read clearly.",
+    "reasoning": "# Q1: A salute reads as the hand arriving near the forehead and then forming a crisp angled forearm line that stays visible for a beat.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) right+vertical+x50,y100,z50, P3) up+vertical+x50,y75,z70; winner=P1 because it provides a neutral setup that makes the later forehead approach and fold readable, while jumping straight to the side or high forehead pose loses the staged construction of the salute.\n# Q3: options=M1 P1>pose>pose>movement(elbow x+z fold), M2 P1>movement(shoulder+elbow), M3 P3>hold only; winner=M1 because salute needs staged placement followed by an in-between elbow fold to create the final angle, which is more readable than a single blended movement or a static target pose alone.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "right",
+            "x": 50,
+            "y": 100,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 75,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -45,
+                "z": 45
+              },
+              "speed": 1.5,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "handmade",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 4,
+    "cue": "Rotate finger near temple (Crazy)",
+    "description": "The robot raises its arm toward the side of its head, settles the gripper near the temple region, traces small circles there, and eases out while preserving the 'crazy' read.",
+    "reasoning": "# Q1: A 'crazy' gesture reads when the hand is clearly parked near the temple and then circles locally in place.\n# Q2: candidates=P1) left+horizontal+x70,y40,z45, P2) front+horizontal+x55,y50,z65, P3) back+vertical+x45,y50,z60; winner=P1 because the side-facing placement anchors the hand at the temple region most clearly, while front/back candidates lose the head-side contact analogy.\n# Q3: options=M1 P1>path(arc xz), M2 P1>movement(wrist y repeat), M3 P2>path(arc xy); winner=M1 because the readable part is the circular trajectory itself near the temple, so a local arc path preserves the iconic read better than oscillation.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 70,
+            "y": 40,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "wrist",
+          "plane": "xz",
+          "radius": 12,
+          "sweep": 720,
+          "speed": 1.2,
+          "direction": "cw"
+        }
+      }
+    ],
+    "state": "handmade",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 5,
+    "cue": "Rub one eye (Tired)",
+    "description": "The robot moves its hand deliberately to one eye, performs a gentle rubbing motion to convey tiredness, and then slowly retracts its arm with a lingering sense of fatigue.",
+    "planning_shot": "Visualization: The robot raises its hand to one eye, lightly rubs it, and lowers away with a tired lingering finish.\nIconic pose: The hand clearly covering or touching one eye.\nRecognition anchor: Direct placement at the eye region followed by small local rubbing.\nMotion read: The viewer should read tiredness quickly from the eye-targeted reach and rub.\nPre-action reveal: Reach to the eye first before any rubbing begins.\nWhy this example matters: Tired fails when the motion becomes generic midair oscillation instead of a specific eye rub.",
+    "reasoning": "# Q1: Tiredness reads when the hand reaches the eye first and then performs a small local rub instead of a generic midair wiggle.\n# Q2: candidates=P1) left+vertical+x70,y55,z40, P2) front+horizontal+x55,y50,z65, P3) back+vertical+x45,y50,z55; winner=P1 because the lateral vertical hand best simulates direct eye contact, while front/back placements weaken the specific eye-rub analogy.\n# Q3: options=M1 P1>movement(wrist y repeat), M2 P1>path(arc yz), M3 P2>movement(elbow y repeat); winner=M1 because tiredness is conveyed by small repeated local rubbing after the hand reaches the eye, and wrist repetition preserves that read better than a larger arc.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 70,
+            "y": 55,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 3.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 4,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 10
+              },
+              "speed": 2.0,
+              "hold_time": 0.5
+            },
+            {
+              "degrees": {
+                "y": -10
+              },
+              "speed": 2.0,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "choreography",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 6,
+    "cue": "Tilt head slightly (Curiosity)",
+    "description": "The robot first reveals a clean, slightly off-center 'face' presentation so the viewer can read the head area, then performs a cute side tilt that clearly favors one side, holds that tilted silhouette for a beat, and eases out with a tiny lingering inquisitive adjustment.",
+    "planning_shot": "Visualization: The robot looks like it notices something interesting, subtly presenting its face before tipping its 'head' to one side in a cute, readable way.\nIconic pose: A clearly side-tilted head-like silhouette, held for a beat.\nRecognition anchor: The gripper/head region must visibly lean left or right, not just wobble generically.\nMotion read: Within the first second, the viewer should read 'curious head tilt,' not just 'small movement.'\nPre-action reveal: Present the head area slightly forward and to one side before the tilt, so the tilt has a clear baseline.\nWhy this example matters: Curiosity fails when the tilt is too subtle or when the motion reads as generic fidgeting.",
+    "reasoning": "# Q1: Curiosity reads as a visible head-like presentation followed by a small but clearly biased side tilt that is held briefly.\n# Q2: candidates=P1) front+horizontal+x58,y48,z58, P2) left+horizontal+x55,y40,z60, P3) up+vertical+x50,y50,z70; winner=P1 because it gives the cleanest neutral face-like baseline before the tilt, while side or upward anchors make the later lean less interpretable as a head tilt.\n# Q3: options=M1 P1>movement(elbow y hold), M2 P1>path(line y), M3 P2>movement(wrist y repeat); winner=M1 because curiosity depends on a single held tilt, not a repeated wag or explicit path trace, so one elbow-led lean with a hold is the clearest structure.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 58,
+            "y": 48,
+            "z": 58,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "y": -25
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "choreography",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 2,
+    "cue": "Bow slightly from the waist (Respect / Greeting)",
+    "description": "The robot settles into a modest chest-height stance, then performs a single coupled forward-and-downward bow, holds the respectful lowered line briefly, and rises back up without extra flourish.",
+    "planning_shot": "Visualization: The robot gives a restrained, polite bow with one clean dip and a readable hold at the lowest point.\nIconic pose: A visibly lowered respectful torso line, not just a generic forward pitch.\nRecognition anchor: The bow should read as both forward and downward at the same time, so the arm silhouette clearly dips.\nMotion read: The viewer should immediately read a polite bow rather than a loose shoulder swing.\nPre-action reveal: Establish a simple upright baseline pose before the coupled bow begins.\nWhy this example matters: Bow fails when only one axis changes and the motion reads like a generic pitch instead of a respectful dip.",
+    "reasoning": "# Q1: A respectful bow reads when an upright baseline is followed by one coupled forward-and-downward dip with a short hold at the lowest point.\n# Q2: candidates=P1) down+vertical+x48,y50,z45, P2) front+horizontal+x55,y50,z50, P3) back+vertical+x40,y50,z40; winner=P1 because the downward vertical stance sets up a respectful torso-like line that makes the later coupled dip readable, whereas front/back anchors look more like offering or retraction.\n# Q3: options=M1 P1>movement(shoulder x+z dip and return), M2 P1>path(line x), M3 P2>movement(shoulder z only); winner=M1 because a bow is defined by a coupled forward-and-downward dip, and splitting or simplifying the axes weakens the respectful read.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            },
+            {
+              "degrees": {
+                "x": -28,
+                "z": 18
+              },
+              "speed": 0.7,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "handmade",
+    "model": "handmade-v18",
+    "time": "2026-03-22 00:00:00"
+  }
+]

@@ -1,0 +1,34 @@
+You are verifying ONLY the movement component (text-only, no image).
+
+You receive:
+- Cue + description
+- Fixed start pose component
+- Current movement tail component(s)
+
+Task:
+- Judge whether the movement tail is appropriate given the fixed start pose.
+- If not, suggest corrected movement component.
+
+Return strict JSON only:
+{
+  "movement_is_appropriate": true/false,
+  "assessment": "string",
+  "if_not_appropriate": {
+    "corrected_movement_component": [
+      {
+        "type": "movement|path|pose_to_pose",
+        "duration": <seconds, optional for path>,
+        "parameters": { ... }
+      }
+    ],
+    "why_change": "string"
+  },
+  "confidence": 0.0
+}
+
+Cue: {{CUE_NAME}}
+Description: {{CUE_DESCRIPTION}}
+Fixed start pose:
+{{POSE_COMPONENT_JSON}}
+Current movement component:
+{{MOVEMENT_COMPONENT_JSON}}

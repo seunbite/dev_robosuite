@@ -1,0 +1,1189 @@
+{
+  "time": "2026-06-02T01:12:12",
+  "model": "gemini-2.5-pro",
+  "mode": "motion_component_verify_text_only",
+  "config": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/manipulator/motion_configs_prompt_v19_gt_fixed_pose_pilot40.json",
+  "n": 39,
+  "rows": [
+    {
+      "cue_idx": 7,
+      "cue": "raise_fists_victory",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The sequence of movements perfectly matches the textual description. The initial elbow bend creates the 'preparatory dip', the fast shoulder lift with a hold enacts the 'powerful upward thrust' and 'peak pose', and the final repeated wrist movement provides the 'triumphant shake'. The parameters are well-chosen to convey the intended dynamics.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adding a small forward component (e.g., x: 5) to the shoulder thrust to make the gesture more projective, as if directed towards an audience.",
+            "The triumphant shake could be made even more energetic by slightly increasing its speed or repetition count."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 8,
+      "cue": "fist_pump",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. It correctly deconstructs the 'fist pump' into two distinct phases described in the text: a small, preparatory 'pull back' (the elbow movement) followed by a 'fast, triumphant upward thrust' (the high-speed shoulder movement). The use of a high speed (3.8) for the upward motion and a hold at the apex effectively conveys the intended triumphant emotion.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider slightly increasing the hold_time at the apex (e.g., to 0.7s) to further emphasize the triumphant peak of the gesture.",
+            "The initial pull-back could be slightly faster to create a more dynamic 'wind-up' contrast before the main thrust."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": null,
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 9,
+      "cue": "flex_bicep",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The generated tail movement correctly interprets the description. It performs a fast elbow curl, holds it to show off the 'bicep', and then performs a small, rapid shake with the wrist, which aligns perfectly with the 'triumphant shake' described.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "For a more pronounced and classic bicep flex, the elbow curl angle could be increased significantly, e.g., from `z:45` to `z:90` or more.",
+            "To make the shake feel more powerful, it could be performed by the shoulder (`z +- rep shoulder`) instead of the wrist."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": {},
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": []
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 10,
+      "cue": "shrug_idk",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The two-part movement directly implements the cue's description: a quick, held lift from the shoulder followed by a slower, relaxed return. The direction (upward and outward via z and y rotations), speed change (fast up, slow down), and brief hold are all characteristic of a classic single-arm shrug gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "To enhance the 'questioning' nature of the shrug, a subtle, simultaneous wrist rotation could be added during the main shoulder lift.",
+            "The speed of the return motion (1.2) could be made even slower to better emphasize the 'relaxing back down' quality."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": null,
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": []
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 11,
+      "cue": "self_scratch_head_confused",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The initial movement to raise the arm to the head and pause is appropriate for the cue. However, the subsequent scratching motion is implemented as a wrist twist (Z-axis rotation), which does not resemble a physical scratching action.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The scratching action is implemented as a repetitive wrist twist (rotation around its Z-axis). A head scratch is a back-and-forth rubbing motion, which would be better represented by a wrist flexion/extension (Y-axis) or a small elbow movement.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "y": "+-"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "Keep the first shoulder movement that raises the arm to the head and pauses.",
+            "Replace the second component (the wrist twist).",
+            "The new second component should be a repetitive wrist movement using flexion/extension (y +- rep wrist) to simulate a scratching motion."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-"
+        },
+        "joint": "wrist",
+        "repetition": "rep"
+      }
+    },
+    {
+      "cue_idx": 12,
+      "cue": "facepalm",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The overall two-step structure (orient wrist, move to face) is correct for a facepalm. However, the specific wrist rotation is wrong. A rotation on the x-axis from a horizontal start pose will tilt the hand, not turn the 'palm' to face the robot's head, which is the critical part of the gesture. The subsequent elbow movement is plausible for bringing the hand to the face, but it's ineffective without the correct hand orientation.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The initial wrist rotation around the x-axis (`x:40`) fails to orient the gripper like a palm facing inward. For a facepalm, the gripper needs to be turned to a vertical orientation to make contact with the 'face'. The current movement would result in the edge or back of the hand hitting the face.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "y": "+"
+            },
+            "joint": "wrist",
+            "repetition": "non",
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "First, replace the `x:40` wrist movement with a sharp rotation on the y-axis to turn the horizontal gripper into a vertical 'palm' facing the robot.",
+            "Then, execute the movement to bring the hand to the 'face'. The existing elbow movement is acceptable, but a more direct `line x-` path might read more clearly as a slap to the forehead.",
+            "Finally, hold the pose firmly against the 'face' to emphasize the gesture, as the current motion does with its long hold time."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+"
+        },
+        "joint": "wrist",
+        "repetition": "non"
+      }
+    },
+    {
+      "cue_idx": 13,
+      "cue": "point_self",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The gesture requires the arm to swing from a position behind the back to the front, and then point at the chest. The current movement is only a small, linear push forward from the back, which completely fails to accomplish the goal of the cue.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement is a small linear push forward from a starting position behind the robot. It does not bring the arm around to the front to perform the pointing action at the chest, which is the core of the 'point_self' cue.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": null,
+            "joint": "shoulder",
+            "repetition": null,
+            "hold": null,
+            "plane": "xy",
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "First, use a large `arc xy` with the shoulder to swing the arm from its starting 'back' position to the front of the robot's body.",
+            "After the swing, add a brief pause or hold to clearly separate the two parts of the gesture.",
+            "Conclude with a sharp, linear poke towards the chest, like `x + non hold`, to complete the 'point_self' action."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "xy"
+      }
+    },
+    {
+      "cue_idx": 14,
+      "cue": "point_you",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. A high-speed linear path along the +x axis (forward) directly implements the 'thrusts sharply forward' part of the cue description. The added hold time effectively creates the required 'emphasis'.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "To increase the sense of sharpness, a very brief, small pullback (e.g., `line x -`) could be added before the main thrust to serve as anticipation.",
+            "The hold time of 0.8s is good; it could be slightly lengthened (e.g., to 1.0s) for a more dramatic or assertive point."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 15,
+      "cue": "beckon_come_here",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement is not appropriate. It uses a z-axis rotation at the wrist, which creates a side-to-side twisting or waving motion. A 'beckon' gesture requires a curling inward motion, which is a flexion/extension of the wrist (a y-axis rotation for this robot's orientation).",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The movement uses a Z-axis wrist rotation, creating a side-to-side twisting motion. A 'beckon' gesture requires a Y-axis rotation (wrist flexion/extension) to create the characteristic 'curling inward' movement.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "y": "+-"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": true,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "Change the axis of rotation for the wrist movement from 'z' to 'y'.",
+            "Use a negative y-axis rotation to perform the 'curling inward' motion.",
+            "Return the wrist to the starting position (positive y-axis rotation) and repeat for a total of two repetitions."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-"
+        },
+        "joint": "wrist",
+        "repetition": "rep",
+        "hold": true
+      }
+    },
+    {
+      "cue_idx": 16,
+      "cue": "stop_palm_out",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement perfectly captures the described cue. The initial small backward motion (x: -8) serves as an effective anticipation, and the subsequent sharp, high-speed forward push (x: 25) with a long hold time effectively creates a definitive 'stop' gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "For a more forceful and direct 'stop', the second movement could be a pure forward push, removing the minor upward component (z:5).",
+            "The hold time (0.8s) is good, but could be extended slightly longer to emphasize the command."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": []
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 17,
+      "cue": "pat_stomach",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The initial movement to bring the hand to the center of the body (`line y`) is correct and matches the description. However, the subsequent patting motion is flawed. An `arc` in the `xy` plane describes a horizontal circle, as if stirring a pot. A stomach pat requires motion on a vertical plane against the robot's torso.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The `arc` motion is in the `xy` plane (horizontal), which would look like stirring the air in front of the robot. A stomach pat requires movement on a vertical plane, such as a repeated forward-and-back motion (`x` axis) against the robot's body.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "Keep the initial `line y` movement to bring the hand to the center of the body.",
+            "Replace the `arc xy` with a `movement` component.",
+            "Use a repeated forward-and-back motion (`x +- rep`) to simulate several gentle pats against the stomach."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      }
+    },
+    {
+      "cue_idx": 18,
+      "cue": "fan_face_hot",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The repetitive wrist motion is conceptually correct for fanning, but the chosen axis of rotation (y-axis) results in an up-and-down flapping motion from the specified start pose. The cue requires a side-to-side motion to convincingly mimic fanning the face.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The wrist rotation is around the y-axis, which produces an up-and-down flapping. Fanning the face requires a side-to-side motion, which corresponds to rotation around the wrist's z-axis (a yawing motion).",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "z": "+-"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "Change the axis of rotation for both wrist movements from the y-axis to the z-axis.",
+            "This will produce the correct side-to-side fanning action.",
+            "Maintain the two-part structure of fast repetitions followed by slower ones to match the description's nuance."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+-"
+        },
+        "joint": "wrist",
+        "repetition": "rep"
+      }
+    },
+    {
+      "cue_idx": 19,
+      "cue": "cover_yawn_sleepy",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The two-part motion correctly models the cue's description. The initial shoulder movement brings the hand to the 'mouth' area and holds it for the yawn, and the subsequent slow elbow bend effectively creates the 'sleepy droop' at the end. The sequence and joint choices are logical for this gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Decrease the speed of the first shoulder movement (currently 0.9) to better match the 'slowly lifts' description.",
+            "Add a small, slow wrist rotation component at the very end to further emphasize the 'sleepy droop' of the hand."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 20,
+      "cue": "rub_eye_tired",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. The first action, a slow circular path in the yz-plane, directly corresponds to 'slowly rubs in a small circle' at the side of the head. The second action, a slow downward movement from the shoulder, perfectly captures the arm 'slumping down tiredly'. The sequence and characteristics align very well with the cue and description.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "To make the 'rub' feel less perfectly geometric, a repeated `y +- z +-` wrist movement could be used instead of the `arc` path.",
+            "To enhance the 'slump', a small amount of negative x-axis rotation (sagging backward) could be added to the downward z-axis shoulder movement."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 21,
+      "cue": "tap_temple_think",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The two-part motion correctly interprets the cue. The initial shoulder movement effectively repositions the arm from the 'left' start pose to the temple area. The subsequent repeated elbow movement successfully creates the 'two quick taps' described, with appropriate speed and repetition.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "The tap is currently performed by the elbow joint. For a more subtle, human-like tap, consider using a `wrist` joint rotation instead (e.g., around the y-axis for flexion/extension).",
+            "The speed and repetition for the taps are good. A slightly longer hold time after the final tap could add a more deliberate pause to the gesture."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 22,
+      "cue": "circle_temple_crazy",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The generated motion correctly implements the 'two small, quick vertical circles' part of the description. The use of a `path(arc)` in the `yz` plane with a `sweep` of 720 degrees is a direct and efficient way to create this motion. However, the cue is 'circle_temple_crazy', which requires the gesture to be performed near the robot's head/temple to be understandable. The current tail motion executes the circles from the fixed start pose ('dir=left', likely at the robot's side), completely missing the critical locational context.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The gesture is performed in the wrong location. For 'circle temple', the hand must first move from its starting position to the temple area before making the circles. The current tail movement omits this crucial preparatory step.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "y": "+",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "First, add a preparatory movement to bring the hand from its starting position up and in towards the robot's 'temple' (e.g., `movement z + y + shoulder`).",
+            "Once the hand is in position, then perform the existing `arc yz` motion to trace the two circles.",
+            "This sequence ensures the gesture is performed in the correct context to be understood as 'crazy'."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      }
+    },
+    {
+      "cue_idx": 23,
+      "cue": "lean_forward_interest",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. The single shoulder rotation forward (+x) and upward (+z) directly implements the 'extends further forward and slightly upward' action described. The inclusion of a hold time in the JSON also correctly matches the 'holding the pose to show... attention' part of the description.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider a slightly longer `hold_time` (e.g., 1.0s) to further emphasize the 'focused attention' aspect.",
+            "A slightly slower speed (e.g., 1.0) could enhance the 'smoothly extends' quality."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": null,
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": null
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 24,
+      "cue": "cover_mouth_gasp",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The tail movement is highly appropriate. It uses a single, high-speed elbow movement to bring the hand from a raised position toward the robot's centerline, which directly corresponds to the 'jerks inward quickly to cover the 'mouth' area' description. The speed and hold time effectively convey the suddenness and shock of a gasp.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adding a slight wrist flexion (e.g., y-) at the end of the movement to better 'cup' the hand over the mouth.",
+            "The high speed is good; ensuring a sharp acceleration profile will further emphasize the 'jerk' quality of the motion."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": null,
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 25,
+      "cue": "cheers_toast",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The three-part movement correctly interprets the description. The initial elbow rotation forward creates a 'thrust' for the 'clink', the repeated wrist motion provides a 'celebratory shake', and the reverse elbow motion serves as a 'retraction'. The chosen joints and speeds are well-suited for a toast gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "For a more direct 'clink' motion, the initial forward thrust could be a Cartesian `path_line` along the x-axis instead of an elbow rotation.",
+            "The hold time after the forward thrust (0.2s) could be slightly longer to emphasize the moment of the 'clink'."
+          ]
+        },
+        "if_not_appropriate": null,
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 26,
+      "cue": "highfive_invite",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement is a wrist twist around the world z-axis, which creates a side-to-side waving or beckoning motion. This does not match the description's specific request for 'upward nods,' which requires a vertical up-and-down movement.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The component `movement(joint=wrist, deg=z:15 | z:-15)` defines a rotation around the vertical z-axis. For a high-five pose, this results in a horizontal hand twist, not the vertical 'upward nod' required by the description.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "z": "+-"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "The movement should be a repeated wrist flexion/extension to create the nod.",
+            "Specify a movement component with `joint=wrist` and `repetition=2`.",
+            "The primary axis of motion should be vertical (`z +-`) to achieve the 'upward nod' effect."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+-"
+        },
+        "joint": "wrist",
+        "repetition": "rep"
+      }
+    },
+    {
+      "cue_idx": 27,
+      "cue": "highfive_imitation",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The intent of the motion (quick out, hold, recoil) matches the description, but the chosen joint and axis are incorrect. A shoulder rotation *around* the world x-axis from an 'up' pose will not produce a forward 'slap' motion toward the viewer. It will instead cause the hand to move sideways or vertically in the y-z plane.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The cue requires a forward 'slap' motion along the +x axis. The current movement is a shoulder rotation *around* the x-axis (`deg=x:15`), which does not move the hand forward but rather side-to-side or up-and-down.",
+          "recommended_component": {
+            "kind": "path_line",
+            "axes": null,
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "From the starting pose, execute a fast linear path forward along the +x axis to simulate the slap.",
+            "Hold briefly at the point of maximum extension.",
+            "Recoil along the same path (-x axis) to return to the start."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_line",
+        "axis": "x"
+      }
+    },
+    {
+      "cue_idx": 28,
+      "cue": "fistbump_invite",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement is highly appropriate. The fixed start pose already has the arm extended forward for the offer ('dir=front'). The tail movement, using two vertical pumps at the elbow joint, directly and effectively implements the 'two small, encouraging vertical pumps' described in the cue.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider reducing the rotation angle slightly (e.g., to +/- 12 degrees) to make the pump feel 'smaller' and more subtle, as suggested by the description.",
+            "A slightly longer hold time after the final pump could enhance the feeling of an invitation, signaling that the robot is waiting for the user's response."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": {},
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": []
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 30,
+      "cue": "pat_self_back",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement is not appropriate. Rotating the elbow joint around the world x-axis causes the forearm to swing from side-to-side. This does not create a 'patting' motion, which requires the hand to move forward (toward the back) and backward (away from the back).",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "A patting motion is a forward-backward movement of the hand. The specified elbow rotation around the x-axis generates a side-to-side swing. The axis of rotation is incorrect for the intended action.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "y": "+-"
+            },
+            "joint": "elbow",
+            "repetition": "rep",
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "The primary action should be a forward-backward 'pat' of the hand against the robot's back.",
+            "This is best achieved by rotating the elbow joint around the y-axis, which creates the required flexion/extension motion.",
+            "Keep the repetition count of 3 to match the 'three quick pats' in the description."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-"
+        },
+        "joint": "elbow",
+        "repetition": "rep"
+      }
+    },
+    {
+      "cue_idx": 32,
+      "cue": "throat_cut_stop",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The initial fast slice (`path_line y -`) is highly appropriate and matches the description's core action ('fast, sharp horizontal slice across its body'). However, the concluding 'downward flick' is incorrectly implemented as a wrist twist (a rotation around the world z-axis) instead of a downward motion, which fails to punctuate the gesture as described.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The gesture is described as a slice followed by a 'downward flick'. The implementation uses a wrist twist (rotation around the z-axis) for the flick, which does not create the required downward motion.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "z": "-"
+            },
+            "joint": "wrist",
+            "repetition": "non",
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "Keep the first component: a fast line in the -y direction for the slice.",
+            "Replace the second component (wrist twist).",
+            "Add a new second component: a small, sharp downward wrist movement (`z - non wrist`) to create the 'downward flick'."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": "wrist",
+        "repetition": "non"
+      }
+    },
+    {
+      "cue_idx": 35,
+      "cue": "salute",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement is not appropriate. It only bends the elbow, which from a forward-extended arm, moves the hand to the robot's chest. A salute requires the hand to be brought up to the head, which necessitates a shoulder lift.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The gesture fails because it lacks any shoulder movement. Starting with the arm extended forward, an elbow-only bend cannot raise the hand to the height of the head; it only brings it to the chest area.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "First, use a primary shoulder movement to lift the entire arm upwards (z+).",
+            "Combine this with an elbow bend (x-) to bring the hand inwards to the 'forehead' area.",
+            "Hold the final salute pose as specified, then reverse the motion to lower the arm."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      }
+    },
+    {
+      "cue_idx": 36,
+      "cue": "visor_search",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. The two-part linear path along the y-axis directly implements the 'sweep across' and 'sweep back' described in the cue. The initial faster sweep, the hold time for the 'pause', and the slower return sweep create a very clear and well-paced representation of a 'visor search' gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "The different speeds for the outward and return sweep are a good touch. The return could be made even slower to emphasize a more deliberate or thoughtful end to the search.",
+            "During the 0.5s hold, a very subtle, small wrist rotation ('y +- rep wrist') could be added to enhance the feeling of 'scanning' or 'processing'."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 37,
+      "cue": "yield_turn",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The use of a horizontal arc in the xy-plane is a geometrically correct and intuitive way to represent the 'outward sweeping arc' described for a 'yield_turn' gesture. The core component choice is appropriate.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "The speed of 1.8 is likely too high for a 'polite' gesture, potentially making it feel abrupt or dismissive. Consider reducing the speed to a more moderate level (e.g., 1.0-1.2) to convey a smoother, more deliberate motion.",
+            "A 60-degree sweep is acceptable, but a slightly larger sweep (e.g., 75-90 degrees) could make the yielding intention more clear and generous."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 39,
+      "cue": "request_turn",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is a simple and direct interpretation of the 'sweep to the side' described in the cue. Starting from the raised 'platter' pose, an elbow rotation around the y-axis effectively moves the hand sideways to offer the turn, and the included hold reinforces the gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "For a more expansive and natural-looking sweep, consider using a shoulder rotation (e.g., 'shoulder y +') instead of the elbow.",
+            "A slight wrist extension at the end of the sweep could enhance the 'presenting' quality of the gesture."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": {},
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": []
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 40,
+      "cue": "guiding_arm",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The gesture is described as a 'sweep', which implies an arcing motion. The current linear path along the y-axis is a translation, which is not a natural or effective way to perform a guiding sweep from a forward-extended starting position.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "A 'sweep' gesture from a forward-extended arm naturally follows an arc, pivoting at the shoulder. A straight-line Cartesian path in the y-direction is a lateral translation, which is an unnatural and non-communicative motion for this cue.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {},
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": "xy",
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "Replace the linear path with an arc in the horizontal (xy) plane.",
+            "The arc should pivot from the robot's shoulder to create a natural sweeping motion to the side.",
+            "End the motion with a brief hold to clearly indicate the intended direction."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "xy"
+      }
+    },
+    {
+      "cue_idx": 41,
+      "cue": "protective_arm_out",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. It uses a single, fast shoulder rotation to thrust the arm forward (+x) and down (-z), which perfectly matches the description of a 'sharp, protective blocking motion'. The high speed (3.5) and the final hold (0.5s) effectively convey the intended protective and decisive quality of the gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold time slightly (e.g., to 0.75s or 1.0s) to emphasize the resolute, blocking nature of the final pose.",
+            "To add more force, a very slight and quick preparatory move backward/upward just before the main thrust could be added, but this is not essential."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 45,
+      "cue": "slow_down_request_palm_down",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. It uses a repeated up-and-down elbow rotation (z+/-) to create two distinct 'patting' motions, which directly implements the description of 'two gentle, slow, downward pats' for a 'slow down' request.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "To better match the 'gentle, slow' description, consider making the downward pat (z: -20) slightly slower than the upward reset (z: 20). Currently, the downward speed (1.2) is faster than the upward speed (1.0)."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": null,
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": null
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 50,
+      "cue": "firm_accept_forward_reach",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The linear path forward (`line x`) at a high speed with a hold directly and effectively conveys the 'firm_accept_forward_reach' cue, matching the description of a direct, firm extension for a handshake or item acceptance.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider a slightly longer hold time (e.g., 1.0s) to further emphasize the 'holds steady' part of the gesture.",
+            "The speed is effective for 'firm', but a marginal reduction (e.g., to 1.8) could shift the feel from 'quick' to 'deliberate'."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 59,
+      "cue": "nod_yes",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. It directly implements the description's 'two quick, small down-and-up beats' using the wrist joint. The repetition count, fast speed, and small angle of rotation perfectly align with the gesture of a 'yes' nod.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider making the downward motion (z:-15) slightly faster to create a crisper, more affirmative 'beat'.",
+            "The small hold time (0.05s) at the end is good for punctuation; a slightly longer hold (e.g., 0.1s) could also work well to signify the end of the gesture."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": {},
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": []
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 60,
+      "cue": "shake_head_no",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The side-to-side wrist rotation (y-axis) is a direct and clear representation of a 'shake head no' gesture. The fixed start pose (raised forward) is a natural and effective position from which to perform this cue.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Adjusting the speed (currently 3.0) could convey different emotional tones; a slightly slower speed might feel more deliberate.",
+            "For a more emphatic 'no', the number of repetitions could be increased from 2 to 3."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": {},
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": []
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 61,
+      "cue": "air_quotes",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. It directly translates the description of 'two quick wrist flicks, separated by a distinct pause'. The use of two sequential wrist movements with a hold time after the first one perfectly captures the cadence of the air quotes gesture. The x-axis (pitch) flick is a very clear and common way to perform this motion.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "To make the flicks feel more 'quick' and crisp, the speed could be slightly increased (e.g., from 3.0 to 3.5).",
+            "For more natural variation, the second flick could be slightly smaller in magnitude than the first (e.g., 20 degrees instead of 25)."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": []
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 64,
+      "cue": "tilt_head_curious",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The movement is inappropriate. It performs a pitch (nodding) motion, but the 'head tilt' cue requires a roll (tilting to the side) motion.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement uses a wrist rotation around the y-axis, which results in a pitch or nodding motion. A 'head tilt' gesture requires a roll motion, which would be a rotation around the x-axis for a forward-facing gripper.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-"
+            },
+            "joint": "wrist",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "Keep the core idea of a single, slow wrist movement with a hold.",
+            "Change the axis of rotation from pitch (y-axis) to roll (x-axis).",
+            "This will produce the correct side-to-side tilt that mimics a curious head gesture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-"
+        },
+        "joint": "wrist",
+        "repetition": "non",
+        "hold": true
+      }
+    },
+    {
+      "cue_idx": 66,
+      "cue": "shh_gesture",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. Starting with the arm raised and gripper vertical (like an index finger), the straight forward motion (+x) effectively brings the hand to the 'lips' position, directly enacting the 'shh' gesture. The concluding hold reinforces the cue.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "A slight downward arc (`arc xz`) as the hand moves forward could feel more organic than a purely linear path.",
+            "A slightly slower speed could enhance the gentle, quieting nature of the gesture."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 74,
+      "cue": "hands_up_surrender",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is appropriate. The sequence directly translates the description: the shoulder motion lifts the arm higher (z:30) and forward (x:10), and the subsequent wrist motion pitches the gripper up (y:-45) to present a 'palm'. This creates a clear and readable 'hands up surrender' gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "To make the 'palm' presentation more emphatic, the wrist pitch could be slightly increased (e.g., from y:-45 to y:-60).",
+            "Consider a slightly longer hold time (e.g., 1.5s) at the very end to make the final surrender pose more deliberate and readable."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": {
+            "kind": null,
+            "axes": {},
+            "joint": null,
+            "repetition": null,
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": []
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 104,
+      "cue": "scale_expand",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The movement is highly appropriate. It directly translates the cue 'scale_expand' from the given starting pose. A linear path along the y-axis (outward to the left) with a terminal hold effectively 'pushes' and defines an expanded boundary, as described.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider slightly reducing the speed (e.g., from 1.8 to 1.2) to convey a more 'firm' and 'deliberate' push rather than a quick shove.",
+            "To add a sense of initiation or 'push-off', a very small, brief wrist extension (e.g. `movement wrist x+`) could be added at the beginning of the linear motion."
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": null,
+          "recommended_component": null,
+          "recommended_tail_guidance": null
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null
+    }
+  ]
+}

@@ -1,0 +1,317 @@
+{
+  "remaining_indices": [
+    25,
+    26,
+    27,
+    28,
+    30,
+    32,
+    35,
+    36,
+    37,
+    39,
+    41,
+    50,
+    59,
+    60,
+    61,
+    64,
+    66,
+    74
+  ],
+  "mp4": [
+    {
+      "idx": 25,
+      "cue": "cheers_toast",
+      "gt_side": "right",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/025_cheers_toast_pair_remaining.mp4",
+      "left": "axis",
+      "right": "gt",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: cheers_toast\n- description: Starting in a raised 'toast' position, the arm thrusts forward for a sharp 'clink', gives a small celebratory shake, and then retracts.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=up, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement wrist (z+)\n- RIGHT: movement shoulder (x+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "right",
+      "correct": true,
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side's motion is far more appropriate for a 'cheers_toast'. The description calls for a 'thrusts forward for a sharp clink', which is exactly what the right side's motion shows—a linear extension forward from the shoulder, as if to meet another glass. The left side's motion is an upward flick from the wrist, which does not convey the primary action of toasting.",
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 26,
+      "cue": "highfive_invite",
+      "gt_side": "left",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/026_highfive_invite_pair_remaining.mp4",
+      "left": "gt",
+      "right": "axis",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: highfive_invite\n- description: Starting with the arm raised in a classic high-five position, the robot makes two small, encouraging upward nods with its wrist to invite a high-five.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=up, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (z+)\n- RIGHT: movement elbow (x+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "right",
+      "correct": false,
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The cue describes small, encouraging upward 'nods' with the wrist. The right side's motion, a small pulse forward and up from the elbow, effectively creates this beckoning, inviting gesture with the end-effector. It's a localized and subtle movement, appropriate for an invitation. The left side's motion is a large lift of the entire arm from the shoulder, which is too broad and lacks the specific 'nodding' quality of the cue. It reads more as a general 'raise your hand' than a specific invitation.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 27,
+      "cue": "highfive_imitation",
+      "gt_side": "right",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/027_highfive_imitation_pair_remaining.mp4",
+      "left": "axis",
+      "right": "gt",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: highfive_imitation\n- description: Starting with its arm raised in a ready position, the robot performs a quick forward 'slap' motion, holds briefly at full extension, and then recoils to the starting pose to simulate a high-five.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=up, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement wrist (z+)\n- RIGHT: movement shoulder (x+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "right",
+      "correct": true,
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side's motion is much more appropriate for a high-five. A high-five is a forward 'slapping' motion, which the right side executes by extending the arm forward from the shoulder. This correctly mimics the human gesture of moving the hand forward to meet another. The left side's motion is a simple upward wrist flick, which does not have the necessary forward trajectory to be recognizable as a high-five.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 28,
+      "cue": "fistbump_invite",
+      "gt_side": "right",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/028_fistbump_invite_pair_remaining.mp4",
+      "left": "axis",
+      "right": "gt",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: fistbump_invite\n- description: The robot extends its arm forward in a fistbump offer, then gives two small, encouraging vertical pumps to invite a response.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=front, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (z+)\n- RIGHT: movement shoulder (x+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": false,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The cue specifies \"two small, encouraging vertical pumps\" to invite a response. The left side executes this perfectly, with the arm moving up and down along the vertical axis. The right side, in contrast, moves horizontally forward and backward. This horizontal jabbing motion does not match the description of a vertical pump and is less common for this type of inviting gesture. The vertical motion on the left is a much more natural and recognizable way to convey the cue.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 30,
+      "cue": "pat_self_back",
+      "gt_side": "left",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/030_pat_self_back_pair_remaining.mp4",
+      "left": "gt",
+      "right": "axis",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: pat_self_back\n- description: Starting with its arm already behind its back, the robot gives itself three quick, encouraging pats.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=back, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (z+)\n- RIGHT: movement wrist (x+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": true,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate. A pat on the back involves a tapping motion against the surface of the back. The left side's motion, driven by the shoulder, produces a clear up-and-down trajectory that effectively simulates this tapping or patting action. The right side's motion is a wrist flick, moving the hand forward and away from the body, which does not resemble a patting gesture at all.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 32,
+      "cue": "throat_cut_stop",
+      "gt_side": "left",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/032_throat_cut_stop_pair_remaining.mp4",
+      "left": "gt",
+      "right": "axis",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: throat_cut_stop\n- description: Starting with the arm extended to the left, the robot executes a fast, sharp horizontal slice across its body and holds abruptly, then adds a small downward flick to punctuate the 'stop' gesture.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=left, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: path line y\n- RIGHT: path line z\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": true,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The cue requires a \"fast, sharp horizontal slice\". The LEFT side correctly executes this by moving the end-effector in a straight, horizontal path across the robot's body. The RIGHT side's motion is a vertical chop downwards, which is completely inconsistent with the iconic 'throat cut' gesture. The horizontal trajectory on the LEFT is the defining characteristic of this cue.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 35,
+      "cue": "salute",
+      "gt_side": "right",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/035_salute_pair_remaining.mp4",
+      "left": "axis",
+      "right": "gt",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: salute\n- description: Starting with the arm extended forward, the robot snaps its hand up to a formal salute position near its head, holds it, and then lowers the arm.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=front, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (y+)\n- RIGHT: movement shoulder (z+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": false,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The LEFT side is much more appropriate for a 'salute'. A salute involves bringing the hand up to the forehead or brow. The motion on the LEFT side correctly moves the hand up and inward, ending at a position analogous to a forehead on the robot's central column. The motion on the RIGHT side simply raises the arm vertically in an arc, ending high but not in a recognizable salute position. The final pose is the critical differentiator, and the LEFT side achieves a much more iconic and recognizable pose for the gesture.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 36,
+      "cue": "visor_search",
+      "gt_side": "left",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/036_visor_search_pair_remaining.mp4",
+      "left": "gt",
+      "right": "axis",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: visor_search\n- description: Starting with the hand held to the side of the head like a visor, the arm sweeps smoothly across the front in a straight line, pauses as if processing information, then sweeps back to the start.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=left, gripper_orientation=vertical\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (y+)\n- RIGHT: movement wrist (z+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": true,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The LEFT side is much more appropriate. The cue 'visor_search' describes a smooth sweep across the front, mimicking a person scanning the horizon with a hand shielding their eyes. The LEFT side performs this exact horizontal sweeping motion, driven by the shoulder joint. The RIGHT side, in contrast, performs a small vertical pivot at the wrist, which does not convey the sense of searching or sweeping across a scene at all.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 37,
+      "cue": "yield_turn",
+      "gt_side": "left",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/037_yield_turn_pair_remaining.mp4",
+      "left": "gt",
+      "right": "axis",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: yield_turn\n- description: From a neutral forward pose with a horizontal gripper, the robot arm performs a smooth, outward sweeping arc to politely signal 'after you' or yield a turn.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=front, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (x-)\n- RIGHT: movement shoulder (z-)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": true,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The Left side's motion is a smooth, outward sweeping arc, primarily in the horizontal plane. This is a classic, easily recognizable representation of a 'yield turn' or 'after you' gesture. The Right side's motion is a downward sweep, which does not fit the description or the meaning of the cue. A downward motion would more likely be interpreted as 'put down' or 'lower'. The lateral, opening movement on the Left is crucial for conveying the intended polite yielding action.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 39,
+      "cue": "request_turn",
+      "gt_side": "right",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/039_request_turn_pair_remaining.mp4",
+      "left": "axis",
+      "right": "gt",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: request_turn\n- description: Starting with the arm raised and gripper held flat like a platter, the robot makes a smooth, crisp sweep to the side and holds, clearly indicating that it is someone else's turn.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=up, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement wrist (z+)\n- RIGHT: movement shoulder (x+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "right",
+      "correct": true,
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side is much more appropriate. The cue asks for a 'sweep to the side' to indicate someone else's turn. The right side executes a broad, clear sweep by rotating the shoulder, moving the entire arm to the side. This is a classic, easily recognizable iconic gesture for 'your turn' or 'after you'. The left side's motion is just a small wrist rotation, which is not a sweep and is far too subtle to clearly convey the meaning.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 41,
+      "cue": "protective_arm_out",
+      "gt_side": "left",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/041_protective_arm_out_pair_remaining.mp4",
+      "left": "gt",
+      "right": "axis",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: protective_arm_out\n- description: Starting from a raised-guard position, the arm thrusts forward and slightly down in a sharp, protective blocking motion, holding the final position.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=up, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (x+)\n- RIGHT: movement wrist (z+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": true,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The cue 'protective_arm_out' requires a forward thrusting motion to create a blocking barrier. The left side executes this perfectly by pivoting the entire arm forward from the shoulder, creating a strong, clear, and recognizable blocking gesture. The end-effector moves forward and slightly down, matching the cue description. The right side's motion is a small, upward flick of the wrist. This movement lacks the forward thrust, scale, and intent of a protective block; it moves in the wrong direction and does not create the sense of a protective barrier.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 50,
+      "cue": "firm_accept_forward_reach",
+      "gt_side": "left",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/050_firm_accept_forward_reach_pair_remaining.mp4",
+      "left": "gt",
+      "right": "axis",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: firm_accept_forward_reach\n- description: From a neutral forward position, the arm extends directly forward with firm speed, then holds steady in a classic handshake or item-acceptance gesture.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=front, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (x+)\n- RIGHT: movement shoulder (z+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": true,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate. The cue 'firm_accept_forward_reach' explicitly requires the arm to extend directly forward. The left side's motion is a clear and direct forward extension along the x-axis, perfectly matching the description of a handshake or item-acceptance gesture. The right side's motion is an upward lift along the z-axis, which is a completely different gesture and does not convey a forward reach.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 59,
+      "cue": "nod_yes",
+      "gt_side": "right",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/059_nod_yes_pair_remaining.mp4",
+      "left": "axis",
+      "right": "gt",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: nod_yes\n- description: Starting from a high forward position with a horizontal gripper, the robot's wrist performs two quick, small down-and-up beats to signal a 'yes' nod.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=front, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (y+)\n- RIGHT: movement shoulder (z+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "right",
+      "correct": true,
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The cue 'nod_yes' requires a vertical, down-and-up motion. The right side performs this action by rotating the shoulder in the vertical plane (pitch), causing the end-effector to move down and up. This directly mimics the action of a human head nodding 'yes'. The left side performs a horizontal, side-to-side motion, which is universally recognized as the gesture for 'no'. Therefore, the right side's motion is the only appropriate one for the given cue.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 60,
+      "cue": "shake_head_no",
+      "gt_side": "right",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/060_shake_head_no_pair_remaining.mp4",
+      "left": "axis",
+      "right": "gt",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: shake_head_no\n- description: From a raised forward position, the robot's wrist shakes side-to-side in a clear, repeated motion to signal 'no'.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=front, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (z+)\n- RIGHT: movement shoulder (y+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "right",
+      "correct": true,
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side correctly performs a side-to-side, horizontal shaking motion, which is the universally recognized gesture for 'no'. The left side performs an up-and-down motion, which would be interpreted as 'nodding yes', the opposite of the intended cue.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 61,
+      "cue": "air_quotes",
+      "gt_side": "left",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/061_air_quotes_pair_remaining.mp4",
+      "left": "gt",
+      "right": "axis",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: air_quotes\n- description: From a forward-facing position, the robot's arm performs two quick wrist flicks, separated by a distinct pause, to signify 'air quotes'.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=front, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (z+)\n- RIGHT: movement shoulder (y+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": true,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The 'air quotes' gesture is characterized by small, quick wrist flicks. The motion on the LEFT side, a subtle upward lift and wrist rotation, effectively mimics this localized flicking action. In contrast, the motion on the RIGHT side is a large, outward swing of the entire arm from the shoulder. This large, sweeping motion is completely incongruous with the small, nuanced gesture of air quotes and would not be recognized as such.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 64,
+      "cue": "tilt_head_curious",
+      "gt_side": "right",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/064_tilt_head_curious_pair_remaining.mp4",
+      "left": "axis",
+      "right": "gt",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: tilt_head_curious\n- description: From a neutral forward position, the robot's gripper slowly tilts to the side and holds, mimicking a curious head tilt.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=front, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (y-)\n- RIGHT: movement shoulder (z-)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "right",
+      "correct": true,
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side's motion better conveys a head tilt. The motion is a roll around the upper arm's axis, which causes the gripper (acting as the 'head') to tilt to the side, directly mimicking the described gesture. The left side's motion is a large swing of the entire arm from the shoulder, which looks more like a lean or a side-sweep rather than an isolated, curious head tilt.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 66,
+      "cue": "shh_gesture",
+      "gt_side": "right",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/066_shh_gesture_pair_remaining.mp4",
+      "left": "axis",
+      "right": "gt",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: shh_gesture\n- description: Starting with its arm raised, the robot brings its gripper forward in a smooth motion, as if placing a finger to its lips to signal for quiet.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=up, gripper_orientation=vertical\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement wrist (y+)\n- RIGHT: movement shoulder (x+)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "right",
+      "correct": true,
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side's motion better conveys the 'shh' gesture. It moves the entire arm in a forward arc, bringing the gripper from a raised position to a central location in front of the robot's base, which effectively mimics placing a finger on one's lips. The left side's motion is only a small wrist rotation and does not bring the gripper forward, failing to create the iconic trajectory of the gesture.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 74,
+      "cue": "hands_up_surrender",
+      "gt_side": "left",
+      "pair_mp4": "data/results/verify/samples/motion_gt_neg_pairwise/074_hands_up_surrender_pair_remaining.mp4",
+      "left": "gt",
+      "right": "axis",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nThe image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:\n- Semi-transparent stack of motion frames (faded trail of the arm moving).\n- End-effector path drawn yellow → purple (time order).\n- **Both sides use the identical fixed start pose** (human GT tile-pick). Only the **tail movement after that pose** differs.\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: hands_up_surrender\n- description: From a raised position, the arm lifts higher and slightly forward, then pitches the gripper up to present a flat 'palm' in a classic hands-up surrender gesture.\n\nFixed start pose (same on both sides; do not choose based on changing this):\n- dir=up, gripper_orientation=horizontal\n\nSide labels (geometry / motion hints only — neither side is marked correct):\n- LEFT: movement shoulder (x-)\n- RIGHT: movement wrist (z-)\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "pred": "left",
+      "correct": true,
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is significantly more appropriate for a 'hands up, surrender' gesture. This cue implies raising the entire arm to show empty hands. The left side's motion, originating from the shoulder, lifts the entire arm assembly upwards and forwards, which is a clear and recognizable analogue to the human action. The right side's motion is isolated almost entirely at the wrist; it simply pitches the hand up without raising the arm itself. This small, localized movement fails to convey the full meaning and scale of the surrender gesture.",
+        "confidence": 0.95
+      }
+    }
+  ],
+  "mp4_accuracy": {
+    "ok": 15,
+    "n": 18,
+    "rate": 0.8333333333333334
+  }
+}

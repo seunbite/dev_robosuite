@@ -1,0 +1,2807 @@
+[
+  {
+    "cue": "inviting_to_sit",
+    "description": "The robot starts from a neutral mid-chest position, smoothly extends its arm outward and downward toward an implied chair with an open horizontal gripper, and performs a gentle wrist dip to politely emphasize the seat.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 25,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 0.8,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -15
+              },
+              "speed": 1.0,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 6,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 19:53:39",
+    "reasoning": "# Q1: A human would politely extend their arm outward and slightly downward toward an empty chair with an open, palm-up hand, finishing with a gentle dip to indicate the seat.\n# Q2: candidates=P1) front+horizontal+x50,y50,z55, P2) down+horizontal+x40,y50,z40; winner=P1 because starting from a neutral mid-height \"front\" posture allows the subsequent downward and outward sweep to read clearly as a directed invitation rather than starting already pointed at the floor.\n# Q3: options=M1 P1>movement(sweep), M2 P1>path(arc), M3 P1>pose(extended low)>movement(wrist dip); winner=M3 because the explicit second pose pins the exact spatial location of the implied chair at waist level, and the final wrist dip acts as the polite \"please sit\" accent."
+  },
+  {
+    "cue": "prevent_fall_support_reach",
+    "description": "The robot starts with its arm tucked near chest level in preparation, suddenly shoots the gripper forward in a fast, straight line to catch or brace a falling subject, and then absorbs the impact with a slight tense recoil before holding the firm supportive extension.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "x",
+          "distance": 45,
+          "speed": 3.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -6,
+                "z": 4
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": 6,
+                "z": -4
+              },
+              "speed": 1.0,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 31,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 19:54:24",
+    "reasoning": "# Q1: A human would react to a fall by suddenly shooting their arm forward in a straight line to intercept or brace the falling subject, taking the weight with a stiff, tense stance.\n# Q2: candidates=P1) front+vertical+x40,y50,z45, P2) down+horizontal+x40,y50,z30; winner=1 because pointing the gripper forward with a vertical orientation reads immediately as reaching out to grasp or intercept a falling person, whereas pointing down reads more like bracing against the floor.\n# Q3: options=M1 P1>path(line x)>movement(recoil), M2 P1>pose(extended)>hold, M3 P1>movement(shoulder x); winner=M1 because a high-speed linear path guarantees the sudden straight-line shot of a reactive reach, and the small follow-up recoil movement adds the crucial physical illusion of catching weight and absorbing an impact."
+  },
+  {
+    "idx": 44,
+    "cue": "finish_action_down_release",
+    "description": "The robot arm lowers deliberately along a straight downward path to simulate placing or dropping an object, then executes a small upward and backward movement to cleanly release and pull away.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 60,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -20,
+          "speed": 1.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15,
+                "z": 15
+              },
+              "speed": 0.8,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 19:55:21",
+    "reasoning": "# Q1: A human would express \"finish action down release\" by lowering their hand deliberately to a surface, opening their grip (simulated by a small pull-away), and relaxing the arm.\n# Q2: candidates=P1) down+horizontal+x60,y50,z50, P2) front+vertical+x60,y50,z40; winner=P1 because a downward-pointing horizontal gripper best represents placing or dropping an object onto a flat surface before releasing.\n# Q3: options=M1 P1>pose(lower), M2 P1>path(line z)>movement(pull away), M3 P1>movement(z down); winner=M2 because the linear z-axis path clearly reads as a controlled downward placement, and the subsequent coupled movement smoothly simulates the physical release and separation."
+  },
+  {
+    "cue": "come_closer",
+    "description": "The robot extends its arm forward with the gripper pointing up at chest height, then repeatedly curls its wrist backward toward its own body to clearly signal someone to approach.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 65,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25
+              },
+              "speed": 1.5,
+              "hold_time": 0.2
+            },
+            {
+              "degrees": {
+                "x": 25
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 0,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 19:56:32",
+    "reasoning": "# Q1: A human extends their arm forward with their hand raised, then repeatedly curls their fingers or hand backward toward their own body to signal someone to approach.\n# Q2: candidates=P1) front+horizontal+x75,y50,z55, P2) up+vertical+x65,y50,z55; winner=P2 because an upright hand positioned at chest height provides a clear vertical silhouette that reads unmistakably as a beckon when it pulls backward.\n# Q3: options=M1 P1>movement(wrist z repeat), M2 P2>movement(wrist x repeat), M3 P2>path(line x repeat); winner=M2 because a repeated backward wrist articulation along the x-axis inherently mirrors the rhythmic, inward-curling human gesture without stiffly moving the entire arm."
+  },
+  {
+    "cue": "interrupt_cue",
+    "description": "The robot rests at a moderate height before suddenly darting its hand upward and forward in a sharp 'stop/wait' gesture, holding the peak momentarily to catch attention, and then settling slightly while keeping the floor.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 45,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 25,
+                "z": 40
+              },
+              "speed": 3.5,
+              "hold_time": 0.4
+            },
+            {
+              "degrees": {
+                "x": -5,
+                "z": -10
+              },
+              "speed": 0.8,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 1,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 19:57:28",
+    "reasoning": "# Q1: A human would express an interruption by suddenly throwing one hand upward and forward with an open palm facing out, holding it briefly to halt the conversation.\n# Q2: candidates=P1) up+horizontal+x45,y50,z40, P2) front+vertical+x70,y50,z70; winner=P1 because an interruption is inherently dynamic and reactive, so starting at a lower resting baseline before darting upward creates the essential sudden contrast.\n# Q3: options=M1 P1>movement(coupled x+z sharp raise), M2 P2>movement(y axis small wave), M3 P1>path(z line up); winner=M1 because a coupled, high-speed upward and forward dart perfectly mimics the urgent, spontaneous body mechanics of interjecting."
+  },
+  {
+    "cue": "request_turn",
+    "description": "The robot quickly shoots its arm upward into a raised-hand position and flutters its wrist side-to-side eagerly to clearly signal a request to speak or take a turn.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": 45,
+          "speed": 3.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 12
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "y": -12
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -15,
+          "speed": 1.0
+        }
+      }
+    ],
+    "idx": 2,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 19:58:20",
+    "reasoning": "# Q1: A human would sharply raise their arm high above their head, often adding a slight eager side-to-side wrist wave, to universally signal a request to take a turn.\n# Q2: candidates=P1) up+horizontal+x50,y50,z40, P2) front+horizontal+x60,y50,z40; winner=P1 because orienting the gripper 'up' securely establishes the hand-like vertical state before it shoots upward.\n# Q3: options=M1 P1>path(line z)>movement(wrist y repeat), M2 P1>pose(z85)>hold, M3 P1>movement(shoulder z up); winner=M1 because the fast linear upward path creates the distinct classroom hand-raise, while the lateral wrist flutter adds the necessary eager intention."
+  },
+  {
+    "cue": "yield_turn",
+    "description": "The robot starts with its arm gathered near the chest in an open-palm orientation, then smoothly sweeps outward, forward, and slightly down, holding the extended pose to clearly signal 'after you' or 'your turn'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 60,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 30,
+                "y": -40,
+                "z": -10
+              },
+              "speed": 1.2,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 3,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 19:59:23",
+    "reasoning": "# Q1: A human would start with their hand near their torso and sweep it smoothly outward and slightly downward with an open palm to offer the floor or clear the way for someone else.\n# Q2: candidates=P1) front+horizontal+x40,y60,z45, P2) up+vertical+x50,y50,z60; winner=P1 because an outward-facing horizontal gripper best mimics a welcoming open hand prepared to sweep out, whereas an upward vertical gripper reads incorrectly as a \"stop\" or \"wait\" command.\n# Q3: options=M1 P1>movement(shoulder x,y,z sweep), M2 P1>path(arc xy), M3 P1>pose(extended); winner=M1 because a fluid, multi-axis shoulder sweep forward (x), laterally away (y), and slightly down (z) perfectly captures the dynamic \"after you\" trajectory, avoiding the robotic snap of a pose-only sequence."
+  },
+  {
+    "cue": "guiding_arm",
+    "description": "The robot establishes an open-palm, chest-height pose across its body, then performs a smooth, deliberate outward and lateral sweep, holding the final extended position to clearly indicate the path to follow.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 45,
+            "y": 30,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.4
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "y": 45
+              },
+              "speed": 0.8,
+              "hold_time": 2.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 4,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:00:02",
+    "reasoning": "# Q1: A human would express this by starting with an open hand near the body and performing a smooth, welcoming outward sweep in the direction the person should follow, holding the final extended pose.\n# Q2: candidates=P1) left+horizontal+x45,y30,z45, P2) front+horizontal+x50,y50,z45; winner=1 because starting the arm across the body with the tip pointing in the intended direction of travel (left) creates the strongest baseline for a readable outward sweep.\n# Q3: options=M1 P1>path(arc xy), M2 P1>movement(shoulder x+y), M3 P1>pose(extended); winner=M2 because a coupled movement in lateral (y) and depth (x) smoothly extends the arm forward and sideways, creating an organic, polite sweep that pins the guided direction."
+  },
+  {
+    "cue": "gentle_retreat_motion",
+    "description": "The robot raises its gripper in an open, placating pose, then slowly and smoothly pulls it back towards its body while slightly lowering the arm to convey a gentle, yielding retreat.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 75,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -30,
+                "z": -15
+              },
+              "speed": 0.6,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 5,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:01:21",
+    "reasoning": "# Q1: A human would raise their hand in an open, placating gesture with the palm facing forward, and slowly pull it back toward their chest while slightly lowering it to show they are yielding.\n# Q2: candidates=P1) up+horizontal+x75,y50,z60, P2) front+horizontal+x70,y50,z50; winner=P1 because an upward-pointing gripper with a horizontal orientation mimics a raised open palm, creating a clear, non-threatening \"calm\" signal before the retreat begins.\n# Q3: options=M1 P1>path(line x negative), M2 P1>movement(coupled x and z negative); winner=M2 because slowly pulling back (x) while simultaneously lowering the arm (z) feels more organic, submissive, and gently yielding than a perfectly rigid straight-line track."
+  },
+  {
+    "cue": "protective_arm_out",
+    "description": "The robot quickly sweeps its arm horizontally across the body to form a firm, rigid physical barrier, holding the position to protect or block.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 60,
+            "y": 40,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": 45,
+          "speed": 3.5
+        }
+      }
+    ],
+    "idx": 7,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:02:33",
+    "reasoning": "# Q1: A human would rapidly extend their arm out horizontally to the side, acting as a rigid safety bar to block an oncoming threat or shield someone next to them.\n# Q2: candidates=P1) left+vertical+x60,y40,z45, P2) up+horizontal+x60,y50,z50; winner=P1 because an arm pointing laterally with a vertical orientation creates a much stronger horizontal barrier read than a forward-facing palm.\n# Q3: options=M1 P1>path(line y), M2 P1>movement(shoulder y), M3 P1>pose(y85); winner=M1 because a fast, rigid linear sweep across the lateral axis perfectly mimics a decisive, protective safety bar deploying."
+  },
+  {
+    "cue": "escorting_gesture",
+    "description": "The robot starts with its hand centered near the torso, then smoothly sweeps its arm forward and to the side with an open orientation, holding the gesture to clearly indicate 'right this way'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 30,
+                "y": -30
+              },
+              "speed": 0.8,
+              "hold_time": 2.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 8,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:03:32",
+    "reasoning": "# Q1: A human would start with their hand near their chest and smoothly sweep their arm outward and forward with an open palm, holding the final position to indicate the way.\n# Q2: candidates=P1) front+horizontal+x40,y50,z40, P2) right+horizontal+x60,y20,z40; winner=P1 because starting centrally before sweeping outward emphasizes the dynamic, welcoming presentation of the escorting cue.\n# Q3: options=M1 P1>pose(extended), M2 P1>movement(x and y coupled), M3 P1>path(arc xy); winner=M2 because a smooth, coupled movement outward and forward naturally models the continuous directional sweep while avoiding an abrupt pose jump."
+  },
+  {
+    "cue": "turn_yield_lower_hand",
+    "description": "The robot extends a presenting hand forward, then smoothly lowers and sweeps the arm slightly outward to respectfully yield the space to someone else.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -20,
+                "z": -25
+              },
+              "speed": 0.8,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 9,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:04:26",
+    "reasoning": "# Q1: A human would express this by extending an open hand slightly forward and then smoothly lowering and sweeping the arm to the side to signal \"after you\" or yielding the floor.\n# Q2: candidates=P1) front+horizontal+x60,y50,z55, P2) up+vertical+x50,y50,z60; winner=P1 because a horizontally oriented forward-pointing gripper clearly establishes an offering stance before the downward yield begins.\n# Q3: options=M1 P1>pose(down), M2 P1>path(arc), M3 P1>movement(shoulder y+z drop); winner=M3 because a simultaneous downward and lateral movement perfectly captures the smooth, respectful opening release of yielding space, avoiding a stiff quantized jump."
+  },
+  {
+    "cue": "clarification_request_palm_tilt",
+    "description": "The robot extends its arm forward in a neutral chest-height stance, then performs a crisp, coupled upward and outward wrist tilt, holding the 'open palm' position expectantly to ask for clarification.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": -20,
+                "z": 25
+              },
+              "speed": 1.6,
+              "hold_time": 1.8
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 10,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:04:57",
+    "reasoning": "# Q1: A human would extend a hand forward at chest height and quickly flip the wrist outward and upward into an open-palm gesture, holding it expectantly to ask \"what?\".\n# Q2: candidates=P1) front+horizontal+x55,y50,z45, P2) up+horizontal+x55,y50,z55; winner=P1 because a forward-pointing hand provides a neutral baseline that makes the sudden upward and outward wrist flip visibly pop as a question.\n# Q3: options=M1 P1>movement(wrist z), M2 P1>movement(wrist y+z), M3 P1>path(arc xy); winner=M2 because coupling an outward lateral movement (y) with an upward tilt (z) at the wrist creates the exact diagonal 'asking' flip needed for the cue, followed by a long expectant hold."
+  },
+  {
+    "cue": "slow_down_request_palm_down",
+    "description": "The robot extends its arm forward with a horizontal 'palm-down' gripper orientation, then performs a gentle, rhythmic downward pumping motion to signal 'slow down' or 'calm down'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -15
+              },
+              "speed": 1.0,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": 15
+              },
+              "speed": 0.9,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 11,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:06:20",
+    "reasoning": "# Q1: A human would extend their arm forward with a flat hand facing the ground and gently pump it downward a few times to signal \"calm down\" or \"slow down\".\n# Q2: candidates=P1) front+horizontal+x65,y50,z55, P2) down+horizontal+x50,y50,z40; winner=P1 because extending the arm forward with a horizontal gripper best mimics a flat palm held out to press down the air, whereas pointing straight down looks more like indicating an object on the floor.\n# Q3: options=M1 P1>movement(z-axis down and up repeat), M2 P1>path(line z-axis down); winner=M1 because a rhythmic, repeating downward pulse communicates the active, ongoing request to \"slow down\" far better than a single static drop."
+  },
+  {
+    "cue": "speed_up_circular_cue",
+    "description": "The robot extends its arm forward toward the viewer and makes several rapid, continuous circular motions in the air, mimicking the universally recognized 'wrap it up' or 'hurry up' hand crank gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 65,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "wrist",
+          "plane": "yz",
+          "radius": 10,
+          "sweep": 1440,
+          "direction": "cw",
+          "speed": 2.8
+        }
+      }
+    ],
+    "idx": 12,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:06:55",
+    "reasoning": "# Q1: A human would raise their hand forward and repeatedly draw quick, small circles in the air with their index finger to signal \"hurry up\" or \"keep going\".\n# Q2: candidates=P1) front+vertical+x75,y50,z65, P2) up+horizontal+x60,y50,z80; winner=P1 because pointing directly toward the viewer while circling vertically strongly anchors the one-on-one interpersonal command to speed up.\n# Q3: options=M1 P1>path(arc yz), M2 P1>movement(y and z combined), M3 P1>pose(multiple offsets); winner=M1 because a continuous, fast arc path drawn along the yz plane perfectly captures the smooth rotary \"cranking\" silhouette of the gesture, whereas movement steps might look jagged or unlinked."
+  },
+  {
+    "cue": "resume_speaking_pull",
+    "description": "The robot extends its arm slightly forward to engage the conversational space, then performs a smooth, deliberate pull backward and slightly upward toward its chest to gather the focus and reclaim its speaking turn.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.4
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25,
+                "z": 10
+              },
+              "speed": 0.8,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 13,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:07:22",
+    "reasoning": "# Q1: A human would reach a hand slightly forward into the conversational space, then smoothly pull it back toward their own chest to gather the focus and indicate they are taking the floor again.\n# Q2: candidates=P1) front+horizontal+x75,y50,z45, P2) up+vertical+x60,y50,z55; winner=P1 because reaching outward with a forward-facing horizontal gripper perfectly establishes connection with the external conversational space before the inward pull begins.\n# Q3: options=M1 P1>movement(x negative, z positive), M2 P1>path(line x negative), M3 P1>pose(dir: back, near chest); winner=M1 because a smooth, coupled backward and slightly upward movement naturally mimics the fluid, gathering pull of reclaiming attention without feeling like a rigid robotic sweep."
+  },
+  {
+    "cue": "emphasize_point_downbeat",
+    "description": "The robot starts with its arm positioned forward, raises it slightly in anticipation, and then brings it down in a sharp, decisive downward chop to emphasize a point, holding the final pose for impact.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 15
+              },
+              "speed": 1.2,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": -25
+              },
+              "speed": 2.8,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 14,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:07:56",
+    "reasoning": "# Q1: A human would express this by raising their hand slightly and then bringing it down firmly in a sharp, definitive vertical chop to visually accent a specific moment or statement.\n# Q2: candidates=P1) front+vertical+x60,y50,z50, P2) down+horizontal+x60,y50,z60; winner=P1 because a forward-pointing vertical hand (resembling a karate chop) striking downward reads much more clearly as delivering a communicative point than a hand already pointing straight down at the floor.\n# Q3: options=M1 P1>movement(single fast z down), M2 P1>path(line z), M3 P1>movement(slow z up, then fast z down); winner=M3 because the anticipatory slow upward lift provides the visual contrast necessary to make the fast downward strike feel like a deliberate, forceful emphasis."
+  },
+  {
+    "cue": "wait_for_me_backward_palm",
+    "description": "The robot positions its arm to the side at waist level, then pushes it deliberately backward and slightly upward with the palm facing behind, holding the pose to signal 'wait' to someone following.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 45,
+            "y": 15,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25,
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 15,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:08:48",
+    "reasoning": "# Q1: A human would reach their arm backward and slightly to the side at waist level, with the hand flat and palm facing behind them, holding the gesture to signal \"wait\" to someone following.\n# Q2: candidates=P1) down+horizontal+x45,y15,z35, P2) back+vertical+x30,y15,z35, P3) up+horizontal+x45,y15,z45; winner=1 because down+horizontal naturally positions the palm to face front/back like a trailing hand, avoiding the unnatural shoulder strain of an upward palm or the pointing implication of a backward-facing tip.\n# Q3: options=M1 P1>path(line x), M2 P1>movement(shoulder x,z), M3 P1>movement(wrist x repeat); winner=M2 because moving the shoulder simultaneously backward (negative x) and slightly upward (positive z) creates a deliberate, firm blocking action behind the back, held to reinforce the \"wait\" signal, which a simple path or wrist wag lacks."
+  },
+  {
+    "cue": "continue_on_forward_roll",
+    "description": "The robot extends its arm forward with the hand pointing laterally, then traces continuous, forward-rolling circles in the xz plane to signal 'keep moving forward'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 50,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "shoulder",
+          "plane": "xz",
+          "radius": 12,
+          "sweep": 1080,
+          "direction": "cw",
+          "speed": 1.8
+        }
+      }
+    ],
+    "idx": 16,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:10:39",
+    "reasoning": "# Q1: A human would express this by holding their hand out laterally and making continuous, forward-rolling circles with their arm to mimic a turning wheel.\n# Q2: candidates=P1) left+horizontal+x50,y50,z55, P2) up+vertical+x50,y50,z55; winner=P1 because pointing the hand laterally makes the arm look like the central axle of a wheel, strongly reinforcing the \"rolling\" read.\n# Q3: options=M1 P1>movement(coupled x,z repeat), M2 P1>path(arc xz), M3 P1>movement(wrist pitch); winner=M2 because a forward roll is inherently a smooth, continuous circular trajectory, which is perfectly captured by a multi-cycle xz arc path rather than jagged alternating linear movements."
+  },
+  {
+    "cue": "polite_decline_small_push",
+    "description": "The robot raises its arm to chest level with the gripper pointing upward to simulate an open palm, executes a gentle, slow push forward to establish a polite boundary, and softly retracts.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.4
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15
+              },
+              "speed": 0.8,
+              "hold_time": 0.6
+            },
+            {
+              "degrees": {
+                "x": -10
+              },
+              "speed": 0.6,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 17,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:11:13",
+    "reasoning": "# Q1: A human would raise their hand to chest level with the palm facing outward, and perform a slow, gentle push forward to politely establish a boundary before relaxing.\n# Q2: candidates=P1) up+vertical+x50,y50,z60, P2) front+vertical+x60,y50,z50; winner=P1 because pointing the gripper upward forms a vertical silhouette that mimics a raised 'stop' hand, making the forward push read as a refusal rather than a pointing or grabbing motion.\n# Q3: options=M1 P1>movement(x forward and retract), M2 P1>movement(y side-to-side shake), M3 P1>path(z down); winner=M1 because a slow, deliberate forward extension and soft retraction perfectly embodies the 'small push' of a polite decline without the harshness of a wagging shake."
+  },
+  {
+    "cue": "firm_accept_forward_reach",
+    "description": "The robot starts with its arm slightly pulled back at stomach height, executes a brisk, unwavering straight-line reach forward, and finishes with a subtle upward wrist tilt, holding the final pose to clearly signal a firm readiness to accept.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 45,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "x",
+          "distance": 35,
+          "speed": 2.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 15
+              },
+              "speed": 1.5,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 18,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:12:00",
+    "reasoning": "# Q1: A human would draw their arm back slightly and then extend it directly forward with a flat palm, stopping sharply and holding the position to communicate a firm, clear readiness to receive an object.\n# Q2: candidates=P1) front+horizontal+x45,y50,z45, P2) front+vertical+x45,y50,z45, P3) up+horizontal+x50,y50,z60; winner=1 because starting with a horizontal orientation creates a flat 'palm' ready to accept, and beginning pulled back at x45 allows the necessary physical space for a visible forward extension.\n# Q3: options=M1 P1>movement(shoulder x), M2 P1>path(line x), M3 P1>path(line x)>movement(wrist z); winner=M3 because the line path creates a strict, unwavering forward trajectory for firmness, while the subsequent small upward wrist movement creates a distinct 'accepting' silhouette that holds at the end."
+  },
+  {
+    "cue": "hesitant_accept_half_reach",
+    "description": "The robot starts with its gripper close to the body, slowly begins to extend forward to receive an object, briefly pulls back in doubt, and then cautiously completes a partial reach, holding the hesitant half-extension.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15
+              },
+              "speed": 0.8,
+              "hold_time": 0.4
+            },
+            {
+              "degrees": {
+                "x": -6
+              },
+              "speed": 1.0,
+              "hold_time": 0.3
+            },
+            {
+              "degrees": {
+                "x": 18
+              },
+              "speed": 0.6,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 19,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:12:25",
+    "reasoning": "# Q1: A human would slowly begin to reach their hand forward to receive something, pause or pull back slightly in doubt, and then continue the extension but stop halfway, conveying uncertainty.\n# Q2: candidates=P1) front+horizontal+x40,y50,z45, P2) front+vertical+x40,y50,z45; winner=P1 because a horizontal gripper reads clearly as an open hand prepared to accept an object, and starting close to the body (x40) leaves the necessary depth room for a readable forward reach.\n# Q3: options=M1 P1>path(line x)>path(-x)>path(x), M2 P1>movement(x forward, x back, x forward); winner=M2 because a single movement primitive with stuttering, low-speed forward-and-back phases perfectly and compactly captures the internal conflict and hesitant timing without needing complex geometric paths."
+  },
+  {
+    "cue": "cancel_previous_offer_retract",
+    "description": "The robot starts with its arm extended forward in a horizontal offering gesture, holds it briefly so the offer registers, and then swiftly pulls the arm back and slightly up to clearly retract the offer.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 85,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -35,
+                "z": 15
+              },
+              "speed": 2.5,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 20,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:13:56",
+    "reasoning": "# Q1: A human would start with their hand extended forward as if offering something, then quickly pull it back toward their chest to signal \"nevermind\" or withdraw the offer.\n# Q2: candidates=P1) front+horizontal+x85,y50,z45, P2) up+horizontal+x85,y50,z45; winner=P1 because a front-pointing, horizontal gripper best reads as a flat hand presenting an offer to the viewer.\n# Q3: options=M1 P1>pose(retracted), M2 P1>path(line x), M3 P1>movement(shoulder x+z retract); winner=M3 because a swift, coupled backward and slightly upward movement conveys the abrupt \"taking it back\" intent much more organically than a static pose transition or rigid linear path."
+  },
+  {
+    "cue": "conditional_accept_pause_then_reach",
+    "description": "The robot pulls its hand up and back in a hesitant 'wait' gesture, performs a small wrist adjustment to signify weighing the options, and then decisively extends its arm forward to accept.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 40,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.2,
+          "hold_time": 1.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 20
+              },
+              "speed": 1.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 85,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 2.0,
+          "hold_time": 1.5
+        }
+      }
+    ],
+    "idx": 21,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:15:41",
+    "reasoning": "# Q1: A human would pull their hand back slightly near their chest in a brief \"wait/hold on\" gesture to show hesitation, then decisively extend their arm forward with an open hand to accept the offer.\n# Q2: candidates=P1) up+vertical+x40,y50,z60, P2) front+horizontal+x30,y50,z45; winner=P1 because an upward-pointing, vertically oriented gripper near the chest perfectly mimics a \"wait/hold on\" gesture for the hesitation phase before reaching.\n# Q3: options=M1 P1>movement(wrist y)>pose(front reach), M2 P1>path(line x), M3 P1>pose(front reach); winner=M1 because injecting a small lateral wrist tilt during the pause actively demonstrates \"weighing conditions\" before snapping into the crisp final reach."
+  },
+  {
+    "cue": "final_decision_down_press",
+    "description": "The robot raises its arm with a flat, downward-facing gripper to build anticipation, then swiftly drives it straight down along the z-axis, holding the final low position rigidly to convey a firm, irreversible decision.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 60,
+            "y": 50,
+            "z": 75,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.4
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -35
+              },
+              "speed": 3.5,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 22,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:16:41",
+    "reasoning": "# Q1: A human would express this by raising a flat hand or fist and bringing it down sharply onto a surface, holding it there rigidly to emphasize finality and authority.\n# Q2: candidates=P1) down+horizontal+x60,y50,z75, P2) front+vertical+x70,y50,z50; winner=P1 because 'down' directly aligns with the pressing action, and a 'horizontal' orientation perfectly mimics a flat palm or fist raised high, ready to slam down onto a button or table.\n# Q3: options=M1 P1>pose(low z), M2 P1>path(line z), M3 P1>movement(shoulder z with long hold); winner=M3 because a shoulder 'movement' along the z-axis allows us to combine a sharp, high-speed downward stroke with an integrated, lingering hold at the bottom to emphasize absolute irreversible finality."
+  },
+  {
+    "cue": "unsure_response_hand_hover_stop",
+    "description": "The robot tentatively reaches its arm forward as if to act, hesitates with a slight pullback and lateral waver, then creeps forward just a fraction before freezing in an unsure mid-air hover.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 45,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 18,
+                "z": 8
+              },
+              "speed": 1.2,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "x": -6,
+                "y": 4
+              },
+              "speed": 0.9,
+              "hold_time": 0.2
+            },
+            {
+              "degrees": {
+                "x": 3,
+                "y": -2
+              },
+              "speed": 0.6,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 23,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:17:22",
+    "reasoning": "# Q1: A human would express this by starting to reach forward, pausing their flat hand mid-air as if second-guessing, showing a slight wavering retreat, and finally freezing in an uncertain hover.\n# Q2: candidates=P1) front+horizontal+x45,y50,z40, P2) up+vertical+x50,y50,z50; winner=P1 because a horizontally oriented hand pointing forward best represents a tentative reach that can hover over an implied target, whereas 'up' reads more like a strict halt command.\n# Q3: options=M1 P1>movement(reach, back, forward), M2 P1>path(forward)>pose(retract), M3 P1>pose(reach)>movement(wobble); winner=M1 because chaining a forward reach, a slight lateral-pullback waver, and a micro-reach into a single movement block perfectly captures the continuous stuttering rhythm of an unsure hover before it freezes."
+  },
+  {
+    "cue": "agreement_confirm_double_nod_arm",
+    "description": "The robot establishes engagement by holding the gripper forward at face level, then performs two crisp downward dips along the z-axis to mimic a confident, affirmative double head nod.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 65,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 2.5,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 2.0,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 24,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:18:04",
+    "reasoning": "# Q1: A human would express this by establishing eye contact and performing two quick, crisp downward dips of the head to convey strong affirmation.\n# Q2: candidates=P1) front+horizontal+x60,y50,z65, P2) up+vertical+x50,y50,z70; winner=P1 because pointing the gripper forward at eye level establishes a readable \"face\" engaging the viewer, allowing the z-axis motion to be immediately interpreted as a head nod.\n# Q3: options=M1 P1>movement(wrist z down/up repeat 2), M2 P1>path(line z down/up manually); winner=M1 because a localized wrist movement with repetition perfectly captures the brisk, bouncing cadence and angular pitch of a double nod without moving the entire arm track."
+  },
+  {
+    "cue": "disagreement_cross_then_release",
+    "description": "The robot starts with a raised hand, sharply sweeps it laterally across the body to form a blocking 'cross' gesture, holds it to emphasize the disagreement, and then slowly drops the arm down and slightly back to release the posture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 20,
+            "z": 65,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": 50
+              },
+              "speed": 2.5,
+              "hold_time": 1.2
+            },
+            {
+              "degrees": {
+                "y": -20,
+                "z": -35
+              },
+              "speed": 0.8,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 25,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:23:36",
+    "reasoning": "# Q1: A human expresses this by sharply swiping one arm horizontally across the chest to form a barrier, holding the block to emphasize the rejection, and then relaxing the arm downward.\n# Q2: candidates=P1) up+vertical+x50,y20,z65, P2) left+horizontal+x40,y80,z50; winner=1 because starting with a raised, uncrossed hand provides the spatial contrast needed to make the subsequent crossing sweep visually impactful.\n# Q3: options=M1 P1>pose(cross)>pose(drop), M2 P1>movement(y sweep, then y+z drop), M3 P1>path(line y)>path(line z); winner=M2 because the movement primitive naturally creates the angular, joint-driven swing of a human arm sweeping across and slumping, which is more organic than strict paths or quantized poses."
+  },
+  {
+    "cue": "reduce_distance_invite_pull",
+    "description": "The robot extends its arm forward with a vertical gripper, then performs a repeated, scooping pull backward and slightly upward toward its chest to clearly invite someone to close the distance.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 80,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -35,
+                "z": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.2
+            },
+            {
+              "degrees": {
+                "x": 35,
+                "z": -10
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 26,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:25:22",
+    "reasoning": "# Q1: A human would extend their arm forward and repeatedly sweep their hand and forearm backward toward their own chest to signal someone or something to come closer.\n# Q2: candidates=P1) front+vertical+x80,y50,z50, P2) up+horizontal+x70,y50,z70; winner=P1 because a forward-pointing vertical gripper pulling deeply back along the x-axis reads as a clear, broad scooping pull, avoiding the risk of P2 looking like a static wave or high-five.\n# Q3: options=M1 P1>movement(elbow x+z repeat), M2 P1>path(line -x); winner=M1 because a rhythmic, coupled-axis scooping movement (pulling inward and slightly upward) conveys an organic, active invitation much better than a rigid, single-axis mechanical withdrawal."
+  },
+  {
+    "cue": "redirect_path_sweep",
+    "description": "The robot positions its gripper on the right side pointing leftwards, then executes a steady, authoritative lateral sweep across its body to visually redirect attention or flow to a new path.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 60,
+            "y": 25,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": 50,
+          "speed": 1.5
+        }
+      }
+    ],
+    "idx": 27,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:26:40",
+    "reasoning": "# Q1: A human would extend their arm to one side with the hand open, then perform a smooth, definitive lateral sweep across the body to indicate a new path or direct flow.\n# Q2: candidates=P1) left+vertical+x60,y25,z50, P2) front+horizontal+x70,y50,z50, P3) right+vertical+x60,y75,z50; winner=1 because pointing the gripper leftwards while starting on the far right creates a clear leading edge for a leftward sweeping redirection.\n# Q3: options=M1 P1>path(line y), M2 P1>path(arc xy), M3 P1>movement(shoulder y); winner=M1 because a linear path purely along the lateral y-axis creates the straightest, most authoritative sweeping plane to read as a path redirection."
+  },
+  {
+    "cue": "stop_entry_cross_block",
+    "description": "The robot starts with its arm drawn back to the side, rapidly sweeps it across the body to form a horizontal barrier, and pushes slightly forward to firmly brace against entry.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 40,
+            "y": 20,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 55,
+            "y": 80,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 3.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.0,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 28,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:27:12",
+    "reasoning": "# Q1: A human would sharply swing their arm horizontally across their chest or entryway, holding it firm like a closed gate to physically block passage.\n# Q2: candidates=P1) left+vertical+x55,y80,z45 (horizontal sweep), P2) up+horizontal+x70,y50,z60 (stop hand); winner=P1 because a lateral direction perfectly creates the physical horizontal barrier implied by a cross block.\n# Q3: options=M1 P1>movement(y push), M2 P_open>P_crossed>movement(x brace), M3 P_crossed>path(arc); winner=M2 because snapping from an open stance into a firm cross-body pose and pushing slightly forward vividly conveys slamming a gate and bracing against entry."
+  },
+  {
+    "cue": "allow_entry_open_side",
+    "description": "The robot starts with its arm positioned slightly across its body, then sweeps it smoothly wide to the side, holding the open gesture to politely invite entry.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 60,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15,
+                "y": -45
+              },
+              "speed": 0.8,
+              "hold_time": 2.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 29,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:27:53",
+    "reasoning": "# Q1: A human would express this by starting with their arm lightly across their center, then sweeping it smoothly outward to the side with an open palm and holding the final wide pose to indicate the way is clear.\n# Q2: candidates=P1) front+horizontal+x55,y60,z45, P2) right+vertical+x50,y50,z45; winner=P1 because a forward-pointing horizontal \"palm\" starting slightly across the body provides the best runway for a wide, welcoming sweep.\n# Q3: options=M1 P1>path(line y), M2 P1>movement(shoulder y+x), M3 P1>pose(wide); winner=M2 because a coupled shoulder movement naturally arcs the arm open and slightly back like a swinging gate, which feels more organic than a rigid linear path."
+  },
+  {
+    "cue": "guide_to_position_down_mark",
+    "description": "The robot extends its arm downwards from a high position, smoothly traces a vertical line down to guide attention, and executes a sharp downward wrist flick to explicitly mark the final spot.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 60,
+            "y": 50,
+            "z": 70,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.4
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -35,
+          "speed": 1.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": -10
+              },
+              "speed": 3.0,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "x": -10,
+                "z": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.6
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 30,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:28:29",
+    "reasoning": "# Q1: A human would extend an open hand downwards, smoothly lower it to a specific spot, and perform a sharp, distinct tap or wrist flick to explicitly mark the final location.\n# Q2: candidates=P1) down+horizontal+x60,y50,z70, P2) front+horizontal+x60,y50,z70; winner=P1 because an initially downward-pointing orientation cleanly establishes the downward intent from the start, setting up the trace perfectly.\n# Q3: options=M1 P1>path(z line)>movement(wrist flick), M2 P1>pose(low)>movement(wrist flick); winner=M1 because the linear path provides the smooth, steady \"guiding\" trajectory, while the sudden wrist movement creates the contrasting sharp \"mark\" at the exact end position."
+  },
+  {
+    "cue": "relief_release_drop",
+    "description": "The robot holds its gripper against its chest in a tense, breath-holding posture, then suddenly drops its arm completely limp to its side with a heavy, natural bounce to convey immense relief.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 45,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 1.5
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 50,
+            "z": 20,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 3.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 2.0,
+              "hold_time": 1.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 32,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:30:45",
+    "reasoning": "# Q1: A human would clutch their chest in tension, hold their breath for a moment, and then abruptly let out a sigh while dropping their arm loosely to their side.\n# Q2: candidates=P1) back+horizontal+x45,y50,z55, P2) up+horizontal+x50,y50,z70; winner=P1 because pointing the gripper back at the chest creates a highly readable anchor of internal tension or holding one's breath, making the subsequent drop feel like a genuine emotional release.\n# Q3: options=M1 P1>pose(down)>movement(bounce), M2 P1>path(line z down), M3 P1>movement(shoulder z down); winner=M1 because using a new pose allows the gripper direction to instantly flop from 'back' to 'down' mimicking a limp wrist, and the subsequent fast movement provides a physical gravity bounce that perfectly sells the weight of the freefall drop."
+  },
+  {
+    "cue": "frustration_down_throw",
+    "description": "The robot starts from a neutral stance, swiftly raises its arm high with an upward-pointing fist to build tension, then aggressively whips the arm down and forward while snapping the gripper downward, finishing with a slight physical recoil to sell the impact of the throw.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 85,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 75,
+            "y": 50,
+            "z": 25,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 3.5,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5,
+                "z": 12
+              },
+              "speed": 2.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 33,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:32:28",
+    "reasoning": "# Q1: A human would sharply raise their arm high with clenched tension, then violently whip their hand downward and forward, snapping the wrist down as if slamming an invisible object into the ground.\n# Q2: candidates=P1) front+vertical+x50,y50,z45, P2) down+vertical+x50,y50,z30; winner=1 because starting from a forward-facing neutral waist-level baseline allows the arm to visibly and deliberately yank upward into a high tension pose, making the subsequent downward throw feel like an emotional escalation rather than a static spawned state.\n# Q3: options=M1 P1>movement(up)>movement(down), M2 P1>pose(up+z85)>pose(down+z25)>movement(bounce), M3 P1>path(z up)>path(z down); winner=M2 because using explicit poses allows the gripper direction to flip completely from pointing 'up' at the peak to 'down' at the impact, creating a violent wrist snap that simple joint movements miss, while the trailing movement provides a natural physical recoil."
+  },
+  {
+    "cue": "disbelief_hold_then_drop",
+    "description": "The robot moves its hand to its face in a shocked, hand-over-mouth posture, holds the tense pose for a couple of seconds in disbelief, and then suddenly lets the arm drop straight down.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 55,
+            "y": 50,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 2.5
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -45,
+          "speed": 2.5
+        }
+      }
+    ],
+    "idx": 34,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:33:31",
+    "reasoning": "# Q1: A human would freeze with their hand covering their mouth or suspended in mid-air for a tense moment, then let the arm fall limply to their side in defeat or realization.\n# Q2: candidates=P1) left+vertical+x55,y50,z70, P2) up+horizontal+x50,y50,z75; winner=P1 because pointing laterally toward the centerline strongly evokes the classic hand-over-mouth gasp of disbelief.\n# Q3: options=M1 P1>pose(drop down), M2 P1>path(line z drop), M3 P1>movement(shoulder pitch down); winner=M2 because a straight downward line path perfectly captures the sudden, gravity-driven limp fall of the arm after the tense hold."
+  },
+  {
+    "cue": "submission_lowered_open_palm",
+    "description": "The robot starts from a neutral mid-height stance, then slowly and deliberately lowers its arm while extending slightly forward with a horizontal 'open palm' orientation, holding the submissive low posture to clearly convey yielding.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 25,
+                "z": -20
+              },
+              "speed": 0.6,
+              "hold_time": 2.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 35,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:34:11",
+    "reasoning": "# Q1: A human would slowly lower their arm and gently extend it forward with an open, flat palm to demonstrate non-threatening submission and yielding.\n# Q2: candidates=P1) front+horizontal+x40,y50,z45, P2) up+horizontal+x40,y50,z30; winner=P1 because starting from a neutral height with a forward-pointing horizontal gripper allows the motion to explicitly reveal the downward-and-forward yielding drop, whereas starting pointing straight up feels stiff and unnatural for submission.\n# Q3: options=M1 P1>movement(shoulder x+z), M2 P1>path(line z), M3 P1>pose(lowered); winner=M1 because a coupled, slow downward and forward movement creates an organic, yielding trajectory that reads as gentle submission, rather than a robotic straight line drop."
+  },
+  {
+    "cue": "dominance_high_open_hold",
+    "description": "The robot gathers its arm near the chest, then performs a swift, expansive thrust upward, forward, and outward, locking rigidly into a high commanding posture to project size and authority.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 45,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.4
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 35,
+                "y": -30,
+                "z": 45
+              },
+              "speed": 2.5,
+              "hold_time": 3.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 36,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:34:50",
+    "reasoning": "# Q1: A human would assertively thrust one arm high, forward, and outward with an open palm facing the viewer, then freeze rigidly to project size, power, and unyielding authority.\n# Q2: candidates=P1) front+vertical+x45,y50,z45, P2) up+horizontal+x50,y50,z85; winner=P1 because starting from a slightly condensed, forward-facing vertical posture allows the subsequent outward explosion to act like an imposing open hand extending directly toward the viewer, maximizing the feeling of spatial dominance and confrontation.\n# Q3: options=M1 P1>movement(simultaneous x,y,z expansion with long hold), M2 P1>path(z-axis line), M3 P1>pose(direct jump to high hold); winner=M1 because a coupled multi-axis movement creates a dynamic, unmistakable upward and outward burst of spatial expansion before abruptly locking into the rigid commanding hold, making the intent feel like an active assertion of power rather than just a static height adjustment."
+  },
+  {
+    "cue": "apology_forward_lowered_hold",
+    "description": "The robot establishes an upright resting baseline, then slowly executes a deep, coupled forward and downward bow, holding the lowest point for several seconds to convey deep remorse and sincerity, before slowly rising back up.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 35,
+                "z": -25
+              },
+              "speed": 0.6,
+              "hold_time": 3.0
+            },
+            {
+              "degrees": {
+                "x": -35,
+                "z": 25
+              },
+              "speed": 0.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 37,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:36:16",
+    "reasoning": "# Q1: A human expresses a deep apology by slowly leaning their torso and head forward and downward into a deep bow, holding that lowered position for an extended moment to show sincere remorse, before slowly rising back up.\n# Q2: candidates=P1) down+vertical+x50,y50,z55, P2) front+horizontal+x60,y50,z40; winner=P1 because starting with the gripper pointing down at chest height creates a clear baseline vertical silhouette that can powerfully pitch forward and downward to simulate a bowing figure.\n# Q3: options=M1 P1>movement(coupled x+z down with long hold)>return, M2 P1>path(arc xz), M3 P1>pose(low+long hold)>pose(up); winner=M1 because a slow, coupled x+z movement actively traces the respectful hinging motion of a deep bow, and the long hold parameter perfectly captures the extended remorseful pause."
+  },
+  {
+    "cue": "gratitude_small_bow_hold",
+    "description": "The robot establishes an upright torso-like baseline, gracefully dips forward and downward into a small polite bow, holds the lowered position to emphasize sincere gratitude, and gently rises back up.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 15,
+                "z": -12
+              },
+              "speed": 0.8,
+              "hold_time": 1.5
+            },
+            {
+              "degrees": {
+                "x": -15,
+                "z": 12
+              },
+              "speed": 0.6,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 38,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:36:48",
+    "reasoning": "# Q1: A human would express this by standing straight, then softly dipping their torso forward and downward, holding the lowest point for a moment to show sincere appreciation before slowly rising.\n# Q2: candidates=P1) down+vertical+x50,y50,z50, P2) back+horizontal+x45,y50,z50; winner=1 because treating the arm vertically as the torso creates the clearest baseline for a readable forward-and-down structural dip without the visual clutter of a hand-on-chest gesture.\n# Q3: options=M1 P1>movement(x,z coupled with hold)>movement(return), M2 P1>path(arc), M3 P1>pose(lowered); winner=M1 because a coupled downward and forward shoulder movement with a pronounced hold cleanly mimics the mechanics and rhythm of a respectful bow."
+  },
+  {
+    "cue": "disappointment_slow_fold",
+    "description": "The robot starts from a hopeful, slightly elevated posture, then slowly withdraws its arm, folding it inward across its core while slumping downwards to convey a heavy sense of disappointment.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.8
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 35,
+            "y": 60,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 0.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -8,
+                "z": -12
+              },
+              "speed": 0.5,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 39,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:37:25",
+    "reasoning": "# Q1: A human would slowly drop their raised arms inward towards their chest or stomach and slump their shoulders downward as their energy deflates.\n# Q2: candidates=P1) front+horizontal+x65,y50,z60, P2) down+vertical+x50,y50,z45; winner=P1 because an initially elevated, forward-facing pose provides the necessary active contrast to make the subsequent deflating withdrawal readable.\n# Q3: options=M1 P1>movement(coupled down/in), M2 P1>pose(left+vertical, low x/z)>movement(z/x sag), M3 P1>path(line z); winner=M2 because explicitly driving to a tight, inward-pointing pose at a slow speed creates the physical 'fold' across the body, while the final coupled downward movement delivers the heavy slump of defeat."
+  },
+  {
+    "cue": "satisfaction_small_clench_release",
+    "description": "The robot establishes a forward-reaching upward baseline, executes a quick, tense inward and downward pull to simulate a satisfied clench, holds the flexed silhouette briefly, and then slowly relaxes back to its starting position.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 60,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15,
+                "z": -10
+              },
+              "speed": 2.5,
+              "hold_time": 0.8
+            },
+            {
+              "degrees": {
+                "x": 15,
+                "z": 10
+              },
+              "speed": 0.6,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 40,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:37:57",
+    "reasoning": "# Q1: A human would express this by sharply pulling a closed hand slightly inward and downward toward the torso to show a quick burst of success, holding the tense flex for a beat, and then slowly relaxing the arm back outward.\n# Q2: candidates=P1) up+horizontal+x60,y50,z45, P2) front+vertical+x60,y50,z50; winner=1 because an upward-pointing gripper held horizontally acts as a recognizable surrogate for a raised fist, making the subsequent inward pull clearly read as a mini fist-pump of satisfaction rather than just retracting the arm.\n# Q3: options=M1 P1>pose(inward)>pose(outward), M2 P1>movement(coupled x+z in)>movement(coupled x+z out), M3 P1>path(line z); winner=M2 because applying a sharp, fast multi-axis inward movement with a solid hold conveys the muscular tension of a clench, while a distinctly slower reverse movement within the same primitive perfectly captures the satisfying relaxing release."
+  },
+  {
+    "cue": "start_action_forward_snap",
+    "description": "The robot arm establishes a neutral forward posture, pulls back deliberately to build tension, and then executes a rapid, sharp forward thrust (with a tiny recoil) to signal the start of an action.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25
+              },
+              "speed": 1.2,
+              "hold_time": 0.3
+            },
+            {
+              "degrees": {
+                "x": 45
+              },
+              "speed": 3.8,
+              "hold_time": 0.3
+            },
+            {
+              "degrees": {
+                "x": -10
+              },
+              "speed": 2.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 41,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:38:37",
+    "reasoning": "# Q1: A human would pull their fist or pointing finger back toward their chest briefly to build tension, then sharply thrust it straight forward to initiate an action or signal \"go\".\n# Q2: candidates=P1) front+vertical+x55,y50,z50, P2) up+horizontal+x50,y50,z70; winner=P1 because a chest-height forward-facing pose with a vertical orientation mimics a fist or hand preparing for a direct, assertive jab, whereas an upward pose reads as a top-down chop.\n# Q3: options=M1 P1>movement(multi-phase x-axis), M2 P1>path(line backward)>path(line forward); winner=M1 because a multi-phase movement allows us to inject a brief `hold_time` right after the pullback to build anticipatory tension, making the subsequent high-speed forward snap feel crisp and intentional rather than robotic."
+  },
+  {
+    "cue": "stop_action_freeze_palm",
+    "description": "The robot sets up a neutral palm-forward shape at mid-body, then executes a sharp, rapid thrust forward and slightly upward, locking into a rigid, prolonged freeze to forcefully convey 'stop'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 30,
+                "z": 15
+              },
+              "speed": 3.5,
+              "hold_time": 2.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 42,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:40:58",
+    "reasoning": "# Q1: A human would express this by abruptly thrusting a flat hand forward and slightly upward, palm facing the viewer, and locking the arm completely rigid.\n# Q2: candidates=P1) up+horizontal+x50,y50,z45, P2) front+vertical+x50,y50,z45; winner=1 because pointing the gripper up with horizontal jaws presents the flat, wide side of the end effector to the viewer, perfectly mimicking a flat palm facing forward.\n# Q3: options=M1 P1>pose(extended), M2 P1>movement(sharp x+z thrust), M3 P1>path(line x); winner=M2 because an explosive multi-axis movement (forward and up) with a high speed and a long terminal hold time conveys the sudden kinetic force and subsequent rigid \"freeze\" much better than just transitioning between two static poses."
+  },
+  {
+    "cue": "retry_action_reset_circle",
+    "description": "The robot extends its arm forward toward the user and traces a smooth, large vertical circle in the air to represent a 'refresh' or 'redo' motion.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "shoulder",
+          "plane": "yz",
+          "radius": 15,
+          "sweep": 360,
+          "speed": 1.5,
+          "direction": "cw"
+        }
+      }
+    ],
+    "idx": 43,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:41:24",
+    "reasoning": "# Q1: A human would point their hand forward and trace a distinct vertical circle in the air to mimic the universal \"refresh\" or \"redo\" symbol.\n# Q2: candidates=P1) front+vertical+x60,y50,z60 (facing the viewer), P2) up+horizontal+x50,y50,z70 (stirring overhead); winner=P1 because drawing the circle in the vertical plane directly facing the user is the most legible way to evoke a digital refresh icon.\n# Q3: options=M1 P1>movement(coupled multi-axis), M2 P1>path(arc yz plane); winner=M2 because a geometric arc path perfectly preserves the continuous, unmistakable circular shape required for a reset cue, avoiding the wobble of manual multi-axis movements."
+  },
+  {
+    "cue": "abandon_action_drop_turn",
+    "description": "The robot establishes an active forward reach, suddenly drops its arm straight down to abandon the action, and then sweeps its arm away to the side to mimic turning its back on the task.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 1.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -25,
+          "speed": 2.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15,
+                "y": -40
+              },
+              "speed": 1.2,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 45,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:42:36",
+    "reasoning": "# Q1: A human would extend their arm toward a task, suddenly drop their hand downwards in defeat or frustration, and then swing their body and arm to the side to turn away.\n# Q2: candidates=P1) front+horizontal+x75,y50,z55, P2) down+vertical+x60,y50,z40; winner=P1 because an active forward reach clearly establishes a recognizable ongoing action that can then be dramatically abandoned.\n# Q3: options=M1 P1>pose(down)>pose(side), M2 P1>path(z-drop)>movement(turn), M3 P1>movement(coupled drop and turn); winner=M2 because separating the sharp downward path from the subsequent lateral turning movement creates a much clearer two-beat \"abandon, THEN turn\" sequence."
+  },
+  {
+    "cue": "switch_focus_side_pull",
+    "description": "The robot establishes a forward focal point, then swiftly and firmly pulls its arm sideways and slightly back, holding the new lateral direction to indicate a sharp switch in attention.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -45,
+                "x": -20
+              },
+              "speed": 2.5,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 46,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:44:31",
+    "reasoning": "# Q1: A human would convey this by looking or pointing straight ahead, then swiftly snapping their arm and torso to one side as if drawn by a sudden distraction or new focal point.\n# Q2: candidates=P1) front+horizontal+x75,y50,z60, P2) right+horizontal+x60,y20,z60; winner=P1 because establishing a strong central baseline focus first is necessary to make the subsequent lateral pull read as a definitive switch in attention.\n# Q3: options=M1 P1>pose(side), M2 P1>path(arc xy), M3 P1>movement(coupled y+x); winner=M3 because a crisp, coupled shoulder movement that sweeps laterally and pulls back slightly delivers the dynamic weight and snap of pulling focus, whereas a pose-only sequence lacks motion character."
+  },
+  {
+    "cue": "prepare_action_raise_hold",
+    "description": "The robot establishes a neutral forward baseline, then sharply pulls its arm up and back into a high, cocked position, freezing there to build tense anticipation for a subsequent action.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -25,
+                "z": 40
+              },
+              "speed": 2.5,
+              "hold_time": 2.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 47,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:45:01",
+    "reasoning": "# Q1: A human would sharply pull their arm back and high, freezing in a tense, cocked silhouette to signal they are about to strike, throw, or perform a strong action.\n# Q2: candidates=P1) front+vertical+x65,y50,z45, P2) up+horizontal+x50,y50,z80; winner=P1 because starting from a relaxed, mid-level forward baseline makes the subsequent upward and backward 'cocking' contrast much more dramatic and readable.\n# Q3: options=M1 P1>path(line z up), M2 P1>pose(raised high), M3 P1>movement(coupled x and z with long hold); winner=M3 because a fast, coupled movement pulling back (-x) and up (+z) followed by a sustained hold best conveys the sudden accumulation of kinetic tension and frozen anticipation."
+  },
+  {
+    "cue": "hesitation_pause_hold",
+    "description": "The robot starts from a resting position, quickly reaches forward as if to grab or touch something, freezes abruptly mid-extension, and then slowly pulls back and down into a tentative, lingering hover.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 45,
+            "y": 50,
+            "z": 25,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 80,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 3.0,
+          "hold_time": 1.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15,
+                "z": -8
+              },
+              "speed": 0.5,
+              "hold_time": 2.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 48,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:46:18",
+    "reasoning": "# Q1: A human expresses hesitation by starting a deliberate forward action, freezing abruptly mid-reach, and then pulling back slightly to hover in uncertainty.\n# Q2: candidates=P1) front+horizontal+x45,y50,z25 (resting baseline), P2) up+vertical+x50,y50,z50 (defensive hands up); winner=P1 because hesitation reads most clearly as an interrupted intent to interact, which requires a neutral resting baseline before darting forward into a reach.\n# Q3: options=M1 P(rest)>P(reach, freeze)>movement(slow pullback), M2 P(reach)>movement(side-to-side wobble), M3 P(reach)>path(backward line); winner=M1 because the timing contrast between a fast initial reach, a sudden frozen hold, and a slow, tentative retraction perfectly captures the cognitive interruption of hesitation."
+  },
+  {
+    "cue": "commit_action_fast_reach",
+    "description": "The robot starts from a neutral, slightly retracted position, then executes a very fast, straight path forward, ending with a tiny, sharp wrist dip to emphasize the definitive commitment of the reach.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "x",
+          "distance": 45,
+          "speed": 3.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 3.0,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 49,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:47:20",
+    "reasoning": "# Q1: A human would express a fast reach by sharply extending their arm forward from a resting or neutral position, as if definitively committing to grab or press an object.\n# Q2: candidates=P1) front+horizontal+x40,y50,z50, P2) down+vertical+x30,y50,z40; winner=P1 because an outward-facing horizontal gripper best reads as a hand prepared to launch into a forward interaction.\n# Q3: options=M1 P1>pose(extended), M2 P1>path(line x), M3 P1>path(line x)>movement(wrist z); winner=M3 because the line path creates a perfectly straight reach, and the final wrist dip adds the decisive weight of 'committing' to the action."
+  },
+  {
+    "cue": "disengage_step_back_release",
+    "description": "The robot starts with its arm extended forward as if interacting with an object, then cleanly pulls backward and slightly upward to simulate breaking contact and stepping back.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 85,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -35,
+                "z": 15
+              },
+              "speed": 1.2,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 50,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:48:55",
+    "reasoning": "# Q1: A human would express this by releasing their grip and pulling their hand and body backward and slightly upward to visibly break contact and retreat.\n# Q2: candidates=P1) front+vertical+x85,y50,z45, P2) front+horizontal+x80,y50,z50; winner=P1 because a vertical orientation clearly implies holding or interacting with an object in front of the robot, providing a strong baseline for a backward disengagement.\n# Q3: options=M1 P1>path(line x negative), M2 P1>movement(shoulder x,z pull back), M3 P1>pose(retracted); winner=M2 because a coupled movement retreating backward on x and slightly lifting on z visually breaks contact and mimics a natural body weight shift backward."
+  },
+  {
+    "cue": "one_arm_cross_rest",
+    "description": "The robot lifts its arm from a neutral position and brings it laterally across the torso, then slowly drops its shoulder and pulls slightly inward to settle into a relaxed, folded-arm resting posture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 25,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 48,
+            "y": 75,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5,
+                "z": -5
+              },
+              "speed": 0.5,
+              "hold_time": 3.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 51,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:49:31",
+    "reasoning": "# Q1: A human would fold one arm across their stomach or chest, resting the hand near the opposite side of their torso, and visibly drop their shoulder to settle into a relaxed posture.\n# Q2: candidates=P1) left+vertical+x48,y75,z45, P2) back+horizontal+x40,y80,z40; winner=P1 because pointing laterally (left) forces the forearm to lay flat across the torso, perfectly mimicking a folded human arm.\n# Q3: options=M1 pose(neutral)>pose(crossed), M2 pose(crossed)>hold, M3 pose(neutral)>pose(crossed)>movement(settle); winner=M3 because adding a slow, downward and inward settling movement after the cross explicitly conveys the act of relaxing into the posture."
+  },
+  {
+    "cue": "tempo_cue",
+    "description": "The robot extends a flat hand forward and rhythmically taps up and down, using a fast downward strike and a slower upward recovery to visually keep a musical tempo.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 4,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 3.0,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 1.5,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 52,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:50:15",
+    "reasoning": "# Q1: A human would express this by rhythmically tapping their hand up and down in the air, emphasizing the downbeat like a music conductor keeping time.\n# Q2: candidates=P1) front+horizontal+x60,y50,z60 (flat hand ready to tap), P2) up+vertical+z70 (metronome sway); winner=P1 because a horizontal hand mimicking a downward tap creates a more natural and relatable rhythmic beat.\n# Q3: options=M1 P1>movement(wrist z repeat, asymmetric speeds), M2 P1>path(z-line); winner=M1 because alternating a fast downward strike with a slower upward recovery perfectly creates the visual rhythm of a musical tempo."
+  },
+  {
+    "cue": "small_rhythmic_bounce",
+    "description": "The robot establishes a neutral forward-facing posture, then performs a continuous series of quick, small up-and-down bounces on the z-axis to convey a rhythmic groove or eager anticipation.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 4,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 2.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 53,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:51:48",
+    "reasoning": "# Q1: A human would express this by nodding their head or bobbing their torso up and down rhythmically to a beat.\n# Q2: candidates=P1) front+horizontal+x55,y50,z60, P2) up+vertical+x50,y50,z80; winner=P1 because a forward-facing horizontal gripper acts like a head, making the up-and-down motion read as a groovy rhythmic bounce rather than an aggressive fist pump.\n# Q3: options=M1 P1>path(line z), M2 P1>movement(shoulder z repeat); winner=M2 because a repeating movement primitive on the z-axis inherently provides the cyclic up-and-down motion required for a rhythm, whereas paths do not loop natively."
+  },
+  {
+    "cue": "micro_attention_pulse",
+    "description": "The robot establishes a neutral forward-looking baseline, then executes a very fast, tiny coupled movement forward and upward, holding the newly perked silhouette to convey sudden, intense focus.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8,
+                "z": 6
+              },
+              "speed": 3.5,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 54,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:52:17",
+    "reasoning": "# Q1: A human would express this by suddenly snapping their head or upper body slightly forward and upward, freezing intently to signal sudden focus.\n# Q2: candidates=P1) front+horizontal+x55,y50,z60, P2) up+vertical+x50,y50,z75; winner=P1 because orienting the gripper forward at mid-height creates a clear 'face' directed at a target, setting the stage for a readable jump in focus.\n# Q3: options=M1 P1>movement(sharp x+z pulse), M2 P1>pose(extended), M3 P1>path(z line); winner=M1 because applying a high-speed, small-degree coupled 'x' and 'z' movement best mimics the sudden, involuntary 'perk up' physical reflex of snapping to attention."
+  },
+  {
+    "cue": "laughter_substitute",
+    "description": "The robot establishes a neutral forward-facing posture, suddenly throws its 'head' back, and rapidly heaves its arm up and down to simulate a hearty belly laugh.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 70,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 2.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 5,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5,
+                "z": -8
+              },
+              "speed": 3.0,
+              "hold_time": 0.0
+            },
+            {
+              "degrees": {
+                "x": -5,
+                "z": 8
+              },
+              "speed": 3.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 55,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:53:04",
+    "reasoning": "# Q1: A human would express a hearty laugh by throwing their head back and rapidly heaving their chest and shoulders up and down in a repetitive, rhythmic motion.\n# Q2: candidates=P1) front+horizontal+x60,y50,z55, P2) up+horizontal+x50,y50,z70, P3) left+vertical+x50,y50,z40; winner=P1 because establishing a neutral forward posture first makes the subsequent sudden backward head-throw read unmistakably as a spontaneous laughing reaction.\n# Q3: options=M1 P1>pose(up)>movement(shoulder x+z repeat), M2 P1>movement(wrist z repeat), M3 P2>movement(shoulder z repeat); winner=M1 because the discrete pose change to throw the head back followed by rapid, coupled forward-and-downward shoulder heaving perfectly captures the physical mechanics of a belly laugh."
+  },
+  {
+    "cue": "shame_shy_substitute",
+    "description": "The robot starts by facing forward, then slowly pulls its arm close, drops its height significantly, and turns its gripper downward and to the side to mimic a shrinking, shy withdrawal, finishing with a subtle downward slump.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 70,
+            "z": 25,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 0.7,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5,
+                "z": -5
+              },
+              "speed": 0.5,
+              "hold_time": 2.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 56,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:53:44",
+    "reasoning": "# Q1: A human expressing shame or shyness would break eye contact, lower their head, pull their limbs inward to shrink their silhouette, and turn slightly away.\n# Q2: candidates=P1) front+horizontal+x60,y50,z60, P2) down+horizontal+x40,y50,z30; winner=1 because starting with a confident forward-facing baseline creates the necessary contrast to make the subsequent dropping and turning away read as an active withdrawal.\n# Q3: options=M1 P1>pose(down, tucked)>movement(slump), M2 P1>movement(z pitch down), M3 P1>path(arc down); winner=M1 because shyness requires a highly specific tucked spatial silhouette (pulled close, lowered, and turned off-center) that is best guaranteed by pinning a second pose, followed by a movement step for a subtle organic slump."
+  },
+  {
+    "cue": "listening_lean_substitute",
+    "description": "The robot turns its 'head' sideways to present an implied ear, then performs a slow, coupled forward-and-downward lean, holding the posture deliberately to convey active listening before smoothly easing back.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 45,
+            "y": 50,
+            "z": 65,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 22,
+                "z": -10
+              },
+              "speed": 0.5,
+              "hold_time": 2.5
+            },
+            {
+              "degrees": {
+                "x": -22,
+                "z": 10
+              },
+              "speed": 0.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 57,
+    "state": "fewshot",
+    "model": "gemini-3.1-pro-preview",
+    "time": "2026-03-26 20:54:27",
+    "reasoning": "# Q1: A human would turn their head sideways to present an ear toward the sound and lean their torso forward slowly, holding still to focus on hearing.\n# Q2: candidates=P1) front+horizontal+x50,y50,z60, P2) left+vertical+x45,y50,z65; winner=P2 because turning the gripper sideways explicitly mimics an ear turned toward the speaker, preventing the motion from looking like visual inspection.\n# Q3: options=M1 P2>path(line x), M2 P2>movement(shoulder x+z lean), M3 P2>pose(lean); winner=M2 because a slow, coupled forward-and-downward shoulder movement dynamically captures the organic weight of a torso leaning in, and a long hold at the peak locks in the listening read."
+  }
+]

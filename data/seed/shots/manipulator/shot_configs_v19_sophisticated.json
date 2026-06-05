@@ -1,0 +1,547 @@
+[
+  {
+    "cue": "Wave one hand side to side (Hello / Hi)",
+    "description": "The robot first makes small fore-aft noticing beats as if recognizing someone in front of it, then lifts into the waving lane and performs the repeated side-to-side wave.",
+    "reasoning": "# Q1: A natural hello can read more clearly if the robot first seems to notice the other person, then commits to the actual wave.\n# Q2: candidates=P1) up+horizontal+x60,y50,z65, P2) front+horizontal+x70,y50,z60, P3) back+horizontal+x55,y50,z60; winner=P1 because the raised horizontal hand gives the clearest wave silhouette after the noticing beats, while the others read more like presenting or retracting.\n# Q3: options=M1 P1>movement(shoulder x fore-back notice)>movement(wrist y repeat), M2 P1>path(line y), M3 P2>movement(elbow y repeat); winner=M1 because the cue should feel like the robot spots someone and then waves, not like a plain lateral oscillation.\n# Q4: options=C1 slight fore-back noticing beats before the wave, C2 a final settle pose after the wave, C3 a side recoil before the wave; winner=C1 because the forward-back checking action strengthens the social interpretation of saying hi without ending in a generic static finish.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 60,
+            "y": 50,
+            "z": 65,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8
+              },
+              "speed": 1.1,
+              "hold_time": 0.08
+            },
+            {
+              "degrees": {
+                "x": -8
+              },
+              "speed": 1.1,
+              "hold_time": 0.08
+            },
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 1.0,
+              "hold_time": 0.08
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": -18
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "y": 36
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "y": -18
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 0,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-20 13:41:41"
+  },
+  {
+    "idx": 1,
+    "cue": "Raise one hand briefly",
+    "description": "The robot gathers attention with a small dip, rises into a brief acknowledgement, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "reasoning": "# Q1: A brief acknowledgement feels more intentional if it gathers attention first, rises, and punctuates the top of the lift.\n# Q2: candidates=P1) front+horizontal+x60,y50,z35, P2) up+horizontal+x55,y50,z55, P3) back+vertical+x45,y50,z35; winner=P1 because the low front baseline makes the upward acknowledgement and accent easiest to read.\n# Q3: options=M1 P1>movement(shoulder z dip)>path(line z up)>movement(wrist z accent), M2 P1>movement(shoulder z), M3 P2>pose>movement; winner=M1 because the pre-lift dip and top accent make the motion read like a social acknowledgement rather than a simple arm raise.\n# Q4: options=C1 preparatory dip before the lift, C2 final settle after the lift, C3 lateral sway before the lift; winner=C1 because the cue is strengthened by a quick attention-gathering beat rather than a trailing static pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "handmade",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 3,
+    "cue": "Bring one hand to forehead in salute position (Salute)",
+    "description": "The robot first places the arm into the salute lane, then tightens the elbow into the forehead angle and holds it crisply, without adding a separate release pose.",
+    "reasoning": "# Q1: A salute reads best when the arm first enters the proper lane and then sharply locks into the forehead angle.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) right+vertical+x50,y100,z50, P3) up+vertical+x50,y75,z70; winner=P1 because it gives the cleanest staging before the arm is placed laterally and folded into salute.\n# Q3: options=M1 P1>pose(right lane)>pose(forehead lane)>movement(elbow x+z fold), M2 P1>movement(shoulder+elbow), M3 P3>hold only; winner=M1 because the cue depends on staged lane placement before the final crisp angle.\n# Q4: options=C1 lane placement before the fold, C2 release pose after the fold, C3 small recoil after the fold; winner=C1 because the contextual setup makes the salute read militarily precise, whereas a release pose only weakens the locked salute impression.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "right",
+            "x": 56,
+            "y": 92,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.1,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 75,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.4,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -45,
+                "z": 45
+              },
+              "speed": 1.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "handmade",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 4,
+    "cue": "Rotate finger near temple (Crazy)",
+    "description": "The robot first points outward as if saying 'you', then taps at the head, and finally traces a circle beside the temple so the motion reads like 'you are crazy.'",
+    "reasoning": "# Q1: The crazy cue reads more clearly as an accusation if the robot first points at the other person, then taps its own head, and only then makes the crazy circle beside the temple.\n# Q2: candidates=P1) left+horizontal+x70,y40,z45, P2) front+horizontal+x58,y58,z60, P3) back+vertical+x45,y50,z60; winner=P2 because the front-facing start makes the outward accusation easiest to read before the motion shifts into the head-side sign.\n# Q3: options=M1 P2>movement(shoulder x point)>pose(P1 temple lane)>movement(wrist x tap)>path(arc xz), M2 P1>movement(wrist x+y jitter)>path(arc xz), M3 P2>path(arc xy); winner=M1 because the cue is strongest when the accusation, the head reference, and the symbolic circle all appear in sequence.\n# Q4: options=C1 point at you before the temple tap and circle, C2 final recoil pose after the circle, C3 extra settle after the circle; winner=C1 because the prior accusation supplies the social context that turns the temple actions into 'you are crazy' rather than a generic head-side motion.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 58,
+            "y": 58,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.1,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 12
+              },
+              "speed": 1.4,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 70,
+            "y": 40,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.6,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "wrist",
+          "plane": "xz",
+          "radius": 12,
+          "sweep": 720,
+          "speed": 1.2,
+          "direction": "cw"
+        }
+      }
+    ],
+    "state": "handmade",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 5,
+    "cue": "Rub one eye (Tired)",
+    "description": "The robot drifts toward the eye as if already heavy, rubs it repeatedly, and then sags downward under fatigue instead of ending with a clean posed finish.",
+    "planning_shot": "Visualization: The robot raises its hand to one eye, lightly rubs it, and lets the whole line droop with fatigue.\nIconic pose: A clearly eye-targeted hand position.\nRecognition anchor: Direct placement at the eye region followed by small local rubbing.\nMotion read: The viewer should read tiredness quickly from the eye-targeted reach and rub.\nPre-action reveal: Reach to the eye first before any rubbing begins.\nWhy this example matters: Tired fails when the motion becomes generic midair oscillation instead of a specific eye rub.",
+    "reasoning": "# Q1: Tiredness reads more clearly if the hand drifts sluggishly into the eye, rubs locally, and then visibly sags under fatigue.\n# Q2: candidates=P1) left+vertical+x70,y55,z40, P2) front+horizontal+x55,y50,z65, P3) back+vertical+x45,y50,z55; winner=P1 because the lateral vertical hand best simulates direct eye contact before the tired drift and sagging drop.\n# Q3: options=M1 P1>movement(shoulder x+z slow drift)>movement(wrist y repeat)>path(line z down), M2 P1>path(arc yz), M3 P2>movement(elbow y repeat); winner=M1 because the sluggish approach and post-rub sag add a tired before-and-after context that a simple local rub alone does not convey.\n# Q4: options=C1 sag downward after the rub, C2 final low linger pose, C3 small recoil after the rub; winner=C1 because the falling-away fatigue is more informative than parking the arm in a static ending pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 70,
+            "y": 55,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 6,
+                "z": -4
+              },
+              "speed": 0.8,
+              "hold_time": 0.15
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 10
+              },
+              "speed": 2.0,
+              "hold_time": 0.3
+            },
+            {
+              "degrees": {
+                "y": -10
+              },
+              "speed": 2.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "z",
+          "distance": -10,
+          "speed": 0.8
+        }
+      }
+    ],
+    "state": "choreography",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 6,
+    "cue": "Tilt head slightly (Curiosity)",
+    "description": "The robot busily probes forward and side-to-side as if checking something from multiple angles, then resolves into a small side tilt that reads as curiosity.",
+    "planning_shot": "Visualization: The robot looks like it notices something interesting, probes around it, then tips its 'head' to one side.\nIconic pose: A clearly side-tilted head-like silhouette.\nRecognition anchor: The gripper/head region must visibly lean left or right, not just wobble generically.\nMotion read: The viewer should read curiosity rather than generic fidgeting.\nPre-action reveal: Probe first, then let the tilt feel like a conclusion.\nWhy this example matters: Curiosity fails when only the final tilt is shown without exploratory context.",
+    "reasoning": "# Q1: Curiosity reads better when the hand first probes around restlessly and only then tips to one side as if forming a question.\n# Q2: candidates=P1) front+horizontal+x58,y48,z58, P2) left+horizontal+x55,y40,z60, P3) up+vertical+x50,y50,z70; winner=P1 because it gives the cleanest face-like baseline from which the busy probing and final tilt remain interpretable as curiosity.\n# Q3: options=M1 P1>movement(shoulder x probe)>movement(elbow x+y restless shifts)>movement(elbow y hold), M2 P1>path(line y), M3 P2>movement(wrist y repeat); winner=M1 because the clue is not only the final tilt, but the preceding exploratory checking motions.\n# Q4: options=C1 forward and side probing before the tilt, C2 final settle pose after the tilt, C3 recoil after the tilt; winner=C1 because curiosity is strengthened by visible searching behavior, not by adding a trailing static pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 58,
+            "y": 48,
+            "z": 58,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8
+              },
+              "speed": 1.1,
+              "hold_time": 0.08
+            },
+            {
+              "degrees": {
+                "x": -6
+              },
+              "speed": 1.0,
+              "hold_time": 0.08
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8,
+                "y": -10
+              },
+              "speed": 1.3,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "x": -6,
+                "y": 12
+              },
+              "speed": 1.3,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "x": 4,
+                "y": -6
+              },
+              "speed": 1.3,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "y": -25
+              },
+              "speed": 0.9,
+              "hold_time": 0.9
+            }
+          ]
+        }
+      }
+    ],
+    "state": "choreography",
+    "model": "handmade-v17",
+    "time": "2026-03-19 00:00:00"
+  },
+  {
+    "idx": 2,
+    "cue": "Bow slightly from the waist (Respect / Greeting)",
+    "description": "The robot gives a subtle preparatory lift as if taking a breath, then bows with a coupled forward-down dip and holds respectfully at the bottom instead of returning to a separate ending pose.",
+    "planning_shot": "Visualization: The robot gives a restrained, polite bow with one clean dip and a readable hold at the lowest point.\nIconic pose: A visibly lowered respectful torso line.\nRecognition anchor: The bow should read as both forward and downward at the same time.\nMotion read: The viewer should immediately read a polite bow rather than a loose shoulder swing.\nPre-action reveal: Establish a simple baseline and a small preparatory breath-like lift.\nWhy this example matters: Bow fails when only one axis changes or when it ends with an unnecessary static return pose.",
+    "reasoning": "# Q1: A respectful bow reads more clearly when a small preparatory lift is followed by a coupled dip and a pause at the lowest point.\n# Q2: candidates=P1) down+vertical+x48,y50,z45, P2) front+horizontal+x55,y50,z50, P3) back+vertical+x40,y50,z40; winner=P1 because the downward vertical baseline makes the respectful dip and hold easiest to read.\n# Q3: options=M1 P1>movement(shoulder z prep)>movement(shoulder x+z dip), M2 P1>path(line x), M3 P2>movement(shoulder z only); winner=M1 because the bow benefits from a preparatory breath-like lift and a respectful held dip, not just a single coarse bend.\n# Q4: options=C1 preparatory breath-like lift before the bow, C2 final return pose after the bow, C3 lateral sway before the bow; winner=C1 because the pre-bow lift strengthens the politeness reading without diluting it with an extra ending pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "handmade",
+    "model": "handmade-v18",
+    "time": "2026-03-22 00:00:00"
+  }
+]

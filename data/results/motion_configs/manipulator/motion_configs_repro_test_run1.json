@@ -1,0 +1,383 @@
+[
+  {
+    "idx": 61,
+    "cue": "air_quotes",
+    "description": "The robot first raises its hand to head level, makes a small preparatory shift for emphasis, and then performs two sharp wrist flicks to simulate air quotes.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 65,
+            "z": 70,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.8,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": 5,
+                "z": 3
+              },
+              "speed": 2.0,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 3.5,
+              "hold_time": 0.05
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 3.5,
+              "hold_time": 0.15
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-05-29 16:26:31",
+    "reasoning": "# Q1: A human first raises their hand to head level with a preparatory beat, then performs two sharp, distinct finger-crooking motions to signify the quotes.\n# Q2: candidates=P1) up+horizontal+x50,y65,z70, P2) front+vertical+x60,y60,z70; winner=P1 because its head-side placement and upward-pointing, horizontal-gripper geometry is the most iconic and readable pose for air quotes.\n# Q3: options=M1 pose>movement(flick)>movement(flick), M2 pose(low)>pose(high)>movement(prep)>movement(flick); winner=M2 because staging the gesture by first raising the hand into the proper lane makes the subsequent sharp quotes much clearer.\n# Q4: options=C1 small preparatory shoulder shift before the flicks, C2 a hold after the flicks, C3 a slow drift away after the flicks; winner=C1 because the pre-flick shift adds an 'anticipation' beat that strengthens the intentional, sarcastic read of the gesture."
+  },
+  {
+    "idx": 35,
+    "cue": "salute",
+    "description": "The robot first makes a small 'attention' lift, then sharply moves its arm into a lateral staging position before snapping the hand to the temple and holding it rigidly.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 5
+              },
+              "speed": 2.0,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "right",
+            "x": 55,
+            "y": 85,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 2.5,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -40,
+                "z": 40
+              },
+              "speed": 3.0,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-05-29 16:27:32",
+    "reasoning": "# Q1: A human salute involves a sharp, direct movement of the hand from a neutral position to the forehead, often with the arm taking a specific path out to the side and then folding in.\n# Q2: candidates=P1) front+horizontal+x60,y50,z40, P2) right+vertical+x55,y85,z50; winner=P1 because a neutral forward-facing start makes the subsequent formal swing out to the side and crisp fold to the temple more distinct and readable.\n# Q3: options=M1 pose>pose>pose, M2 pose>path(arc), M3 pose>pose(staging)>movement(fold); winner=M3 because breaking the motion into a sharp staging move and a final crisp fold better captures the precise, angular quality of a formal salute than a single smooth arc.\n# Q4: options=C1 a sharp hold at the end, C2 a slow release after the hold, C3 a preparatory 'attention' lift; winner=C1&C3 because the preparatory lift adds formality and the final hold is essential for the gesture's meaning, while a release would be a separate cue."
+  },
+  {
+    "idx": 36,
+    "cue": "visor_search",
+    "description": "The robot raises its hand to its brow like a visor, peers forward intently, and then scans side-to-side as if searching the horizon.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 70,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.8,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": 20
+              },
+              "speed": 1.2,
+              "hold_time": 0.2
+            },
+            {
+              "degrees": {
+                "y": -20
+              },
+              "speed": 1.2,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-05-29 16:28:03",
+    "reasoning": "# Q1: A human would raise their hand to their brow to shield their eyes, then lean forward and look side-to-side to scan the horizon.\n# Q2: candidates=P1) front+horizontal+x60,y50,z70, P2) down+horizontal+x60,y50,z70; winner=P1 because the forward-pointing hand with a horizontal gripper is the most direct geometric analog to a human hand shielding the eyes to look forward.\n# Q3: options=M1 pose(visor)>movement(scan), M2 pose(start)>pose(visor)>movement(peer)>movement(scan); winner=M2 because the sequence of placing the hand, peering forward, and then scanning tells a much clearer story of \"searching\" than a simple scan alone.\n# Q4: options=C1 a forward peer before scanning, C2 a final return pose; winner=C1 because the peer strongly reinforces the intent of looking into the distance, making the subsequent scan feel motivated and specific to searching."
+  },
+  {
+    "idx": 15,
+    "cue": "beckon_come_here",
+    "description": "The robot lifts its hand into position, extends it slightly to gain attention, then repeatedly curls its fingers inward in a clear 'come here' gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 55,
+            "y": 60,
+            "z": 65,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.4,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.6,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": -40
+              },
+              "speed": 2.5,
+              "hold_time": 0.05
+            },
+            {
+              "degrees": {
+                "x": 40
+              },
+              "speed": 2.0,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-05-29 16:28:40",
+    "reasoning": "# Q1: A human beckons by raising their hand with the palm facing inward and repeatedly curling their fingers toward their body.\n# Q2: candidates=P1) up+horizontal+x55,y60,z65, P2) front+vertical+x70,y50,z50; winner=P1 because the upward-pointing hand with an inward-facing palm is the canonical starting geometry for a finger-curling beckon.\n# Q3: options=M1 pose>movement(wrist x repeat), M2 pose>pose>movement(shoulder x)>movement(wrist x repeat); winner=M2 because lifting the hand into position and extending it slightly creates a clear setup and anticipation, making the final curling motion more intentional.\n# Q4: options=C1 a small forward extension before the curls, C2 a final static hold after the curls; winner=C1 because the pre-curl extension acts as an attention-getting beat that strengthens the \"I'm beckoning you\" context, whereas a final hold feels unnatural."
+  },
+  {
+    "idx": 8,
+    "cue": "fist_pump",
+    "description": "The robot first pulls its arm down in a preparatory wind-up, then thrusts it sharply upward in a classic fist pump, holding the peak to punctuate the celebration before a slight release.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 60,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -12
+              },
+              "speed": 1.8,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5,
+                "z": 45
+              },
+              "speed": 3.5,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "fewshot",
+    "model": "gemini-2.5-pro",
+    "time": "2026-05-29 16:29:14",
+    "reasoning": "# Q1: A human performs a fist pump by first pulling their arm back and down in a preparatory wind-up, then thrusting it sharply upward and holding the peak for a moment of celebration.\n# Q2: candidates=P1) up+vertical+x50,y60,z40, P2) front+horizontal+x65,y50,z50; winner=P1 because the upward vertical orientation is the most natural starting pose for a celebratory upward thrust, keeping the elbow bent and ready.\n# Q3: options=M1 pose>movement(down wind-up)>movement(up pump+hold), M2 pose>path(line z up only); winner=M1 because the preparatory wind-up and peak hold are essential for conveying the power and celebratory intent of the gesture, which a simple lift lacks.\n# Q4: options=C1 preparatory downward wind-up before the pump, C2 a final slow return to a neutral pose; winner=C1 because the wind-up builds anticipation and makes the pump feel more explosive, whereas a slow return would kill the celebratory energy."
+  }
+]

@@ -1,0 +1,29 @@
+You are verifying ONLY the pose component from a rendered GIF.
+
+You receive:
+- A rendered GIF (mobile manipulator cue)
+- Cue text and current pose component JSON
+
+Task:
+- Judge whether the first-pose setup is appropriate for the cue intent.
+- If not, suggest corrected pose component.
+
+Return strict JSON only:
+{
+  "pose_is_appropriate": true/false,
+  "visual_assessment": "string",
+  "if_not_appropriate": {
+    "corrected_pose_component": {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": { "pose": { ... } }
+    },
+    "why_change": "string"
+  },
+  "confidence": 0.0
+}
+
+Cue: {{CUE_NAME}}
+Description: {{CUE_DESCRIPTION}}
+Current pose component:
+{{POSE_COMPONENT_JSON}}

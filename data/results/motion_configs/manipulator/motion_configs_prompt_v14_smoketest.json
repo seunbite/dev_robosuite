@@ -1,0 +1,98 @@
+[
+  {
+    "cue": "Tilt head slightly (Curiosity)",
+    "description": "The robot first takes on an inquisitive stance, subtly presenting its 'face' area, then executes a distinct side tilt to one side, holding it to express curiosity, and finishing with a small, lingering, thoughtful adjustment.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "joint": "shoulder",
+          "axis": "y",
+          "distance": 10,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder-elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 8,
+                "z": 6
+              },
+              "speed": 1.8,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": -25
+              },
+              "speed": 2.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": "wrist",
+          "plane": "xy",
+          "radius": 8,
+          "sweep": 70,
+          "speed": 1.6,
+          "direction": "ccw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 5
+              },
+              "speed": 0.9,
+              "hold_time": 0.4
+            }
+          ]
+        }
+      }
+    ],
+    "idx": 0,
+    "state": "fewshot",
+    "model": "gemini-2.5-flash",
+    "time": "2026-03-17 17:22:41",
+    "reasoning": "# Visualization: The robot first takes on an inquisitive stance, subtly presenting its 'face' area, then executes a distinct side tilt to one side, holding it to express curiosity, and finishing with a small, lingering, thoughtful adjustment.\n# Iconic pose: A distinctly side-tilted 'head' (gripper) silhouette, held briefly.\n# Recognition anchor: The clear lateral angle of the gripper relative to the body, emphasizing a 'head' tilt.\n# Motion read: The viewer should perceive 'inquisitive observation' or 'curiosity' from the prominent tilt and its sustained hold.\n# Pre-action reveal: The robot brings its 'face' (gripper) slightly forward and to one side, establishing a clear visual reference point before the tilt occurs.\n# Category: expressive-transition\n# Joint cascade:\n#   Act 1 (Reveal): Shoulder for initial lateral positioning to one side and slight forward extension.\n#   Act 2 (Core Action): Wrist for the primary tilting motion, potentially minor elbow/shoulder for overall body lean.\n#   Act 3 (Follow-through): Wrist for a small, subtle counter-movement and hold.\n# Path plan:\n#   A `path(line)` for the initial lateral shift of the shoulder to present the 'face' clearly off-center.\n#   A `path(arc)` for a subtle, lingering head swivel in the follow-through, reinforcing the inquisitive nature.\n# Setup (Act 1): Robot moves its arm slightly forward and laterally (to the left, in this case) to make the gripper/face prominent and set up a clear visual baseline for the subsequent rightward tilt.\n# Core action (Act 2): The wrist performs a distinct and moderately rapid tilt to the right, holding this pose to emphasize the curious expression.\n# Follow-through (Act 3): The tilt slightly eases, followed by a small, slow, arcing adjustment of the wrist, suggesting continued thought or observation, without returning to a completely neutral pose.\n# Pattern: pose (initial setup) -> path(line) (shoulder lateral reveal) -> movement (shoulder-elbow forward/up adjust) -> movement (wrist: core tilt + hold) -> path(arc) (wrist: lingering swivel) -> movement (wrist: subtle settle).\n# Start pose: dir=front, z=60, x=55, y=50 (approx. center-ish initially)\n# Speed dynamics: setup(1.0) -> reveal(1.5) -> forward-adjust(1.8) -> sharp-tilt(2.8) -> hold(0.8) -> lingering-adjust(1.6) -> settle(0.9)\n# Step count: 6"
+  }
+]

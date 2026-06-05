@@ -1,0 +1,70 @@
+You are an expert in robot motion design. Your task is to generate a structured JSON configuration for a specific robot motion "cue".
+The output must follow the schema used in a robot arm simulation environment (robosuite).
+
+### JSON Schema Description:
+- **cue**: The name of the motion.
+- **description**: A brief explanation of the motion's intention and flow in English.
+- **movements**: A list of steps to execute the motion.
+    - **type**: Either "pose" (static target) or "movement" (relative joint rotation).
+    - **parameters (for type "pose")**:
+        - **pose**: A dictionary with spatial keys (used to filter available poses):
+            - "dir": "front", "back", "left", "right", "up", "down" (or omit if any direction is fine)
+            - "x" (depth): "low", "med", "high", "med-low", "high-med", "any" (or omit entirely)
+            - "y" (left and right): "low", "med", "high", "med-low", "high-med", "any" (or omit entirely)
+            - "z" (height): "low", "med", "high", "med-low", "high-med", "any" (or omit entirely)
+            - "pitch": "horizontal", "vertical" (or omit if any pitch is fine)
+            - Use ranges like "med-low" to allow multiple regions
+            - Use "any" or omit the key entirely if the constraint is not important
+            - **IMPORTANT**: Specify only the essential constraints. Do not attempt to define every pose dimension; over-constraining may result in no feasible poses. 
+        - **speed**: Float (default 1.0, higher is faster)
+        - **hold_time**: Float (time to stay at the pose in seconds)
+    - **parameters (for type "movement")**:
+        - **repetition**: Integer (number of times to repeat)
+        - **axis**: "x", "y", "z" or combined like "yz" (the spatial axis to move along)
+        - **joint**: "shoulder", "elbow", "wrist" or combined like "elbow-shoulder"
+        - **directions**: A list of movement phases:
+            - **degrees**: Float or list of floats (rotation amount in degrees)
+            - **speed**: Float
+            - **hold_time**: Float
+            - **sign**: "positive" or "negative" (direction of movement)
+
+### Motion Planning Process:
+Before generating the JSON, think through the motion step by step:
+1. **Analyze the cue**: What is the essential gesture or emotion to convey?
+2. **Break down into phases**: What are the key sequential steps? (e.g., preparation → main action → ending)
+3. **Plan joint movements**: Which joints (shoulder/elbow/wrist) and axes (x/y/z) create the intended motion?
+4. **Add expressiveness**: What speeds, hold times, or repetitions enhance recognition?
+
+Example thinking for "self_hug":
+- Start: Lower elbows, pull inward to center (preparation)
+- Extend: Reach arms forward (opening motion)
+- Wrap: Rotate shoulder → elbow → wrist sequentially to the left, creating embrace shape
+- Result: Arms crossing over chest
+
+### Constraints:
+1. First provide your reasoning as "# Motion Planning: ..." on separate lines starting with #
+2. Then provide ONLY the JSON object (no markdown code blocks)
+3. The motion MUST start with a "pose" type. Do not start with "movement" type.
+4. **Pose parameters are filters**: They narrow down available robot poses. Only specify the MOST ESSENTIAL constraints (e.g., direction and z). Leave other parameters unspecified or use "any" to maximize available poses.
+5. **Create expressive, rich motions**: 
+   - Include at least 2-4 movement steps (pose changes or joint movements)
+   - Use multiple directions in movements (e.g., move forward then back, or oscillate)
+   - Add appropriate hold_time to emphasize key poses
+   - Consider repetition for rhythmic gestures
+   - The motion should be immediately recognizable and expressive, not minimal or abbreviated
+
+---
+### Examples:
+Below are examples including good patterns to follow and bad patterns to avoid.
+Pay attention to correction pairs marked with ❌ (bad) and ✅ (good) to learn what NOT to do.
+
+{{FEW_SHOT_EXAMPLES}}
+
+---
+### Target Cue:
+Cue Name: {{CUE_NAME}}
+
+# Motion Planning:
+# (Think through the motion phases and joint movements here)
+
+JSON Configuration:
