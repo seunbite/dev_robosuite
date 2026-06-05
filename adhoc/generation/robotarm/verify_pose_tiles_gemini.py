@@ -16,7 +16,13 @@ _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
-from vlm_client import VLMClient, is_local_backend, is_vllm_http_backend, require_vllm_server  # noqa: E402
+from vlm_client import (  # noqa: E402
+    VLMClient,
+    init_inprocess_engine,
+    is_inprocess_backend,
+    is_vllm_http_backend,
+    require_vllm_server,
+)
 
 # Must match generate_pose_group_tiles.py layout
 _GRID_PAD = 6
@@ -265,10 +271,8 @@ def _write_checkpoint(
 def run(args: argparse.Namespace) -> None:
     if is_vllm_http_backend(args.vlm_backend):
         require_vllm_server()
-    elif is_local_backend(args.vlm_backend):
-        from vllm_local import get_vllm_engine
-
-        get_vllm_engine(model=args.model)
+    elif is_inprocess_backend(args.vlm_backend):
+        init_inprocess_engine(args.vlm_backend, args.model)
     vlm = VLMClient(backend=args.vlm_backend, model=args.model)
 
     cfg_rows = _load_json(args.config_json)
@@ -434,9 +438,9 @@ def main() -> None:
     )
     ap.add_argument(
         "--vlm-backend",
-        default=os.getenv("VLM_BACKEND", "local"),
-        choices=["local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
-        help="Default local (in-process vLLM). gemini=Google API.",
+        default=os.getenv("VLM_BACKEND", "transformers"),
+        choices=["transformers", "hf", "local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
+        help="Default transformers (HF). gemini=Google API.",
     )
     ap.add_argument("--model", type=str, default=None, help="Override VLM_MODEL env")
     ap.add_argument("--fewshot-n", type=int, default=4)

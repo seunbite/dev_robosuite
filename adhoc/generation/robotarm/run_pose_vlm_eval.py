@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-Single-process pose VLM evaluation with in-process vLLM (no HTTP server).
+Single-process pose VLM evaluation (sbatch-friendly). No HTTP server.
 
-Designed for sbatch: load Qwen-VL once, run compare experiments, write JSON + print accuracy.
+Default backend: transformers (works on older NVIDIA drivers / Babel-style clusters).
+Use --backend vllm only on nodes with a new driver + matching vLLM torch stack.
 
 Examples:
+  bash scripts/install_vlm_transformers.sh
   python adhoc/generation/robotarm/run_pose_vlm_eval.py --experiment multitile20
-  python adhoc/generation/robotarm/run_pose_vlm_eval.py --experiment all20 --tensor-parallel-size 2
-  sbatch scripts/sbatch_pose_vlm.sh
+  sbatch --partition=YOUR_PART --gres=gpu:2 scripts/sbatch_pose_vlm.sh
 """
 from __future__ import annotations
 
@@ -23,7 +24,20 @@ for p in (_REPO, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from vllm_local import get_vllm_engine  # noqa: E402
+from gpu_check import require_cuda_gpu  # noqa: E402
+from vlm_client import init_inprocess_engine, is_transformers_backend, is_vllm_local_backend  # noqa: E402
+
+_BACKEND_CHOICES = ("transformers", "vllm", "local")
+
+
+def _vlm_backend_name(backend: str) -> str:
+    if backend == "vllm":
+        return "local"
+    return backend
+
+
+def _out_suffix(backend: str) -> str:
+    return "hf_local" if is_transformers_backend(backend) else "vllm_local"
 
 
 def _print_multitile_summary(path: Path) -> None:
@@ -37,7 +51,6 @@ def _print_multitile_summary(path: Path) -> None:
         ok = s.get("ok") or 0
         acc = s.get("accuracy")
         acc_txt = f"{100 * acc:.1f}%" if acc is not None else "n/a"
-        grid = key.replace("grid_", "")
         rand = s.get("random_baseline")
         rand_txt = f", random {100 * rand:.1f}%" if rand else ""
         print(f"  {key}: {ok}/{n} = {acc_txt}{rand_txt}")
@@ -61,7 +74,13 @@ def _print_pairwise_summary(path: Path) -> None:
     print(f"  → {path}")
 
 
-def _run_multitile(args: argparse.Namespace, *, max_cues: int, out_json: Path) -> None:
+def _run_multitile(
+    args: argparse.Namespace,
+    *,
+    max_cues: int,
+    out_json: Path,
+    vlm_backend: str,
+) -> None:
     from verify_pose_multitile_gt_gemini import run
 
     ns = argparse.Namespace(
@@ -71,7 +90,7 @@ def _run_multitile(args: argparse.Namespace, *, max_cues: int, out_json: Path) -
         image_dir=_REPO / "data/results/visualize/pose_multitile_gt",
         out_json=out_json,
         model=args.model,
-        vlm_backend="local",
+        vlm_backend=vlm_backend,
         grid_sizes=args.grid_sizes,
         max_cues=max_cues,
         cue_indices=args.cue_indices,
@@ -81,7 +100,13 @@ def _run_multitile(args: argparse.Namespace, *, max_cues: int, out_json: Path) -
     run(ns)
 
 
-def _run_pairwise(args: argparse.Namespace, *, max_cues: int, out_json: Path) -> None:
+def _run_pairwise(
+    args: argparse.Namespace,
+    *,
+    max_cues: int,
+    out_json: Path,
+    vlm_backend: str,
+) -> None:
     from verify_pose_pairwise_12_gemini import run
 
     ns = argparse.Namespace(
@@ -91,7 +116,7 @@ def _run_pairwise(args: argparse.Namespace, *, max_cues: int, out_json: Path) ->
         image_dir=_REPO / "data/results/visualize/pose_pairwise_12",
         out_json=out_json,
         model=args.model,
-        vlm_backend="local",
+        vlm_backend=vlm_backend,
         dry_run=False,
         max_cues=max_cues,
         max_pairs_per_cue=None,
@@ -106,13 +131,19 @@ def _run_pairwise(args: argparse.Namespace, *, max_cues: int, out_json: Path) ->
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="In-process vLLM pose compare eval (sbatch-friendly)")
+    p = argparse.ArgumentParser(description="In-process pose VLM eval (sbatch-friendly)")
     p.add_argument(
         "--experiment",
         choices=["multitile20", "multitile100", "pairwise20", "all20"],
         default="multitile20",
     )
-    p.add_argument("--model", default=os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-32B-Instruct"))
+    p.add_argument(
+        "--backend",
+        choices=_BACKEND_CHOICES,
+        default=os.getenv("BACKEND", os.getenv("VLM_BACKEND", "transformers")),
+        help="transformers=HF (old drivers OK); vllm/local=vLLM in-process",
+    )
+    p.add_argument("--model", default=os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-7B-Instruct"))
     p.add_argument("--tensor-parallel-size", type=int, default=int(os.getenv("VLLM_TENSOR_PARALLEL_SIZE", "1")))
     p.add_argument("--max-model-len", type=int, default=int(os.getenv("VLLM_MAX_MODEL_LEN", "8192")))
     p.add_argument(
@@ -120,41 +151,53 @@ def main() -> None:
         type=float,
         default=float(os.getenv("VLLM_GPU_MEMORY_UTILIZATION", "0.90")),
     )
-    p.add_argument("--grid-sizes", default="6,12", help="For multitile experiments")
+    p.add_argument("--grid-sizes", default="6,12")
     p.add_argument("--cue-indices", type=str, default=None)
     p.add_argument("--out-dir", type=Path, default=_REPO / "data/results/verify")
-    p.add_argument("--resume", action="store_true", help="Skip already-scored items in output JSON")
+    p.add_argument("--resume", action="store_true")
     args = p.parse_args()
 
+    if args.backend == "vllm":
+        args.backend = "local"
+
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    os.environ["VLM_BACKEND"] = "local"
+    vlm_backend = _vlm_backend_name(args.backend)
+    os.environ["VLM_BACKEND"] = vlm_backend
     os.environ["VLM_MODEL"] = args.model
 
-    print("=== Loading vLLM (single process, no HTTP server) ===", flush=True)
-    get_vllm_engine(
-        model=args.model,
-        tensor_parallel_size=args.tensor_parallel_size,
-        max_model_len=args.max_model_len,
-        gpu_memory_utilization=args.gpu_memory_utilization,
-    )
+    require_cuda_gpu()
 
-    mt20_out = args.out_dir / "pilot20_pose_multitile_vllm_local.json"
-    mt100_out = args.out_dir / "pilot100_pose_multitile_vllm_local.json"
-    pw_out = args.out_dir / "pilot20_pose_pairwise_vllm_local.json"
+    print(f"=== Loading model (backend={vlm_backend}, no HTTP) ===", flush=True)
+    if is_vllm_local_backend(vlm_backend):
+        from vllm_local import get_vllm_engine
+
+        get_vllm_engine(
+            model=args.model,
+            tensor_parallel_size=args.tensor_parallel_size,
+            max_model_len=args.max_model_len,
+            gpu_memory_utilization=args.gpu_memory_utilization,
+        )
+    else:
+        init_inprocess_engine(vlm_backend, args.model)
+
+    suffix = _out_suffix(vlm_backend)
+    mt20_out = args.out_dir / f"pilot20_pose_multitile_{suffix}.json"
+    mt100_out = args.out_dir / f"pilot100_pose_multitile_{suffix}.json"
+    pw_out = args.out_dir / f"pilot20_pose_pairwise_{suffix}.json"
 
     if args.experiment in {"multitile20", "all20"}:
         print("\n=== Multitile GT (grid 6 + 12), 20 cues ===", flush=True)
-        _run_multitile(args, max_cues=20, out_json=mt20_out)
+        _run_multitile(args, max_cues=20, out_json=mt20_out, vlm_backend=vlm_backend)
         _print_multitile_summary(mt20_out)
 
     if args.experiment == "multitile100":
         print("\n=== Multitile GT (grid 6 + 12), 100 cues ===", flush=True)
-        _run_multitile(args, max_cues=100, out_json=mt100_out)
+        _run_multitile(args, max_cues=100, out_json=mt100_out, vlm_backend=vlm_backend)
         _print_multitile_summary(mt100_out)
 
     if args.experiment in {"pairwise20", "all20"}:
         print("\n=== Pairwise 2-way, 20 cues ===", flush=True)
-        _run_pairwise(args, max_cues=20, out_json=pw_out)
+        _run_pairwise(args, max_cues=20, out_json=pw_out, vlm_backend=vlm_backend)
         _print_pairwise_summary(pw_out)
 
     print("\n=== Done ===", flush=True)

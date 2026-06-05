@@ -32,7 +32,13 @@ from verify_pose_tiles_gemini import (  # noqa: E402
     _load_tile_pick,
     _resolve_pose_image,
 )
-from vlm_client import VLMClient, is_local_backend, is_vllm_http_backend, require_vllm_server  # noqa: E402
+from vlm_client import (  # noqa: E402
+    VLMClient,
+    init_inprocess_engine,
+    is_inprocess_backend,
+    is_vllm_http_backend,
+    require_vllm_server,
+)
 
 REPRESENTATIVE_MEANS_LINE = (
     '   "More representative" means: which side\'s static pose (dir + gripper_orientation, and the '
@@ -245,10 +251,8 @@ def run(args: argparse.Namespace) -> None:
     if not args.dry_run:
         if is_vllm_http_backend(args.vlm_backend):
             require_vllm_server()
-        elif is_local_backend(args.vlm_backend):
-            from vllm_local import get_vllm_engine
-
-            get_vllm_engine(model=args.model)
+        elif is_inprocess_backend(args.vlm_backend):
+            init_inprocess_engine(args.vlm_backend, args.model)
         vlm = VLMClient(backend=args.vlm_backend, model=args.model)
 
     comparisons: list[dict[str, Any]] = list(existing)
@@ -431,8 +435,8 @@ def main() -> None:
     p.add_argument("--model", default=None, help="Override VLM_MODEL env")
     p.add_argument(
         "--vlm-backend",
-        default=os.getenv("VLM_BACKEND", "local"),
-        choices=["local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
+        default=os.getenv("VLM_BACKEND", "transformers"),
+        choices=["transformers", "hf", "local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
     )
     p.add_argument("--dry-run", action="store_true", help="Only save stitched PNGs, no API")
     p.add_argument("--max-cues", type=int, default=None)
