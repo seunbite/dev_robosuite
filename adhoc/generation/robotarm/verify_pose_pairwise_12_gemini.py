@@ -32,7 +32,7 @@ from verify_pose_tiles_gemini import (  # noqa: E402
     _load_tile_pick,
     _resolve_pose_image,
 )
-from vlm_client import VLMClient  # noqa: E402
+from vlm_client import VLMClient, is_vllm_backend, require_vllm_server  # noqa: E402
 
 REPRESENTATIVE_MEANS_LINE = (
     '   "More representative" means: which side\'s static pose (dir + gripper_orientation, and the '
@@ -243,6 +243,8 @@ def run(args: argparse.Namespace) -> None:
 
     vlm: VLMClient | None = None
     if not args.dry_run:
+        if is_vllm_backend(args.vlm_backend):
+            require_vllm_server()
         vlm = VLMClient(backend=args.vlm_backend, model=args.model)
 
     comparisons: list[dict[str, Any]] = list(existing)
@@ -425,8 +427,8 @@ def main() -> None:
     p.add_argument("--model", default=None, help="Override VLM_MODEL env")
     p.add_argument(
         "--vlm-backend",
-        default=os.getenv("VLM_BACKEND", "gemini"),
-        choices=["gemini", "openai", "qwen", "vllm"],
+        default=os.getenv("VLM_BACKEND", "vllm"),
+        choices=["vllm", "openai", "qwen", "gemini"],
     )
     p.add_argument("--dry-run", action="store_true", help="Only save stitched PNGs, no API")
     p.add_argument("--max-cues", type=int, default=None)

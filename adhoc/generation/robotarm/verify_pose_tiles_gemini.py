@@ -5,12 +5,18 @@ import argparse
 import json
 import os
 import re
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from PIL import Image
-from google import genai
+
+_HERE = Path(__file__).resolve().parent
+if str(_HERE) not in sys.path:
+    sys.path.insert(0, str(_HERE))
+
+from vlm_client import VLMClient, is_vllm_backend, require_vllm_server  # noqa: E402
 
 # Must match generate_pose_group_tiles.py layout
 _GRID_PAD = 6
@@ -243,6 +249,7 @@ def _write_checkpoint(
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "mode": "single_selected_tile",
+        "vlm_backend": args.vlm_backend,
         "model": args.model,
         "config_json": str(args.config_json),
         "tile_dir": str(args.tile_dir),
@@ -256,9 +263,9 @@ def _write_checkpoint(
 
 
 def run(args: argparse.Namespace) -> None:
-    key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-    if not key:
-        raise SystemExit("Set GOOGLE_API_KEY (or GEMINI_API_KEY).")
+    if is_vllm_backend(args.vlm_backend):
+        require_vllm_server()
+    vlm = VLMClient(backend=args.vlm_backend, model=args.model)
 
     cfg_rows = _load_json(args.config_json)
     shots = _load_json(args.shots_json)
@@ -270,7 +277,6 @@ def run(args: argparse.Namespace) -> None:
     out_json.parent.mkdir(parents=True, exist_ok=True)
     out_md.parent.mkdir(parents=True, exist_ok=True)
 
-    client = genai.Client(api_key=key)
     fewshot_text = _fewshot_block(shots, n=args.fewshot_n)
 
     results: list[dict[str, Any]] = []
@@ -321,11 +327,7 @@ def run(args: argparse.Namespace) -> None:
             continue
 
         prompt = _prompt(row, fewshot_text)
-        resp = client.models.generate_content(
-            model=args.model,
-            contents=[prompt, img],
-        )
-        text = (resp.text or "").strip()
+        text = vlm.generate(prompt, images=[img])
         try:
             parsed = _extract_json(text)
         except Exception as e:
@@ -350,6 +352,7 @@ def run(args: argparse.Namespace) -> None:
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "mode": "single_selected_tile",
+        "vlm_backend": args.vlm_backend,
         "model": args.model,
         "config_json": str(args.config_json),
         "tile_dir": str(args.tile_dir),
@@ -362,8 +365,9 @@ def run(args: argparse.Namespace) -> None:
     out_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
     md_lines = [
-        "# Pose Verification — single selected tile (Gemini)",
+        "# Pose Verification — single selected tile",
         "",
+        f"- backend: `{args.vlm_backend}`",
         f"- model: `{args.model}`",
         f"- config: `{args.config_json}`",
         f"- group tiles: `{args.tile_dir}`",
@@ -424,7 +428,13 @@ def main() -> None:
         action="store_true",
         help="Save cropped single-tile PNGs under --selected-tile-dir.",
     )
-    ap.add_argument("--model", type=str, default="gemini-2.5-pro")
+    ap.add_argument(
+        "--vlm-backend",
+        default=os.getenv("VLM_BACKEND", "vllm"),
+        choices=["vllm", "openai", "qwen", "gemini"],
+        help="Default vllm (Qwen via vLLM server). gemini=Google API.",
+    )
+    ap.add_argument("--model", type=str, default=None, help="Override VLM_MODEL env")
     ap.add_argument("--fewshot-n", type=int, default=4)
     ap.add_argument(
         "--out-json",

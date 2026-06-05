@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run pilot pose-compare experiments with Qwen via vLLM (OpenAI-compatible API).
+# Run pilot pose-compare experiments via vLLM (Qwen-VL OpenAI API).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -12,7 +12,12 @@ if [[ -f .env ]]; then
   set +a
 fi
 
-export VLM_BACKEND="${VLM_BACKEND:-openai}"
+export VLM_BACKEND="${VLM_BACKEND:-vllm}"
+
+echo "=== Preflight: vLLM server ==="
+bash scripts/check_vlm_remote.sh
+echo ""
+
 PY=python
 
 run_multitile_pilot20() {
@@ -50,17 +55,19 @@ run_pairwise_pilot20() {
 run_fewshot_verify_pilot20() {
   echo "=== Exp 3: few-shot tile verify baseline ==="
   $PY adhoc/generation/robotarm/verify_pose_tiles_gemini.py \
-    --vlm-backend "$VLM_BACKEND" 2>/dev/null || \
-  echo "NOTE: wire verify_pose_tiles_gemini.py to vlm_client if not yet patched"
+    --vlm-backend "$VLM_BACKEND" \
+    --out-json data/results/verify/pilot20_pose_fewshot_qwen.json \
+    --out-md data/results/verify/pilot20_pose_fewshot_qwen.md
 }
 
 case "${1:-multitile20}" in
   multitile20) run_multitile_pilot20 ;;
   multitile100) run_multitile_pilot100 ;;
   pairwise20) run_pairwise_pilot20 ;;
+  fewshot20) run_fewshot_verify_pilot20 ;;
   all20)
     run_pairwise_pilot20
     run_multitile_pilot20
     ;;
-  *) echo "Usage: $0 {multitile20|multitile100|pairwise20|all20}"; exit 1 ;;
+  *) echo "Usage: $0 {multitile20|multitile100|pairwise20|fewshot20|all20}"; exit 1 ;;
 esac

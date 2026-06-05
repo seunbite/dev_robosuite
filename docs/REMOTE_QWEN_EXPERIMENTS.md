@@ -1,37 +1,73 @@
-# Remote Qwen-32B experiments
+# Remote Qwen-32B experiments (vLLM)
 
-See setup, commands, and experiment backlog for the pilot gesture pipeline.
+Pilot gesture VLM experiments use **vLLM inference only** — not HuggingFace `transformers` in-process loading.
 
-## Clone & env
+```
+실험 스크립트  ──HTTP──►  vLLM serve (GPU)  ──►  Qwen2.5-VL-32B
+              VLM_BASE_URL     port 8000
+```
+
+## 0. micromamba (first time)
+
+```bash
+"${SHELL}" <(curl -L micro.mamba.pm/install.sh)
+source ~/.bashrc   # or ~/.zshrc
+```
+
+## 1. Clone & env
 
 ```bash
 git clone git@github.com:seunbite/dev_robosuite.git
 cd dev_robosuite
 micromamba env create -f environment-vlm.yml && micromamba activate robosuite-vlm
-cp .env.example .env   # VLM_BASE_URL, VLM_MODEL
-bash scripts/check_vlm_remote.sh
+cp .env.example .env
 ```
 
-## vLLM example
+## 2. salloc + vLLM (GPU node, terminal 1)
 
 ```bash
-vllm serve Qwen/Qwen2.5-VL-32B-Instruct --host 0.0.0.0 --port 8000 --max-model-len 8192
+salloc ...                    # GPU 노드 진입
+micromamba activate robosuite-vlm
+cd dev_robosuite
+tmux new -s vllm
+
+bash scripts/start_vllm_server.sh
+# → http://0.0.0.0:8000/v1  (모델 로딩 완료까지 대기)
 ```
 
-`.env`:
+Optional `.env` overrides for the server script:
 
 ```
-VLM_BACKEND=openai
+VLLM_PORT=8000
+VLLM_TENSOR_PARALLEL_SIZE=2   # 32B OOM 시
+VLLM_MAX_MODEL_LEN=8192
+```
+
+`.env` client side (same node):
+
+```
+VLM_BACKEND=vllm
 VLM_BASE_URL=http://127.0.0.1:8000/v1
 VLM_MODEL=Qwen/Qwen2.5-VL-32B-Instruct
 OPENAI_API_KEY=EMPTY
 ```
 
-## Run
+Port is arbitrary — if you use `--port 9000`, set `VLM_BASE_URL=...9000/v1` to match.
+
+## 3. Preflight (terminal 2, same salloc session)
+
+```bash
+micromamba activate robosuite-vlm
+cd dev_robosuite
+bash scripts/check_vlm_remote.sh
+```
+
+## 4. Run experiments
 
 ```bash
 bash scripts/run_qwen_experiments.sh multitile20
 bash scripts/run_qwen_experiments.sh pairwise20
+bash scripts/run_qwen_experiments.sh fewshot20
 bash scripts/run_qwen_experiments.sh multitile100
 ```
 
@@ -39,11 +75,13 @@ Direct:
 
 ```bash
 python adhoc/generation/robotarm/verify_pose_multitile_gt_gemini.py \
-  --max-cues 20 --grid-sizes 6,12 --vlm-backend openai \
+  --max-cues 20 --grid-sizes 6,12 \
   --out-json data/results/verify/pilot20_pose_multitile_qwen.json --resume
 ```
 
-Capture-only HTML (no API):
+(`--vlm-backend` defaults to `vllm`; server check runs automatically.)
+
+Capture-only HTML (no vLLM):
 
 ```bash
 python adhoc/generation/robotarm/build_pose_multitile_gt_capture_html.py
@@ -73,7 +111,7 @@ Run compare on `dynamic_temporal` cues (21); optional tempo-aware prompt edits.
 
 ### 3. Few-shot baseline
 
-`verify_pose_tiles_gemini.py` with shots from `data/seed/shots/manipulator/` — verify without pairwise.
+`verify_pose_tiles_gemini.py` with shots from `data/seed/shots/manipulator/`.
 
 ### 4. Google Robot × ~40 cues
 
@@ -91,4 +129,4 @@ Run compare on `dynamic_temporal` cues (21); optional tempo-aware prompt edits.
 | dynamic_temporal | 21 | 2 | 19 |
 | abstract | 10 | 0 | 10 |
 
-Backend: `adhoc/generation/robotarm/vlm_client.py` (`--vlm-backend openai` for Qwen/vLLM).
+Backend: `adhoc/generation/robotarm/vlm_client.py` — default `VLM_BACKEND=vllm`.

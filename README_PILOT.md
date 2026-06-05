@@ -2,13 +2,16 @@
 
 Iconic gesture cue pipeline for **IIWA manipulator**: pose tiles, motion verify, GT-vs-neg compare.
 
-**Remote Qwen-32B setup → [docs/REMOTE_QWEN_EXPERIMENTS.md](docs/REMOTE_QWEN_EXPERIMENTS.md)**
+**Remote Qwen via vLLM → [docs/REMOTE_QWEN_EXPERIMENTS.md](docs/REMOTE_QWEN_EXPERIMENTS.md)**
 
-## Quick start (VLM server)
+## Quick start (salloc + vLLM)
 
 ```bash
-cp .env.example .env   # set VLM_BASE_URL, VLM_MODEL
-pip install -r requirements-vlm.txt
+# Terminal 1 (GPU): inference server
+bash scripts/start_vllm_server.sh
+
+# Terminal 2: experiments
+cp .env.example .env
 bash scripts/check_vlm_remote.sh
 bash scripts/run_qwen_experiments.sh multitile20
 ```
@@ -17,11 +20,11 @@ bash scripts/run_qwen_experiments.sh multitile20
 
 | Script | Description |
 |--------|-------------|
+| `scripts/start_vllm_server.sh` | Launch Qwen-VL on vLLM |
 | `verify_pose_multitile_gt_gemini.py` | Grid 6 / 12 GT tile pick |
 | `verify_pose_pairwise_12_gemini.py` | 2-way pose compare |
 | `verify_pose_tiles_gemini.py` | Single-tile verify (+ few-shot) |
 | `build_pose_multitile_gt_capture_html.py` | Input images + prompts only (no API) |
-| `build_pilot40_wrong_answer_notebook_html.py` | Wrong-case review HTML |
 
 ## Manifest
 
