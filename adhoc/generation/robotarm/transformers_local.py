@@ -17,7 +17,7 @@ class TransformersLocalEngine:
         import torch
         from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 
-        self.model_name = model or os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-7B-Instruct")
+        self.model_name = model or os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-32B-Instruct")
         if not torch.cuda.is_available():
             raise RuntimeError(
                 "CUDA not visible. Run on a GPU node (salloc/sbatch), not a login node."
@@ -32,13 +32,29 @@ class TransformersLocalEngine:
             ) from e
 
         n_gpu = torch.cuda.device_count()
-        print(f"[transformers] loading {self.model_name} ({n_gpu} GPU(s))", flush=True)
-        self.processor = AutoProcessor.from_pretrained(self.model_name, trust_remote_code=True)
+        from hf_cache_setup import hub_model_cache_dir, prefer_local_files
+
+        local_only = prefer_local_files(self.model_name)
+        cache_dir = hub_model_cache_dir(self.model_name)
+        print(
+            f"[transformers] loading {self.model_name} ({n_gpu} GPU(s)) "
+            f"local_files_only={local_only} cache={cache_dir}",
+            flush=True,
+        )
+        if not local_only and not cache_dir.is_dir():
+            print(
+                "[transformers] NOTE: this model is not in hub cache yet — will download.\n"
+                "  Cached now: Qwen2.5-VL-32B-Instruct, VL-3B, etc.\n"
+                "  Use: --model Qwen/Qwen2.5-VL-32B-Instruct  (or VL-3B if low VRAM)",
+                flush=True,
+            )
+        load_kw = {"trust_remote_code": True, "local_files_only": local_only}
+        self.processor = AutoProcessor.from_pretrained(self.model_name, **load_kw)
         self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
             self.model_name,
             torch_dtype=torch.bfloat16,
             device_map="auto",
-            trust_remote_code=True,
+            **load_kw,
         )
         self.model.eval()
         print("[transformers] ready", flush=True)

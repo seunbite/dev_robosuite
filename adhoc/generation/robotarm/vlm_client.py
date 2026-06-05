@@ -127,7 +127,7 @@ class VLMClient:
 
     def _default_model(self) -> str:
         if self.backend in _INPROCESS_BACKENDS or self.backend in _VLLM_HTTP_BACKENDS:
-            return os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-7B-Instruct")
+            return os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-32B-Instruct")
         return os.getenv("VLM_MODEL", "gemini-2.5-pro")
 
     def generate(self, prompt: str, images: list[Image.Image] | None = None) -> str:

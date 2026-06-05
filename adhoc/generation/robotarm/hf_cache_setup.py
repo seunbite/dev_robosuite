@@ -29,3 +29,35 @@ def setup_hf_cache(hf_home: str | Path | None = None) -> Path:
     os.environ["TRANSFORMERS_CACHE"] = str(transformers)
     os.environ["HF_DATASETS_CACHE"] = str(datasets)
     return root
+
+
+def hub_model_cache_dir(model_id: str, hf_home: Path | None = None) -> Path:
+    """Path like .../hub/models--Qwen--Qwen2.5-VL-32B-Instruct"""
+    if hf_home is not None:
+        hub = Path(hf_home)
+        if hub.name != "hub":
+            hub = hub / "hub"
+    elif os.environ.get("HUGGINGFACE_HUB_CACHE"):
+        hub = Path(os.environ["HUGGINGFACE_HUB_CACHE"])
+    else:
+        hub = setup_hf_cache() / "hub"
+    return hub / ("models--" + model_id.replace("/", "--"))
+
+
+def model_is_locally_cached(model_id: str) -> bool:
+    """True if hub cache has at least one snapshot with config.json."""
+    cache_dir = hub_model_cache_dir(model_id)
+    snapshots = cache_dir / "snapshots"
+    if not snapshots.is_dir():
+        return False
+    for snap in snapshots.iterdir():
+        if snap.is_dir() and (snap / "config.json").is_file():
+            return True
+    return False
+
+
+def prefer_local_files(model_id: str) -> bool:
+    """Use cache-only load when offline flag set or weights already on disk."""
+    if os.getenv("HF_HUB_OFFLINE", "").lower() in {"1", "true", "yes"}:
+        return True
+    return model_is_locally_cached(model_id)

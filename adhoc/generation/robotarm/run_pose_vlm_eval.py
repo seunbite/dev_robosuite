@@ -148,7 +148,7 @@ def main() -> None:
         default=os.getenv("BACKEND", os.getenv("VLM_BACKEND", "transformers")),
         help="transformers=HF (old drivers OK); vllm/local=vLLM in-process",
     )
-    p.add_argument("--model", default=os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-7B-Instruct"))
+    p.add_argument("--model", default=os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-32B-Instruct"))
     p.add_argument("--tensor-parallel-size", type=int, default=int(os.getenv("VLLM_TENSOR_PARALLEL_SIZE", "1")))
     p.add_argument("--max-model-len", type=int, default=int(os.getenv("VLLM_MAX_MODEL_LEN", "8192")))
     p.add_argument(
