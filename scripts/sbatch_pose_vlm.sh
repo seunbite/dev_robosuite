@@ -19,6 +19,9 @@ cd "$ROOT"
 mkdir -p logs
 
 export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
+# shellcheck disable=SC1091
+source "$ROOT/scripts/cluster_env.sh" "${HF_HOME:-/data/user_data/${USER}/hf_cache}" || true
+
 export EXPERIMENT="${EXPERIMENT:-multitile20}"
 export BACKEND="${BACKEND:-transformers}"
 export VLM_MODEL="${VLM_MODEL:-Qwen/Qwen2.5-VL-7B-Instruct}"
