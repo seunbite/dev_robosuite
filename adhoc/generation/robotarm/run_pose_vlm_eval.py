@@ -24,6 +24,11 @@ for p in (_REPO, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
+from hf_cache_setup import setup_hf_cache  # noqa: E402
+
+# Default HF cache to /data before huggingface_hub import anywhere downstream
+setup_hf_cache(os.environ.get("HF_HOME"))
+
 from gpu_check import require_cuda_gpu  # noqa: E402
 from vlm_client import init_inprocess_engine, is_transformers_backend, is_vllm_local_backend  # noqa: E402
 
@@ -154,8 +159,19 @@ def main() -> None:
     p.add_argument("--grid-sizes", default="6,12")
     p.add_argument("--cue-indices", type=str, default=None)
     p.add_argument("--out-dir", type=Path, default=_REPO / "data/results/verify")
+    p.add_argument(
+        "--hf-cache",
+        type=Path,
+        default=None,
+        help="HF cache root (default: HF_HOME or /data/user_data/$USER/hf_cache)",
+    )
     p.add_argument("--resume", action="store_true")
     args = p.parse_args()
+
+    if args.hf_cache:
+        setup_hf_cache(args.hf_cache)
+    cache_root = setup_hf_cache(os.environ.get("HF_HOME"))
+    print(f"[hf] cache root: {cache_root}", flush=True)
 
     if args.backend == "vllm":
         args.backend = "local"

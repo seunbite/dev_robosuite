@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # Babel / shared cluster: point HuggingFace cache to /data (home quota is tiny).
-# Usage:
+# Usage (from repo root):
 #   source scripts/cluster_env.sh
 #   source scripts/cluster_env.sh /data/user_data/$USER/hf_cache
+#
+# One-time: move existing ~/.cache/huggingface weights:
+#   bash scripts/migrate_hf_cache_to_data.sh
 set -euo pipefail
 
 HF_ROOT="${1:-${HF_HOME:-/data/user_data/${USER}/hf_cache}}"

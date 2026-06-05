@@ -46,6 +46,9 @@ def is_vllm_http_backend(backend: str | None = None) -> bool:
 
 def init_inprocess_engine(backend: str | None = None, model: str | None = None) -> None:
     """Load model once for in-process backends."""
+    from hf_cache_setup import setup_hf_cache
+
+    setup_hf_cache(os.environ.get("HF_HOME"))
     b = (backend or os.getenv("VLM_BACKEND", "transformers")).lower()
     if b in _TRANSFORMERS_BACKENDS:
         from transformers_local import get_transformers_engine
