@@ -32,27 +32,21 @@ class TransformersLocalEngine:
             ) from e
 
         n_gpu = torch.cuda.device_count()
-        from hf_cache_setup import hub_model_cache_dir, prefer_local_files
+        from hf_cache_setup import hub_model_cache_dir, resolve_model_load_path
 
-        local_only = prefer_local_files(self.model_name)
+        load_path, local_only, cache_msg = resolve_model_load_path(self.model_name)
         cache_dir = hub_model_cache_dir(self.model_name)
         print(
-            f"[transformers] loading {self.model_name} ({n_gpu} GPU(s)) "
-            f"local_files_only={local_only} cache={cache_dir}",
+            f"[transformers] {self.model_name} | {n_gpu} GPU(s) | {cache_msg}",
             flush=True,
         )
-        if not local_only and not cache_dir.is_dir():
-            print(
-                "[transformers] NOTE: this model is not in hub cache yet — will download.\n"
-                "  Cached now: Qwen2.5-VL-32B-Instruct, VL-3B, etc.\n"
-                "  Use: --model Qwen/Qwen2.5-VL-32B-Instruct  (or VL-3B if low VRAM)",
-                flush=True,
-            )
+        print(f"[transformers] load_path={load_path} local_files_only={local_only}", flush=True)
+        print(f"[transformers] hub_cache={cache_dir}", flush=True)
         load_kw = {"trust_remote_code": True, "local_files_only": local_only}
-        self.processor = AutoProcessor.from_pretrained(self.model_name, **load_kw)
+        self.processor = AutoProcessor.from_pretrained(load_path, **load_kw)
         self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-            self.model_name,
-            torch_dtype=torch.bfloat16,
+            load_path,
+            dtype=torch.bfloat16,
             device_map="auto",
             **load_kw,
         )
