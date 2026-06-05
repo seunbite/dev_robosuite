@@ -1,5 +1,30 @@
 # Remote Qwen pose experiments
 
+## Full 7-experiment suite (one salloc session)
+
+```bash
+git pull
+salloc --partition=YOUR_PART --gres=gpu:2 --mem=128G --time=24:00:00
+conda activate m2m_caption32b
+cd dev_robosuite
+export HF_HOME=/data/user_data/$USER/hf_cache
+bash scripts/run_pilot32b_suite.sh
+```
+
+| # | Experiment | JSON |
+|---|------------|------|
+| 1 | Multitile grid 6, pilot 20 | `exp1_multitile_grid6_pilot20.json` |
+| 2 | Multitile grid 12, pilot 20 | `exp2_multitile_grid12_pilot20.json` |
+| 3 | Pairwise 2-way, pilot 20 | `exp3_pairwise_pilot20.json` |
+| 4 | Few-shot tile verify | `exp4_fewshot_pilot20.json` |
+| 5 | Temporal cues multitile 6+12 | `exp5_temporal_multitile.json` |
+| 6 | Google Robot compare ~40 | `exp6_google_robot_compare40.json` |
+| 7 | Multitile 6+12, pilot 100 | `exp7_multitile_pilot100.json` |
+
+Output dir: `data/results/verify/pilot32b_qwen32b/` + `pilot32b_suite_summary.json` (acc table on stdout).
+
+Options: `RESUME=1`, `ONLY=1,3,7`.
+
 ## Two separate issues you may hit
 
 | Error | Cause | Fix |
