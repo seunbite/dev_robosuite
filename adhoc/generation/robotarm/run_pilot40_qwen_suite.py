@@ -346,6 +346,11 @@ def main() -> None:
     p.add_argument("--gpu-memory-utilization", type=float, default=float(os.getenv("VLLM_GPU_MEMORY_UTILIZATION", "0.90")))
     p.add_argument("--out-dir", type=Path, default=DEFAULT_QWEN_OUT)
     p.add_argument("--resume", action="store_true")
+    p.add_argument(
+        "--summary-only",
+        action="store_true",
+        help="Skip all runs; read existing result JSONs and print the accuracy table",
+    )
     p.add_argument("--only", type=str, default=None, help="Comma-separated step ids 1-10")
     p.add_argument("--skip-model-load", action="store_true", help="Score-only steps (1,7) without GPU")
     args = p.parse_args()
@@ -358,6 +363,34 @@ def main() -> None:
     if args.only:
         want = {x.strip() for x in args.only.split(",") if x.strip()}
         specs = [s for s in specs if s["id"] in want]
+
+    if args.summary_only:
+        all_metrics = [
+            {**metrics_from_json(args.out_dir / spec["out_name"], spec), "experiment_id": spec["id"], "title": spec["title"]}
+            for spec in specs
+        ]
+        print_summary_table(specs, all_metrics)
+        summary_path = args.out_dir / "pilot40_qwen_suite_summary.json"
+        summary = {
+            "time": datetime.now().isoformat(timespec="seconds"),
+            "model": args.model,
+            "backend": args.backend,
+            "n_cues": 39,
+            "out_dir": str(args.out_dir),
+            "summary_only": True,
+            "table": [
+                {
+                    "id": spec["id"],
+                    "title": spec["title"],
+                    "json": str(args.out_dir / spec["out_name"]),
+                    **{k: v for k, v in m.items() if k not in {"experiment_id", "title"}},
+                }
+                for spec, m in zip(specs, all_metrics)
+            ],
+        }
+        summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+        print(f"\nWrote suite summary → {summary_path}\n", flush=True)
+        return
 
     needs_motion_media = any(s["kind"] == "motion_verify_vlm" for s in specs)
     if needs_motion_media:

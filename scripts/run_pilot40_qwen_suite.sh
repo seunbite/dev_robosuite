@@ -5,6 +5,8 @@
 #   bash scripts/run_pilot40_qwen_suite.sh
 #   bash scripts/run_pilot40_qwen_suite.sh --only 5,6        # new multitile 6/12 only
 #   RESUME=1 bash scripts/run_pilot40_qwen_suite.sh
+#   SUMMARY_ONLY=1 bash scripts/run_pilot40_qwen_suite.sh          # table only, no GPU
+#   ONLY=8 SUMMARY_ONLY=1 bash scripts/run_pilot40_qwen_suite.sh
 #   SEPARATE_STEPS=1 bash scripts/run_pilot40_qwen_suite.sh   # 10× model reload (slow)
 #
 # Gemini baselines (steps 1–4, 7–10 already done; 5–6 are new):
@@ -61,6 +63,7 @@ SUITE_ARGS=(
 )
 
 [[ "${RESUME:-0}" == "1" ]] && SUITE_ARGS+=(--resume)
+[[ "${SUMMARY_ONLY:-0}" == "1" ]] && SUITE_ARGS+=(--summary-only)
 [[ -n "${ONLY:-}" ]] && SUITE_ARGS+=(--only "$ONLY")
 [[ $# -gt 0 ]] && SUITE_ARGS+=("$@")
 
