@@ -5,11 +5,19 @@ import argparse
 import json
 import os
 import re
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from google import genai
+
+def _gemini_client():
+    from google import genai
+
+    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("Set GOOGLE_API_KEY (or GEMINI_API_KEY).")
+    return genai.Client(api_key=api_key)
 
 
 def _load_json(path: Path) -> Any:
@@ -108,18 +116,16 @@ def run(args: argparse.Namespace) -> None:
     shots = _load_json(args.shots_json)
     fewshot_text = _fewshot_block(shots, n=args.fewshot_n)
 
-    backend = getattr(args, "vlm_backend", "gemini") or "gemini"
+    backend = (
+        getattr(args, "vlm_backend", None)
+        or os.getenv("VLM_BACKEND")
+        or "transformers"
+    ).lower()
     vlm = None
     client = None
     if backend == "gemini":
-        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise SystemExit("Set GOOGLE_API_KEY (or GEMINI_API_KEY).")
-        client = genai.Client(api_key=api_key)
+        client = _gemini_client()
     else:
-        import sys
-        from pathlib import Path
-
         _here = Path(__file__).resolve().parent
         if str(_here) not in sys.path:
             sys.path.insert(0, str(_here))
@@ -190,7 +196,7 @@ def main() -> None:
     ap.add_argument("--model", type=str, default=None)
     ap.add_argument(
         "--vlm-backend",
-        default=os.getenv("VLM_BACKEND", "gemini"),
+        default=os.getenv("VLM_BACKEND", "transformers"),
         choices=["transformers", "hf", "local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
     )
     ap.add_argument("--fewshot-n", type=int, default=4)

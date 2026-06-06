@@ -28,6 +28,15 @@ SHOTS = _REPO / "data/seed/shots/manipulator/shot_configs_v19_sophisticated.json
 OUT_JSON = _REPO / "data/results/verify/pilot40_motion_component_verify_text_gemini.json"
 
 
+def _gemini_client():
+    from google import genai
+
+    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("Set GOOGLE_API_KEY or GEMINI_API_KEY.")
+    return genai.Client(api_key=api_key)
+
+
 def _call_text(
     model_id: str,
     prompt: str,
@@ -38,12 +47,7 @@ def _call_text(
     if vlm is not None:
         text = vlm.generate(prompt)
     else:
-        from google import genai
-
-        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise RuntimeError("Set GOOGLE_API_KEY or GEMINI_API_KEY.")
-        client = genai.Client(api_key=api_key)
+        client = _gemini_client()
         resp = client.models.generate_content(model=model_id, contents=[prompt])
         text = (resp.text or "").strip()
     try:
@@ -60,7 +64,11 @@ def run(args: argparse.Namespace) -> None:
     shots = json.loads(SHOTS.read_text(encoding="utf-8"))
     fewshot = _fewshot_block(shots, n=args.fewshot_n)
 
-    backend = getattr(args, "vlm_backend", "gemini") or "gemini"
+    backend = (
+        getattr(args, "vlm_backend", None)
+        or os.getenv("VLM_BACKEND")
+        or "transformers"
+    ).lower()
     vlm = None
     if backend != "gemini":
         from vlm_client import (  # noqa: WPS433
@@ -138,7 +146,7 @@ def main() -> None:
     ap.add_argument("--model", default=None)
     ap.add_argument(
         "--vlm-backend",
-        default=os.getenv("VLM_BACKEND", "gemini"),
+        default=os.getenv("VLM_BACKEND", "transformers"),
         choices=["transformers", "hf", "local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
     )
     ap.add_argument("--out-json", type=Path, default=OUT_JSON)

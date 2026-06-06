@@ -39,6 +39,16 @@ DEFAULT_PAIRWISE_JSONS = [
 ]
 DEFAULT_OUT = _REPO / "data/results/verify/pilot40_motion_pairwise_mp4_qwen.json"
 
+
+def _gemini_client():
+    from google import genai
+
+    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise SystemExit("Set GOOGLE_API_KEY for gemini backend.")
+    return genai.Client(api_key=api_key)
+
+
 NEG_LABELS = {
     "gt": "component GT positive tail",
     "axis": "negative: wrong axis",
@@ -86,15 +96,14 @@ def _fill_prompt(
 
 
 def run(args: argparse.Namespace) -> None:
-    backend = args.vlm_backend
+    backend = (
+        getattr(args, "vlm_backend", None)
+        or os.getenv("VLM_BACKEND")
+        or "transformers"
+    ).lower()
     if backend == "gemini":
         vlm = None
-        from google import genai
-
-        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise SystemExit("Set GOOGLE_API_KEY for gemini backend.")
-        client = genai.Client(api_key=api_key)
+        client = _gemini_client()
     else:
         if is_vllm_http_backend(backend):
             require_vllm_server()
