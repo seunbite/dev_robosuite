@@ -11,8 +11,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import shutil
-import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -24,6 +22,7 @@ for p in (_REPO, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
+from motion_media_paths import resolve_mp4  # noqa: E402
 from verify_pose_tiles_gemini import (  # noqa: E402
     APPROPRIATE_MEANS_LINE,
     _fewshot_block,
@@ -38,11 +37,9 @@ BASE_CFG = (
     / "data/results/motion_configs/manipulator/motion_configs_prompt_v19_gt_fixed_pose_pilot40.json"
 )
 MP4_DIR = _REPO / "data/results/render/manipulator/motion_vlm_verify_pilot40/mp4"
-GEN_GIF_DIR = _REPO / "data/results/visualize/gt_fixed_pose_pilot20_hz10/IIWA"
 MANIFEST = _REPO / "data/results/render/manipulator/motion_vlm_verify_pilot40/manifest_pilot40.json"
 SHOTS = _REPO / "data/seed/shots/manipulator/shot_configs_v19_sophisticated.json"
 OUT_JSON = _REPO / "data/results/verify/pilot40_motion_component_verify_gemini.json"
-ROBOT = "IIWA"
 
 
 def _gemini_client():
@@ -52,66 +49,6 @@ def _gemini_client():
     if not api_key:
         raise RuntimeError("Set GOOGLE_API_KEY or GEMINI_API_KEY.")
     return genai.Client(api_key=api_key)
-
-
-def _pick_latest_gif(dir_path: Path, cue: str) -> Path | None:
-    if not dir_path.is_dir():
-        return None
-    cands = sorted(
-        [p for p in dir_path.glob("*.gif") if f"_{ROBOT}_{cue}_" in p.name],
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
-    return cands[0] if cands else None
-
-
-def _gif_to_mp4(gif: Path, mp4: Path) -> None:
-    mp4.parent.mkdir(parents=True, exist_ok=True)
-    ff = shutil.which("ffmpeg")
-    if not ff:
-        raise RuntimeError("ffmpeg not found on PATH")
-    cmd = [
-        ff,
-        "-y",
-        "-hide_banner",
-        "-loglevel",
-        "error",
-        "-i",
-        str(gif),
-        "-movflags",
-        "+faststart",
-        "-pix_fmt",
-        "yuv420p",
-        str(mp4),
-    ]
-    r = subprocess.run(cmd, text=True, capture_output=True)
-    if r.returncode != 0:
-        raise RuntimeError((r.stderr or r.stdout or "").strip() or "ffmpeg failed")
-
-
-def _resolve_mp4(item: dict[str, Any], idx: int, cue: str, *, build: bool = True) -> Path | None:
-    raw = item.get("mp4")
-    if raw:
-        path = Path(raw)
-        if not path.is_absolute():
-            path = _REPO / path
-        if path.is_file():
-            return path
-    path = MP4_DIR / f"{idx:03d}_{cue}.mp4"
-    if path.is_file():
-        return path
-    if not build:
-        return None
-    gif = _pick_latest_gif(GEN_GIF_DIR, cue)
-    if not gif:
-        return None
-    try:
-        print(f"[mp4] {cue} from {gif.name}", flush=True)
-        _gif_to_mp4(gif, path)
-    except Exception as e:
-        print(f"[mp4 fail] {cue}: {e}", flush=True)
-        return None
-    return path if path.is_file() else None
 
 
 def _vlm_prompt(row: dict[str, Any], fewshot_text: str) -> str:
@@ -274,9 +211,9 @@ def run(args: argparse.Namespace) -> None:
         row = by_idx.get(idx)
         if not row:
             continue
-        mp4_path = _resolve_mp4(item, idx, str(item["cue"]))
+        mp4_path, skip_reason = resolve_mp4(_REPO, item, idx, str(item["cue"]))
         if not mp4_path:
-            print(f"[skip] {item['cue']}: no mp4", flush=True)
+            print(f"[skip] {item['cue']}: {skip_reason or 'no mp4'}", flush=True)
             continue
 
         parsed = _vlm_mp4(
