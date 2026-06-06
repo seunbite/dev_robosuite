@@ -35,6 +35,7 @@ source "$ROOT/scripts/cluster_env.sh" "${HF_HOME:-/data/user_data/${USER}/hf_cac
 export BACKEND="${BACKEND:-transformers}"
 export VLM_MODEL="${VLM_MODEL:-Qwen/Qwen2.5-VL-32B-Instruct}"
 export VLM_BACKEND="${VLM_BACKEND:-transformers}"
+export MOTION_PREPARE_MP4="${MOTION_PREPARE_MP4:-1}"
 export VLLM_TENSOR_PARALLEL_SIZE="${VLLM_TENSOR_PARALLEL_SIZE:-2}"
 
 OUT_DIR="${OUT_DIR:-data/results/verify/pilot40_qwen32b}"

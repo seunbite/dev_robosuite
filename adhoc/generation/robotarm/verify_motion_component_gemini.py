@@ -22,7 +22,7 @@ for p in (_REPO, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from motion_media_paths import resolve_mp4  # noqa: E402
+from motion_media_paths import prepare_pilot40_motion_mp4s, resolve_mp4, write_pilot40_manifest  # noqa: E402
 from verify_pose_tiles_gemini import (  # noqa: E402
     APPROPRIATE_MEANS_LINE,
     _fewshot_block,
@@ -204,6 +204,17 @@ def run(args: argparse.Namespace) -> None:
     if args.limit:
         manifest_rows = manifest_rows[: args.limit]
 
+    prepare_media = getattr(args, "prepare_media", True)
+    if prepare_media and not args.dry_run:
+        todo = [
+            (int(item["cue_idx"]), str(item["cue"]))
+            for item in manifest_rows
+            if int(item["cue_idx"]) not in done or args.force
+        ]
+        ready = prepare_pilot40_motion_mp4s(_REPO, _HERE, todo, config_json=BASE_CFG)
+        print(f"[prepare] {ready}/{len(todo)} mp4 ready", flush=True)
+        write_pilot40_manifest(_REPO, [by_idx[i] for i, _ in todo if i in by_idx])
+
     for item in manifest_rows:
         idx = int(item["cue_idx"])
         if idx in done and not args.force:
@@ -291,6 +302,12 @@ def main() -> None:
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--prepare-media",
+        action=argparse.BooleanOptionalAction,
+        default=os.getenv("MOTION_PREPARE_MP4", "1") != "0",
+        help="Render missing GIFs + build MP4 before VLM (default: on)",
+    )
     ap.add_argument(
         "--manifest",
         type=Path,

@@ -235,6 +235,19 @@ def _run_multitile(spec: dict[str, Any], args: argparse.Namespace, out_json: Pat
     run(ns)
 
 
+def _prepare_motion_media_if_needed() -> None:
+    if os.getenv("MOTION_PREPARE_MP4", "1") == "0":
+        return
+    from motion_media_paths import prepare_pilot40_motion_mp4s, write_pilot40_manifest  # noqa: WPS433
+
+    rows = json.loads(MOTION_CFG.read_text(encoding="utf-8"))
+    todo = [(int(r["idx"]), str(r["cue"])) for r in rows]
+    robotarm = _HERE
+    ready = prepare_pilot40_motion_mp4s(_REPO, robotarm, todo, config_json=MOTION_CFG)
+    manifest = write_pilot40_manifest(_REPO, rows)
+    print(f"[suite] motion media: {ready}/{len(todo)} mp4 ready → {manifest}", flush=True)
+
+
 def _run_motion_verify_vlm(args: argparse.Namespace, out_json: Path) -> None:
     from verify_motion_component_gemini import run
 
@@ -248,6 +261,8 @@ def _run_motion_verify_vlm(args: argparse.Namespace, out_json: Path) -> None:
         resume=args.resume,
         force=False,
         dry_run=False,
+        prepare_media=not getattr(args, "motion_media_prepared", False)
+        and os.getenv("MOTION_PREPARE_MP4", "1") != "0",
         manifest=MOTION_MANIFEST,
     )
     run(ns)
@@ -340,6 +355,11 @@ def main() -> None:
     if args.only:
         want = {x.strip() for x in args.only.split(",") if x.strip()}
         specs = [s for s in specs if s["id"] in want]
+
+    needs_motion_media = any(s["kind"] == "motion_verify_vlm" for s in specs)
+    if needs_motion_media:
+        _prepare_motion_media_if_needed()
+        args.motion_media_prepared = True
 
     needs_model = any(
         s["kind"]
