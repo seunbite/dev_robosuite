@@ -26,7 +26,7 @@ MOTION_CFG = (
 )
 CONSOLIDATED = _REPO / "data/results/verify/pilot40_pose_eval_consolidated.json"
 MOTION_MANIFEST = (
-    _REPO / "data/results/render/manipulator/motion_gt_compare/manifest_generation_pilot40.json"
+    _REPO / "data/results/render/manipulator/motion_vlm_verify_pilot40/manifest_pilot40.json"
 )
 SHOTS = _REPO / "data/seed/shots/manipulator/shot_configs_v19_sophisticated.json"
 TILE_DIR = _REPO / "data/results/visualize/pose_groups_12"
@@ -127,7 +127,7 @@ EXPERIMENT_SPECS: list[dict[str, Any]] = [
     },
     {
         "id": "8",
-        "title": "Movement verify + regenerate — VLM (alpha)",
+        "title": "Movement verify + regenerate — VLM (MP4)",
         "kind": "motion_verify_vlm",
         "out_name": "exp08_motion_verify_vlm.json",
     },

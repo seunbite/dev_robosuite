@@ -21,15 +21,9 @@ from pilot40_experiment_suite import (  # noqa: E402
     MOTION_PAIRWISE_DIR,
     PROMPT_MOTION_PAIRWISE,
 )
-from render_and_verify_o_picked_motions import _extract_json  # noqa: E402
 from verify_pose_tiles_gemini import _first_pose, _movement_summary  # noqa: E402
-from vlm_client import (  # noqa: E402
-    VLMClient,
-    init_inprocess_engine,
-    is_inprocess_backend,
-    is_vllm_http_backend,
-    require_vllm_server,
-)
+from vlm_client import setup_vlm_from_args  # noqa: E402
+from vlm_json import extract_json  # noqa: E402
 
 DEFAULT_PAIRWISE_JSONS = [
     MOTION_PAIRWISE_DIR / "pairwise_eval_results.json",
@@ -96,21 +90,11 @@ def _fill_prompt(
 
 
 def run(args: argparse.Namespace) -> None:
-    backend = (
-        getattr(args, "vlm_backend", None)
-        or os.getenv("VLM_BACKEND")
-        or "transformers"
-    ).lower()
-    if backend == "gemini":
-        vlm = None
+    backend, vlm = setup_vlm_from_args(args)
+    client = None
+    if backend == "gemini" and vlm is None:
         client = _gemini_client()
-    else:
-        if is_vllm_http_backend(backend):
-            require_vllm_server()
-        elif is_inprocess_backend(backend):
-            init_inprocess_engine(backend, args.model)
-        vlm = VLMClient(backend=backend, model=args.model)
-        client = None
+    print(f"[motion-pairwise] backend={backend} shared_vlm={'yes' if vlm else 'no'}", flush=True)
 
     template = PROMPT_MOTION_PAIRWISE.read_text(encoding="utf-8")
     cfg_rows = {int(r["idx"]): r for r in json.loads(MOTION_CFG.read_text(encoding="utf-8"))}
@@ -164,15 +148,19 @@ def run(args: argparse.Namespace) -> None:
 
         if vlm is not None:
             text = vlm.generate(prompt, videos=[str(mp4_path.resolve())])
-        else:
+        elif client is not None:
             from google.genai import types
 
             part = types.Part.from_bytes(data=mp4_path.read_bytes(), mime_type="video/mp4")
             resp = client.models.generate_content(model=args.model, contents=[part, prompt])
             text = (resp.text or "").strip()
+        else:
+            raise RuntimeError(
+                f"Non-gemini backend {backend!r} requires an in-process VLMClient (got vlm=None)."
+            )
 
         try:
-            parsed = _extract_json(text)
+            parsed = extract_json(text)
         except Exception as e:
             parsed = {"parse_error": str(e), "raw_text": text}
 

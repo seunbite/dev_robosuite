@@ -3,7 +3,7 @@
 Motion verify (pose-style): is the generated tail appropriate for the cue?
 If not, recommend component-level fixes (axis/joint/rep/hold/path).
 
-Input: alpha_frame_trajectory image + text (fixed pose + tail summary).
+Input: rendered motion MP4 + text (fixed pose + tail summary).
 Scores vs component GT in score_pilot40_motion_verify_metrics.py.
 """
 from __future__ import annotations
@@ -11,7 +11,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
+import shutil
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -23,24 +24,25 @@ for p in (_REPO, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from render_and_verify_o_picked_motions import _extract_json  # noqa: E402
 from verify_pose_tiles_gemini import (  # noqa: E402
     APPROPRIATE_MEANS_LINE,
     _fewshot_block,
     _first_pose,
     _movement_summary,
 )
+from vlm_client import setup_vlm_from_args  # noqa: E402
+from vlm_json import extract_json  # noqa: E402
 
 BASE_CFG = (
     _REPO
     / "data/results/motion_configs/manipulator/motion_configs_prompt_v19_gt_fixed_pose_pilot40.json"
 )
-MANIFEST = (
-    _REPO
-    / "data/results/render/manipulator/motion_gt_compare/manifest_generation_pilot40.json"
-)
+MP4_DIR = _REPO / "data/results/render/manipulator/motion_vlm_verify_pilot40/mp4"
+GEN_GIF_DIR = _REPO / "data/results/visualize/gt_fixed_pose_pilot20_hz10/IIWA"
+MANIFEST = _REPO / "data/results/render/manipulator/motion_vlm_verify_pilot40/manifest_pilot40.json"
 SHOTS = _REPO / "data/seed/shots/manipulator/shot_configs_v19_sophisticated.json"
 OUT_JSON = _REPO / "data/results/verify/pilot40_motion_component_verify_gemini.json"
+ROBOT = "IIWA"
 
 
 def _gemini_client():
@@ -52,12 +54,72 @@ def _gemini_client():
     return genai.Client(api_key=api_key)
 
 
+def _pick_latest_gif(dir_path: Path, cue: str) -> Path | None:
+    if not dir_path.is_dir():
+        return None
+    cands = sorted(
+        [p for p in dir_path.glob("*.gif") if f"_{ROBOT}_{cue}_" in p.name],
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    return cands[0] if cands else None
+
+
+def _gif_to_mp4(gif: Path, mp4: Path) -> None:
+    mp4.parent.mkdir(parents=True, exist_ok=True)
+    ff = shutil.which("ffmpeg")
+    if not ff:
+        raise RuntimeError("ffmpeg not found on PATH")
+    cmd = [
+        ff,
+        "-y",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-i",
+        str(gif),
+        "-movflags",
+        "+faststart",
+        "-pix_fmt",
+        "yuv420p",
+        str(mp4),
+    ]
+    r = subprocess.run(cmd, text=True, capture_output=True)
+    if r.returncode != 0:
+        raise RuntimeError((r.stderr or r.stdout or "").strip() or "ffmpeg failed")
+
+
+def _resolve_mp4(item: dict[str, Any], idx: int, cue: str, *, build: bool = True) -> Path | None:
+    raw = item.get("mp4")
+    if raw:
+        path = Path(raw)
+        if not path.is_absolute():
+            path = _REPO / path
+        if path.is_file():
+            return path
+    path = MP4_DIR / f"{idx:03d}_{cue}.mp4"
+    if path.is_file():
+        return path
+    if not build:
+        return None
+    gif = _pick_latest_gif(GEN_GIF_DIR, cue)
+    if not gif:
+        return None
+    try:
+        print(f"[mp4] {cue} from {gif.name}", flush=True)
+        _gif_to_mp4(gif, path)
+    except Exception as e:
+        print(f"[mp4 fail] {cue}: {e}", flush=True)
+        return None
+    return path if path.is_file() else None
+
+
 def _vlm_prompt(row: dict[str, Any], fewshot_text: str) -> str:
     p = _first_pose(row)
     fixed = row.get("gt_fixed_first_pose") or p
     return f"""
 You are verifying a robot-arm motion (IIWA) for a social gesture cue.
-You see one composite image: alpha-stack of frames with end-effector trajectory (yellow → purple).
+You see a short video of the simulated robot executing the motion.
 
 Context:
 - The **first pose is fixed** (human GT); only the **tail movement** after that pose was generated.
@@ -110,27 +172,29 @@ Return ONLY strict JSON:
 """.strip()
 
 
-def _vlm_image(
+def _vlm_mp4(
     model_id: str,
     prompt: str,
-    png: Path,
+    mp4: Path,
     *,
-    vlm_backend: str = "gemini",
+    vlm_backend: str = "transformers",
     vlm: Any | None = None,
 ) -> dict[str, Any]:
     if vlm is not None:
-        from PIL import Image
-
-        text = vlm.generate(prompt, images=[Image.open(png)])
-    else:
+        text = vlm.generate(prompt, videos=[str(mp4.resolve())])
+    elif vlm_backend == "gemini":
         from google.genai import types
 
         client = _gemini_client()
-        part = types.Part.from_bytes(data=png.read_bytes(), mime_type="image/png")
+        part = types.Part.from_bytes(data=mp4.read_bytes(), mime_type="video/mp4")
         resp = client.models.generate_content(model=model_id, contents=[part, prompt])
         text = (resp.text or "").strip()
+    else:
+        raise RuntimeError(
+            f"Non-gemini backend {vlm_backend!r} requires an in-process VLMClient (got vlm=None)."
+        )
     try:
-        return _extract_json(text)
+        return extract_json(text)
     except Exception as e:
         return {"parse_error": str(e), "raw_text": text}
 
@@ -178,30 +242,19 @@ def run(args: argparse.Namespace) -> None:
     out_path = Path(args.out_json) if getattr(args, "out_json", None) else OUT_JSON
     rows = sorted(json.loads(BASE_CFG.read_text(encoding="utf-8")), key=lambda r: int(r["idx"]))
     by_idx = {int(r["idx"]): r for r in rows}
-    manifest_rows = json.loads(manifest_path.read_text(encoding="utf-8"))["rows"]
+    if manifest_path.is_file():
+        manifest_rows = json.loads(manifest_path.read_text(encoding="utf-8"))["rows"]
+    else:
+        print(f"[warn] manifest missing ({manifest_path}); using motion config rows", flush=True)
+        manifest_rows = [{"cue_idx": int(r["idx"]), "cue": r["cue"]} for r in rows]
     shots = json.loads(SHOTS.read_text(encoding="utf-8"))
     fewshot = _fewshot_block(shots, n=args.fewshot_n)
 
-    backend = (
-        getattr(args, "vlm_backend", None)
-        or os.getenv("VLM_BACKEND")
-        or "transformers"
-    ).lower()
-    vlm = None
-    if backend != "gemini":
-        from vlm_client import (  # noqa: WPS433
-            VLMClient,
-            init_inprocess_engine,
-            is_inprocess_backend,
-            is_vllm_http_backend,
-            require_vllm_server,
-        )
-
-        if is_vllm_http_backend(backend):
-            require_vllm_server()
-        elif is_inprocess_backend(backend):
-            init_inprocess_engine(backend, args.model)
-        vlm = VLMClient(backend=backend, model=args.model)
+    backend, vlm = setup_vlm_from_args(args)
+    print(
+        f"[motion-vlm] backend={backend} modality=mp4 shared_vlm={'yes' if vlm else 'no'}",
+        flush=True,
+    )
 
     out_rows: list[dict[str, Any]] = []
     if args.resume and out_path.is_file():
@@ -221,15 +274,15 @@ def run(args: argparse.Namespace) -> None:
         row = by_idx.get(idx)
         if not row:
             continue
-        alpha = item.get("alpha_frame_trajectory")
-        if not alpha or not Path(alpha).is_file():
-            print(f"[skip] {item['cue']}: no alpha", flush=True)
+        mp4_path = _resolve_mp4(item, idx, str(item["cue"]))
+        if not mp4_path:
+            print(f"[skip] {item['cue']}: no mp4", flush=True)
             continue
 
-        parsed = _vlm_image(
+        parsed = _vlm_mp4(
             args.model,
             _vlm_prompt(row, fewshot),
-            Path(alpha),
+            mp4_path,
             vlm_backend=backend,
             vlm=vlm,
         )
@@ -242,7 +295,7 @@ def run(args: argparse.Namespace) -> None:
         record = {
             "cue_idx": idx,
             "cue": item["cue"],
-            "alpha_frame_trajectory": alpha,
+            "mp4": str(mp4_path),
             "verify_result": parsed,
             "movement_is_appropriate": parsed.get("movement_is_appropriate"),
             "recommended_component": rec_comp,
@@ -261,7 +314,7 @@ def run(args: argparse.Namespace) -> None:
         "time": datetime.now().isoformat(timespec="seconds"),
         "vlm_backend": backend,
         "model": args.model,
-        "mode": "motion_component_verify_alpha_trajectory",
+        "mode": "motion_component_verify_mp4",
         "config": str(BASE_CFG),
         "n": len(out_rows),
         "rows": sorted(out_rows, key=lambda r: int(r["cue_idx"])),
@@ -305,7 +358,7 @@ def main() -> None:
         "--manifest",
         type=Path,
         default=MANIFEST,
-        help="JSON manifest with alpha_frame_trajectory paths (default: motion_gt_compare)",
+        help="Optional JSON manifest with mp4 paths (default: motion_vlm_verify_pilot40)",
     )
     args = ap.parse_args()
     if args.model is None:

@@ -241,6 +241,7 @@ def _run_motion_verify_vlm(args: argparse.Namespace, out_json: Path) -> None:
     ns = argparse.Namespace(
         model=args.model,
         vlm_backend=_vlm_backend_name(args.backend),
+        vlm=getattr(args, "vlm", None),
         out_json=out_json,
         fewshot_n=4,
         limit=0,
@@ -258,6 +259,7 @@ def _run_motion_verify_text(args: argparse.Namespace, out_json: Path) -> None:
     ns = argparse.Namespace(
         model=args.model,
         vlm_backend=_vlm_backend_name(args.backend),
+        vlm=getattr(args, "vlm", None),
         out_json=out_json,
         fewshot_n=4,
         limit=0,
@@ -275,6 +277,7 @@ def _run_motion_pairwise_mp4(args: argparse.Namespace, out_json: Path) -> None:
         out_json=out_json,
         model=args.model,
         vlm_backend=_vlm_backend_name(args.backend),
+        vlm=getattr(args, "vlm", None),
         pairwise_jsons=None,
         limit=0,
         resume=args.resume,
@@ -348,6 +351,11 @@ def main() -> None:
     )
     if needs_model and not args.skip_model_load:
         _init_model(args)
+        from vlm_client import VLMClient  # noqa: WPS433
+
+        args.vlm = VLMClient(backend=_vlm_backend_name(args.backend), model=args.model)
+    else:
+        args.vlm = None
 
     run_records: list[dict[str, Any]] = []
     all_metrics: list[dict[str, Any]] = []

@@ -17,8 +17,9 @@ for p in (_REPO, _HERE):
         sys.path.insert(0, str(p))
 
 from motion_verify_shared import motion_verify_prompt, record_from_parsed  # noqa: E402
-from render_and_verify_o_picked_motions import _extract_json  # noqa: E402
 from verify_pose_tiles_gemini import _fewshot_block  # noqa: E402
+from vlm_client import setup_vlm_from_args  # noqa: E402
+from vlm_json import extract_json  # noqa: E402
 
 BASE_CFG = (
     _REPO
@@ -41,17 +42,21 @@ def _call_text(
     model_id: str,
     prompt: str,
     *,
-    vlm_backend: str = "gemini",
+    vlm_backend: str = "transformers",
     vlm: Any | None = None,
 ) -> dict[str, Any]:
     if vlm is not None:
         text = vlm.generate(prompt)
-    else:
+    elif vlm_backend == "gemini":
         client = _gemini_client()
         resp = client.models.generate_content(model=model_id, contents=[prompt])
         text = (resp.text or "").strip()
+    else:
+        raise RuntimeError(
+            f"Non-gemini backend {vlm_backend!r} requires an in-process VLMClient (got vlm=None)."
+        )
     try:
-        return _extract_json(text)
+        return extract_json(text)
     except Exception as e:
         return {"parse_error": str(e), "raw_text": text}
 
@@ -64,26 +69,8 @@ def run(args: argparse.Namespace) -> None:
     shots = json.loads(SHOTS.read_text(encoding="utf-8"))
     fewshot = _fewshot_block(shots, n=args.fewshot_n)
 
-    backend = (
-        getattr(args, "vlm_backend", None)
-        or os.getenv("VLM_BACKEND")
-        or "transformers"
-    ).lower()
-    vlm = None
-    if backend != "gemini":
-        from vlm_client import (  # noqa: WPS433
-            VLMClient,
-            init_inprocess_engine,
-            is_inprocess_backend,
-            is_vllm_http_backend,
-            require_vllm_server,
-        )
-
-        if is_vllm_http_backend(backend):
-            require_vllm_server()
-        elif is_inprocess_backend(backend):
-            init_inprocess_engine(backend, args.model)
-        vlm = VLMClient(backend=backend, model=args.model)
+    backend, vlm = setup_vlm_from_args(args)
+    print(f"[motion-text] backend={backend} shared_vlm={'yes' if vlm else 'no'}", flush=True)
 
     out_rows: list[dict[str, Any]] = []
     done: set[int] = set()

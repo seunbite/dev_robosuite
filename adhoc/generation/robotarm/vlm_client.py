@@ -14,6 +14,34 @@ _TRANSFORMERS_BACKENDS = frozenset({"transformers", "hf"})
 _INPROCESS_BACKENDS = _VLLM_LOCAL_BACKENDS | _TRANSFORMERS_BACKENDS
 
 
+def resolve_vlm_backend(args: Any | None = None, *, default: str = "transformers") -> str:
+    """Resolve backend from argparse Namespace, env, or explicit string."""
+    if isinstance(args, str):
+        return args.strip().lower() or default
+    raw = (
+        getattr(args, "vlm_backend", None)
+        if args is not None
+        else None
+    ) or os.getenv("VLM_BACKEND") or default
+    return str(raw).strip().lower() or default
+
+
+def setup_vlm_from_args(args: Any) -> tuple[str, "VLMClient | None"]:
+    """Return (backend, client). Gemini leaves client None (API used separately)."""
+    backend = resolve_vlm_backend(args)
+    shared = getattr(args, "vlm", None)
+    if shared is not None:
+        return backend, shared
+    if backend == "gemini":
+        return backend, None
+    if is_vllm_http_backend(backend):
+        require_vllm_server()
+    elif is_inprocess_backend(backend):
+        init_inprocess_engine(backend, getattr(args, "model", None))
+    model = getattr(args, "model", None)
+    return backend, VLMClient(backend=backend, model=model)
+
+
 def _pil_to_b64_png(img: Image.Image) -> str:
     buf = io.BytesIO()
     img.convert("RGB").save(buf, format="PNG")
