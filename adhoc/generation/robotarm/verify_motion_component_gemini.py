@@ -211,8 +211,12 @@ def run(args: argparse.Namespace) -> None:
             for item in manifest_rows
             if int(item["cue_idx"]) not in done or args.force
         ]
-        ready = prepare_pilot40_motion_mp4s(_REPO, _HERE, todo, config_json=BASE_CFG)
+        ready, failures = prepare_pilot40_motion_mp4s(_REPO, _HERE, todo, config_json=BASE_CFG)
         print(f"[prepare] {ready}/{len(todo)} mp4 ready", flush=True)
+        if failures and ready < len(todo):
+            print(f"[prepare warn] {len(failures)} issues (first 3):", flush=True)
+            for line in failures[:3]:
+                print(f"  {line}", flush=True)
         write_pilot40_manifest(_REPO, [by_idx[i] for i, _ in todo if i in by_idx])
 
     for item in manifest_rows:

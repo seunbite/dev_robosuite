@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -14,10 +15,31 @@ PILOT40_MOTION_CFG = (
 )
 PILOT40_GIF_OUT = "data/results/visualize/gt_fixed_pose_pilot20_hz10"
 PILOT40_MANIFEST = "data/results/render/manipulator/motion_vlm_verify_pilot40/manifest_pilot40.json"
+DEFAULT_JSONL = "data/seed/_remainder/closest_poses_results.jsonl"
+
+
+def pose_jsonl(repo: Path) -> Path:
+    raw = os.getenv("MOTION_POSE_JSONL", DEFAULT_JSONL)
+    p = Path(raw)
+    return p if p.is_absolute() else repo / p
+
+
+def check_pilot40_render_prereqs(repo: Path) -> Path:
+    jpath = pose_jsonl(repo)
+    if not jpath.is_file():
+        raise FileNotFoundError(
+            f"Missing pose database: {jpath}\n"
+            "Step 8 render needs closest_poses_results.jsonl (not in git).\n"
+            "Copy it to data/seed/_remainder/ or set MOTION_POSE_JSONL."
+        )
+    ff = shutil.which("ffmpeg")
+    if not ff:
+        raise RuntimeError("ffmpeg not found on PATH (needed for GIF→MP4)")
+    return jpath
 
 
 def gif_matches_cue(name: str, cue: str, *, robot: str = ROBOT) -> bool:
-    """Match ``*_IIWA_{cue}_p123.gif`` and ``*_IIWA_{cue}.gif``."""
+    """Match ``*_IIWA_{cue}_p123.gif``, ``*_IIWA_{cue}_c7_tiled.gif``, etc."""
     token = f"_{robot}_{cue}"
     if token not in name:
         return False
@@ -27,19 +49,25 @@ def gif_matches_cue(name: str, cue: str, *, robot: str = ROBOT) -> bool:
 
 
 def gif_dirs(repo: Path) -> list[Path]:
+    root = repo / PILOT40_GIF_OUT
     return [
-        repo / "data/results/visualize/gt_fixed_pose_pilot20_hz10/IIWA",
+        root / "IIWA",
+        root,
         repo / "data/results/visualize/gt_fixed_pose_pilot40_hz10/IIWA",
-        repo / "data/results/visualize/gt_fixed_pose_pilot20_hz10",
         repo / "data/results/render/manipulator/motion_gt_compare/gt_positive/IIWA",
     ]
 
 
 def mp4_dirs(repo: Path) -> list[Path]:
-    return [
+    extra = os.getenv("MOTION_MP4_DIR")
+    dirs = [
         repo / "data/results/render/manipulator/motion_vlm_verify_pilot40/mp4",
         repo / "data/results/render/manipulator/motion_gt_compare/media/generation/mp4",
     ]
+    if extra:
+        p = Path(extra)
+        dirs.insert(0, p if p.is_absolute() else repo / p)
+    return dirs
 
 
 def default_mp4_out(repo: Path, idx: int, cue: str) -> Path:
@@ -143,8 +171,7 @@ def resolve_mp4(
 
     gif = pick_latest_gif(repo, cue)
     if not gif:
-        searched = ", ".join(str(d.relative_to(repo)) for d in gif_dirs(repo))
-        return None, f"no mp4 (no gif; searched {searched} + visualize/**)"
+        return None, "no mp4 (no gif found after render/search)"
 
     try:
         print(f"[mp4] {cue} from {gif.relative_to(repo)}", flush=True)
@@ -176,9 +203,10 @@ def _render_pilot40_cues(
     gif_out: Path,
     cue_indices: list[int],
     *,
+    jpath: Path,
     hz: int = 10,
-) -> None:
-    """Render GIFs via motion_generation_core.generate (no render.py dependency)."""
+) -> list[str]:
+    """Render GIFs via motion_generation_core.generate. Returns failure messages."""
     if str(repo) not in sys.path:
         sys.path.insert(0, str(repo))
     if str(robotarm_dir) not in sys.path:
@@ -187,8 +215,8 @@ def _render_pilot40_cues(
 
     rows = json.loads(cfg.read_text(encoding="utf-8"))
     by_idx = {int(r["idx"]): r for r in rows}
-    jpath = str(repo / "data/seed/_remainder/closest_poses_results.jsonl")
     gif_out.mkdir(parents=True, exist_ok=True)
+    failures: list[str] = []
 
     for idx in cue_indices:
         row = by_idx.get(idx)
@@ -204,14 +232,19 @@ def _render_pilot40_cues(
                 cue=cue,
                 cue_idx=idx,
                 pose_index=_pose_index_from_row(row),
-                jsonl_path=jpath,
+                jsonl_path=str(jpath),
                 config_path=str(cfg),
                 output_dir=str(gif_out),
                 hz=hz,
                 top_k=1,
             )
+            if not pick_latest_gif(repo, cue):
+                failures.append(f"c{idx} {cue}: generate finished but no GIF found under {PILOT40_GIF_OUT}")
         except Exception as e:
-            print(f"[render fail] c{idx} {cue}: {e}", flush=True)
+            msg = f"c{idx} {cue}: {e}"
+            failures.append(msg)
+            print(f"[render fail] {msg}", flush=True)
+    return failures
 
 
 def prepare_pilot40_motion_mp4s(
@@ -221,10 +254,11 @@ def prepare_pilot40_motion_mp4s(
     *,
     config_json: Path | None = None,
     hz: int = 10,
-) -> int:
-    """Render missing MuJoCo GIFs (if needed) and build MP4s. Returns ready count."""
+) -> tuple[int, list[str]]:
+    """Render missing MuJoCo GIFs (if needed) and build MP4s. Returns (ready count, failures)."""
     cfg = config_json or (repo / PILOT40_MOTION_CFG)
     gif_out = repo / PILOT40_GIF_OUT
+    failures: list[str] = []
 
     need_render: list[int] = []
     for idx, cue in items:
@@ -234,18 +268,31 @@ def prepare_pilot40_motion_mp4s(
         need_render.append(idx)
 
     if need_render:
-        print(
-            f"[render] {len(need_render)} cues missing GIF → {gif_out.relative_to(repo)}/IIWA",
-            flush=True,
-        )
-        _render_pilot40_cues(repo, robotarm_dir, cfg, gif_out, need_render, hz=hz)
+        try:
+            jpath = check_pilot40_render_prereqs(repo)
+        except (FileNotFoundError, RuntimeError) as e:
+            failures.append(str(e))
+            print(f"[render abort] {e}", flush=True)
+            need_render = []
+        else:
+            print(
+                f"[render] {len(need_render)} cues missing GIF → {gif_out.relative_to(repo)}/IIWA",
+                flush=True,
+            )
+            failures.extend(
+                _render_pilot40_cues(
+                    repo, robotarm_dir, cfg, gif_out, need_render, jpath=jpath, hz=hz
+                )
+            )
 
     ready = 0
     for idx, cue in items:
-        mp4, _ = resolve_mp4(repo, {}, idx, cue, build=True)
+        mp4, reason = resolve_mp4(repo, {}, idx, cue, build=True)
         if mp4:
             ready += 1
-    return ready
+        elif reason:
+            failures.append(f"{cue}: {reason}")
+    return ready, failures
 
 
 def write_pilot40_manifest(repo: Path, rows: list[dict[str, Any]]) -> Path:

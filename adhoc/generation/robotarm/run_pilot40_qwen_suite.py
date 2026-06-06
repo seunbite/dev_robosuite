@@ -235,17 +235,21 @@ def _run_multitile(spec: dict[str, Any], args: argparse.Namespace, out_json: Pat
     run(ns)
 
 
-def _prepare_motion_media_if_needed() -> None:
+def _prepare_motion_media_if_needed() -> tuple[int, list[str]]:
     if os.getenv("MOTION_PREPARE_MP4", "1") == "0":
-        return
+        return 0, []
     from motion_media_paths import prepare_pilot40_motion_mp4s, write_pilot40_manifest  # noqa: WPS433
 
     rows = json.loads(MOTION_CFG.read_text(encoding="utf-8"))
     todo = [(int(r["idx"]), str(r["cue"])) for r in rows]
-    robotarm = _HERE
-    ready = prepare_pilot40_motion_mp4s(_REPO, robotarm, todo, config_json=MOTION_CFG)
+    ready, failures = prepare_pilot40_motion_mp4s(_REPO, _HERE, todo, config_json=MOTION_CFG)
     manifest = write_pilot40_manifest(_REPO, rows)
     print(f"[suite] motion media: {ready}/{len(todo)} mp4 ready → {manifest}", flush=True)
+    if failures and ready < len(todo):
+        print(f"[suite] {len(failures)} media issues (showing first 3):", flush=True)
+        for line in failures[:3]:
+            print(f"  {line}", flush=True)
+    return ready, failures
 
 
 def _run_motion_verify_vlm(args: argparse.Namespace, out_json: Path) -> None:
@@ -261,8 +265,7 @@ def _run_motion_verify_vlm(args: argparse.Namespace, out_json: Path) -> None:
         resume=args.resume,
         force=False,
         dry_run=False,
-        prepare_media=not getattr(args, "motion_media_prepared", False)
-        and os.getenv("MOTION_PREPARE_MP4", "1") != "0",
+        prepare_media=os.getenv("MOTION_PREPARE_MP4", "1") != "0",
         manifest=MOTION_MANIFEST,
     )
     run(ns)
@@ -358,8 +361,15 @@ def main() -> None:
 
     needs_motion_media = any(s["kind"] == "motion_verify_vlm" for s in specs)
     if needs_motion_media:
-        _prepare_motion_media_if_needed()
-        args.motion_media_prepared = True
+        ready, _ = _prepare_motion_media_if_needed()
+        if ready == 0:
+            raise SystemExit(
+                "Step 8 aborted: no motion MP4s found or built.\n"
+                "  • Need data/seed/_remainder/closest_poses_results.jsonl (not in git)\n"
+                "  • Or pre-copy MP4s to data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/\n"
+                "  • Run first: python adhoc/generation/robotarm/prepare_pilot40_motion_mp4.py\n"
+                "  • Check [render fail] lines above for robosuite/mujoco errors"
+            )
 
     needs_model = any(
         s["kind"]
