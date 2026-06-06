@@ -155,6 +155,65 @@ def resolve_mp4(
     return (out if out.is_file() else None), (None if out.is_file() else "mp4 build failed")
 
 
+def _pose_index_from_row(row: dict[str, Any]) -> int | None:
+    gfp = row.get("gt_fixed_first_pose")
+    if isinstance(gfp, dict) and gfp.get("pose_id") is not None:
+        return int(gfp["pose_id"])
+    for step in row.get("movements") or []:
+        if step.get("type") != "pose":
+            continue
+        pose = (step.get("parameters") or {}).get("pose")
+        if isinstance(pose, dict) and pose.get("pose_id") is not None:
+            return int(pose["pose_id"])
+        break
+    return None
+
+
+def _render_pilot40_cues(
+    repo: Path,
+    robotarm_dir: Path,
+    cfg: Path,
+    gif_out: Path,
+    cue_indices: list[int],
+    *,
+    hz: int = 10,
+) -> None:
+    """Render GIFs via motion_generation_core.generate (no render.py dependency)."""
+    if str(repo) not in sys.path:
+        sys.path.insert(0, str(repo))
+    if str(robotarm_dir) not in sys.path:
+        sys.path.insert(0, str(robotarm_dir))
+    from legacy.motion_generation_core import generate  # noqa: WPS433
+
+    rows = json.loads(cfg.read_text(encoding="utf-8"))
+    by_idx = {int(r["idx"]): r for r in rows}
+    jpath = str(repo / "data/seed/_remainder/closest_poses_results.jsonl")
+    gif_out.mkdir(parents=True, exist_ok=True)
+
+    for idx in cue_indices:
+        row = by_idx.get(idx)
+        if not row:
+            continue
+        cue = str(row["cue"])
+        if pick_latest_gif(repo, cue):
+            continue
+        try:
+            print(f"[render] c{idx} {cue} ...", flush=True)
+            generate(
+                robot=ROBOT,
+                cue=cue,
+                cue_idx=idx,
+                pose_index=_pose_index_from_row(row),
+                jsonl_path=jpath,
+                config_path=str(cfg),
+                output_dir=str(gif_out),
+                hz=hz,
+                top_k=1,
+            )
+        except Exception as e:
+            print(f"[render fail] c{idx} {cue}: {e}", flush=True)
+
+
 def prepare_pilot40_motion_mp4s(
     repo: Path,
     robotarm_dir: Path,
@@ -175,24 +234,11 @@ def prepare_pilot40_motion_mp4s(
         need_render.append(idx)
 
     if need_render:
-        if str(robotarm_dir) not in sys.path:
-            sys.path.insert(0, str(robotarm_dir))
-        from render import run as render_run  # noqa: WPS433
-
         print(
             f"[render] {len(need_render)} cues missing GIF → {gif_out.relative_to(repo)}/IIWA",
             flush=True,
         )
-        render_run(
-            config_json=str(cfg),
-            output_dir=str(gif_out),
-            sim_robot=ROBOT,
-            hz=hz,
-            cue_indices=need_render,
-            skip_existing=True,
-            auto_generate_if_missing=False,
-            do_html=False,
-        )
+        _render_pilot40_cues(repo, robotarm_dir, cfg, gif_out, need_render, hz=hz)
 
     ready = 0
     for idx, cue in items:
