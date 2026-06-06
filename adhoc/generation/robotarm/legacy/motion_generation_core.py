@@ -253,6 +253,35 @@ def _debug_log(msg: str) -> None:
     print(f"[motion_debug] {msg}", flush=True)
 
 
+def _lookat_quat_wxyz(
+    eye: np.ndarray,
+    target: np.ndarray,
+    world_up: Optional[np.ndarray] = None,
+) -> np.ndarray:
+    """World orientation of fixed camera (MuJoCo ``cam_quat``: w,x,y,z). Looks along local -Z."""
+    from robosuite.utils.transform_utils import mat2quat
+
+    if world_up is None:
+        world_up = np.array([0.0, 0.0, 1.0], dtype=np.float64)
+    fwd = target - eye
+    fn = float(np.linalg.norm(fwd))
+    if fn < 1e-9:
+        fwd = np.array([1.0, 0.0, 0.0], dtype=np.float64)
+    else:
+        fwd = fwd / fn
+    right = np.cross(fwd, world_up)
+    rn = float(np.linalg.norm(right))
+    if rn < 1e-8:
+        world_up = np.array([0.0, 1.0, 0.0], dtype=np.float64)
+        right = np.cross(fwd, world_up)
+        rn = float(np.linalg.norm(right))
+    right = right / max(rn, 1e-9)
+    up = np.cross(right, fwd)
+    rmat = np.stack([right, up, -fwd], axis=1)
+    q_xyzw = mat2quat(rmat)
+    return np.array([q_xyzw[3], q_xyzw[0], q_xyzw[1], q_xyzw[2]], dtype=np.float64)
+
+
 class MotionGenerator:
     """Generate robot motions based on cue definitions."""
     
@@ -270,6 +299,11 @@ class MotionGenerator:
         capture_image_height: int = 512,
         camera_distance: float = 1.8,
         hz: int = 4,
+        camera_spherical_framing: bool = False,
+        camera_lookat_z_offset: float = 0.38,
+        camera_elevation_deg: float = 42.0,
+        camera_azimuth_deg: float = 92.0,
+        camera_spherical_m: float = 1.06,
     ):
         """
         Initialize the motion generator.
@@ -287,6 +321,11 @@ class MotionGenerator:
             capture_image_height: Image height for capture
             camera_distance: Multiplier for camera FOV to zoom out (1.8 = default, >1.0 = wider view)
             hz: Frame rate for GIF generation (frames per second)
+            camera_spherical_framing: If True, re-place ``frontview`` using spherical offset from the
+                robot root (higher ``camera_elevation_deg`` = more top-down on the arm).
+            camera_lookat_z_offset: Meters to raise the look-at point above the robot root.
+            camera_elevation_deg / camera_azimuth_deg: Direction from target toward the camera eye.
+            camera_spherical_m: Distance from target to camera (meters).
         """
         self.robot_name = robot_name
         self.env_name = env_name
@@ -298,6 +337,11 @@ class MotionGenerator:
         self.capture_image_height = capture_image_height
         self.camera_distance = camera_distance
         self.hz = hz
+        self.camera_spherical_framing = bool(camera_spherical_framing)
+        self.camera_lookat_z_offset = float(camera_lookat_z_offset)
+        self.camera_elevation_deg = float(camera_elevation_deg)
+        self.camera_azimuth_deg = float(camera_azimuth_deg)
+        self.camera_spherical_m = float(camera_spherical_m)
         
         # Create output directory
         os.makedirs(self.output_dir, exist_ok=True)
@@ -321,25 +365,59 @@ class MotionGenerator:
         self.initial_joint_pos = self.jacobian_calculator.initial_joint_pos
         _debug_log("JacobianCalculator ready; env and robot acquired")
         
-        # Adjust camera FOV to zoom out (instead of moving position)
-        # Larger FOV = wider view = can see more
         camera_name = "frontview"
         try:
             cam_id = self.env.sim.model.camera_name2id(camera_name)
-            # Get current FOV (default is usually around 45-55 degrees)
-            current_fov = self.env.sim.model.cam_fovy[cam_id]
-            # Scale FOV: camera_distance > 1.0 means zoom out (larger FOV)
-            new_fov = current_fov * camera_distance
-            # Clamp to reasonable range (20-120 degrees) - increased max for upward pointing robots
-            new_fov = max(20.0, min(120.0, new_fov))
-            self.env.sim.model.cam_fovy[cam_id] = new_fov
-            print(f"Camera FOV adjusted: {current_fov:.1f}° -> {new_fov:.1f}° (zoom factor: {camera_distance})")
+            if self.camera_spherical_framing:
+                self._configure_spherical_frontview(cam_id=cam_id)
+            else:
+                # Default: only widen FOV (fixed MJCF pose)
+                current_fov = self.env.sim.model.cam_fovy[cam_id]
+                new_fov = current_fov * camera_distance
+                new_fov = max(20.0, min(120.0, new_fov))
+                self.env.sim.model.cam_fovy[cam_id] = new_fov
+                print(
+                    f"Camera FOV adjusted: {current_fov:.1f}° -> {new_fov:.1f}° "
+                    f"(zoom factor: {camera_distance})"
+                )
         except Exception as e:
             print(f"Warning: Could not adjust camera FOV: {e}")
         
         print(f"Motion generator initialized for {robot_name}")
         _debug_log("MotionGenerator init complete")
-    
+
+    def _configure_spherical_frontview(self, *, cam_id: int) -> None:
+        """Place ``frontview`` slightly above the default line of sight (shows more upper arm / EE)."""
+        model = self.env.sim.model
+        data = self.env.sim.data
+        self.env.sim.forward()
+        root = str(self.robot.robot_model.root_body)
+        bid = model.body_name2id(root)
+        target = np.asarray(data.body_xpos[bid], dtype=np.float64).copy()
+        target[2] += float(self.camera_lookat_z_offset)
+
+        el = np.radians(float(self.camera_elevation_deg))
+        az = np.radians(float(self.camera_azimuth_deg))
+        m = float(self.camera_spherical_m)
+        offset = m * np.array(
+            [np.cos(el) * np.cos(az), np.cos(el) * np.sin(az), np.sin(el)],
+            dtype=np.float64,
+        )
+        eye = target + offset
+
+        model.cam_pos[cam_id] = eye
+        model.cam_quat[cam_id] = _lookat_quat_wxyz(eye, target)
+        self.env.sim.forward()
+
+        base_fov = float(model.cam_fovy[cam_id])
+        new_fov = base_fov * float(self.camera_distance)
+        new_fov = max(20.0, min(120.0, new_fov))
+        model.cam_fovy[cam_id] = new_fov
+        print(
+            f"Camera spherical frame: eye={np.round(eye, 3)}, target_z={target[2]:.3f}, "
+            f"FOV {base_fov:.1f}° → {new_fov:.1f}° (×{self.camera_distance})"
+        )
+
     def _load_pose_database(self, jsonl_path: str) -> List[Dict]:
         """Load pose database from JSONL file."""
         if not os.path.exists(jsonl_path):
@@ -730,6 +808,56 @@ class MotionGenerator:
         site_id = mujoco.mj_name2id(mujoco_model, mujoco.mjtObj.mjOBJ_SITE, self.jacobian_calculator.eef_site_name)
         return np.array(mujoco_data.site_xpos[site_id], dtype=float).copy()
 
+    def _probe_axis_delta(
+        self,
+        axis: str,
+        robot_joint_idx: int,
+        current_joint_pos,
+        probe_deg: float = 2.0,
+    ) -> float:
+        """World-frame EE delta along ``axis`` from a small positive joint rotation."""
+        axis_idx = {"x": 0, "y": 1, "z": 2}.get(axis, 1)
+        original_joint_pos = current_joint_pos.copy()
+        start_pos = self._get_eef_position()
+        probe_joint_pos = original_joint_pos.copy()
+        probe_joint_pos[robot_joint_idx] += np.deg2rad(probe_deg)
+        self._set_joint_positions(probe_joint_pos)
+        probe_pos = self._get_eef_position()
+        self._set_joint_positions(original_joint_pos)
+        return float(probe_pos[axis_idx] - start_pos[axis_idx])
+
+    def _movement_degrees_world_aligned(
+        self,
+        *,
+        move_axis: str,
+        degrees: float,
+        robot_joint_idx: int,
+        current_joint_pos,
+        jac_sign: float,
+        probe_deg: float = 2.0,
+    ) -> float:
+        """
+        Map config +/- on ``move_axis`` to joint degrees so world motion matches annotation.
+        """
+        magnitude = abs(float(degrees))
+        annot_sign = 1.0 if float(degrees) >= 0 else -1.0
+
+        delta = self._probe_axis_delta(
+            move_axis, robot_joint_idx, current_joint_pos, probe_deg=probe_deg
+        )
+        if abs(delta) < 1e-6:
+            world_per_pos_joint = 1.0 if jac_sign >= 0 else -1.0
+        else:
+            world_per_pos_joint = 1.0 if delta > 0 else -1.0
+
+        joint_degrees = annot_sign * world_per_pos_joint * magnitude
+        if abs(delta) >= 1e-6 and joint_degrees * float(degrees) < 0:
+            print(
+                f"  {move_axis} probe delta={delta:+.4f} vs annot "
+                f"{'+' if annot_sign > 0 else '-'} -> joint {joint_degrees:+.1f}°"
+            )
+        return joint_degrees
+
     def _path_axis_sign_multiplier(
         self,
         *,
@@ -745,29 +873,22 @@ class MotionGenerator:
         For x-paths we probe the actual end-effector displacement from a small
         positive joint rotation at the current pose, because the visible
         front/back effect can differ by robot and selected joint.
-        For z-paths we keep the existing jacobian-aware correction.
+        Uses EE probe for x, y, and z (same rule as movement alignment).
         """
-        if axis == "z":
-            return -1.0 if jac_sign < 0 else 1.0
-        if axis != "x":
+        if axis not in ("x", "y", "z"):
             return 1.0
 
-        original_joint_pos = current_joint_pos.copy()
-        start_pos = self._get_eef_position()
-        probe_joint_pos = original_joint_pos.copy()
-        probe_joint_pos[robot_joint_idx] += np.deg2rad(probe_deg)
-        self._set_joint_positions(probe_joint_pos)
-        probe_pos = self._get_eef_position()
-        self._set_joint_positions(original_joint_pos)
-
-        delta_x = float(probe_pos[0] - start_pos[0])
-        if abs(delta_x) < 1e-6:
+        delta = self._probe_axis_delta(axis, robot_joint_idx, current_joint_pos, probe_deg)
+        if abs(delta) < 1e-6:
             multiplier = 1.0 if jac_sign >= 0 else -1.0
-            print(f"  Path x probe nearly zero; falling back to jac_sign -> multiplier {multiplier:+.0f}")
+            print(
+                f"  Path {axis} probe nearly zero; falling back to jac_sign "
+                f"-> multiplier {multiplier:+.0f}"
+            )
             return multiplier
 
-        multiplier = 1.0 if delta_x > 0 else -1.0
-        print(f"  Path x probe delta_x={delta_x:+.6f} -> multiplier {multiplier:+.0f}")
+        multiplier = 1.0 if delta > 0 else -1.0
+        print(f"  Path {axis} probe delta={delta:+.6f} -> multiplier {multiplier:+.0f}")
         return multiplier
     
     def _check_self_collision(self) -> bool:
@@ -859,7 +980,7 @@ class MotionGenerator:
             config_path: Path to JSONL file with cue configurations
             proximal_degree_scale: Deprecated compatibility argument. Degrees are no longer scaled by joint choice.
             cue_idx: Optional config idx for exact lookup (avoids duplicate cue name issues)
-            save_gif: If True, save GIF to disk. If False, return (frames, pose_id) instead.
+            save_gif: If True, save GIF to disk (and return filepath). If False, return (frames, pose_id).
             overlay_progress_bar: If True, overlay a progress bar onto frames.
             progress_bar_style: "typed", "simple", or "none".
         """
@@ -1098,7 +1219,7 @@ class MotionGenerator:
                 # Execute repetitions
                 for rep in range(repetition):
                     print(f"\nRepetition {rep + 1}/{repetition}")
-                    
+
                     # Execute each degree value in the array
                     for deg_idx, (degrees_dict, dir_speed, dir_hold_time) in enumerate(direction_params):
                         effective_dir_speed = max(0.5, dir_speed * (1.0 - 0.45 * hesitation_strength))
@@ -1142,26 +1263,17 @@ class MotionGenerator:
                             if robot_joint_idx is None:
                                 raise ValueError(f"Could not find joint index for DOF ID {joint_dof_id}")
 
-                            scaled_degrees = degrees
-                            print(f"  Movement {move_axis}: {scaled_degrees}°")
-
-                            if move_axis == 'z' and jac_sign < 0:
-                                scaled_degrees = -scaled_degrees
-                                if degrees != scaled_degrees:
-                                    print(
-                                        f"  Adjusted {move_axis} sign for upward movement: "
-                                        f"{scaled_degrees}° (original: {degrees}°)"
-                                    )
-
-                            if expected_sign is not None and len(degrees_dict) == 1:
-                                actual_sign = np.sign(scaled_degrees) or 1
-                                if actual_sign != expected_sign:
-                                    print(
-                                        f"  Sign mismatch detected! Expected: {expected_sign}, "
-                                        f"Actual: {actual_sign}"
-                                    )
-                                    print(f"  Flipping degree sign: {scaled_degrees}° -> {-scaled_degrees}°")
-                                    scaled_degrees = -scaled_degrees
+                            scaled_degrees = self._movement_degrees_world_aligned(
+                                move_axis=move_axis,
+                                degrees=float(degrees),
+                                robot_joint_idx=robot_joint_idx,
+                                current_joint_pos=current_joint_pos,
+                                jac_sign=jac_sign,
+                            )
+                            print(
+                                f"  Movement {move_axis}: {scaled_degrees}° "
+                                f"(config: {degrees}°)"
+                            )
 
                             axis_moves.append({
                                 "axis": move_axis,
@@ -1275,6 +1387,7 @@ class MotionGenerator:
                                 image = self._capture_image()
                                 frames.append(Image.fromarray(image))
                             print(f"  Captured {num_hold_frames} hold frames (hold_time: {effective_dir_hold_time}s)")
+
             elif movement_type == 'path':
                 if current_pose_name is None:
                     raise ValueError("No pose set before path. Please set a pose first.")
@@ -1359,369 +1472,34 @@ class MotionGenerator:
                         if num_hold_frames > 0:
                             print(f"  Captured {num_hold_frames} hold frames (hold_time: {hold_time}s)")
                         continue
-                
-                if joint_preference is None:
-                    raise ValueError("'joint' parameter is required for 'path' type")
+
+                try:
+                    from legacy.path_ee_ik import normalize_path_parameters
+                except ImportError:
+                    from path_ee_ik import normalize_path_parameters
+                parameters = normalize_path_parameters(parameters)
+                if parameters.get("joint") is not None:
+                    raise ValueError(
+                        "path must not use 'joint'; EE IK draws line/arc in world frame "
+                        "(line: axis x|y|z + distance m; arc: plane xy|yz|xz + radius m + sweep deg)."
+                    )
                 if shape is None:
                     raise ValueError("'shape' parameter is required for 'path' type")
-                
-                current_joint_pos = self._get_joint_positions()
-                
-                if shape == 'line':
-                    axis = parameters.get('axis')
-                    distance = parameters.get('distance')
-                    
-                    if axis is None or distance is None:
-                        raise ValueError("'axis' and 'distance' are required for line path")
 
-                    if isinstance(distance, dict):
-                        axis_items = [(ax, float(val)) for ax, val in distance.items() if ax in "xyz"]
-                        if not axis_items:
-                            raise ValueError(f"line path distance dict must contain x/y/z values, got: {distance}")
+                try:
+                    from legacy.path_ee_ik import execute_path_ee_ik
+                except ImportError:
+                    from path_ee_ik import execute_path_ee_ik
 
-                        print(f"\n--- Path (line multi-axis) ---")
-                        print(f"Axes: {axis_items}, Speed: {path_speed}, Joint: {joint_preference}")
+                execute_path_ee_ik(
+                    self,
+                    parameters,
+                    hz=hz,
+                    frames=frames,
+                    capture_image_fn=self._capture_image,
+                    hesitation_strength=hesitation_strength,
+                )
 
-                        axis_moves = []
-                        joint_offsets = {}
-                        effective_path_speed = max(0.5, path_speed * (1.0 - 0.45 * hesitation_strength))
-                        path_length_deg = float(np.sqrt(sum(single_distance ** 2 for _, single_distance in axis_items)))
-                        duration = _path_duration_from_length(path_length_deg, effective_path_speed)
-                        num_frames = max(1, int(duration * hz))
-
-                        for single_axis, single_distance in axis_items:
-                            cache_key = (single_axis, joint_preference)
-                            if cache_key in joint_cache:
-                                joint_idx, joint_name, joint_dof_id, score, jac_sign = joint_cache[cache_key]
-                                print(f"  Reusing cached joint for {single_axis}-axis: {joint_name}")
-                            else:
-                                joint_idx, joint_name, joint_dof_id, score, jac_sign = self._select_joint(
-                                    axis=single_axis, joint_preference=joint_preference, selection_mode="path",
-                                )
-                                joint_cache[cache_key] = (joint_idx, joint_name, joint_dof_id, score, jac_sign)
-
-                            robot_joint_idx = self._find_joint_index_in_robot(joint_dof_id)
-                            if robot_joint_idx is None:
-                                raise ValueError(f"Could not find joint index for DOF ID {joint_dof_id}")
-
-                            sign_multiplier = self._path_axis_sign_multiplier(
-                                axis=single_axis,
-                                robot_joint_idx=robot_joint_idx,
-                                current_joint_pos=current_joint_pos,
-                                jac_sign=jac_sign,
-                            )
-                            effective_distance = _normalize_path_axis_value(single_axis, single_distance, sign_multiplier)
-
-                            offset_rad = np.deg2rad(effective_distance)
-                            joint_offsets[robot_joint_idx] = joint_offsets.get(robot_joint_idx, 0.0) + offset_rad
-                            axis_moves.append(
-                                {
-                                    "axis": single_axis,
-                                    "degrees": effective_distance,
-                                    "joint_name": joint_name,
-                                    "joint_idx": robot_joint_idx,
-                                }
-                            )
-
-                        secondary_joint_idx = None
-                        if elegant_curve_strength > 0 or zittering_strength > 0:
-                            try:
-                                secondary_axis = axis_items[1][0] if len(axis_items) > 1 else _orthogonal_axis(axis_items[0][0])
-                                cache_key2 = (secondary_axis, joint_preference)
-                                if cache_key2 in joint_cache:
-                                    sec_joint = joint_cache[cache_key2]
-                                else:
-                                    sec_joint = self._select_joint(axis=secondary_axis, joint_preference=joint_preference)
-                                    joint_cache[cache_key2] = sec_joint
-                                secondary_joint_idx = self._find_joint_index_in_robot(sec_joint[2])
-                            except Exception:
-                                secondary_joint_idx = None
-
-                        for frame_idx in range(num_frames):
-                            t = (frame_idx + 1) / num_frames
-                            new_joint_pos = current_joint_pos.copy()
-                            for joint_idx, offset in joint_offsets.items():
-                                new_joint_pos[joint_idx] += t * offset
-                            _apply_style_offsets(
-                                new_joint_pos,
-                                t=t,
-                                primary_joint_idx=axis_moves[0]["joint_idx"] if axis_moves else None,
-                                secondary_joint_idx=secondary_joint_idx,
-                                elegant_curve=elegant_curve_strength,
-                                zittering=zittering_strength,
-                            )
-                            self._set_joint_positions(new_joint_pos)
-                            image = self._capture_image()
-                            frames.append(Image.fromarray(image))
-
-                        for joint_idx, offset in joint_offsets.items():
-                            current_joint_pos[joint_idx] += offset
-                        move_summaries = [f"{m['axis']}={m['degrees']:.1f}° via {m['joint_name']}" for m in axis_moves]
-                        print(
-                            f"  Captured {num_frames} frames ({', '.join(move_summaries)}, "
-                            f"duration: {duration:.2f}s, speed: {effective_path_speed})"
-                        )
-                        continue
-                    
-                    print(f"\n--- Path (line) ---")
-                    print(f"Axis: {axis}, Distance: {distance}°, Speed: {path_speed}, Joint: {joint_preference}")
-                    
-                    cache_key = (axis, joint_preference)
-                    if cache_key in joint_cache:
-                        joint_idx, joint_name, joint_dof_id, score, jac_sign = joint_cache[cache_key]
-                        print(f"Reusing cached joint: {joint_name}")
-                    else:
-                        joint_idx, joint_name, joint_dof_id, score, jac_sign = self._select_joint(
-                            axis=axis, joint_preference=joint_preference, selection_mode="path",
-                        )
-                        joint_cache[cache_key] = (joint_idx, joint_name, joint_dof_id, score, jac_sign)
-                    
-                    self._set_joint_positions(current_joint_pos)
-                    
-                    robot_joint_idx = self._find_joint_index_in_robot(joint_dof_id)
-                    if robot_joint_idx is None:
-                        raise ValueError(f"Could not find joint index for DOF ID {joint_dof_id}")
-                    
-                    sign_multiplier = self._path_axis_sign_multiplier(
-                        axis=axis,
-                        robot_joint_idx=robot_joint_idx,
-                        current_joint_pos=current_joint_pos,
-                        jac_sign=jac_sign,
-                    )
-                    effective_distance = _normalize_path_axis_value(axis, distance, sign_multiplier)
-                    
-                    offset_rad = np.deg2rad(effective_distance)
-                    start_angle = current_joint_pos[robot_joint_idx]
-                    
-                    effective_path_speed = max(0.5, path_speed * (1.0 - 0.45 * hesitation_strength))
-                    pre_pause_frames = int(hz * 0.12 * hesitation_strength)
-                    if pre_pause_frames > 0:
-                        for _ in range(pre_pause_frames):
-                            image = self._capture_image()
-                            frames.append(Image.fromarray(image))
-
-                    secondary_joint_idx = None
-                    if elegant_curve_strength > 0 or zittering_strength > 0:
-                        secondary_axis = _orthogonal_axis(axis)
-                        cache_key2 = (secondary_axis, joint_preference)
-                        try:
-                            if cache_key2 in joint_cache:
-                                sec_joint = joint_cache[cache_key2]
-                            else:
-                                sec_joint = self._select_joint(axis=secondary_axis, joint_preference=joint_preference)
-                                joint_cache[cache_key2] = sec_joint
-                            secondary_joint_idx = self._find_joint_index_in_robot(sec_joint[2])
-                        except Exception:
-                            secondary_joint_idx = None
-
-                    duration = _path_duration_from_length(abs(effective_distance), effective_path_speed)
-                    num_frames = max(1, int(duration * hz))
-                    
-                    for frame_idx in range(num_frames):
-                        t = (frame_idx + 1) / num_frames
-                        new_joint_pos = current_joint_pos.copy()
-                        new_joint_pos[robot_joint_idx] = start_angle + t * offset_rad
-                        _apply_style_offsets(
-                            new_joint_pos,
-                            t=t,
-                            primary_joint_idx=robot_joint_idx,
-                            secondary_joint_idx=secondary_joint_idx,
-                            elegant_curve=elegant_curve_strength,
-                            zittering=zittering_strength,
-                        )
-                        self._set_joint_positions(new_joint_pos)
-                        image = self._capture_image()
-                        frames.append(Image.fromarray(image))
-                    
-                    current_joint_pos[robot_joint_idx] = start_angle + offset_rad
-                    print(f"  Captured {num_frames} frames ({effective_distance:.1f}°, duration: {duration:.2f}s, speed: {effective_path_speed})")
-                
-                elif shape in ('arc', 'circle'):
-                    plane = parameters.get('plane')
-                    radius = parameters.get('radius')
-                    sweep = parameters.get('sweep')
-                    direction = parameters.get('direction', 'ccw')
-                    destination = parameters.get('destination')
-                    if shape == 'circle' and sweep is None:
-                        sweep = 360
-                    
-                    if not all([plane, radius is not None, sweep is not None]):
-                        if destination is not None:
-                            base_pose = {}
-                            if isinstance(current_pose_name, dict):
-                                base_pose.update(current_pose_name)
-                            if isinstance(current_pose, dict):
-                                for key in ("dir", "gripper_orientation", "x_pct", "y_pct", "z_pct"):
-                                    if current_pose.get(key) is not None:
-                                        base_pose[key] = current_pose.get(key)
-                            target_pose = {
-                                "dir": base_pose.get("dir"),
-                                "gripper_orientation": base_pose.get("gripper_orientation"),
-                                "x": destination.get("x", base_pose.get("x_pct")),
-                                "y": destination.get("y", base_pose.get("y_pct")),
-                                "z": destination.get("z", base_pose.get("z_pct")),
-                            }
-                            target_pose = {k: v for k, v in target_pose.items() if v is not None}
-                            print(f"\n--- Path ({shape}) destination → pose fallback ---")
-                            print(f"Destination pose: {target_pose}, Speed: {path_speed}")
-
-                            matching_poses = self._find_matching_poses(target_pose)
-                            if not matching_poses:
-                                raise ValueError(f"No matching poses found for destination fallback: {target_pose}")
-
-                            current_joint_pos = self._get_joint_positions()
-                            selected_pose, pose_metrics = self._find_closest_pose(
-                                current_joint_pos,
-                                matching_poses,
-                                target_pose,
-                            )
-                            start_joint_pos = current_joint_pos
-                            end_joint_pos = self._pose_data_to_joint_positions(selected_pose)
-                            duration = 1.0 / path_speed
-                            num_transition_frames = max(1, int(duration * hz))
-
-                            for frame_idx in range(num_transition_frames):
-                                t = (frame_idx + 1) / num_transition_frames
-                                interpolated_joint_pos = start_joint_pos * (1 - t) + end_joint_pos * t
-                                self._set_joint_positions(interpolated_joint_pos)
-                                image = self._capture_image()
-                                frames.append(Image.fromarray(image))
-
-                            print(
-                                f"  Captured {num_transition_frames} destination fallback frames "
-                                f"(speed: {path_speed}, duration: {duration:.2f}s)"
-                            )
-                            self.jacobian_calculator._set_pose_from_data(selected_pose)
-                            current_pose_name = target_pose
-                            current_pose = selected_pose
-                            hold_time = parameters.get('hold_time', 0.0)
-                            num_hold_frames = int(hold_time * hz)
-                            for _ in range(num_hold_frames):
-                                image = self._capture_image()
-                                frames.append(Image.fromarray(image))
-                            continue
-                        raise ValueError("'plane', 'radius', and 'sweep' are required for arc path")
-                    if len(plane) != 2 or not all(c in 'xyz' for c in plane):
-                        raise ValueError(f"'plane' must be two axes like 'xy', 'xz', 'yz', got: {plane}")
-                    
-                    axis1, axis2 = plane[0], plane[1]
-                    
-                    print(f"\n--- Path (arc) ---")
-                    print(f"Plane: {plane}, Radius: {radius}°, Sweep: {sweep}°, Direction: {direction}, Speed: {path_speed}, Joint: {joint_preference}")
-                    
-                    joints_info = {}
-                    for ax in [axis1, axis2]:
-                        cache_key = (ax, joint_preference)
-                        if cache_key in joint_cache:
-                            joints_info[ax] = joint_cache[cache_key]
-                            print(f"  Reusing cached joint for {ax}-axis: {joints_info[ax][1]}")
-                        else:
-                            result = self._select_joint(
-                                axis=ax, joint_preference=joint_preference, selection_mode="path",
-                            )
-                            joint_cache[cache_key] = result
-                            joints_info[ax] = result
-                    
-                    self._set_joint_positions(current_joint_pos)
-                    
-                    j1 = joints_info[axis1]
-                    j2 = joints_info[axis2]
-                    
-                    robot_joint_idx1 = self._find_joint_index_in_robot(j1[2])
-                    robot_joint_idx2 = self._find_joint_index_in_robot(j2[2])
-                    
-                    if robot_joint_idx1 is None or robot_joint_idx2 is None:
-                        raise ValueError("Could not find joint indices for arc path")
-                    
-                    same_joint = (robot_joint_idx1 == robot_joint_idx2)
-                    if same_joint:
-                        print(f"  Warning: Same joint selected for both axes ({j1[1]}). Arc may be distorted.")
-                    
-                    jac_sign1 = j1[4]
-                    jac_sign2 = j2[4]
-                    sign_multiplier1 = self._path_axis_sign_multiplier(
-                        axis=axis1,
-                        robot_joint_idx=robot_joint_idx1,
-                        current_joint_pos=current_joint_pos,
-                        jac_sign=jac_sign1,
-                    )
-                    sign_multiplier2 = self._path_axis_sign_multiplier(
-                        axis=axis2,
-                        robot_joint_idx=robot_joint_idx2,
-                        current_joint_pos=current_joint_pos,
-                        jac_sign=jac_sign2,
-                    )
-                    
-                    effective_radius = radius
-                    
-                    radius_rad = np.deg2rad(effective_radius)
-                    sweep_rad = np.deg2rad(sweep)
-                    
-                    start1 = current_joint_pos[robot_joint_idx1]
-                    start2 = current_joint_pos[robot_joint_idx2]
-                    
-                    effective_path_speed = max(0.5, path_speed * (1.0 - 0.45 * hesitation_strength))
-                    pre_pause_frames = int(hz * 0.12 * hesitation_strength)
-                    if pre_pause_frames > 0:
-                        for _ in range(pre_pause_frames):
-                            image = self._capture_image()
-                            frames.append(Image.fromarray(image))
-
-                    path_length_deg = abs(effective_radius * sweep_rad)
-                    duration = _path_duration_from_length(path_length_deg, effective_path_speed)
-                    num_frames = max(1, int(duration * hz))
-                    
-                    dir_sign = 1.0 if direction == 'ccw' else -1.0
-                    
-                    print(f"  Joint 1 ({axis1}): {j1[1]} (robot idx: {robot_joint_idx1}, jac_sign: {jac_sign1})")
-                    print(f"  Joint 2 ({axis2}): {j2[1]} (robot idx: {robot_joint_idx2}, jac_sign: {jac_sign2})")
-                    
-                    for frame_idx in range(num_frames):
-                        t = (frame_idx + 1) / num_frames
-                        theta = t * sweep_rad
-                        
-                        offset1 = radius_rad * np.sin(theta) * dir_sign
-                        offset2 = radius_rad * (1.0 - np.cos(theta))
-                        
-                        offset1 = _normalize_path_axis_value(axis1, offset1, sign_multiplier1)
-                        offset2 = _normalize_path_axis_value(axis2, offset2, sign_multiplier2)
-                        
-                        new_joint_pos = current_joint_pos.copy()
-                        if same_joint:
-                            new_joint_pos[robot_joint_idx1] = start1 + offset1 + offset2
-                        else:
-                            new_joint_pos[robot_joint_idx1] = start1 + offset1
-                            new_joint_pos[robot_joint_idx2] = start2 + offset2
-                        _apply_style_offsets(
-                            new_joint_pos,
-                            t=t,
-                            primary_joint_idx=robot_joint_idx1,
-                            secondary_joint_idx=None if same_joint else robot_joint_idx2,
-                            elegant_curve=elegant_curve_strength * 0.5,
-                            zittering=zittering_strength,
-                        )
-                        
-                        self._set_joint_positions(new_joint_pos)
-                        image = self._capture_image()
-                        frames.append(Image.fromarray(image))
-                    
-                    final_theta = sweep_rad
-                    final_offset1 = radius_rad * np.sin(final_theta) * dir_sign
-                    final_offset2 = radius_rad * (1.0 - np.cos(final_theta))
-                    final_offset1 = _normalize_path_axis_value(axis1, final_offset1, sign_multiplier1)
-                    final_offset2 = _normalize_path_axis_value(axis2, final_offset2, sign_multiplier2)
-                    
-                    if same_joint:
-                        current_joint_pos[robot_joint_idx1] = start1 + final_offset1 + final_offset2
-                    else:
-                        current_joint_pos[robot_joint_idx1] = start1 + final_offset1
-                        current_joint_pos[robot_joint_idx2] = start2 + final_offset2
-                    
-                    print(f"  Captured {num_frames} frames (radius: {effective_radius:.1f}°, sweep: {sweep}°, duration: {duration:.2f}s)")
-                
-                else:
-                    raise ValueError(f"Unknown path shape: {shape}")
-            
             elif movement_type == 'gripper':
                 target_open = parameters.get('target_open')
                 hold_time = parameters.get('hold_time', 0.0)
@@ -1782,6 +1560,7 @@ class MotionGenerator:
         print(f"Saved GIF: {filepath}")
         print(f"Total frames: {len(frames)}")
         print(f"{'='*60}\n")
+        return filepath
     
     def close(self):
         """Close the environment."""
@@ -1891,12 +1670,20 @@ def generate(
     proximal_degree_scale: float = 0.6,
     camera_distance: float = 1.8,
     hz: int = 4,
+    camera_spherical_framing: bool = False,
+    camera_lookat_z_offset: float = 0.38,
+    camera_elevation_deg: float = 42.0,
+    camera_azimuth_deg: float = 92.0,
+    camera_spherical_m: float = 1.06,
     path_hz: int = 12,
     top_k: Optional[int] = 5,
     enable_self_collision_check: bool = False,
     preview_speed_scale: float = 1.0,
     preview_hold_scale: float = 1.0,
     preview_max_hold_time: Optional[float] = None,
+    overlay_progress_bar: bool = True,
+    progress_bar_style: str = "typed",
+    gif_filename_suffix: Optional[str] = None,
 ):
     """
     Main function to generate robot motions.
@@ -1912,13 +1699,21 @@ def generate(
         proximal_degree_scale: Deprecated compatibility argument. Executor now uses configured degrees as-is.
         camera_distance: Multiplier for camera FOV to zoom out (default: 1.8 = 80% wider view)
         hz: Frame rate for GIF generation in frames per second (default: 4)
+        camera_spherical_framing: Reposition frontview from the robot root with a slightly elevated eye.
+        camera_lookat_z_offset: Meters above root for the look-at point (only if spherical framing).
+        camera_elevation_deg / camera_azimuth_deg / camera_spherical_m: Spherical camera placement.
         path_hz: Frame rate used when the config contains path steps (default: 12)
         top_k: Number of unique initial poses to sample (default: 5)
         enable_self_collision_check: Enable self-collision detection and angle reduction (default: False)
         preview_speed_scale: Multiplier for all speeds when rendering a fast preview
         preview_hold_scale: Multiplier for all hold times when rendering a fast preview
         preview_max_hold_time: Optional clamp for hold times when rendering a fast preview
+        overlay_progress_bar: If False, do not draw the colored step progress bar on frames.
+        progress_bar_style: ``typed``, ``simple``, or ``none`` (only used when overlay is on).
+        gif_filename_suffix: Optional suffix embedded in output ``.gif`` name (helps locate the file).
     """
+
+    saved_gif_path: Optional[str] = None
 
     with open(config_path, 'r') as f:
         configs = json.load(f)
@@ -1988,13 +1783,18 @@ def generate(
         has_offscreen_renderer=True,
         camera_distance=camera_distance,
         output_dir=output_dir,
+        camera_spherical_framing=camera_spherical_framing,
+        camera_lookat_z_offset=camera_lookat_z_offset,
+        camera_elevation_deg=camera_elevation_deg,
+        camera_azimuth_deg=camera_azimuth_deg,
+        camera_spherical_m=camera_spherical_m,
     )
     _debug_log("generate: MotionGenerator constructed")
 
     try:
         if pose_index is not None:
             _debug_log(f"generate: direct pose_index path pose_index={pose_index}")
-            generator.execute_cue(
+            _ret = generator.execute_cue(
                 cue=cue,
                 pose_index=pose_index,
                 config_path=effective_config_path,
@@ -2003,7 +1803,12 @@ def generate(
                 enable_self_collision_check=enable_self_collision_check,
                 cue_idx=cue_idx,
                 save_gif=True,
+                overlay_progress_bar=overlay_progress_bar,
+                progress_bar_style=progress_bar_style,
+                filename_suffix=gif_filename_suffix,
             )
+            if isinstance(_ret, str):
+                saved_gif_path = _ret
         else:
             _debug_log("generate: selecting initial poses from config")
             first_pose_def = None
@@ -2027,7 +1832,7 @@ def generate(
             print(f"Selected {len(selected_poses)} unique initial poses (top_k={top_k})")
 
             if len(selected_poses) == 1:
-                generator.execute_cue(
+                _ret = generator.execute_cue(
                     cue=cue,
                     pose_index=selected_poses[0]['pose_id'],
                     config_path=effective_config_path,
@@ -2036,7 +1841,12 @@ def generate(
                     enable_self_collision_check=enable_self_collision_check,
                     cue_idx=cue_idx,
                     save_gif=True,
+                    overlay_progress_bar=overlay_progress_bar,
+                    progress_bar_style=progress_bar_style,
+                    filename_suffix=gif_filename_suffix,
                 )
+                if isinstance(_ret, str):
+                    saved_gif_path = _ret
             else:
                 variations = []
                 for k, pose in enumerate(selected_poses):
@@ -2052,6 +1862,8 @@ def generate(
                             enable_self_collision_check=enable_self_collision_check,
                             cue_idx=cue_idx,
                             save_gif=False,
+                            overlay_progress_bar=overlay_progress_bar,
+                            progress_bar_style=progress_bar_style,
                         )
                         variations.append((frames, pid, pose))
                     except Exception as e:
@@ -2066,7 +1878,7 @@ def generate(
         if temp_config_path and os.path.exists(temp_config_path):
             os.unlink(temp_config_path)
 
-    return True
+    return saved_gif_path if saved_gif_path else True
 
 
 def _make_pose_label(pose_id, pose_data=None):
