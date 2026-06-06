@@ -53,11 +53,17 @@ class TransformersLocalEngine:
         self.model.eval()
         print("[transformers] ready", flush=True)
 
-    def generate(self, prompt: str, images: list[Image.Image] | None = None) -> str:
+    def generate(
+        self,
+        prompt: str,
+        images: list[Image.Image] | None = None,
+        videos: list[str] | None = None,
+    ) -> str:
         import torch
         from qwen_vl_utils import process_vision_info
 
         images = images or []
+        videos = videos or []
         content: list[dict[str, Any]] = []
         tmp_paths: list[str] = []
 
@@ -68,6 +74,8 @@ class TransformersLocalEngine:
                 img.convert("RGB").save(path)
                 tmp_paths.append(path)
                 content.append({"type": "image", "image": path})
+            for vpath in videos:
+                content.append({"type": "video", "video": vpath})
             content.append({"type": "text", "text": prompt})
 
             messages = [{"role": "user", "content": content}]

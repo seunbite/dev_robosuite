@@ -130,10 +130,16 @@ class VLMClient:
             return os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-32B-Instruct")
         return os.getenv("VLM_MODEL", "gemini-2.5-pro")
 
-    def generate(self, prompt: str, images: list[Image.Image] | None = None) -> str:
+    def generate(
+        self,
+        prompt: str,
+        images: list[Image.Image] | None = None,
+        videos: list[str] | None = None,
+    ) -> str:
         images = images or []
+        videos = videos or []
         if self._kind in {"transformers", "vllm_local"}:
-            return self._client.generate(prompt, images)
+            return self._client.generate(prompt, images, videos=videos)
 
         if self._kind == "vllm_http":
             parts: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
