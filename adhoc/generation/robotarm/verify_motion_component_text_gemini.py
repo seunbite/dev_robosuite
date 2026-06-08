@@ -16,7 +16,12 @@ for p in (_REPO, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from motion_verify_shared import motion_verify_prompt, record_from_parsed  # noqa: E402
+from motion_verify_shared import (  # noqa: E402
+    load_verify_done_indices,
+    motion_verify_prompt,
+    record_from_parsed,
+    resume_default,
+)
 from verify_pose_tiles_gemini import _fewshot_block  # noqa: E402
 from vlm_client import setup_vlm_from_args  # noqa: E402
 from vlm_json import extract_json  # noqa: E402
@@ -78,7 +83,12 @@ def run(args: argparse.Namespace) -> None:
     if args.resume and out_path.is_file():
         prev = json.loads(out_path.read_text(encoding="utf-8"))
         out_rows = prev.get("rows") or []
-        done = {int(r["cue_idx"]) for r in out_rows}
+        done = load_verify_done_indices(out_path)
+        if done:
+            print(
+                f"[resume] skipping {len(done)} cues already verified in {out_path.name}",
+                flush=True,
+            )
 
     for row in rows:
         idx = int(row["idx"])
@@ -141,7 +151,12 @@ def main() -> None:
     ap.add_argument("--out-json", type=Path, default=OUT_JSON)
     ap.add_argument("--fewshot-n", type=int, default=4)
     ap.add_argument("--limit", type=int, default=0)
-    ap.add_argument("--resume", action="store_true")
+    ap.add_argument(
+        "--resume",
+        action=argparse.BooleanOptionalAction,
+        default=resume_default(),
+        help="Skip cues already in out-json (default: on; RESUME=0 or --no-resume to disable)",
+    )
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()

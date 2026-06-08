@@ -251,13 +251,26 @@ def _run_multitile(spec: dict[str, Any], args: argparse.Namespace, out_json: Pat
     run(ns)
 
 
-def _prepare_motion_media_if_needed() -> tuple[int, list[str]]:
+def _prepare_motion_media_if_needed(
+    out_dir: Path, *, resume: bool
+) -> tuple[int, list[str]]:
     if os.getenv("MOTION_PREPARE_MP4", "1") == "0":
         return 0, []
     from motion_media_paths import prepare_pilot90_motion_mp4s, write_pilot90_manifest  # noqa: WPS433
+    from motion_verify_shared import load_verify_done_indices  # noqa: WPS433
 
     rows = manifest90_rows_from_cfg(json.loads(MOTION_CFG.read_text(encoding="utf-8")))
     todo = [(int(r["idx"]), str(r["cue"])) for r in rows]
+    if resume:
+        skip = load_verify_done_indices(out_dir / "exp08_motion_verify_vlm.json")
+        if skip:
+            n_before = len(todo)
+            todo = [(i, c) for i, c in todo if i not in skip]
+            print(
+                f"[suite] resume: MP4 prep for {len(todo)}/{n_before} cues "
+                f"({len(skip)} already in exp08)",
+                flush=True,
+            )
     render_missing = os.getenv("MOTION_RENDER_MISSING", "0") == "1"
     ready, failures = prepare_pilot90_motion_mp4s(
         _REPO, _HERE, todo, config_json=MOTION_CFG, render_missing=render_missing
@@ -370,7 +383,12 @@ def main() -> None:
     p.add_argument("--max-model-len", type=int, default=int(os.getenv("VLLM_MAX_MODEL_LEN", "8192")))
     p.add_argument("--gpu-memory-utilization", type=float, default=float(os.getenv("VLLM_GPU_MEMORY_UTILIZATION", "0.90")))
     p.add_argument("--out-dir", type=Path, default=DEFAULT_QWEN_OUT)
-    p.add_argument("--resume", action="store_true")
+    p.add_argument(
+        "--resume",
+        action=argparse.BooleanOptionalAction,
+        default=os.getenv("RESUME", "1") != "0",
+        help="Skip cues already in step output JSONs (default: on)",
+    )
     p.add_argument(
         "--summary-only",
         action="store_true",
@@ -421,13 +439,22 @@ def main() -> None:
 
     needs_motion_media = any(s["kind"] == "motion_verify_vlm" for s in specs)
     if needs_motion_media:
-        ready, _ = _prepare_motion_media_if_needed()
-        if ready == 0:
+        ready, failures = _prepare_motion_media_if_needed(args.out_dir, resume=args.resume)
+        exp08 = args.out_dir / "exp08_motion_verify_vlm.json"
+        from motion_verify_shared import load_verify_done_indices  # noqa: WPS433
+
+        already = len(load_verify_done_indices(exp08)) if args.resume and exp08.is_file() else 0
+        if ready == 0 and already == 0:
             raise SystemExit(
                 "Step 8 aborted: no pilot90 motion MP4s found or built.\n"
                 "  • GIFs expected under run/IIWA/ (from render_manipulator_20260608)\n"
                 "  • Or run: bash scripts/prepare_pilot90_motion_mp4.sh\n"
                 "  • Set MOTION_PREPARE_MP4=0 to skip auto-build"
+            )
+        if failures and ready == 0 and already == 0:
+            raise SystemExit(
+                "Step 8 aborted: MP4 prep failed for all pending cues.\n"
+                f"  • First issue: {failures[0]}"
             )
 
     needs_model = any(

@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import json
+import os
+from pathlib import Path
 from typing import Any
 
 from verify_pose_tiles_gemini import APPROPRIATE_MEANS_LINE, _first_pose, _movement_summary
 
 
 def motion_verify_prompt(row: dict[str, Any], fewshot_text: str, *, modality: str) -> str:
+    from prompt_loader import fill_template  # noqa: WPS433
+
     p = _first_pose(row)
     fixed = row.get("gt_fixed_first_pose") or p
     tail_json = json.dumps(
@@ -16,66 +20,37 @@ def motion_verify_prompt(row: dict[str, Any], fewshot_text: str, *, modality: st
         indent=2,
         ensure_ascii=False,
     )
-    intro = (
-        "You see one composite image: alpha-stack of frames with end-effector trajectory (yellow → purple)."
-        if modality == "vlm"
-        else "You have NO image — use only the text below (fixed pose + tail JSON)."
+    appropriate = APPROPRIATE_MEANS_LINE.replace("this pose", "this fixed start pose").replace(
+        "subsequent movements", "the shown tail movement"
     )
-    return f"""
-You are verifying a robot-arm motion (IIWA) for a social gesture cue.
-{intro}
+    if modality == "vlm":
+        from prompt_loader import fill_template as _fill  # noqa: WPS433
 
-Context:
-- The **first pose is fixed** (human GT); only the **tail movement** after that pose was generated.
-- World frame: +x forward toward viewer, +y robot left, +z up.
-- Movement uses joint rotations (shoulder/elbow/wrist) and/or Cartesian paths (line/arc).
-
-Task:
-1) Q1: Is the **current tail movement** appropriate for conveying this cue, given the fixed start pose?
-{APPROPRIATE_MEANS_LINE.replace("this pose", "this fixed start pose").replace("subsequent movements", "the shown tail movement")}
-2) Q2: If appropriate, note small optional refinements (short bullets).
-3) Q3: If **not** appropriate, recommend how to **change the movement** using the component vocabulary below
-   (same style as human motion annotations: e.g. "z +- rep wrist", "x + non hold", "arc xz", "line y").
-
-Component vocabulary for recommendations:
-- movement: axes x/y/z each +, -, or +- ; optional joint shoulder|elbow|wrist ; repetition non|rep|any ; optional hold
-- path_arc: plane xy|yz|xz
-- path_line: axis x|y|z
-
-Few-shot examples (pose + movement style):
-{fewshot_text}
-
-Target:
-- cue: {row.get("cue")}
-- description: {row.get("description", "")}
-- fixed_start_pose: dir={fixed.get("dir")}, gripper_orientation={fixed.get("gripper_orientation")}
-- current_tail_summary: {_movement_summary(row)}
-- current_tail_json:
-{tail_json}
-
-Return ONLY strict JSON:
-{{
-  "movement_is_appropriate": true/false,
-  "movement_assessment": "string",
-  "if_appropriate": {{
-    "optional_refinements": ["string", "string"]
-  }},
-  "if_not_appropriate": {{
-    "why_not": "string",
-    "recommended_component": {{
-      "kind": "movement|path_arc|path_line",
-      "axes": {{"x": "+", "y": "-", "z": "+-"}},
-      "joint": "shoulder|elbow|wrist|null",
-      "repetition": "non|rep|any|null",
-      "hold": true|null,
-      "plane": "xy|yz|xz|null",
-      "axis": "x|y|z|null"
-    }},
-    "recommended_tail_guidance": ["step 1", "step 2", "step 3"]
-  }},
-  "confidence": 0.0
-}}
-""".strip()
+        return _fill(
+            "exp08_motion_verify_vlm.txt",
+            {
+                "APPROPRIATE_MEANS": appropriate,
+                "FEWSHOT": fewshot_text,
+                "CUE": str(row.get("cue", "")),
+                "DESCRIPTION": str(row.get("description", "")),
+                "FIXED_DIR": str(fixed.get("dir", "")),
+                "FIXED_GRIPPER": str(fixed.get("gripper_orientation", "")),
+                "TAIL_SUMMARY": _movement_summary(row),
+            },
+        )
+    return fill_template(
+        "exp09_motion_verify_text.txt",
+        {
+            "APPROPRIATE_MEANS": appropriate,
+            "FEWSHOT": fewshot_text,
+            "CUE": str(row.get("cue", "")),
+            "DESCRIPTION": str(row.get("description", "")),
+            "FIXED_DIR": str(fixed.get("dir", "")),
+            "FIXED_GRIPPER": str(fixed.get("gripper_orientation", "")),
+            "TAIL_SUMMARY": _movement_summary(row),
+            "TAIL_JSON": tail_json,
+        },
+    )
 
 
 def normalize_component(raw: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -114,6 +89,39 @@ def normalize_component(raw: dict[str, Any] | None) -> dict[str, Any] | None:
     if raw.get("hold") is True:
         out["hold"] = True
     return out if len(out) > 1 else None
+
+
+def resume_default() -> bool:
+    return os.getenv("RESUME", "1") != "0"
+
+
+def load_verify_done_indices(
+    out_path: Path,
+    *,
+    rows_key: str | None = None,
+    idx_key: str = "cue_idx",
+) -> set[int]:
+    """Cue indices with a completed verify record in a prior output JSON."""
+    if not out_path.is_file():
+        return set()
+    data = json.loads(out_path.read_text(encoding="utf-8"))
+    if rows_key:
+        rows = data.get(rows_key) or []
+    else:
+        rows = data.get("rows") or data.get("mp4") or []
+    done: set[int] = set()
+    for r in rows:
+        idx_raw = r.get(idx_key, r.get("idx"))
+        if idx_raw is None:
+            continue
+        if (
+            r.get("movement_is_appropriate") is not None
+            or r.get("verify_result")
+            or r.get("vlm_correct") is not None
+            or r.get("correct") is not None
+        ):
+            done.add(int(idx_raw))
+    return done
 
 
 def record_from_parsed(parsed: dict[str, Any]) -> dict[str, Any]:

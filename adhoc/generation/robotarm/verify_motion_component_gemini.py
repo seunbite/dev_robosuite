@@ -28,6 +28,7 @@ from motion_media_paths import (  # noqa: E402
     resolve_mp4,
     write_pilot40_manifest,
 )
+from motion_verify_shared import load_verify_done_indices, resume_default  # noqa: E402
 from verify_pose_tiles_gemini import (  # noqa: E402
     APPROPRIATE_MEANS_LINE,
     _fewshot_block,
@@ -168,12 +169,16 @@ def run(args: argparse.Namespace) -> None:
     )
 
     out_rows: list[dict[str, Any]] = []
+    done: set[int] = set()
     if args.resume and out_path.is_file():
         prev = json.loads(out_path.read_text(encoding="utf-8"))
         out_rows = prev.get("rows") or []
-        done = {int(r["cue_idx"]) for r in out_rows}
-    else:
-        done = set()
+        done = load_verify_done_indices(out_path)
+        if done:
+            print(
+                f"[resume] skipping {len(done)} cues already verified in {out_path.name}",
+                flush=True,
+            )
 
     if args.limit:
         manifest_rows = manifest_rows[: args.limit]
@@ -297,7 +302,12 @@ def main() -> None:
     ap.add_argument("--out-json", type=Path, default=OUT_JSON)
     ap.add_argument("--fewshot-n", type=int, default=4)
     ap.add_argument("--limit", type=int, default=0)
-    ap.add_argument("--resume", action="store_true")
+    ap.add_argument(
+        "--resume",
+        action=argparse.BooleanOptionalAction,
+        default=resume_default(),
+        help="Skip cues already in out-json (default: on; RESUME=0 or --no-resume to disable)",
+    )
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument(

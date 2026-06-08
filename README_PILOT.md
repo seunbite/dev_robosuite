@@ -153,10 +153,11 @@ bash scripts/prepare_pilot90_motion_mp4.sh --render-missing
 # or: MOTION_RENDER_MISSING=1 bash scripts/prepare_pilot90_motion_mp4.sh
 ```
 
-Then resume step 8–10:
+Then resume step 8–10 (default **resume on** — skips cues already in output JSON):
 
 ```bash
-ONLY=8,9,10 RESUME=1 bash scripts/run_pilot90_qwen_suite.sh
+ONLY=8,9,10 bash scripts/run_pilot90_qwen_suite.sh
+# exp08 with 39 done → [resume] skipping 39 cues; only remaining cues inferenced
 ```
 
 ---

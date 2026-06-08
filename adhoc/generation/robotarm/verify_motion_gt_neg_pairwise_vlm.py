@@ -16,6 +16,7 @@ for p in (_REPO, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
+from motion_verify_shared import load_verify_done_indices, resume_default  # noqa: E402
 from pilot40_experiment_suite import (  # noqa: E402
     MOTION_CFG,
     MOTION_PAIRWISE_DIR,
@@ -111,7 +112,12 @@ def run(args: argparse.Namespace) -> None:
     if args.resume and out_path.is_file():
         prev = json.loads(out_path.read_text(encoding="utf-8"))
         existing = prev.get("mp4") or []
-        done = {int(r["idx"]) for r in existing if "vlm_correct" in r or "correct" in r}
+        done = load_verify_done_indices(out_path, rows_key="mp4", idx_key="idx")
+        if done:
+            print(
+                f"[resume] skipping {len(done)} pairwise cues already in {out_path.name}",
+                flush=True,
+            )
 
     results: list[dict[str, Any]] = list(existing)
     for spec in specs:
@@ -235,7 +241,12 @@ def main() -> None:
     p.add_argument("--pairwise-dir", type=Path, default=MOTION_PAIRWISE_DIR)
     p.add_argument("--pairwise-jsons", nargs="*", type=Path, default=None)
     p.add_argument("--limit", type=int, default=0)
-    p.add_argument("--resume", action="store_true")
+    p.add_argument(
+        "--resume",
+        action=argparse.BooleanOptionalAction,
+        default=resume_default(),
+        help="Skip cues already in out-json (default: on; RESUME=0 or --no-resume to disable)",
+    )
     p.add_argument("--force", action="store_true")
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args()

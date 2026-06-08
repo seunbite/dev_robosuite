@@ -41,6 +41,7 @@ esac
 export BACKEND="${BACKEND:-transformers}"
 export VLM_BACKEND="${VLM_BACKEND:-transformers}"
 export MOTION_PREPARE_MP4="${MOTION_PREPARE_MP4:-1}"
+export RESUME="${RESUME:-1}"
 
 POSE_CFG="data/results/motion_configs/manipulator/motion_configs_prompt_v19_sophisticated_ee_pilot90_non_essence.json"
 MOTION_GT="data/results/verify/pilot40_motion_component_gt.json"
@@ -61,7 +62,7 @@ SUITE_ARGS=(
   --out-dir "$OUT_DIR"
 )
 
-[[ "${RESUME:-1}" == "1" ]] && SUITE_ARGS+=(--resume)
+[[ "${RESUME}" == "0" ]] && SUITE_ARGS+=(--no-resume)
 [[ "${SUMMARY_ONLY:-0}" == "1" ]] && SUITE_ARGS+=(--summary-only)
 [[ -n "${ONLY:-}" ]] && SUITE_ARGS+=(--only "$ONLY")
 [[ $# -gt 0 ]] && SUITE_ARGS+=("$@")
@@ -79,6 +80,17 @@ for f in "$POSE_CFG" "$CONSOLIDATED" "$MOTION_GT"; do
   [[ -f "$f" ]] || { echo "Missing: $f" >&2; exit 1; }
 done
 
+# VLM verify steps (2–6, 8–10) need prompt_loader + pilot40 templates (must be in git)
+PROMPT_LOADER="adhoc/generation/robotarm/prompt_loader.py"
+PROMPT_PILOT40="data/seed/prompt/pilot40/exp02_pose_verify_vlm.txt"
+for f in "$PROMPT_LOADER" "$PROMPT_PILOT40"; do
+  if [[ ! -f "$f" ]]; then
+    echo "Missing: $f" >&2
+    echo "  → git add adhoc/generation/robotarm/prompt_loader.py data/seed/prompt/pilot40/ && git push" >&2
+    exit 1
+  fi
+done
+
 # Step 10 pairwise spec manifest (MP4 paths filled when media exists)
 $PY adhoc/generation/robotarm/build_pilot90_motion_pairwise_specs.py 2>/dev/null || true
 
@@ -86,7 +98,7 @@ if [[ "${SEPARATE_STEPS:-0}" == "1" ]]; then
   echo "=== SEPARATE_STEPS=1: one Python process per step ==="
   COMMON=(--vlm-backend "$BACKEND_FLAG" --model "$VLM_MODEL")
   RESUME_FLAG=()
-  [[ "${RESUME:-1}" == "1" ]] && RESUME_FLAG=(--resume)
+  [[ "${RESUME}" == "0" ]] && RESUME_FLAG=(--no-resume)
   CUES="$($PY -c "import sys; sys.path.insert(0,'adhoc/generation/robotarm'); from pilot90_experiment_suite import manifest90_cues_csv; print(manifest90_cues_csv())")"
 
   $PY adhoc/generation/robotarm/run_pilot90_qwen_suite.py --only 1 --skip-model-load --out-dir "$OUT_DIR"
@@ -129,7 +141,7 @@ if [[ "${SEPARATE_STEPS:-0}" == "1" ]]; then
     "${COMMON[@]}" --out-json "$OUT_DIR/exp06_pose_multitile_grid12.json" \
     $([[ "${RESUME:-1}" == "1" ]] && echo --resume)
 
-  bash scripts/prepare_pilot90_motion_mp4.sh
+  bash scripts/prepare_pilot90_motion_mp4.sh --skip-done-from "$OUT_DIR/exp08_motion_verify_vlm.json"
 
   $PY adhoc/generation/robotarm/verify_motion_component_gemini.py \
     --config-json "$POSE_CFG" --manifest "$MANIFEST" --pilot90 \
