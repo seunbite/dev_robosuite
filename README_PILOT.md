@@ -129,9 +129,34 @@ bash scripts/run_pilot90_qwen_all_models.sh       # 32b → 7b → 3b
 Before step 8 on cluster:
 
 ```bash
-bash scripts/prepare_pilot40_motion_mp4.sh   # pilot-40
-bash scripts/prepare_pilot90_motion_mp4.sh   # pilot-90 (uses run/IIWA GIFs)
+bash scripts/prepare_pilot40_motion_mp4.sh   # pilot-40 (auto-renders missing GIFs)
+bash scripts/prepare_pilot90_motion_mp4.sh   # pilot-90: GIF→MP4 only (expects run/IIWA)
 # or inside suite: MOTION_PREPARE_MP4=1 (default)
+```
+
+**Pilot-90 needs 88 motion GIFs** under `run/IIWA/` (not in git). Step 8 skips cues without GIF.
+
+**Option A — sync from local** (fastest if you already rendered 90 cues locally):
+
+```bash
+# on laptop (repo root):
+rsync -avz run/IIWA/ USER@login2.babel.cs.cmu.edu:PATH/TO/dev_robosuite/run/IIWA/
+
+# on cluster:
+bash scripts/prepare_pilot90_motion_mp4.sh   # expect 88/88 or 90/90 mp4 ready
+```
+
+**Option B — render on cluster** (needs `data/seed/_remainder/closest_poses_results.jsonl`):
+
+```bash
+bash scripts/prepare_pilot90_motion_mp4.sh --render-missing
+# or: MOTION_RENDER_MISSING=1 bash scripts/prepare_pilot90_motion_mp4.sh
+```
+
+Then resume step 8–10:
+
+```bash
+ONLY=8,9,10 RESUME=1 bash scripts/run_pilot90_qwen_suite.sh
 ```
 
 ---
@@ -143,7 +168,8 @@ bash scripts/prepare_pilot90_motion_mp4.sh   # pilot-90 (uses run/IIWA GIFs)
 | `Disk quota exceeded` | `source scripts/cluster_env.sh /data/user_data/$USER/hf_cache`; clear `~/.cache/huggingface` |
 | `CUDA not available` | use `salloc` / sbatch with `--gres=gpu` |
 | `'joint' parameter is required for 'path'` | pull latest `path_ee_ik.py` + `motion_generation_core.py` |
-| Step 8 `no mp4` | run `prepare_pilot40_motion_mp4.sh` until 39/39 ready |
+| Step 8 `no mp4` (pilot-40) | `bash scripts/prepare_pilot40_motion_mp4.sh` until 39/39 ready |
+| Step 8 `no mp4` (pilot-90) | sync `run/IIWA/*.gif` from local, then `prepare_pilot90_motion_mp4.sh`; or `--render-missing` |
 
 Env: `m2m_caption32b` or `robosuite-vlm` (hyphen). Set `HF_HOME=/data/user_data/$USER/hf_cache`.
 
@@ -173,3 +199,22 @@ See `data/seed/experiments/planned_backlog.yml`:
 | Wrong-answer notebook | `data/results/html/manipulator/pilot40_wrong_answer_notebook.html` |
 | Motion GT-fixed review | `data/results/html/manipulator/pilot40_motion_vlm_verify_gt_fixed.html` |
 | Google Robot renders | `data/results/html/google_robot/render_google_robot_*.html` |
+
+---
+
+## Paper figures (pilot-90)
+
+After Qwen suite finishes (`SUMMARY_ONLY=1 bash scripts/run_pilot90_qwen_suite.sh`):
+
+```bash
+bash scripts/build_paper_figures.sh acc
+IDX=1,5,8,2,15,28 bash scripts/build_paper_figures.sh qual-pose
+IDX=7,59,60 bash scripts/build_paper_figures.sh qual-movement
+IDX=0,1,0,1 bash scripts/build_paper_figures.sh pairwise
+bash scripts/build_paper_figures.sh components
+bash scripts/build_paper_figures.sh persona      # GOOGLE_API_KEY
+bash scripts/build_paper_figures.sh essence10    # GOOGLE_API_KEY
+```
+
+Outputs: `data/results/paper_figures/` (PDF line plots, PNG grids, captions).
+CLI: `python adhoc/generation/robotarm/paper_figures/cli.py <acc|qual|pairwise|components|persona|essence10>`.

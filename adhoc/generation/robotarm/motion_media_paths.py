@@ -208,7 +208,7 @@ def _pose_index_from_row(row: dict[str, Any]) -> int | None:
     return None
 
 
-def _render_pilot40_cues(
+def _render_motion_cues(
     repo: Path,
     robotarm_dir: Path,
     cfg: Path,
@@ -217,6 +217,7 @@ def _render_pilot40_cues(
     *,
     jpath: Path,
     hz: int = 10,
+    pilot90: bool = False,
 ) -> list[str]:
     """Render GIFs via motion_generation_core.generate. Returns failure messages."""
     if str(repo) not in sys.path:
@@ -235,7 +236,7 @@ def _render_pilot40_cues(
         if not row:
             continue
         cue = str(row["cue"])
-        if pick_latest_gif(repo, cue):
+        if pick_latest_gif(repo, cue, pilot90=pilot90):
             continue
         try:
             print(f"[render] c{idx} {cue} ...", flush=True)
@@ -250,13 +251,18 @@ def _render_pilot40_cues(
                 hz=hz,
                 top_k=1,
             )
-            if not pick_latest_gif(repo, cue):
-                failures.append(f"c{idx} {cue}: generate finished but no GIF found under {PILOT40_GIF_OUT}")
+            if not pick_latest_gif(repo, cue, pilot90=pilot90):
+                rel = gif_out.relative_to(repo) if gif_out.is_relative_to(repo) else gif_out
+                failures.append(f"c{idx} {cue}: generate finished but no GIF found under {rel}")
         except Exception as e:
             msg = f"c{idx} {cue}: {e}"
             failures.append(msg)
             print(f"[render fail] {msg}", flush=True)
     return failures
+
+
+# Back-compat alias
+_render_pilot40_cues = _render_motion_cues
 
 
 def prepare_motion_mp4s(
@@ -267,6 +273,7 @@ def prepare_motion_mp4s(
     config_json: Path | None = None,
     hz: int = 10,
     pilot90: bool = False,
+    render_missing: bool | None = None,
 ) -> tuple[int, list[str]]:
     """Render missing MuJoCo GIFs (if needed) and build MP4s. Returns (ready count, failures)."""
     cfg = config_json or (repo / (PILOT90_MOTION_CFG if pilot90 else PILOT40_MOTION_CFG))
@@ -284,7 +291,9 @@ def prepare_motion_mp4s(
             continue
         need_render.append(idx)
 
-    if need_render and not pilot90:
+    do_render = render_missing if render_missing is not None else os.getenv("MOTION_RENDER_MISSING", "0") == "1"
+
+    if need_render and do_render:
         try:
             jpath = check_pilot40_render_prereqs(repo)
         except (FileNotFoundError, RuntimeError) as e:
@@ -297,14 +306,26 @@ def prepare_motion_mp4s(
                 flush=True,
             )
             failures.extend(
-                _render_pilot40_cues(
-                    repo, robotarm_dir, cfg, gif_out, need_render, jpath=jpath, hz=hz
+                _render_motion_cues(
+                    repo,
+                    robotarm_dir,
+                    cfg,
+                    gif_out,
+                    need_render,
+                    jpath=jpath,
+                    hz=hz,
+                    pilot90=pilot90,
                 )
             )
-    elif need_render and pilot90:
+    elif need_render:
+        hint = (
+            "bash scripts/prepare_pilot90_motion_mp4.sh --render-missing"
+            if pilot90
+            else "bash scripts/prepare_pilot40_motion_mp4.sh"
+        )
         print(
-            f"[render skip] pilot90: {len(need_render)} cues missing GIF "
-            f"(use run/IIWA renders or prepare with jsonl + render)",
+            f"[render skip] {len(need_render)} cues missing GIF "
+            f"(sync run/IIWA GIFs or run: {hint})",
             flush=True,
         )
 
@@ -338,9 +359,16 @@ def prepare_pilot90_motion_mp4s(
     *,
     config_json: Path | None = None,
     hz: int = 10,
+    render_missing: bool | None = None,
 ) -> tuple[int, list[str]]:
     return prepare_motion_mp4s(
-        repo, robotarm_dir, items, config_json=config_json, hz=hz, pilot90=True
+        repo,
+        robotarm_dir,
+        items,
+        config_json=config_json,
+        hz=hz,
+        pilot90=True,
+        render_missing=render_missing,
     )
 
 

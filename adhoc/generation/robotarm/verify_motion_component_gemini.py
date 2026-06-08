@@ -185,8 +185,11 @@ def run(args: argparse.Namespace) -> None:
             for item in manifest_rows
             if int(item["cue_idx"]) not in done or args.force
         ]
+        render_missing = os.getenv("MOTION_RENDER_MISSING", "0") == "1"
         ready, failures = (
-            prepare_pilot90_motion_mp4s(_REPO, _HERE, todo, config_json=config_path)
+            prepare_pilot90_motion_mp4s(
+                _REPO, _HERE, todo, config_json=config_path, render_missing=render_missing
+            )
             if pilot90
             else prepare_pilot40_motion_mp4s(_REPO, _HERE, todo, config_json=config_path)
         )

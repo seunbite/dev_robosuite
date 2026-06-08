@@ -258,7 +258,10 @@ def _prepare_motion_media_if_needed() -> tuple[int, list[str]]:
 
     rows = manifest90_rows_from_cfg(json.loads(MOTION_CFG.read_text(encoding="utf-8")))
     todo = [(int(r["idx"]), str(r["cue"])) for r in rows]
-    ready, failures = prepare_pilot90_motion_mp4s(_REPO, _HERE, todo, config_json=MOTION_CFG)
+    render_missing = os.getenv("MOTION_RENDER_MISSING", "0") == "1"
+    ready, failures = prepare_pilot90_motion_mp4s(
+        _REPO, _HERE, todo, config_json=MOTION_CFG, render_missing=render_missing
+    )
     manifest = write_pilot90_manifest(_REPO, rows)
     print(f"[suite] pilot90 motion media: {ready}/{len(todo)} mp4 ready → {manifest}", flush=True)
     if failures and ready < len(todo):
