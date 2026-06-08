@@ -284,6 +284,22 @@ def _prepare_motion_media_if_needed(
     return ready, failures
 
 
+def _prepare_pairwise_mp4_if_needed() -> tuple[int, list[str]]:
+    if os.getenv("MOTION_PREPARE_PAIRWISE", "1") == "0":
+        return 0, []
+    from build_pilot90_motion_pairwise_specs import main as refresh_pairwise_specs  # noqa: WPS433
+    from motion_pairwise_media import prepare_pilot90_pairwise_mp4s  # noqa: WPS433
+
+    ready, failures = prepare_pilot90_pairwise_mp4s()
+    refresh_pairwise_specs()
+    print(f"[suite] pilot90 pairwise mp4: {ready} ready → {MOTION_PAIRWISE_DIR}", flush=True)
+    if failures:
+        print(f"[suite] {len(failures)} pairwise issues (first 3):", flush=True)
+        for line in failures[:3]:
+            print(f"  {line}", flush=True)
+    return ready, failures
+
+
 def _run_motion_verify_vlm(args: argparse.Namespace, out_json: Path) -> None:
     from verify_motion_component_gemini import run
 
@@ -436,6 +452,17 @@ def main() -> None:
         summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
         print(f"\nWrote suite summary → {summary_path}\n", flush=True)
         return
+
+    needs_pairwise_media = any(s["kind"] == "motion_pairwise_mp4" for s in specs)
+    if needs_pairwise_media:
+        ready, _ = _prepare_pairwise_mp4_if_needed()
+        if ready == 0:
+            raise SystemExit(
+                "Step 10 aborted: no pilot90 pairwise MP4s built.\n"
+                "  • Run: bash scripts/prepare_pilot90_motion_pairwise_mp4.sh\n"
+                "  • Needs closest_poses_results.jsonl + ffmpeg + MuJoCo display/offscreen\n"
+                "  • Set MOTION_PREPARE_PAIRWISE=0 to skip auto-build"
+            )
 
     needs_motion_media = any(s["kind"] == "motion_verify_vlm" for s in specs)
     if needs_motion_media:

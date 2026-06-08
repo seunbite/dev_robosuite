@@ -143,6 +143,8 @@ if [[ "${SEPARATE_STEPS:-0}" == "1" ]]; then
 
   bash scripts/prepare_pilot90_motion_mp4.sh --skip-done-from "$OUT_DIR/exp08_motion_verify_vlm.json"
 
+  bash scripts/prepare_pilot90_motion_pairwise_mp4.sh
+
   $PY adhoc/generation/robotarm/verify_motion_component_gemini.py \
     --config-json "$POSE_CFG" --manifest "$MANIFEST" --pilot90 \
     "${COMMON[@]}" "${RESUME_FLAG[@]}" \

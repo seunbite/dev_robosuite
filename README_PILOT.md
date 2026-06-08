@@ -160,6 +160,15 @@ ONLY=8,9,10 bash scripts/run_pilot90_qwen_suite.sh
 # exp08 with 39 done → [resume] skipping 39 cues; only remaining cues inferenced
 ```
 
+**Step 10 prep (pairwise MP4)** — GT vs neg-axis side-by-side composites:
+
+```bash
+bash scripts/prepare_pilot90_motion_pairwise_mp4.sh
+# → data/results/verify/samples/motion_gt_neg_pairwise_pilot90/*_pair_axis.mp4
+# then refresh specs + run step 10:
+ONLY=10 bash scripts/run_pilot90_qwen_suite.sh
+```
+
 ---
 
 ## Cluster troubleshooting
@@ -171,6 +180,7 @@ ONLY=8,9,10 bash scripts/run_pilot90_qwen_suite.sh
 | `'joint' parameter is required for 'path'` | pull latest `path_ee_ik.py` + `motion_generation_core.py` |
 | Step 8 `no mp4` (pilot-40) | `bash scripts/prepare_pilot40_motion_mp4.sh` until 39/39 ready |
 | Step 8 `no mp4` (pilot-90) | sync `run/IIWA/*.gif` from local, then `prepare_pilot90_motion_mp4.sh`; or `--render-missing` |
+| Step 10 `missing mp4 None` | `bash scripts/prepare_pilot90_motion_pairwise_mp4.sh` (needs jsonl + MuJoCo); then `ONLY=10` |
 
 Env: `m2m_caption32b` or `robosuite-vlm` (hyphen). Set `HF_HOME=/data/user_data/$USER/hf_cache`.
 
