@@ -1,0 +1,46 @@
+# 3 cues × 10 personas = 30 configs
+# Run:
+#   python adhoc/generation/robotarm/paper_figures/cli.py persona \
+#     --matrix-yml data/seed/yml/persona_paper_runs_2cue10.yml \
+#     --out-dir data/results/paper_figures/persona_2cue10
+
+personas:
+  grandmotherly: >
+    Warm, gentle, slightly slow; small amplitudes, soft deceleration, longer caring holds —
+    like a kind grandmother offering or acknowledging something.
+  buzz_lightyear: >
+    Toy-hero theatrical: crisp poses, confident extensions, mission-briefing pauses,
+    stiff then decisive motion — Buzz Lightyear energy (not literal quotes).
+  high_extraversion: >
+    Outgoing, big, open, socially eager; larger reach, faster approach, extra flourish beats.
+  low_extraversion: >
+    Reserved, contained, minimal gesture; smaller range, shorter visible motion, inward finish.
+  high_neuroticism: >
+    Nervous, self-conscious; micro-pauses, speed jitter, incomplete commits, second-guessing beats.
+  low_neuroticism: >
+    Unflappable, steady; even timing, clean arcs, no hesitation, consistent amplitude.
+  playful_child: >
+    Bouncy, imprecise-but-eager; slightly overshooting, quick recoveries, light repetition.
+  calm_steady: >
+    Smooth, unrushed, balanced; moderate speed, clean holds, no drama (distinct from low neuroticism).
+  aggressive: >
+    Sharp, fast, emphatic; short holds, large angles, decisive single beats.
+  sad_subdued: >
+    Low energy, drooping finish; slow speed, long holds, reduced peak height.
+
+_all_personas: &all10
+  - grandmotherly
+  - buzz_lightyear
+  - high_extraversion
+  - low_extraversion
+  - high_neuroticism
+  - low_neuroticism
+  - playful_child
+  - calm_steady
+  - aggressive
+  - sad_subdued
+
+runs:
+  - {idx: 15, cue: beckon_come_here, personas: *all10}
+  - {idx: 59, cue: nod_yes, personas: *all10}
+  - {idx: 65, cue: raise_index_one_moment, personas: *all10}

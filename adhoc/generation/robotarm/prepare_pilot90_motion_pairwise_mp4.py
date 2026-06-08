@@ -14,6 +14,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 from build_pilot90_motion_pairwise_specs import main as refresh_specs  # noqa: E402
+from motion_media_paths import check_pose_jsonl  # noqa: E402
 from motion_pairwise_media import prepare_pilot90_pairwise_mp4s  # noqa: E402
 from pilot90_experiment_suite import MOTION_PAIRWISE_DIR  # noqa: E402
 
@@ -25,6 +26,9 @@ def main() -> None:
     p.add_argument("--limit", type=int, default=0)
     p.add_argument("--skip-spec-refresh", action="store_true")
     args = p.parse_args()
+
+    jpath = check_pose_jsonl(_REPO)
+    print(f"[preflight] pose JSONL ok: {jpath}", flush=True)
 
     ready, failures = prepare_pilot90_pairwise_mp4s(
         out_dir=args.out_dir,

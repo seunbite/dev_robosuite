@@ -30,14 +30,54 @@ def pose_jsonl(repo: Path) -> Path:
     return p if p.is_absolute() else repo / p
 
 
-def check_pilot40_render_prereqs(repo: Path) -> Path:
+def _count_pose_jsonl(jpath: Path, *, robot: str = ROBOT) -> tuple[int, int]:
+    """Return (total lines, poses for ``robot``)."""
+    total = 0
+    n_robot = 0
+    with jpath.open(encoding="utf-8") as f:
+        for line in f:
+            if not line.strip():
+                continue
+            total += 1
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if row.get("robot") == robot:
+                n_robot += 1
+    return total, n_robot
+
+
+def check_pose_jsonl(
+    repo: Path,
+    *,
+    robot: str = ROBOT,
+    min_robot_poses: int = 100,
+) -> Path:
+    """Ensure pose JSONL exists and has enough entries for MuJoCo pose lookup."""
     jpath = pose_jsonl(repo)
     if not jpath.is_file():
         raise FileNotFoundError(
             f"Missing pose database: {jpath}\n"
-            "Step 8 render needs closest_poses_results.jsonl (not in git).\n"
-            "Copy it to data/seed/_remainder/ or set MOTION_POSE_JSONL."
+            "Copy data/seed/_remainder/closest_poses_results.jsonl to the cluster "
+            "(git pull, or rsync from laptop) or set MOTION_POSE_JSONL."
         )
+    total, n_robot = _count_pose_jsonl(jpath, robot=robot)
+    if total == 0 or n_robot < min_robot_poses:
+        raise RuntimeError(
+            f"Pose database unusable: {jpath}\n"
+            f"  lines={total}, {robot} poses={n_robot} (need >={min_robot_poses})\n"
+            "Likely an empty placeholder file on the cluster. Fix:\n"
+            "  git pull   # file is tracked (~3MB, ~3400 lines, ~548 IIWA)\n"
+            "  # or from laptop:\n"
+            "  rsync -avz data/seed/_remainder/closest_poses_results.jsonl "
+            "USER@babel:.../dev_robosuite/data/seed/_remainder/"
+        )
+    return jpath
+
+
+def check_pilot40_render_prereqs(repo: Path) -> Path:
+    jpath = check_pose_jsonl(repo)
     ff = shutil.which("ffmpeg")
     if not ff:
         raise RuntimeError("ffmpeg not found on PATH (needed for GIF→MP4)")

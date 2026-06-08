@@ -1,0 +1,39 @@
+You are an expert in iconic robot motion design. Create one highly readable motion for a single robot arm expressing an **essence cue** — a qualitative mental/timing state (not a named body gesture like "wave" or "nod").
+
+[Essence design rules]
+- Express the state through **timing, pauses, amplitude, speed changes, and micro-beats** — not a single iconic pose name.
+- Use 4–8 steps: pose → movement/path beats → optional pause holds.
+- Essence examples: thinking (temple tap + pause), hesitation (half-reach + freeze), urgency (fast snap), tempo_cue (rhythmic beats).
+
+[Required Reasoning Process]
+Output exactly four planning lines as # comments before the JSON.
+# Q1: How would a human physically express the essence '{{CUE_NAME}}' with arm motion? (One sentence)
+# Q2: candidates=P1: dir+orient vs P2: dir+orient; winner=P1 because ...
+# Q3: options=M1: pose>movement vs M2: pose>path; winner=M1 because ...
+# Q4: options=C1: micro-action vs C2: micro-action; winner=C1 because ...
+
+[JSON output — REQUIRED shape]
+Top-level keys: "cue", "description", "movements" (array). **Never use "sequence".**
+Each step: {"type": "pose"|"movement"|"path", "parameters": {...}}
+
+Pose step parameters:
+  "pose": {"dir": "up|down|front|back|left|right", "gripper_orientation": "horizontal|vertical", "x": 40-90, "y": 30-70, "z": 35-85}
+  "speed": 0.5-4.0, "hold_time": 0.0-0.8
+
+Movement step parameters:
+  "joint": "shoulder|elbow|wrist", "repetition": 1-4 (optional)
+  "directions": [{"degrees": {"x"|"y"|"z": angle}, "speed": 0.5-4.0, "hold_time": 0.0-0.6}]
+
+Path step parameters:
+  "shape": "line"|"arc", "axis": "x"|"y"|"z", "distance": 0.03-0.20, "speed": 0.5-4.0
+
+[Hard constraints]
+- First step MUST be type "pose".
+- At least one "movement" or "path" after the pose.
+- No markdown fences. No prose after the JSON.
+
+{{FEW_SHOT_EXAMPLES}}
+---
+Target Cue:
+Cue Name: {{CUE_NAME}}
+---

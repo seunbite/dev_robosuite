@@ -8,8 +8,16 @@ export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}:$ROOT/adhoc/generation/robot
 source "$ROOT/scripts/cluster_env.sh" "${HF_HOME:-/data/user_data/${USER}/hf_cache}" 2>/dev/null || true
 for f in \
   adhoc/generation/robotarm/motion_neg_axis_pick.py \
-  adhoc/generation/robotarm/motion_gt_tail_builder.py \
-  data/seed/_remainder/closest_poses_results.jsonl; do
+  adhoc/generation/robotarm/motion_gt_tail_builder.py; do
   [[ -f "$f" ]] || { echo "Missing: $f" >&2; exit 1; }
 done
+python - <<'PY' || exit 1
+import sys
+from pathlib import Path
+ROOT = Path(".").resolve()
+sys.path.insert(0, str(ROOT / "adhoc/generation/robotarm"))
+from motion_media_paths import check_pose_jsonl
+j = check_pose_jsonl(ROOT)
+print(f"[preflight] pose JSONL: {j}")
+PY
 python adhoc/generation/robotarm/prepare_pilot90_motion_pairwise_mp4.py "$@"
