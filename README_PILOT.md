@@ -85,32 +85,26 @@ Paths in the **Qwen result** column are relative to `data/results/verify/pilot40
 
 ---
 
-## Pilot-90 suite — pose steps 1–6 (90 non-essence cues)
-
-Extended benchmark on the full pilot-100 manifest minus 10 essence placeholders. Step 1 uses **any-pose-in-config** scoring (same rule as `pilot40_pose_eval_consolidated_scored.tsv`).
+## Pilot-90 suite — 10 experiments (90 non-essence cues)
 
 | Item | Location |
 |------|----------|
 | Experiment registry | `adhoc/generation/robotarm/pilot90_experiment_suite.py` |
 | Suite runner | `scripts/run_pilot90_qwen_suite.sh` → `run_pilot90_qwen_suite.py` |
 | Pose configs | `motion_configs_prompt_v19_sophisticated_ee_pilot90_non_essence.json` |
-| Human GT | `pilot40_pose_eval_consolidated.json` (90 annotated cues) |
+| Pose human GT | `pilot40_pose_eval_consolidated.json` (any-pose scoring) |
+| Motion component GT | `pilot40_motion_component_gt.json` (90 cues) |
 | Qwen outputs | `pilot90_qwen32b/`, `pilot90_qwen7b/`, `pilot90_qwen3b/` |
 
-Run on cluster (single model):
+Run on cluster (**`RESUME=1` default** — skips cues already in output JSONs):
 
 ```bash
-bash scripts/run_pilot90_qwen_suite.sh                    # 32B default
-MODEL_SIZE=7b RESUME=1 bash scripts/run_pilot90_qwen_suite.sh
-MODEL_SIZE=3b bash scripts/run_pilot90_qwen_suite.sh
-SUMMARY_ONLY=1 bash scripts/run_pilot90_qwen_suite.sh       # acc table only
-```
-
-Run all three model sizes (32B → 7B → 3B):
-
-```bash
-bash scripts/run_pilot90_qwen_all_models.sh
-RESUME=1 bash scripts/run_pilot90_qwen_all_models.sh
+bash scripts/prepare_pilot90_motion_mp4.sh
+bash scripts/run_pilot90_qwen_suite.sh
+MODEL_SIZE=7b bash scripts/run_pilot90_qwen_suite.sh
+RESUME=0 bash scripts/run_pilot90_qwen_suite.sh   # fresh run
+SUMMARY_ONLY=1 bash scripts/run_pilot90_qwen_suite.sh
+bash scripts/run_pilot90_qwen_all_models.sh       # 32b → 7b → 3b
 ```
 
 | # | Experiment | Qwen result |
@@ -121,6 +115,10 @@ RESUME=1 bash scripts/run_pilot90_qwen_all_models.sh
 | 4 | Pose pairwise 2-way | `exp04_pose_pairwise_2way.json` |
 | 5 | Multitile grid 6 | `exp05_pose_multitile_grid6.json` |
 | 6 | Multitile grid 12 | `exp06_pose_multitile_grid12.json` |
+| 7 | Motion generation vs component GT | `exp07_motion_generation_score.json` |
+| 8 | Motion verify — VLM (MP4) | `exp08_motion_verify_vlm.json` |
+| 9 | Motion verify — text | `exp09_motion_verify_text.json` |
+| 10 | Motion pairwise (MP4) | `exp10_motion_pairwise_mp4.json` |
 
 **Suite summary JSON:** `data/results/verify/pilot90_qwen32b/pilot90_qwen_suite_summary.json`
 
@@ -131,7 +129,8 @@ RESUME=1 bash scripts/run_pilot90_qwen_all_models.sh
 Before step 8 on cluster:
 
 ```bash
-bash scripts/prepare_pilot40_motion_mp4.sh
+bash scripts/prepare_pilot40_motion_mp4.sh   # pilot-40
+bash scripts/prepare_pilot90_motion_mp4.sh   # pilot-90 (uses run/IIWA GIFs)
 # or inside suite: MOTION_PREPARE_MP4=1 (default)
 ```
 

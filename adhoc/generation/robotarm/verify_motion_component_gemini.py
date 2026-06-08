@@ -22,7 +22,12 @@ for p in (_REPO, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from motion_media_paths import prepare_pilot40_motion_mp4s, resolve_mp4, write_pilot40_manifest  # noqa: E402
+from motion_media_paths import (  # noqa: E402
+    prepare_pilot40_motion_mp4s,
+    prepare_pilot90_motion_mp4s,
+    resolve_mp4,
+    write_pilot40_manifest,
+)
 from verify_pose_tiles_gemini import (  # noqa: E402
     APPROPRIATE_MEANS_LINE,
     _fewshot_block,
@@ -51,62 +56,29 @@ def _gemini_client():
     return genai.Client(api_key=api_key)
 
 
+def _appropriate_means_motion() -> str:
+    return APPROPRIATE_MEANS_LINE.replace("this pose", "this fixed start pose").replace(
+        "subsequent movements", "the shown tail movement"
+    )
+
+
 def _vlm_prompt(row: dict[str, Any], fewshot_text: str) -> str:
+    from prompt_loader import fill_template  # noqa: WPS433
+
     p = _first_pose(row)
     fixed = row.get("gt_fixed_first_pose") or p
-    return f"""
-You are verifying a robot-arm motion (IIWA) for a social gesture cue.
-You see a short video of the simulated robot executing the motion.
-
-Context:
-- The **first pose is fixed** (human GT); only the **tail movement** after that pose was generated.
-- World frame: +x forward toward viewer, +y robot left, +z up.
-- Movement uses joint rotations (shoulder/elbow/wrist) and/or Cartesian paths (line/arc).
-
-Task:
-1) Q1: Is the **current tail movement** appropriate for conveying this cue, given the fixed start pose?
-{APPROPRIATE_MEANS_LINE.replace("this pose", "this fixed start pose").replace("subsequent movements", "the shown tail movement")}
-2) Q2: If appropriate, note small optional refinements (short bullets).
-3) Q3: If **not** appropriate, recommend how to **change the movement** using the component vocabulary below
-   (same style as human motion annotations: e.g. "z +- rep wrist", "x + non hold", "arc xz", "line y").
-
-Component vocabulary for recommendations:
-- movement: axes x/y/z each +, -, or +- ; optional joint shoulder|elbow|wrist ; repetition non|rep|any ; optional hold
-- path_arc: plane xy|yz|xz
-- path_line: axis x|y|z
-
-Few-shot examples (pose + movement style):
-{fewshot_text}
-
-Target:
-- cue: {row.get("cue")}
-- description: {row.get("description", "")}
-- fixed_start_pose: dir={fixed.get("dir")}, gripper_orientation={fixed.get("gripper_orientation")}
-- current_tail_summary: {_movement_summary(row)}
-
-Return ONLY strict JSON:
-{{
-  "movement_is_appropriate": true/false,
-  "movement_assessment": "string",
-  "if_appropriate": {{
-    "optional_refinements": ["string", "string"]
-  }},
-  "if_not_appropriate": {{
-    "why_not": "string",
-    "recommended_component": {{
-      "kind": "movement|path_arc|path_line",
-      "axes": {{"x": "+", "y": "-", "z": "+-"}},
-      "joint": "shoulder|elbow|wrist|null",
-      "repetition": "non|rep|any|null",
-      "hold": true|null,
-      "plane": "xy|yz|xz|null",
-      "axis": "x|y|z|null"
-    }},
-    "recommended_tail_guidance": ["step 1", "step 2", "step 3"]
-  }},
-  "confidence": 0.0
-}}
-""".strip()
+    return fill_template(
+        "exp08_motion_verify_vlm.txt",
+        {
+            "APPROPRIATE_MEANS": _appropriate_means_motion(),
+            "FEWSHOT": fewshot_text,
+            "CUE": str(row.get("cue", "")),
+            "DESCRIPTION": str(row.get("description", "")),
+            "FIXED_DIR": str(fixed.get("dir", "")),
+            "FIXED_GRIPPER": str(fixed.get("gripper_orientation", "")),
+            "TAIL_SUMMARY": _movement_summary(row),
+        },
+    )
 
 
 def _vlm_mp4(
@@ -175,9 +147,11 @@ def _normalize_component(raw: dict[str, Any] | None) -> dict[str, Any] | None:
 
 
 def run(args: argparse.Namespace) -> None:
+    config_path = Path(getattr(args, "config_json", None) or BASE_CFG)
     manifest_path = Path(args.manifest)
     out_path = Path(args.out_json) if getattr(args, "out_json", None) else OUT_JSON
-    rows = sorted(json.loads(BASE_CFG.read_text(encoding="utf-8")), key=lambda r: int(r["idx"]))
+    pilot90 = bool(getattr(args, "pilot90", False))
+    rows = sorted(json.loads(config_path.read_text(encoding="utf-8")), key=lambda r: int(r["idx"]))
     by_idx = {int(r["idx"]): r for r in rows}
     if manifest_path.is_file():
         manifest_rows = json.loads(manifest_path.read_text(encoding="utf-8"))["rows"]
@@ -211,13 +185,22 @@ def run(args: argparse.Namespace) -> None:
             for item in manifest_rows
             if int(item["cue_idx"]) not in done or args.force
         ]
-        ready, failures = prepare_pilot40_motion_mp4s(_REPO, _HERE, todo, config_json=BASE_CFG)
+        ready, failures = (
+            prepare_pilot90_motion_mp4s(_REPO, _HERE, todo, config_json=config_path)
+            if pilot90
+            else prepare_pilot40_motion_mp4s(_REPO, _HERE, todo, config_json=config_path)
+        )
         print(f"[prepare] {ready}/{len(todo)} mp4 ready", flush=True)
         if failures and ready < len(todo):
             print(f"[prepare warn] {len(failures)} issues (first 3):", flush=True)
             for line in failures[:3]:
                 print(f"  {line}", flush=True)
-        write_pilot40_manifest(_REPO, [by_idx[i] for i, _ in todo if i in by_idx])
+        if pilot90:
+            from motion_media_paths import write_pilot90_manifest  # noqa: WPS433
+
+            write_pilot90_manifest(_REPO, [by_idx[i] for i, _ in todo if i in by_idx])
+        else:
+            write_pilot40_manifest(_REPO, [by_idx[i] for i, _ in todo if i in by_idx])
 
     for item in manifest_rows:
         idx = int(item["cue_idx"])
@@ -226,7 +209,9 @@ def run(args: argparse.Namespace) -> None:
         row = by_idx.get(idx)
         if not row:
             continue
-        mp4_path, skip_reason = resolve_mp4(_REPO, item, idx, str(item["cue"]))
+        mp4_path, skip_reason = resolve_mp4(
+            _REPO, item, idx, str(item["cue"]), pilot90=pilot90
+        )
         if not mp4_path:
             print(f"[skip] {item['cue']}: {skip_reason or 'no mp4'}", flush=True)
             continue
@@ -267,7 +252,7 @@ def run(args: argparse.Namespace) -> None:
         "vlm_backend": backend,
         "model": args.model,
         "mode": "motion_component_verify_mp4",
-        "config": str(BASE_CFG),
+        "config": str(config_path),
         "n": len(out_rows),
         "rows": sorted(out_rows, key=lambda r: int(r["cue_idx"])),
     }
@@ -300,6 +285,12 @@ def main() -> None:
         default=os.getenv("VLM_BACKEND", "transformers"),
         choices=["transformers", "hf", "local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
     )
+    ap.add_argument(
+        "--config-json",
+        type=Path,
+        default=BASE_CFG,
+        help="Motion config JSON (default: pilot40 gt-fixed)",
+    )
     ap.add_argument("--out-json", type=Path, default=OUT_JSON)
     ap.add_argument("--fewshot-n", type=int, default=4)
     ap.add_argument("--limit", type=int, default=0)
@@ -317,6 +308,11 @@ def main() -> None:
         type=Path,
         default=MANIFEST,
         help="Optional JSON manifest with mp4 paths (default: motion_vlm_verify_pilot40)",
+    )
+    ap.add_argument(
+        "--pilot90",
+        action="store_true",
+        help="Use pilot90 GIF/MP4 paths (run/IIWA + motion_vlm_verify_pilot90)",
     )
     args = ap.parse_args()
     if args.model is None:

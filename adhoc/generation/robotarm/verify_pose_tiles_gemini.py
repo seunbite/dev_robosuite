@@ -29,12 +29,10 @@ _GRID_PAD = 6
 _GRID_HEADER = 58
 _GRID_COLS = 3
 
+from prompt_loader import fill_template, load_snippet  # noqa: E402
+
 # Default human picks (1-based); override via --tile-pick-json
-APPROPRIATE_MEANS_LINE = (
-    '   "Appropriate" means: for this robot to perform the cue, if it starts from this pose '
-    "(these dir and gripper_orientation labels), can a motion that conveys the cue's meaning "
-    "be created using simple subsequent movements?"
-)
+APPROPRIATE_MEANS_LINE = load_snippet("_shared_appropriate_means.txt")
 
 DEFAULT_TILE_PICK: dict[tuple[str, str], int] = {
     ("front", "horizontal"): 5,
@@ -184,65 +182,19 @@ def _resolve_pose_image(
 
 def _prompt(cue_row: dict[str, Any], fewshot_text: str) -> str:
     p = _first_pose(cue_row)
-    return f"""
-You are verifying robot gesture pose suitability from a single rendered robot image.
-The image shows one representative pose from group (dir={p.get('dir')}, gripper_orientation={p.get('gripper_orientation')}).
-
-Task:
-1) Judge whether current pose labels (dir + gripper_orientation) are appropriate for this cue.
-{APPROPRIATE_MEANS_LINE}
-2) If appropriate: propose next movement sequence guidance.
-3) If not appropriate: propose corrected dir + gripper_orientation and explain.
-
-Definitions:
-Coordinate frame (world): +x = forward toward the human viewer, +y = robot left, +z = up (ceiling). The EE is the parallel-jaw gripper. Its **pointing axis** runs wrist → fingertips (palm normal / approach direction).
-1. Direction (`dir`) — where the EE **points** in 3D (NOT gesture category):
-Choose `dir` only from the dominant world direction of that pointing axis:
-- **up**: pointing toward the ceiling (+z). Example: fingertips up, “air quotes” beside the head.
-- **down**: pointing toward the floor (−z). Example: palm-down press, point at the ground.
-- **front**: pointing toward the viewer (+x). Example: reach to shake hands, offer object forward.
-- **back**: pointing toward the robot body (−x). Example: hand on own chest, retract toward torso.
-- **left** / **right**: pointing toward the robot’s left (+y) / right (−y). Example: temple tap on one side.
-
-2. Gripper orientation (`gripper_orientation`):
-The **end line** is the jaw-opening line (between the two fingertip tips). Take the plane **perpendicular** to the pointing axis (`dir`). **Orthogonally project** the end line onto that plane. An observer stands **facing that plane** (looking straight at it). Read the projected line:
-- **horizontal**: projected line is a **ㅡ** (left–right).
-- **vertical**: projected line is a **|** (up–down).
-
-
-Few-shot movement style examples:
-{fewshot_text}
-
-Target cue:
-- cue: {cue_row.get("cue")}
-- description: {cue_row.get("description", "")}
-- current pose: dir={p.get("dir")}, gripper_orientation={p.get("gripper_orientation")}
-- current movement summary: {_movement_summary(cue_row)}
-
-Return ONLY strict JSON:
-{{
-  "pose_is_appropriate": true/false,
-  "direction_orientation_assessment": "string",
-  "if_appropriate": {{
-    "recommended_movement_plan": [
-      "step guidance 1",
-      "step guidance 2",
-      "step guidance 3"
-    ]
-  }},
-  "if_not_appropriate": {{
-    "recommended_dir": "front|back|left|right|up|down",
-    "recommended_gripper_orientation": "horizontal|vertical",
-    "why_change": "string",
-    "recommended_movement_plan_after_change": [
-      "step guidance 1",
-      "step guidance 2",
-      "step guidance 3"
-    ]
-  }},
-  "confidence": 0.0
-}}
-""".strip()
+    return fill_template(
+        "exp02_pose_verify_vlm.txt",
+        {
+            "APPROPRIATE_MEANS": APPROPRIATE_MEANS_LINE,
+            "POSE_DEFINITIONS": load_snippet("_shared_pose_definitions.txt"),
+            "FEWSHOT": fewshot_text,
+            "CUE": str(cue_row.get("cue", "")),
+            "DESCRIPTION": str(cue_row.get("description", "")),
+            "DIR": str(p.get("dir", "")),
+            "GRIPPER_ORIENTATION": str(p.get("gripper_orientation", "")),
+            "MOVEMENT_SUMMARY": _movement_summary(cue_row),
+        },
+    )
 
 
 def _write_checkpoint(
@@ -288,7 +240,22 @@ def run(args: argparse.Namespace) -> None:
     fewshot_text = _fewshot_block(shots, n=args.fewshot_n)
 
     results: list[dict[str, Any]] = []
+    done_idx: set[int] = set()
+    if getattr(args, "resume", False) and out_json.is_file():
+        prev = json.loads(out_json.read_text(encoding="utf-8"))
+        results = list(prev.get("results") or [])
+        done_idx = {
+            int(r["idx"])
+            for r in results
+            if r.get("idx") is not None and "error" not in r and isinstance(r.get("result"), dict)
+        }
+        if done_idx:
+            print(f"[resume] skipping {len(done_idx)} cues already in {out_json.name}", flush=True)
+
     for row in sorted(cfg_rows, key=lambda x: int(x.get("idx", 0))):
+        idx = int(row.get("idx", 0))
+        if idx in done_idx:
+            continue
         pose = _first_pose(row)
         d = pose.get("dir")
         g = pose.get("gripper_orientation")
@@ -459,6 +426,7 @@ def main() -> None:
         action="store_true",
         help="Skip per-cue JSON checkpoint writes (useful when disk is tight).",
     )
+    ap.add_argument("--resume", action="store_true", help="Skip cues already scored in out-json")
     args = ap.parse_args()
     run(args)
 

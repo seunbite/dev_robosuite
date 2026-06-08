@@ -63,7 +63,8 @@ def _call_text(
 
 def run(args: argparse.Namespace) -> None:
     out_path = Path(args.out_json) if getattr(args, "out_json", None) else OUT_JSON
-    rows = sorted(json.loads(BASE_CFG.read_text(encoding="utf-8")), key=lambda r: int(r["idx"]))
+    config_path = Path(getattr(args, "config_json", None) or BASE_CFG)
+    rows = sorted(json.loads(config_path.read_text(encoding="utf-8")), key=lambda r: int(r["idx"]))
     if args.limit:
         rows = rows[: args.limit]
     shots = json.loads(SHOTS.read_text(encoding="utf-8"))
@@ -119,7 +120,7 @@ def run(args: argparse.Namespace) -> None:
         "vlm_backend": backend,
         "model": args.model,
         "mode": "motion_component_verify_text_only",
-        "config": str(BASE_CFG),
+        "config": str(config_path),
         "n": len(out_rows),
         "rows": sorted(out_rows, key=lambda r: int(r["cue_idx"])),
     }
@@ -136,6 +137,7 @@ def main() -> None:
         default=os.getenv("VLM_BACKEND", "transformers"),
         choices=["transformers", "hf", "local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
     )
+    ap.add_argument("--config-json", type=Path, default=BASE_CFG)
     ap.add_argument("--out-json", type=Path, default=OUT_JSON)
     ap.add_argument("--fewshot-n", type=int, default=4)
     ap.add_argument("--limit", type=int, default=0)

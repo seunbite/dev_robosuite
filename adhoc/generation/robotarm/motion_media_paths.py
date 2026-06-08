@@ -15,6 +15,12 @@ PILOT40_MOTION_CFG = (
 )
 PILOT40_GIF_OUT = "data/results/visualize/gt_fixed_pose_pilot20_hz10"
 PILOT40_MANIFEST = "data/results/render/manipulator/motion_vlm_verify_pilot40/manifest_pilot40.json"
+PILOT90_MOTION_CFG = (
+    "data/results/motion_configs/manipulator/motion_configs_prompt_v19_sophisticated_ee_pilot90_non_essence.json"
+)
+PILOT90_MP4_DIR = "data/results/render/manipulator/motion_vlm_verify_pilot90/mp4"
+PILOT90_MANIFEST = "data/results/render/manipulator/motion_vlm_verify_pilot90/manifest_pilot90.json"
+PILOT90_PAIRWISE_DIR = "data/results/verify/samples/motion_gt_neg_pairwise_pilot90"
 DEFAULT_JSONL = "data/seed/_remainder/closest_poses_results.jsonl"
 
 
@@ -48,39 +54,44 @@ def gif_matches_cue(name: str, cue: str, *, robot: str = ROBOT) -> bool:
     return not rest or rest[0] in "._"
 
 
-def gif_dirs(repo: Path) -> list[Path]:
+def gif_dirs(repo: Path, *, pilot90: bool = False) -> list[Path]:
     root = repo / PILOT40_GIF_OUT
-    return [
+    dirs = [
         root / "IIWA",
         root,
         repo / "data/results/visualize/gt_fixed_pose_pilot40_hz10/IIWA",
         repo / "data/results/render/manipulator/motion_gt_compare/gt_positive/IIWA",
     ]
+    if pilot90:
+        dirs[:0] = [
+            repo / "run/IIWA",
+            repo / "data/results/render/manipulator/motion_vlm_verify_pilot90/gif/IIWA",
+        ]
+    return dirs
 
 
-def mp4_dirs(repo: Path) -> list[Path]:
+def mp4_dirs(repo: Path, *, pilot90: bool = False) -> list[Path]:
     extra = os.getenv("MOTION_MP4_DIR")
     dirs = [
         repo / "data/results/render/manipulator/motion_vlm_verify_pilot40/mp4",
         repo / "data/results/render/manipulator/motion_gt_compare/media/generation/mp4",
     ]
+    if pilot90:
+        dirs.insert(0, repo / PILOT90_MP4_DIR)
     if extra:
         p = Path(extra)
         dirs.insert(0, p if p.is_absolute() else repo / p)
     return dirs
 
 
-def default_mp4_out(repo: Path, idx: int, cue: str) -> Path:
-    return (
-        repo
-        / "data/results/render/manipulator/motion_vlm_verify_pilot40/mp4"
-        / f"{idx:03d}_{cue}.mp4"
-    )
+def default_mp4_out(repo: Path, idx: int, cue: str, *, pilot90: bool = False) -> Path:
+    base = repo / (PILOT90_MP4_DIR if pilot90 else "data/results/render/manipulator/motion_vlm_verify_pilot40/mp4")
+    return base / f"{idx:03d}_{cue}.mp4"
 
 
-def pick_latest_gif(repo: Path, cue: str, *, robot: str = ROBOT) -> Path | None:
+def pick_latest_gif(repo: Path, cue: str, *, robot: str = ROBOT, pilot90: bool = False) -> Path | None:
     cands: list[Path] = []
-    for d in gif_dirs(repo):
+    for d in gif_dirs(repo, pilot90=pilot90):
         if not d.is_dir():
             continue
         for p in d.glob("*.gif"):
@@ -97,9 +108,9 @@ def pick_latest_gif(repo: Path, cue: str, *, robot: str = ROBOT) -> Path | None:
     return max(cands, key=lambda p: p.stat().st_mtime)
 
 
-def find_existing_mp4(repo: Path, idx: int, cue: str) -> Path | None:
+def find_existing_mp4(repo: Path, idx: int, cue: str, *, pilot90: bool = False) -> Path | None:
     names = (f"{idx:03d}_{cue}.mp4", f"{idx:03d}_{cue}_gen.mp4")
-    for d in mp4_dirs(repo):
+    for d in mp4_dirs(repo, pilot90=pilot90):
         for name in names:
             p = d / name
             if p.is_file():
@@ -148,6 +159,7 @@ def resolve_mp4(
     cue: str,
     *,
     build: bool = True,
+    pilot90: bool = False,
 ) -> tuple[Path | None, str | None]:
     """Return (mp4 path, skip reason)."""
     raw = item.get("mp4")
@@ -158,18 +170,18 @@ def resolve_mp4(
         if path.is_file():
             return path, None
 
-    found = find_existing_mp4(repo, idx, cue)
+    found = find_existing_mp4(repo, idx, cue, pilot90=pilot90)
     if found:
         return found, None
 
-    out = default_mp4_out(repo, idx, cue)
+    out = default_mp4_out(repo, idx, cue, pilot90=pilot90)
     if out.is_file():
         return out, None
 
     if not build:
         return None, "no mp4"
 
-    gif = pick_latest_gif(repo, cue)
+    gif = pick_latest_gif(repo, cue, pilot90=pilot90)
     if not gif:
         return None, "no mp4 (no gif found after render/search)"
 
@@ -247,27 +259,32 @@ def _render_pilot40_cues(
     return failures
 
 
-def prepare_pilot40_motion_mp4s(
+def prepare_motion_mp4s(
     repo: Path,
     robotarm_dir: Path,
     items: list[tuple[int, str]],
     *,
     config_json: Path | None = None,
     hz: int = 10,
+    pilot90: bool = False,
 ) -> tuple[int, list[str]]:
     """Render missing MuJoCo GIFs (if needed) and build MP4s. Returns (ready count, failures)."""
-    cfg = config_json or (repo / PILOT40_MOTION_CFG)
-    gif_out = repo / PILOT40_GIF_OUT
+    cfg = config_json or (repo / (PILOT90_MOTION_CFG if pilot90 else PILOT40_MOTION_CFG))
+    gif_out = (
+        repo / "data/results/render/manipulator/motion_vlm_verify_pilot90/gif"
+        if pilot90
+        else repo / PILOT40_GIF_OUT
+    )
     failures: list[str] = []
 
     need_render: list[int] = []
     for idx, cue in items:
-        mp4, _ = resolve_mp4(repo, {}, idx, cue, build=False)
-        if mp4 or pick_latest_gif(repo, cue):
+        mp4, _ = resolve_mp4(repo, {}, idx, cue, build=False, pilot90=pilot90)
+        if mp4 or pick_latest_gif(repo, cue, pilot90=pilot90):
             continue
         need_render.append(idx)
 
-    if need_render:
+    if need_render and not pilot90:
         try:
             jpath = check_pilot40_render_prereqs(repo)
         except (FileNotFoundError, RuntimeError) as e:
@@ -284,10 +301,16 @@ def prepare_pilot40_motion_mp4s(
                     repo, robotarm_dir, cfg, gif_out, need_render, jpath=jpath, hz=hz
                 )
             )
+    elif need_render and pilot90:
+        print(
+            f"[render skip] pilot90: {len(need_render)} cues missing GIF "
+            f"(use run/IIWA renders or prepare with jsonl + render)",
+            flush=True,
+        )
 
     ready = 0
     for idx, cue in items:
-        mp4, reason = resolve_mp4(repo, {}, idx, cue, build=True)
+        mp4, reason = resolve_mp4(repo, {}, idx, cue, build=True, pilot90=pilot90)
         if mp4:
             ready += 1
         elif reason:
@@ -295,20 +318,53 @@ def prepare_pilot40_motion_mp4s(
     return ready, failures
 
 
-def write_pilot40_manifest(repo: Path, rows: list[dict[str, Any]]) -> Path:
-    manifest_path = repo / PILOT40_MANIFEST
+def prepare_pilot40_motion_mp4s(
+    repo: Path,
+    robotarm_dir: Path,
+    items: list[tuple[int, str]],
+    *,
+    config_json: Path | None = None,
+    hz: int = 10,
+) -> tuple[int, list[str]]:
+    return prepare_motion_mp4s(
+        repo, robotarm_dir, items, config_json=config_json, hz=hz, pilot90=False
+    )
+
+
+def prepare_pilot90_motion_mp4s(
+    repo: Path,
+    robotarm_dir: Path,
+    items: list[tuple[int, str]],
+    *,
+    config_json: Path | None = None,
+    hz: int = 10,
+) -> tuple[int, list[str]]:
+    return prepare_motion_mp4s(
+        repo, robotarm_dir, items, config_json=config_json, hz=hz, pilot90=True
+    )
+
+
+def write_motion_manifest(
+    repo: Path,
+    rows: list[dict[str, Any]],
+    *,
+    pilot90: bool = False,
+    config_rel: str | None = None,
+) -> Path:
+    manifest_path = repo / (PILOT90_MANIFEST if pilot90 else PILOT40_MANIFEST)
+    cfg_rel = config_rel or (PILOT90_MOTION_CFG if pilot90 else PILOT40_MOTION_CFG)
     manifest_rows: list[dict[str, Any]] = []
     for row in rows:
         idx = int(row["idx"])
         cue = str(row["cue"])
-        mp4, _ = resolve_mp4(repo, {}, idx, cue, build=False)
-        gif = pick_latest_gif(repo, cue)
+        mp4, _ = resolve_mp4(repo, {}, idx, cue, build=False, pilot90=pilot90)
+        gif = pick_latest_gif(repo, cue, pilot90=pilot90)
         manifest_rows.append(
             {
                 "cue_idx": idx,
                 "cue": cue,
                 "description": row.get("description", ""),
-                "config_path": str(repo / PILOT40_MOTION_CFG),
+                "config_path": str(repo / cfg_rel),
                 "gif": str(gif) if gif else None,
                 "mp4": str(mp4) if mp4 else None,
             }
@@ -319,3 +375,11 @@ def write_pilot40_manifest(repo: Path, rows: list[dict[str, Any]]) -> Path:
         encoding="utf-8",
     )
     return manifest_path
+
+
+def write_pilot40_manifest(repo: Path, rows: list[dict[str, Any]]) -> Path:
+    return write_motion_manifest(repo, rows, pilot90=False)
+
+
+def write_pilot90_manifest(repo: Path, rows: list[dict[str, Any]]) -> Path:
+    return write_motion_manifest(repo, rows, pilot90=True)

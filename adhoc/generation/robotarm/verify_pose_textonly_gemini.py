@@ -56,59 +56,19 @@ def _fewshot_block(shots: list[dict[str, Any]], n: int = 4) -> str:
 
 
 def _prompt(cue_row: dict[str, Any], fewshot_text: str) -> str:
+    from prompt_loader import fill_template  # noqa: WPS433
+
     p = _first_pose(cue_row)
-    return f"""
-You are verifying robot cue pose suitability using ONLY text (no image).
-
-Definitions (must be strictly followed):
-- World frame: +x = forward toward human viewer, +y = robot left, +z = up.
-- End-effector (EE) pointing axis: wrist -> fingertips (approach direction).
-- Direction `dir` is the dominant world direction of this pointing axis:
-  up/down/front/back/left/right.
-- `gripper_orientation`:
-  Let end line = jaw opening line between fingertip tips.
-  Project that line orthogonally onto the plane perpendicular to `dir`.
-  Observer faces that plane.
-  If projected line is left-right (ㅡ) => horizontal.
-  If projected line is up-down (|) => vertical.
-
-Task:
-1) Q1: judge if current pose labels (dir + gripper_orientation) are appropriate for the cue intent.
-   "Appropriate" means: for this robot to perform the cue, if it starts from this pose (these dir and gripper_orientation labels), can a motion that conveys the cue's meaning be created using simple subsequent movements?
-2) Q3: if appropriate, propose movement plan; if not appropriate, propose corrected pose and movement plan.
-
-Few-shot style hints:
-{fewshot_text}
-
-Target:
-- cue: {cue_row.get("cue")}
-- description: {cue_row.get("description","")}
-- current_pose: dir={p.get("dir")}, gripper_orientation={p.get("gripper_orientation")}
-
-Return ONLY strict JSON:
-{{
-  "pose_is_appropriate": true/false,
-  "direction_orientation_assessment": "string",
-  "if_appropriate": {{
-    "recommended_movement_plan": [
-      "step guidance 1",
-      "step guidance 2",
-      "step guidance 3"
-    ]
-  }},
-  "if_not_appropriate": {{
-    "recommended_dir": "front|back|left|right|up|down",
-    "recommended_gripper_orientation": "horizontal|vertical",
-    "why_change": "string",
-    "recommended_movement_plan_after_change": [
-      "step guidance 1",
-      "step guidance 2",
-      "step guidance 3"
-    ]
-  }},
-  "confidence": 0.0
-}}
-""".strip()
+    return fill_template(
+        "exp03_pose_verify_text.txt",
+        {
+            "FEWSHOT": fewshot_text,
+            "CUE": str(cue_row.get("cue", "")),
+            "DESCRIPTION": str(cue_row.get("description", "")),
+            "DIR": str(p.get("dir", "")),
+            "GRIPPER_ORIENTATION": str(p.get("gripper_orientation", "")),
+        },
+    )
 
 
 def run(args: argparse.Namespace) -> None:
@@ -144,7 +104,22 @@ def run(args: argparse.Namespace) -> None:
         vlm = VLMClient(backend=backend, model=args.model)
 
     out: list[dict[str, Any]] = []
+    done_idx: set[int] = set()
+    if getattr(args, "resume", False) and args.out_json.is_file():
+        prev = json.loads(args.out_json.read_text(encoding="utf-8"))
+        out = list(prev.get("results") or [])
+        done_idx = {
+            int(r["idx"])
+            for r in out
+            if r.get("idx") is not None and "error" not in r and isinstance(r.get("result"), dict)
+        }
+        if done_idx:
+            print(f"[resume] skipping {len(done_idx)} cues already in {args.out_json.name}", flush=True)
+
     for r in sorted(rows, key=lambda x: int(x.get("idx", 0))):
+        idx = int(r.get("idx", 0))
+        if idx in done_idx:
+            continue
         pose = _first_pose(r)
         prompt = _prompt(r, fewshot_text)
         if vlm is not None:
@@ -156,7 +131,7 @@ def run(args: argparse.Namespace) -> None:
             parsed = _extract_json(text)
         except Exception as e:
             parsed = {"parse_error": str(e), "raw_text": text}
-        out.append(
+        out = [x for x in out if int(x.get("idx", -1)) != idx] + [
             {
                 "idx": r.get("idx"),
                 "cue": r.get("cue"),
@@ -164,8 +139,27 @@ def run(args: argparse.Namespace) -> None:
                 "current_gripper_orientation": pose.get("gripper_orientation"),
                 "result": parsed,
             }
-        )
+        ]
         print(f"[ok] idx={r.get('idx')} cue={r.get('cue')}")
+        if not getattr(args, "dry_run", False):
+            args.out_json.parent.mkdir(parents=True, exist_ok=True)
+            args.out_json.write_text(
+                json.dumps(
+                    {
+                        "time": datetime.now().isoformat(timespec="seconds"),
+                        "mode": "text_only_pose_verification",
+                        "vlm_backend": backend,
+                        "model": args.model,
+                        "config_json": str(args.config_json),
+                        "partial": True,
+                        "total": len(out),
+                        "results": out,
+                    },
+                    indent=2,
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
 
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),
@@ -205,6 +199,7 @@ def main() -> None:
         type=Path,
         default=Path("data/results/verify/pose_textonly_verify_pilot20_gemini.json"),
     )
+    ap.add_argument("--resume", action="store_true", help="Skip cues already scored in out-json")
     args = ap.parse_args()
     if args.model is None:
         args.model = (

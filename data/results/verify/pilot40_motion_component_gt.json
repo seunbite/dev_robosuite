@@ -1,6 +1,9 @@
 {
-  "groundtruth_note": "Per-cue movement/path component requirement. non=repetition 1; rep=repetition>1 or 2+ directions; hold=hold_time>0; axis +=positive degree only, -=negative only, +-=both signs required. Unspecified fields are not checked.",
-  "n": 39,
+  "groundtruth_note": "Per-cue movement/path component requirement. non=repetition 1; rep=repetition>1 or 2+ directions; hold=hold_time>0; axis +=positive degree only, -=negative only, +-=both signs required. Unspecified fields are not checked. Extended with pilot90 new51 cues (HTML order from c51, sequential). pause=mid-action freeze (hold).",
+  "n_pilot40": 39,
+  "n_new51": 51,
+  "n_annotated_new51": 51,
+  "n": 90,
   "annotations": [
     {
       "cue_idx": 7,
@@ -342,12 +345,51 @@
       }
     },
     {
+      "cue_idx": 31,
+      "cue": "draw_circle_repeat",
+      "annotation_raw": "arc yz",
+      "component": {
+        "kind": "path_arc",
+        "plane": "yz"
+      }
+    },
+    {
       "cue_idx": 32,
       "cue": "throat_cut_stop",
       "annotation_raw": "line y",
       "component": {
         "kind": "path_line",
         "axis": "y"
+      }
+    },
+    {
+      "cue_idx": 33,
+      "cue": "chin_flick_dismiss",
+      "annotation_raw": "x + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 34,
+      "cue": "cover_ears_too_loud",
+      "annotation_raw": "y - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "y": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
       }
     },
     {
@@ -413,8 +455,11 @@
     {
       "cue_idx": 40,
       "cue": "guiding_arm",
-      "annotation_raw": "",
-      "component": null
+      "annotation_raw": "none",
+      "component": {
+        "kind": "any"
+      },
+      "always_correct": true
     },
     {
       "cue_idx": 41,
@@ -428,6 +473,31 @@
         "joint": null,
         "repetition": "non",
         "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 42,
+      "cue": "escorting_gesture",
+      "annotation_raw": "arc xy",
+      "component": {
+        "kind": "path_arc",
+        "plane": "xy"
+      }
+    },
+    {
+      "cue_idx": 44,
+      "cue": "clarification_request_palm_tilt",
+      "annotation_raw": "x + / y + - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
         "raw": ""
       }
     },
@@ -447,6 +517,54 @@
       }
     },
     {
+      "cue_idx": 46,
+      "cue": "speed_up_circular_cue",
+      "annotation_raw": "arc yz",
+      "component": {
+        "kind": "path_arc",
+        "plane": "yz"
+      }
+    },
+    {
+      "cue_idx": 47,
+      "cue": "wait_for_me_backward_palm",
+      "annotation_raw": "x - non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 48,
+      "cue": "continue_on_forward_roll",
+      "annotation_raw": "arc xz",
+      "component": {
+        "kind": "path_arc",
+        "plane": "xz"
+      }
+    },
+    {
+      "cue_idx": 49,
+      "cue": "polite_decline_small_push",
+      "annotation_raw": "x + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
       "cue_idx": 50,
       "cue": "firm_accept_forward_reach",
       "annotation_raw": "x + non hold",
@@ -458,6 +576,126 @@
         "joint": null,
         "repetition": "non",
         "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 51,
+      "cue": "hesitant_accept_half_reach",
+      "annotation_raw": "x +- rep hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-"
+        },
+        "joint": null,
+        "repetition": "rep",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 52,
+      "cue": "cancel_previous_offer_retract",
+      "annotation_raw": "x - non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 53,
+      "cue": "conditional_accept_pause_then_reach",
+      "annotation_raw": "x + pause",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": null,
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 54,
+      "cue": "final_decision_down_press",
+      "annotation_raw": "z - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 55,
+      "cue": "resume_speaking_pull",
+      "annotation_raw": "x - non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 56,
+      "cue": "emphasize_point_downbeat",
+      "annotation_raw": "z - non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 57,
+      "cue": "unsure_response_hand_hover_stop",
+      "annotation_raw": "y +- rep hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-"
+        },
+        "joint": null,
+        "repetition": "rep",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 58,
+      "cue": "prevent_fall_support_reach",
+      "annotation_raw": "x + non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
         "raw": ""
       }
     },
@@ -507,6 +745,21 @@
       }
     },
     {
+      "cue_idx": 62,
+      "cue": "self_hug",
+      "annotation_raw": "x - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
       "cue_idx": 64,
       "cue": "tilt_head_curious",
       "annotation_raw": "z - non hold",
@@ -522,6 +775,21 @@
       }
     },
     {
+      "cue_idx": 65,
+      "cue": "raise_index_one_moment",
+      "annotation_raw": "z + non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
       "cue_idx": 66,
       "cue": "shh_gesture",
       "annotation_raw": "x + non hold",
@@ -529,6 +797,51 @@
         "kind": "movement",
         "axes": {
           "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 67,
+      "cue": "rub_arms_cold",
+      "annotation_raw": "y +- rep non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-"
+        },
+        "joint": null,
+        "repetition": "rep",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 69,
+      "cue": "cross_arms_defensive",
+      "annotation_raw": "x - non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 72,
+      "cue": "palms_together_thank_you",
+      "annotation_raw": "z - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
         },
         "joint": null,
         "repetition": "non",
@@ -552,6 +865,172 @@
       }
     },
     {
+      "cue_idx": 75,
+      "cue": "arms_open_welcome",
+      "annotation_raw": "x + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 76,
+      "cue": "stretch_arms_up",
+      "annotation_raw": "z + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 78,
+      "cue": "disagreement_cross_then_release",
+      "annotation_raw": "non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {},
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": "non hold"
+      }
+    },
+    {
+      "cue_idx": 82,
+      "cue": "frustration_down_throw",
+      "annotation_raw": "z - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 84,
+      "cue": "submission_lowered_open_palm",
+      "annotation_raw": "z - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 85,
+      "cue": "dominance_high_open_hold",
+      "annotation_raw": "none",
+      "component": {
+        "kind": "any"
+      },
+      "always_correct": true
+    },
+    {
+      "cue_idx": 86,
+      "cue": "apology_forward_lowered_hold",
+      "annotation_raw": "z - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 90,
+      "cue": "start_action_forward_snap",
+      "annotation_raw": "z - non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 92,
+      "cue": "retry_action_reset_circle",
+      "annotation_raw": "arc yz",
+      "component": {
+        "kind": "path_arc",
+        "plane": "yz"
+      }
+    },
+    {
+      "cue_idx": 94,
+      "cue": "abandon_action_drop_turn",
+      "annotation_raw": "z - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 95,
+      "cue": "prepare_action_raise_hold",
+      "annotation_raw": "z + non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 97,
+      "cue": "hesitation_pause_hold",
+      "annotation_raw": "x + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
       "cue_idx": 104,
       "cue": "scale_expand",
       "annotation_raw": "arc xy 60 ccw",
@@ -562,6 +1041,244 @@
         "direction": "ccw",
         "raw": ""
       }
+    },
+    {
+      "cue_idx": 106,
+      "cue": "uncertainty_wave",
+      "annotation_raw": "y +- rep",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-"
+        },
+        "joint": null,
+        "repetition": "rep",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 107,
+      "cue": "exploration_reach",
+      "annotation_raw": "x +",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": null,
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 108,
+      "cue": "interrupt_hard",
+      "annotation_raw": "x + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 109,
+      "cue": "interrupt_soft",
+      "annotation_raw": "x + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 114,
+      "cue": "contain_space",
+      "annotation_raw": "arc xy",
+      "component": {
+        "kind": "path_arc",
+        "plane": "xy"
+      }
+    },
+    {
+      "cue_idx": 115,
+      "cue": "expand_space",
+      "annotation_raw": "y + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 116,
+      "cue": "compress_space",
+      "annotation_raw": "z - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 117,
+      "cue": "balance_scale",
+      "annotation_raw": "y +- rep",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-"
+        },
+        "joint": null,
+        "repetition": "rep",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 118,
+      "cue": "push_pull_dual",
+      "annotation_raw": "z +- non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 121,
+      "cue": "weight_shift_forward",
+      "annotation_raw": "x + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 122,
+      "cue": "weight_shift_backward",
+      "annotation_raw": "x - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 123,
+      "cue": "torso_rotate_away",
+      "annotation_raw": "arc xy",
+      "component": {
+        "kind": "path_arc",
+        "plane": "xy"
+      }
+    },
+    {
+      "cue_idx": 124,
+      "cue": "torso_rotate_toward",
+      "annotation_raw": "arc xy",
+      "component": {
+        "kind": "path_arc",
+        "plane": "xy"
+      }
+    },
+    {
+      "cue_idx": 125,
+      "cue": "lean_side_doubt",
+      "annotation_raw": "y - non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "y": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 127,
+      "cue": "expand_chest",
+      "annotation_raw": "x + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 128,
+      "cue": "eye_widen_surprise",
+      "annotation_raw": "z + non hold",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": true,
+        "raw": ""
+      }
+    },
+    {
+      "cue_idx": 130,
+      "cue": "gaze_shift_avoid",
+      "annotation_raw": "y - non",
+      "component": {
+        "kind": "movement",
+        "axes": {
+          "y": "-"
+        },
+        "joint": null,
+        "repetition": "non",
+        "hold": null,
+        "raw": ""
+      }
     }
-  ]
+  ],
+  "n_always_correct": 2
 }

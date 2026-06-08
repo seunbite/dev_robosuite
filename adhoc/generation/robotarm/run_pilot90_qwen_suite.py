@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Pilot-90 (90 non-essence cues) × pose experiments 1–6 with one Qwen2.5-VL load.
+Pilot-90 (90 non-essence cues) × 10 experiments with one Qwen2.5-VL load.
 
   bash scripts/run_pilot90_qwen_suite.sh
-  MODEL_SIZE=7b bash scripts/run_pilot90_qwen_suite.sh
+  MODEL_SIZE=7b RESUME=1 bash scripts/run_pilot90_qwen_suite.sh
   SUMMARY_ONLY=1 bash scripts/run_pilot90_qwen_suite.sh
 """
 from __future__ import annotations
@@ -27,15 +27,20 @@ from gpu_check import require_cuda_gpu  # noqa: E402
 from pilot90_experiment_suite import (  # noqa: E402
     CONSOLIDATED,
     DEFAULT_QWEN_OUT,
+    MOTION_CFG,
+    MOTION_COMPONENT_GT,
+    MOTION_MANIFEST,
+    MOTION_PAIRWISE_DIR,
     N_CUES,
     PAIRWISE_IMG_DIR,
     POSE_CFG,
     SHOTS,
     TILE_DIR,
     TILE_PICK,
-    experiment_specs_pose_only,
+    experiment_specs_all,
     manifest90_cue_names,
     manifest90_cues_csv,
+    manifest90_rows_from_cfg,
     metrics_from_json,
     pose_generation_correct_any,
     print_summary_table,
@@ -71,7 +76,7 @@ def _score_pose_generation(out_json: Path) -> None:
     consolidated = {
         r["cue"]: r for r in json.loads(CONSOLIDATED.read_text(encoding="utf-8")).get("rows", [])
     }
-    cfg_rows = json.loads(POSE_CFG.read_text(encoding="utf-8"))
+    cfg_rows = manifest90_rows_from_cfg(json.loads(POSE_CFG.read_text(encoding="utf-8")))
     manifest = set(manifest90_cue_names())
     rows_out: list[dict[str, Any]] = []
     ok = n = 0
@@ -110,6 +115,58 @@ def _score_pose_generation(out_json: Path) -> None:
     print(f"[1] pose generation score (any-pose): {ok}/{n}", flush=True)
 
 
+def _score_motion_generation(out_json: Path) -> None:
+    from score_pilot40_motion_gt_components import (  # noqa: WPS433
+        _tail_matches_component,
+        _tail_steps,
+    )
+
+    ann = {
+        int(a["cue_idx"]): a
+        for a in json.loads(MOTION_COMPONENT_GT.read_text(encoding="utf-8")).get("annotations", [])
+    }
+    cfg_rows = manifest90_rows_from_cfg(json.loads(MOTION_CFG.read_text(encoding="utf-8")))
+    rows_out: list[dict[str, Any]] = []
+    ok = n = 0
+    for row in sorted(cfg_rows, key=lambda r: int(r["idx"])):
+        idx = int(row["idx"])
+        entry = ann.get(idx) or {}
+        comp = entry.get("component")
+        raw = (entry.get("annotation_raw") or "").strip()
+        if not comp and not entry.get("always_correct") and raw.lower() != "none":
+            continue
+        tail = _tail_steps(row.get("movements") or [])
+        if entry.get("always_correct") or (comp and comp.get("kind") == "any"):
+            match = True
+        elif comp:
+            match, _ = _tail_matches_component(tail, comp)
+        else:
+            continue
+        n += 1
+        if match:
+            ok += 1
+        rows_out.append(
+            {
+                "cue_idx": idx,
+                "cue": row["cue"],
+                "annotation_raw": raw,
+                "component_match": match,
+            }
+        )
+    payload = {
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "mode": "motion_generation_vs_component_gt",
+        "config_json": str(MOTION_CFG),
+        "groundtruth_json": str(MOTION_COMPONENT_GT),
+        "n": n,
+        "n_correct": ok,
+        "accuracy": ok / n if n else None,
+        "rows": rows_out,
+    }
+    out_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"[7] motion generation score: {ok}/{n}", flush=True)
+
+
 def _run_pose_verify_vlm(args: argparse.Namespace, out_json: Path) -> None:
     from verify_pose_tiles_gemini import run
 
@@ -126,6 +183,7 @@ def _run_pose_verify_vlm(args: argparse.Namespace, out_json: Path) -> None:
         out_json=out_json,
         out_md=out_json.with_suffix(".md"),
         no_checkpoint=False,
+        resume=args.resume,
     )
     run(ns)
 
@@ -140,6 +198,7 @@ def _run_pose_verify_text(args: argparse.Namespace, out_json: Path) -> None:
         vlm_backend=_vlm_backend_name(args.backend),
         fewshot_n=4,
         out_json=out_json,
+        resume=args.resume,
     )
     run(ns)
 
@@ -192,6 +251,82 @@ def _run_multitile(spec: dict[str, Any], args: argparse.Namespace, out_json: Pat
     run(ns)
 
 
+def _prepare_motion_media_if_needed() -> tuple[int, list[str]]:
+    if os.getenv("MOTION_PREPARE_MP4", "1") == "0":
+        return 0, []
+    from motion_media_paths import prepare_pilot90_motion_mp4s, write_pilot90_manifest  # noqa: WPS433
+
+    rows = manifest90_rows_from_cfg(json.loads(MOTION_CFG.read_text(encoding="utf-8")))
+    todo = [(int(r["idx"]), str(r["cue"])) for r in rows]
+    ready, failures = prepare_pilot90_motion_mp4s(_REPO, _HERE, todo, config_json=MOTION_CFG)
+    manifest = write_pilot90_manifest(_REPO, rows)
+    print(f"[suite] pilot90 motion media: {ready}/{len(todo)} mp4 ready → {manifest}", flush=True)
+    if failures and ready < len(todo):
+        print(f"[suite] {len(failures)} media issues (showing first 3):", flush=True)
+        for line in failures[:3]:
+            print(f"  {line}", flush=True)
+    return ready, failures
+
+
+def _run_motion_verify_vlm(args: argparse.Namespace, out_json: Path) -> None:
+    from verify_motion_component_gemini import run
+
+    ns = argparse.Namespace(
+        model=args.model,
+        vlm_backend=_vlm_backend_name(args.backend),
+        vlm=getattr(args, "vlm", None),
+        out_json=out_json,
+        config_json=MOTION_CFG,
+        fewshot_n=4,
+        limit=0,
+        resume=args.resume,
+        force=False,
+        dry_run=False,
+        prepare_media=os.getenv("MOTION_PREPARE_MP4", "1") != "0",
+        manifest=MOTION_MANIFEST,
+        pilot90=True,
+    )
+    run(ns)
+
+
+def _run_motion_verify_text(args: argparse.Namespace, out_json: Path) -> None:
+    from verify_motion_component_text_gemini import run
+
+    ns = argparse.Namespace(
+        model=args.model,
+        vlm_backend=_vlm_backend_name(args.backend),
+        vlm=getattr(args, "vlm", None),
+        out_json=out_json,
+        config_json=MOTION_CFG,
+        fewshot_n=4,
+        limit=0,
+        resume=args.resume,
+        force=False,
+        dry_run=False,
+    )
+    run(ns)
+
+
+def _run_motion_pairwise_mp4(args: argparse.Namespace, out_json: Path) -> None:
+    from verify_motion_gt_neg_pairwise_vlm import run
+
+    pairwise_json = MOTION_PAIRWISE_DIR / "pairwise_specs_pilot90.json"
+    ns = argparse.Namespace(
+        out_json=out_json,
+        model=args.model,
+        vlm_backend=_vlm_backend_name(args.backend),
+        vlm=getattr(args, "vlm", None),
+        motion_cfg=MOTION_CFG,
+        pairwise_dir=MOTION_PAIRWISE_DIR,
+        pairwise_jsons=[pairwise_json] if pairwise_json.is_file() else None,
+        limit=0,
+        resume=args.resume,
+        force=False,
+        dry_run=False,
+    )
+    run(ns)
+
+
 def _run_one(spec: dict[str, Any], args: argparse.Namespace, out_dir: Path) -> Path:
     out_json = out_dir / spec["out_name"]
 
@@ -211,13 +346,21 @@ def _run_one(spec: dict[str, Any], args: argparse.Namespace, out_dir: Path) -> P
         _run_pose_pairwise(args, out_json)
     elif kind == "multitile":
         _run_multitile(spec, args, out_json)
+    elif kind == "motion_generation_score":
+        _score_motion_generation(out_json)
+    elif kind == "motion_verify_vlm":
+        _run_motion_verify_vlm(args, out_json)
+    elif kind == "motion_verify_text":
+        _run_motion_verify_text(args, out_json)
+    elif kind == "motion_pairwise_mp4":
+        _run_motion_pairwise_mp4(args, out_json)
     else:
         raise ValueError(kind)
     return out_json
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Run pilot-90 Qwen pose suite (steps 1–6, 90 cues)")
+    p = argparse.ArgumentParser(description="Run pilot-90 Qwen suite (10 steps, 90 cues)")
     p.add_argument("--backend", default=os.getenv("BACKEND", "transformers"))
     p.add_argument("--model", default=os.getenv("VLM_MODEL", "Qwen/Qwen2.5-VL-32B-Instruct"))
     p.add_argument("--tensor-parallel-size", type=int, default=int(os.getenv("VLLM_TENSOR_PARALLEL_SIZE", "1")))
@@ -230,15 +373,15 @@ def main() -> None:
         action="store_true",
         help="Skip all runs; read existing result JSONs and print the accuracy table",
     )
-    p.add_argument("--only", type=str, default=None, help="Comma-separated step ids 1-6")
-    p.add_argument("--skip-model-load", action="store_true", help="Score-only step 1 without GPU")
+    p.add_argument("--only", type=str, default=None, help="Comma-separated step ids 1-10")
+    p.add_argument("--skip-model-load", action="store_true", help="Score-only steps (1,7) without GPU")
     args = p.parse_args()
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     cache_root = setup_hf_cache(os.environ.get("HF_HOME"))
     print(f"[hf] cache root: {cache_root}", flush=True)
 
-    specs = experiment_specs_pose_only()
+    specs = experiment_specs_all()
     if args.only:
         want = {x.strip() for x in args.only.split(",") if x.strip()}
         specs = [s for s in specs if s["id"] in want]
@@ -255,7 +398,8 @@ def main() -> None:
             "model": args.model,
             "backend": args.backend,
             "n_cues": N_CUES,
-            "scoring": "any_pose_in_config",
+            "pose_scoring": "any_pose_in_config",
+            "motion_groundtruth": str(MOTION_COMPONENT_GT),
             "out_dir": str(args.out_dir),
             "summary_only": True,
             "table": [
@@ -272,7 +416,20 @@ def main() -> None:
         print(f"\nWrote suite summary → {summary_path}\n", flush=True)
         return
 
-    needs_model = any(s["kind"] != "pose_generation_score" for s in specs)
+    needs_motion_media = any(s["kind"] == "motion_verify_vlm" for s in specs)
+    if needs_motion_media:
+        ready, _ = _prepare_motion_media_if_needed()
+        if ready == 0:
+            raise SystemExit(
+                "Step 8 aborted: no pilot90 motion MP4s found or built.\n"
+                "  • GIFs expected under run/IIWA/ (from render_manipulator_20260608)\n"
+                "  • Or run: bash scripts/prepare_pilot90_motion_mp4.sh\n"
+                "  • Set MOTION_PREPARE_MP4=0 to skip auto-build"
+            )
+
+    needs_model = any(
+        s["kind"] not in {"pose_generation_score", "motion_generation_score"} for s in specs
+    )
     if needs_model and not args.skip_model_load:
         _init_model(args)
         from vlm_client import VLMClient  # noqa: WPS433
@@ -312,7 +469,8 @@ def main() -> None:
         "model": args.model,
         "backend": args.backend,
         "n_cues": N_CUES,
-        "scoring": "any_pose_in_config",
+        "pose_scoring": "any_pose_in_config",
+        "motion_groundtruth": str(MOTION_COMPONENT_GT),
         "out_dir": str(args.out_dir),
         "experiments": run_records,
         "table": [

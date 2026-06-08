@@ -97,7 +97,9 @@ def run(args: argparse.Namespace) -> None:
     print(f"[motion-pairwise] backend={backend} shared_vlm={'yes' if vlm else 'no'}", flush=True)
 
     template = PROMPT_MOTION_PAIRWISE.read_text(encoding="utf-8")
-    cfg_rows = {int(r["idx"]): r for r in json.loads(MOTION_CFG.read_text(encoding="utf-8"))}
+    motion_cfg = Path(getattr(args, "motion_cfg", None) or MOTION_CFG)
+    pairwise_dir = Path(getattr(args, "pairwise_dir", None) or MOTION_PAIRWISE_DIR)
+    cfg_rows = {int(r["idx"]): r for r in json.loads(motion_cfg.read_text(encoding="utf-8"))}
     json_paths = args.pairwise_jsons or DEFAULT_PAIRWISE_JSONS
     specs = _load_pair_specs(json_paths)
     if args.limit:
@@ -123,7 +125,7 @@ def run(args: argparse.Namespace) -> None:
             continue
         mp4_rel = spec.get("pair_mp4")
         if not mp4_rel:
-            hits = sorted(MOTION_PAIRWISE_DIR.glob(f"{idx:03d}_{cue}_pair*.mp4"))
+            hits = sorted(pairwise_dir.glob(f"{idx:03d}_{cue}_pair*.mp4"))
             mp4_rel = str(hits[0].relative_to(_REPO)) if hits else None
         mp4_path = _REPO / mp4_rel if mp4_rel else None
         if not mp4_path or not mp4_path.is_file():
@@ -229,7 +231,9 @@ def main() -> None:
         default=os.getenv("VLM_BACKEND", "transformers"),
         choices=["transformers", "hf", "local", "vllm-local", "vllm", "openai", "qwen", "gemini"],
     )
-    p.add_argument("--pairwise-jsons", nargs="*", type=Path, default=DEFAULT_PAIRWISE_JSONS)
+    p.add_argument("--motion-cfg", type=Path, default=MOTION_CFG)
+    p.add_argument("--pairwise-dir", type=Path, default=MOTION_PAIRWISE_DIR)
+    p.add_argument("--pairwise-jsons", nargs="*", type=Path, default=None)
     p.add_argument("--limit", type=int, default=0)
     p.add_argument("--resume", action="store_true")
     p.add_argument("--force", action="store_true")

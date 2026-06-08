@@ -100,6 +100,20 @@ def _parse_component(spec: str) -> dict[str, Any] | None:
     spec = spec.strip()
     if not spec:
         return None
+    if spec.lower() == "none":
+        return {"kind": "any"}
+    if re.fullmatch(r"non\s+hold", spec, re.I):
+        return {
+            "kind": "movement",
+            "axes": {},
+            "joint": None,
+            "repetition": "non",
+            "hold": True,
+            "raw": spec,
+        }
+    # e.g. "y +- rep non" → treat trailing non as typo after rep
+    if re.search(r"\brep\b", spec, re.I) and re.search(r"\bnon\s*$", spec, re.I):
+        spec = re.sub(r"\s+non\s*$", "", spec, flags=re.I).strip()
 
     m = re.match(
         r"^arc\s+(xy|yz|xz|zx)"
@@ -359,6 +373,21 @@ def _match_line_path_as_movement(tail: list, comp: dict[str, Any]) -> bool:
 
 
 def _tail_matches_component(tail: list, comp: dict[str, Any]) -> tuple[bool, str | None]:
+    if not comp:
+        return False, None
+    if comp.get("kind") == "any":
+        return True, "any"
+
+    if comp.get("kind") == "movement" and not comp.get("axes") and comp.get("hold"):
+        rep_rule = comp.get("repetition")
+        for step in tail:
+            if not _step_has_hold(step):
+                continue
+            if step.get("type") == "movement" and rep_rule == "non" and _step_repetition(step) != 1:
+                continue
+            return True, step.get("type")
+        return False, None
+
     kind = comp["kind"]
     for step in tail:
         if kind.startswith("path"):
@@ -380,17 +409,20 @@ def _build_annotation_map() -> list[dict[str, Any]]:
             if isinstance(anns, list) and anns:
                 out: list[dict[str, Any]] = []
                 for a in anns:
-                    raw = str(a.get("annotation_raw", ""))
+                    raw = str(a.get("annotation_raw", "")).strip()
                     # Re-parse from edited annotation text so user changes apply immediately.
                     comp = _parse_component(raw) if raw else a.get("component")
-                    out.append(
-                        {
-                            "cue_idx": int(a.get("cue_idx")),
-                            "cue": a.get("cue"),
-                            "annotation_raw": raw,
-                            "component": comp,
-                        }
-                    )
+                    entry: dict[str, Any] = {
+                        "cue_idx": int(a.get("cue_idx")),
+                        "cue": a.get("cue"),
+                        "annotation_raw": raw,
+                        "component": comp,
+                    }
+                    if a.get("always_correct") or raw.lower() == "none" or (
+                        comp and comp.get("kind") == "any"
+                    ):
+                        entry["always_correct"] = True
+                    out.append(entry)
                 return out
         except Exception:
             # Fall back to RAW_LINES parser if JSON is malformed.
