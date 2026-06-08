@@ -25,9 +25,15 @@ DEFAULT_JSONL = "data/seed/_remainder/closest_poses_results.jsonl"
 
 
 def pose_jsonl(repo: Path) -> Path:
-    raw = os.getenv("MOTION_POSE_JSONL", DEFAULT_JSONL)
-    p = Path(raw)
-    return p if p.is_absolute() else repo / p
+    raw = os.getenv("MOTION_POSE_JSONL")
+    if raw:
+        p = Path(raw)
+        return p if p.is_absolute() else repo / p
+    canonical = repo / DEFAULT_JSONL
+    if canonical.is_file():
+        return canonical
+    legacy = repo / "data/seed/closest_poses_results.jsonl"
+    return legacy if legacy.is_file() else canonical
 
 
 def _count_pose_jsonl(jpath: Path, *, robot: str = ROBOT) -> tuple[int, int]:

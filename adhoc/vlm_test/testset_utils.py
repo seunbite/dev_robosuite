@@ -1,7 +1,9 @@
 import base64
 import glob
+import hashlib
 import json
 import os
+import pickle
 import random
 import shutil
 import subprocess
@@ -9,7 +11,7 @@ import sys
 import tempfile
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -18,8 +20,30 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SEED_DIR = REPO_ROOT / "data" / "seed"
+
+
+def pose_database_jsonl() -> Path:
+    """Resolve manipulator pose DB (``_remainder`` canonical; legacy path fallback)."""
+    raw = os.getenv("MOTION_POSE_JSONL")
+    if raw:
+        p = Path(raw)
+        return p if p.is_absolute() else REPO_ROOT / p
+    canonical = SEED_DIR / "_remainder" / "closest_poses_results.jsonl"
+    if canonical.is_file():
+        return canonical
+    return SEED_DIR / "closest_poses_results.jsonl"
+SIM_BUNDLE_DISK_ROOT = REPO_ROOT / "data" / "results" / "visualize" / "_sim_bundles"
 MC_MANIP = REPO_ROOT / "data" / "results" / "motion_configs" / "manipulator"
 MOTION_DIR = REPO_ROOT / "data" / "motions"
+
+
+def _robotarm_package_dir() -> Path:
+    """Where ``motion_generation`` / ``motion_generation_quadruped`` live (layout differs by checkout)."""
+    for rel in ("adhoc/robotarm", "adhoc/generation/robotarm"):
+        p = REPO_ROOT / rel
+        if p.is_dir():
+            return p
+    return REPO_ROOT / "adhoc" / "generation" / "robotarm"
 
 
 def _safe_name(text: str) -> str:
@@ -258,6 +282,119 @@ def _build_alpha_stack_image(gif_path: str, stack_count: int = 10) -> Image.Imag
     return canvas.convert("RGB")
 
 
+def _build_alpha_stack_from_numpy_frames(
+    frames: List[np.ndarray],
+    stack_count: int = 10,
+) -> Image.Image:
+    """
+    Same compositing as ``_build_alpha_stack_image`` but from simulator-captured RGB arrays (H,W,3).
+    Used by ``tile_figure`` so alpha trails align with ``get_sim_bundle`` geometry (no GIF mismatch).
+    """
+    n = len(frames)
+    if n <= 1:
+        return Image.fromarray(np.asarray(frames[0], dtype=np.uint8)).convert("RGB")
+    total_frames = n
+    indices = sorted(
+        set(int(round(i * (total_frames - 1) / max(1, stack_count - 1))) for i in range(stack_count))
+    )
+    final_rgb = Image.fromarray(np.asarray(frames[total_frames - 1], dtype=np.uint8)).convert("RGB")
+    canvas = final_rgb.convert("RGBA")
+    final_np = np.asarray(final_rgb).astype(np.int16)
+    trail_indices = [idx for idx in indices if idx != total_frames - 1]
+    for order, frame_idx in enumerate(trail_indices):
+        frame_rgb = Image.fromarray(np.asarray(frames[frame_idx], dtype=np.uint8)).convert("RGB")
+        frame_np = np.asarray(frame_rgb).astype(np.int16)
+        diff = np.abs(frame_np - final_np).sum(axis=2)
+        mask_np = np.where(diff > 28, 255, 0).astype(np.uint8)
+        mask = Image.fromarray(mask_np, mode="L").filter(ImageFilter.GaussianBlur(radius=1.5))
+        frame_rgba = frame_rgb.convert("RGBA")
+        trail_alpha = int(120 + 110 * ((order + 1) / max(1, len(trail_indices))))
+        frame_rgba.putalpha(mask.point(lambda px: min(255, int(px * trail_alpha / 255.0))))
+        canvas.alpha_composite(frame_rgba)
+    final_outline = final_rgb.convert("RGBA")
+    final_outline.putalpha(48)
+    canvas.alpha_composite(final_outline)
+    return canvas.convert("RGB")
+
+
+def build_tile_figure_sim_trajectory_panel(
+    sample: Dict[str, Any],
+    robot: str,
+    hz: int,
+    *,
+    canonical: str,
+    force: bool = False,
+    stack_count: int = 10,
+    blend_weight: float = 0.64,
+) -> tuple[Image.Image, Dict[str, Any]]:
+    """
+    **Simulator-only** panels for ``tile_figure``: no GIF, no alpha_frame fallback.
+    Uses ``get_sim_bundle`` frames + ``_image_with_ee_path`` (yellow→purple) like ``_build_alpha_frame_with_ee``,
+    but builds the motion stack from captured numpy frames so EE projection stays aligned.
+
+    ``canonical`` must be one of: ``alpha_frame_trajectory``, ``middle_frame_trajectory``, ``first_frame_trajectory``.
+
+    Returns ``(RGB PIL image, meta dict)`` with trajectory screen coordinates and frame indices for logging/cache.
+    """
+    if canonical not in (
+        "alpha_frame_trajectory",
+        "middle_frame_trajectory",
+        "first_frame_trajectory",
+    ):
+        raise ValueError(f"unsupported canonical for sim-only tile panel: {canonical!r}")
+
+    b = get_sim_bundle(sample, robot, hz, force=force)
+    frames: list[np.ndarray] = b["frames"]
+    if not frames:
+        raise RuntimeError(f"No sim frames for {sample.get('sample_id')}")
+    nf = len(frames)
+    w = int(b["width"])
+    layers = _sim_trajectory_layers(b, b["cam_pos"], b["cam_rot"], b["fovy"], w)
+    pts = layers.get("ee", [])
+    traj_xy = [{"x": int(x), "y": int(y)} for x, y in pts]
+    mid = nf // 2
+
+    meta: Dict[str, Any] = {
+        "n_frames": nf,
+        "width": w,
+        "trajectory_screen_xy": traj_xy,
+        "ee_screen_points": len(pts),
+        "mid_frame_index": mid,
+        "stack_indices": sorted(
+            set(
+                int(round(i * (nf - 1) / max(1, stack_count - 1)))
+                for i in range(stack_count)
+            )
+        )
+        if canonical == "alpha_frame_trajectory"
+        else None,
+    }
+
+    if canonical == "alpha_frame_trajectory":
+        under = _build_alpha_stack_from_numpy_frames(frames, stack_count=stack_count)
+        path_layer = _image_with_trajectory_layers(
+            Image.fromarray(np.asarray(frames[mid], dtype=np.uint8)).convert("RGB"),
+            layers,
+        )
+        if under.size != path_layer.size:
+            under = under.resize(path_layer.size, Image.LANCZOS)
+        img = Image.blend(under, path_layer, blend_weight).convert("RGB")
+    elif canonical == "middle_frame_trajectory":
+        img = _image_with_trajectory_layers(
+            Image.fromarray(np.asarray(frames[mid], dtype=np.uint8)).convert("RGB"),
+            layers,
+        ).convert("RGB")
+        meta["raster_frame_index"] = mid
+    else:
+        img = _image_with_trajectory_layers(
+            Image.fromarray(np.asarray(frames[0], dtype=np.uint8)).convert("RGB"),
+            layers,
+        ).convert("RGB")
+        meta["raster_frame_index"] = 0
+
+    return img, meta
+
+
 def _estimate_step_frame_counts(cfg: Dict[str, Any], hz: int) -> List[int]:
     counts: List[int] = []
     for step in cfg.get("movements", []):
@@ -381,12 +518,12 @@ def _step_ranges_from_trajectory_len(step_counts: List[int], traj_len: int) -> L
 
 
 def _build_alpha_stack_with_arrows(sample: Dict[str, Any], output_path: str, robot: str, hz: int) -> str:
-    robotarm_dir = REPO_ROOT / "adhoc" / "robotarm"
-    if str(robotarm_dir) not in sys.path:
-        sys.path.insert(0, str(robotarm_dir))
+    arm_pkg = _robotarm_package_dir()
+    if str(arm_pkg) not in sys.path:
+        sys.path.insert(0, str(arm_pkg))
 
     from motion_generation import MotionGenerator, _select_initial_poses
-    from vlm_pose_benchmark import _project_3d, _simulate_trajectory
+    from legacy.vlm_pose_benchmark import _project_3d, _simulate_trajectory
 
     cfg = _load_cue_config_from_sample(sample)
     base = _build_alpha_stack_image(sample["gif_path"]).convert("RGB")
@@ -398,7 +535,7 @@ def _build_alpha_stack_with_arrows(sample: Dict[str, Any], output_path: str, rob
             first_pose_def = movement.get("parameters", {}).get("pose")
             break
 
-    jsonl_path = REPO_ROOT / "data" / "seed" / "closest_poses_results.jsonl"
+    jsonl_path = pose_database_jsonl()
     temp_output_root = (REPO_ROOT / "adhoc" / "test" / "_traj_tmp").resolve()
     temp_output_root.mkdir(parents=True, exist_ok=True)
 
@@ -530,16 +667,119 @@ def clear_sim_bundle_cache() -> None:
     _SIM_BUNDLE_CACHE.clear()
 
 
+def _is_quadruped_sim_robot(robot: str) -> bool:
+    """Legged sim robots that use ``QuadrupedMotionGenerator`` (not arm ``MotionGenerator``)."""
+    u = (robot or "").strip()
+    if not u:
+        return False
+    low = u.lower()
+    if low in ("go2", "unitree", "unitreea1"):
+        return True
+    if low.startswith("spot"):
+        return True
+    return u in ("Go2", "Unitree", "UnitreeA1") or u.startswith("Spot")
+
+
+def _is_tiago_mobile_sim_robot(robot: str) -> bool:
+    """TIAGo mobile base — IK_POSE ``MotionGenerator`` does not support it; use ``render_mobile_config``."""
+    return (robot or "").strip() == "Tiago"
+
+
+def _quadruped_tracking_world(env: Any, robot: Any) -> np.ndarray:
+    """World point for trajectory overlay (base / trunk); arm robots fall back to gripper tip."""
+    rb = getattr(robot.robot_model, "root_body", None)
+    if rb is not None:
+        try:
+            bid = env.sim.model.body_name2id(str(rb)) if isinstance(rb, str) else int(rb)
+            return np.asarray(env.sim.data.body_xpos[bid], dtype=np.float64).copy()
+        except Exception:
+            pass
+    for alt in ("robot0_base", "robot0_trunk"):
+        try:
+            bid = env.sim.model.body_name2id(alt)
+            return np.asarray(env.sim.data.body_xpos[bid], dtype=np.float64).copy()
+        except Exception:
+            continue
+    arm_dir = _robotarm_package_dir()
+    if str(arm_dir) not in sys.path:
+        sys.path.insert(0, str(arm_dir))
+    from legacy.vlm_pose_benchmark import _get_gripper_tip_world
+
+    return np.asarray(_get_gripper_tip_world(env, robot), dtype=np.float64)
+
+
+def _simulate_trajectory_quadruped(
+    gen: Any,
+    cue_name: str,
+    cue_idx: int,
+    config_path: str,
+    hz: int = 4,
+    pose_index: Optional[int] = None,
+) -> Tuple[Any, list[dict[str, Any]], np.ndarray, np.ndarray, float]:
+    trajectory: list[dict[str, Any]] = []
+    orig_capture = gen._capture_image
+
+    def _capture_with_traj():
+        pos = _quadruped_tracking_world(gen.env, gen.robot)
+        trajectory.append({"pos": pos, "rot": np.eye(3)})
+        return orig_capture()
+
+    gen._capture_image = _capture_with_traj
+    try:
+        gen._set_joint_positions(gen.initial_joint_pos)
+        out = gen.execute_cue(
+            cue=cue_name,
+            pose_index=pose_index,
+            config_path=config_path,
+            hz=hz,
+            save_gif=False,
+            cue_idx=cue_idx,
+        )
+    finally:
+        gen._capture_image = orig_capture
+
+    frames, _pose_id = out
+    cam_id = gen.env.sim.model.camera_name2id("frontview")
+    cam_pos = gen.env.sim.data.cam_xpos[cam_id].copy()
+    cam_rot = gen.env.sim.data.cam_xmat[cam_id].reshape(3, 3).copy()
+    fovy = float(gen.env.sim.model.cam_fovy[cam_id])
+    return frames, trajectory, cam_pos, cam_rot, fovy
+
+
+def _sim_bundle_disk_path(
+    sample: Dict[str, Any],
+    robot: str,
+    hz: int,
+    config_path_str: str,
+    *,
+    camera_spherical_framing: bool = False,
+) -> Path:
+    p = Path(config_path_str)
+    fp = ""
+    if p.is_file():
+        st = p.stat()
+        fp = f"{p.resolve()}|{st.st_mtime_ns}|{st.st_size}"
+    csf = int(bool(camera_spherical_framing))
+    key = f"v5|{sample.get('sample_id')}|{robot}|{hz}|{fp}|csf={csf}"
+    h = hashlib.sha256(key.encode("utf-8")).hexdigest()[:48]
+    SIM_BUNDLE_DISK_ROOT.mkdir(parents=True, exist_ok=True)
+    return SIM_BUNDLE_DISK_ROOT / f"{h}.pkl"
+
+
 def get_sim_bundle(
     sample: Dict[str, Any],
     robot: str,
     hz: int,
     *,
     force: bool = False,
+    disk_cache: bool = True,
 ) -> dict[str, Any]:
     """
     One simulation pass per (sample, robot, hz, config_path); cache for all trajectory-based media
     and mp4+trajectory in the same process.
+
+    When ``disk_cache`` is True (default), successful bundles are written under
+    ``data/results/visualize/_sim_bundles/`` so later processes can reload without re-running MuJoCo.
     """
     cfg = _load_cue_config_from_sample(sample)
     first_pose_def = None
@@ -555,46 +795,109 @@ def get_sim_bundle(
         tmp.close()
         temp_config_path = tmp.name
         config_path = temp_config_path
-    ckey = f"{sample.get('sample_id')}|{robot}|{hz}|{os.path.normpath(str(config_path))}"
+    meta = sample.get("meta") if isinstance(sample.get("meta"), dict) else {}
+    cam_sf = bool(meta.get("camera_spherical_framing", False))
+    ckey = (
+        f"{sample.get('sample_id')}|{robot}|{hz}|{os.path.normpath(str(config_path))}|csf={int(cam_sf)}"
+    )
     if not force and ckey in _SIM_BUNDLE_CACHE:
         return _SIM_BUNDLE_CACHE[ckey]
     if force and ckey in _SIM_BUNDLE_CACHE:
         del _SIM_BUNDLE_CACHE[ckey]
 
-    robotarm_dir = REPO_ROOT / "adhoc" / "robotarm"
-    if str(robotarm_dir) not in sys.path:
-        sys.path.insert(0, str(robotarm_dir))
-    from motion_generation import MotionGenerator, _select_initial_poses
-    from vlm_pose_benchmark import _simulate_trajectory
+    if (
+        disk_cache
+        and not force
+        and sample.get("testset") != "persona"
+        and isinstance(config_path, str)
+        and Path(config_path).is_file()
+    ):
+        disk_path = _sim_bundle_disk_path(sample, robot, hz, config_path, camera_spherical_framing=cam_sf)
+        if disk_path.is_file():
+            try:
+                with open(disk_path, "rb") as df:
+                    bundle = pickle.load(df)
+                _SIM_BUNDLE_CACHE[ckey] = bundle
+                return bundle
+            except Exception:
+                pass
 
-    jsonl_path = REPO_ROOT / "data" / "seed" / "closest_poses_results.jsonl"
+    arm_pkg = _robotarm_package_dir()
+    if str(arm_pkg) not in sys.path:
+        sys.path.insert(0, str(arm_pkg))
+
     temp_output_root = (REPO_ROOT / "adhoc" / "test" / "_traj_tmp").resolve()
     temp_output_root.mkdir(parents=True, exist_ok=True)
-    gen = None
+    gen: Any = None
+    trajectory_tracks: dict[str, bool] | None = None
     try:
-        gen = MotionGenerator(
-            robot_name=robot,
-            jsonl_path=str(jsonl_path),
-            output_dir=str(temp_output_root),
-            capture_image_width=512,
-            capture_image_height=512,
-            hz=hz,
-        )
-        pose_id = sample.get("selected_pose_id") or sample.get("pose_index")
-        if pose_id is None and first_pose_def is not None:
-            matching = gen._find_matching_poses(first_pose_def)
-            selected = _select_initial_poses(matching, first_pose_def, 1)
-            if selected:
-                pose_id = selected[0]["pose_id"]
+        if _is_quadruped_sim_robot(robot):
+            from legacy.motion_generation_quadruped import QuadrupedMotionGenerator
 
-        frames, trajectory, cam_pos, cam_rot, fovy = _simulate_trajectory(
-            gen,
-            sample["cue"],
-            int(sample["cue_idx"]),
-            str(config_path),
-            hz=hz,
-            pose_index=pose_id,
-        )
+            gen = QuadrupedMotionGenerator(
+                robot_name=robot,
+                output_dir=str(temp_output_root),
+                capture_image_width=512,
+                capture_image_height=512,
+                hz=hz,
+            )
+            pose_id = sample.get("selected_pose_id") or sample.get("pose_index")
+            frames, trajectory, cam_pos, cam_rot, fovy = _simulate_trajectory_quadruped(
+                gen,
+                sample["cue"],
+                int(sample["cue_idx"]),
+                str(config_path),
+                hz=hz,
+                pose_index=pose_id,
+            )
+        elif _is_tiago_mobile_sim_robot(robot):
+            if str(REPO_ROOT) not in sys.path:
+                sys.path.insert(0, str(REPO_ROOT))
+            from adhoc.generation.google_robot.legacy.render_mobile_config import (
+                render_config_with_trajectory,
+                tiago_trajectory_track_policy,
+            )
+
+            frames, trajectory, cam_pos, cam_rot, fovy = render_config_with_trajectory(cfg)
+            trajectory_tracks = tiago_trajectory_track_policy(cfg)
+        else:
+            # ``legacy.motion_generation_quadruped`` inserts ``adhoc/generation`` at sys.path[0],
+            # so a plain ``import motion_generation`` resolves to generation/motion_generation.py
+            # (thin CLI shim) instead of robotarm/motion_generation.py and breaks IIWA bundles.
+            arm_root = str(arm_pkg.resolve())
+            try:
+                sys.path.remove(arm_root)
+            except ValueError:
+                pass
+            sys.path.insert(0, arm_root)
+            from motion_generation import MotionGenerator, _select_initial_poses
+            from legacy.vlm_pose_benchmark import _simulate_trajectory
+
+            jsonl_path = pose_database_jsonl()
+            gen = MotionGenerator(
+                robot_name=robot,
+                jsonl_path=str(jsonl_path),
+                output_dir=str(temp_output_root),
+                capture_image_width=512,
+                capture_image_height=512,
+                hz=hz,
+                camera_spherical_framing=cam_sf,
+            )
+            pose_id = sample.get("selected_pose_id") or sample.get("pose_index")
+            if pose_id is None and first_pose_def is not None:
+                matching = gen._find_matching_poses(first_pose_def)
+                selected = _select_initial_poses(matching, first_pose_def, 1)
+                if selected:
+                    pose_id = selected[0]["pose_id"]
+
+            frames, trajectory, cam_pos, cam_rot, fovy = _simulate_trajectory(
+                gen,
+                sample["cue"],
+                int(sample["cue_idx"]),
+                str(config_path),
+                hz=hz,
+                pose_index=pose_id,
+            )
         if not frames:
             raise RuntimeError(f"No frames captured for {sample['sample_id']}")
         frames_out = [np.asarray(frames[i]) for i in range(len(frames))]
@@ -606,7 +909,17 @@ def get_sim_bundle(
             "fovy": float(fovy),
             "width": 512,
         }
+        if trajectory_tracks is not None:
+            bundle["trajectory_tracks"] = trajectory_tracks
         _SIM_BUNDLE_CACHE[ckey] = bundle
+        if disk_cache and sample.get("testset") != "persona" and isinstance(config_path, str) and Path(config_path).is_file():
+            disk_path = _sim_bundle_disk_path(sample, robot, hz, config_path, camera_spherical_framing=cam_sf)
+            try:
+                disk_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(disk_path, "wb") as df:
+                    pickle.dump(bundle, df, protocol=4)
+            except Exception:
+                pass
         return bundle
     finally:
         if gen is not None:
@@ -625,10 +938,10 @@ def _project_ee_to_screen(
     fovy: float,
     width: int,
 ) -> List[tuple[int, int]]:
-    robotarm_dir = REPO_ROOT / "adhoc" / "robotarm"
-    if str(robotarm_dir) not in sys.path:
-        sys.path.insert(0, str(robotarm_dir))
-    from vlm_pose_benchmark import _project_3d
+    arm_pkg = _robotarm_package_dir()
+    if str(arm_pkg) not in sys.path:
+        sys.path.insert(0, str(arm_pkg))
+    from legacy.vlm_pose_benchmark import _project_3d
 
     pts: list[tuple[int, int]] = []
     for t in trajectory:
@@ -638,25 +951,109 @@ def _project_ee_to_screen(
     return _offset_overlapping_projected_path(pts)
 
 
-def _image_with_ee_path(base: Image.Image, pts: List[tuple[int, int]]) -> Image.Image:
+def _project_optional_track(
+    trajectory: list[dict[str, Any]],
+    track_key: str,
+    cam_pos: np.ndarray,
+    cam_rot: np.ndarray,
+    fovy: float,
+    width: int,
+) -> List[tuple[int, int]]:
+    """Project a secondary track (e.g. Tiago ``track_head`` / ``track_torso``)."""
+    synthetic: list[dict[str, Any]] = []
+    for t in trajectory:
+        sub = t.get(track_key)
+        if sub is None or sub.get("pos") is None:
+            continue
+        rot = sub.get("rot")
+        if rot is None:
+            rot = np.eye(3)
+        synthetic.append({"pos": sub["pos"], "rot": rot})
+    if len(synthetic) < 2:
+        return []
+    return _project_ee_to_screen(synthetic, cam_pos, cam_rot, fovy, width)
+
+
+def _sim_trajectory_layers(
+    bundle: dict[str, Any],
+    cam_pos: np.ndarray,
+    cam_rot: np.ndarray,
+    fovy: float,
+    width: int,
+) -> dict[str, list[tuple[int, int]]]:
+    traj = bundle.get("trajectory") or []
+    policy = bundle.get("trajectory_tracks")
+    if policy is None:
+        show_ee = True
+        show_head = True
+        show_torso = True
+    else:
+        show_ee = bool(policy.get("show_ee", False))
+        show_head = bool(policy.get("show_head", False))
+        show_torso = bool(policy.get("show_torso", False))
+
+    layers: dict[str, list[tuple[int, int]]] = {}
+    if show_ee:
+        layers["ee"] = _project_ee_to_screen(traj, cam_pos, cam_rot, fovy, width)
+    else:
+        layers["ee"] = []
+
+    if show_head and traj and isinstance(traj[0], dict):
+        ph = _project_optional_track(traj, "track_head", cam_pos, cam_rot, fovy, width)
+        if len(ph) >= 2:
+            layers["head"] = ph
+    if show_torso and traj and isinstance(traj[0], dict):
+        pt = _project_optional_track(traj, "track_torso", cam_pos, cam_rot, fovy, width)
+        if len(pt) >= 2:
+            layers["torso"] = pt
+    return layers
+
+
+def _image_with_trajectory_layers(
+    base: Image.Image,
+    layers: dict[str, list[tuple[int, int]]],
+) -> Image.Image:
+    """Draw EE (warm), torso (orange), head (cyan) polylines; EE drawn last on top."""
     img = base.copy().convert("RGB")
-    if len(pts) < 2:
-        return img
     draw = ImageDraw.Draw(img)
-    n = len(pts)
-    for i in range(1, n):
-        frac = i / max(1, n - 1)
-        color = (
-            int(255 * (1.0 - frac) + 128 * frac),
-            int(220 * (1.0 - frac) + 60 * frac),
-            int(40 * (1.0 - frac) + 220 * frac),
+    track_styles: dict[str, tuple[int, tuple[int, int, int], tuple[int, int, int]]] = {
+        "torso": (5, (255, 145, 55), (140, 45, 35)),
+        "head": (5, (0, 215, 235), (130, 60, 210)),
+        "ee": (6, (255, 230, 80), (138, 80, 220)),
+    }
+    draw_order = ("torso", "head", "ee")
+    for key in draw_order:
+        pts = layers.get(key)
+        if not pts or len(pts) < 2:
+            continue
+        lw, c0, c1 = track_styles.get(key, track_styles["ee"])
+        n = len(pts)
+        for i in range(1, n):
+            frac = i / max(1, n - 1)
+            color = tuple(int(c0[j] + (c1[j] - c0[j]) * frac) for j in range(3))
+            draw.line([pts[i - 1], pts[i]], fill=color, width=lw)
+        sx, sy = pts[0]
+        ex, ey = pts[-1]
+        rad = 5 if key != "ee" else 6
+        start_fill = (255, 245, 160) if key == "ee" else (200, 255, 255)
+        end_fill = (160, 110, 230) if key == "ee" else (120, 200, 255)
+        draw.ellipse(
+            [sx - rad, sy - rad, sx + rad, sy + rad],
+            fill=start_fill,
+            outline="white",
+            width=2,
         )
-        draw.line([pts[i - 1], pts[i]], fill=color, width=5)
-    sx, sy = pts[0]
-    ex, ey = pts[-1]
-    draw.ellipse([sx - 6, sy - 6, sx + 6, sy + 6], fill=(255, 230, 80), outline="white", width=2)
-    draw.ellipse([ex - 6, ey - 6, ex + 6, ey + 6], fill=(138, 80, 220), outline="white", width=2)
+        draw.ellipse(
+            [ex - rad, ey - rad, ex + rad, ey + rad],
+            fill=end_fill,
+            outline="white",
+            width=2,
+        )
     return img
+
+
+def _image_with_ee_path(base: Image.Image, pts: List[tuple[int, int]]) -> Image.Image:
+    return _image_with_trajectory_layers(base, {"ee": pts})
 
 
 def _build_frame_with_ee_trajectory(
@@ -682,9 +1079,9 @@ def _build_frame_with_ee_trajectory(
     else:
         fidx = max(0, min(int(frame_index), nf - 1))
     w = int(b["width"])
-    pts = _project_ee_to_screen(b["trajectory"], b["cam_pos"], b["cam_rot"], b["fovy"], w)
+    layers = _sim_trajectory_layers(b, b["cam_pos"], b["cam_rot"], b["fovy"], w)
     base = Image.fromarray(frames[fidx]).convert("RGB")
-    return _save_png(_image_with_ee_path(base, pts), output_path)
+    return _save_png(_image_with_trajectory_layers(base, layers), output_path)
 
 
 def _build_first_frame_with_trajectory(
@@ -717,7 +1114,8 @@ def _build_alpha_frame_with_ee(
     under = _build_alpha_stack_image(sample["gif_path"]).convert("RGB")
     if under.size != path_layer.size:
         under = under.resize(path_layer.size, Image.LANCZOS)
-    blended = Image.blend(under, path_layer, 0.5)
+    # Favor the mid-frame + yellow→purple EE path so the trajectory stays visible over the stack.
+    blended = Image.blend(under, path_layer, 0.64)
     return _save_png(blended, output_path)
 
 
@@ -741,10 +1139,16 @@ def _build_mp4_plus_trajectory(
     w = int(b["width"])
     tdir = Path(tempfile.mkdtemp(prefix="mp4trj_", dir=str(out.parent)))
     try:
+        policy = b.get("trajectory_tracks")
+        show_ee = policy is None or bool(policy.get("show_ee", True))
         n = len(frames)
         for k in range(n):
             sub = trajectory[: k + 1]
-            pts = _project_ee_to_screen(sub, b["cam_pos"], b["cam_rot"], b["fovy"], w)
+            pts = (
+                _project_ee_to_screen(sub, b["cam_pos"], b["cam_rot"], b["fovy"], w)
+                if show_ee
+                else []
+            )
             base = Image.fromarray(frames[k]).convert("RGB")
             img = _image_with_ee_path(base, pts)
             img.save(tdir / f"frame_{k:04d}.png")
@@ -980,9 +1384,9 @@ def prepare_normalized_eval_media(
     output_dir: str = "adhoc/vlm_test/eval_media",
     force: bool = False,
 ) -> List[Dict[str, Any]]:
-    script_dir = REPO_ROOT / "adhoc" / "robotarm"
+    script_dir = _robotarm_package_dir()
     motion_script = script_dir / "motion_generation.py"
-    jsonl_path = REPO_ROOT / "data" / "seed" / "closest_poses_results.jsonl"
+    jsonl_path = pose_database_jsonl()
     target_root = (REPO_ROOT / output_dir).resolve()
     target_root.mkdir(parents=True, exist_ok=True)
 

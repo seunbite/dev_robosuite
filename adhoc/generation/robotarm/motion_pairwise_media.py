@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -24,6 +25,7 @@ from motion_gt_tail_builder import (  # noqa: E402
     apply_single_element_variant,
     build_config_from_gt_pose_and_component,
 )
+from motion_media_paths import pose_jsonl  # noqa: E402
 from motion_neg_axis_pick import primary_axis_from_component  # noqa: E402
 from pilot90_experiment_suite import MOTION_PAIRWISE_DIR, MOTION_CFG  # noqa: E402
 from score_pilot40_motion_gt_components import _build_annotation_map  # noqa: E402
@@ -193,6 +195,8 @@ def prepare_pilot90_pairwise_mp4s(
     force: bool = False,
     limit: int = 0,
 ) -> tuple[int, list[str]]:
+    jpath = pose_jsonl(_REPO)
+    os.environ["MOTION_POSE_JSONL"] = str(jpath)
     od = out_dir or MOTION_PAIRWISE_DIR
     sc = scratch or (od / "_build_scratch")
     od.mkdir(parents=True, exist_ok=True)
