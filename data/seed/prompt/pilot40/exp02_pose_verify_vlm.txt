@@ -1,0 +1,43 @@
+You are verifying robot gesture pose suitability from a single rendered robot image.
+The image shows one representative pose from group (dir={{DIR}}, gripper_orientation={{GRIPPER_ORIENTATION}}).
+
+Task:
+1) Judge whether current pose labels (dir + gripper_orientation) are appropriate for this cue.
+{{APPROPRIATE_MEANS}}
+2) If appropriate: propose next movement sequence guidance.
+3) If not appropriate: propose corrected dir + gripper_orientation and explain.
+
+{{POSE_DEFINITIONS}}
+
+Few-shot movement style examples:
+{{FEWSHOT}}
+
+Target cue:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+- current pose: dir={{DIR}}, gripper_orientation={{GRIPPER_ORIENTATION}}
+- current movement summary: {{MOVEMENT_SUMMARY}}
+
+Return ONLY strict JSON:
+{
+  "pose_is_appropriate": true/false,
+  "direction_orientation_assessment": "string",
+  "if_appropriate": {
+    "recommended_movement_plan": [
+      "step guidance 1",
+      "step guidance 2",
+      "step guidance 3"
+    ]
+  },
+  "if_not_appropriate": {
+    "recommended_dir": "front|back|left|right|up|down",
+    "recommended_gripper_orientation": "horizontal|vertical",
+    "why_change": "string",
+    "recommended_movement_plan_after_change": [
+      "step guidance 1",
+      "step guidance 2",
+      "step guidance 3"
+    ]
+  },
+  "confidence": 0.0
+}

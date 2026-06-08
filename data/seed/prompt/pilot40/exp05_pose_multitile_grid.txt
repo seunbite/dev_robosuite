@@ -1,0 +1,30 @@
+You are identifying the ground-truth iconic pose for a robot gesture cue from a tiled image.
+{{TEMPORAL_LINE}}
+The image shows {{N_TILES}} cropped robot renders in a {{COLS}}x{{ROWS}} grid.
+Tiles are numbered 1..{{N_TILES}} left-to-right, top-to-bottom.
+Each tile is one representative pose from a (dir, gripper_orientation) group.
+Labels below describe geometry only — none is marked as correct.
+
+Task: Which tile number is the ground-truth iconic pose for this cue — the static pose a human
+annotator would accept as matching the gesture's meaning?
+{{REPRESENTATIVE_MEANS}}
+Do NOT judge based on which pose is easiest to start motion from.
+
+Definitions:
+Coordinate frame: +x forward (viewer), +y robot left, +z up. EE pointing axis = wrist → fingertips.
+- dir: dominant world direction of pointing axis (front|back|left|right|up|down).
+- gripper_orientation: projected jaw-opening line on plane ⊥ to dir — horizontal (ㅡ) or vertical (|).
+
+Target cue:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+
+Tile labels (geometry only):
+{{TILE_LABELS}}
+
+Return ONLY strict JSON:
+{
+  "best_tile_index": 1,
+  "direction_orientation_assessment": "string: why this tile is the GT iconic pose",
+  "confidence": 0.0
+}

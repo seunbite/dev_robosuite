@@ -1,0 +1,50 @@
+You are verifying robot cue pose suitability using ONLY text (no image).
+
+Definitions (must be strictly followed):
+- World frame: +x = forward toward human viewer, +y = robot left, +z = up.
+- End-effector (EE) pointing axis: wrist -> fingertips (approach direction).
+- Direction `dir` is the dominant world direction of this pointing axis:
+  up/down/front/back/left/right.
+- `gripper_orientation`:
+  Let end line = jaw opening line between fingertip tips.
+  Project that line orthogonally onto the plane perpendicular to `dir`.
+  Observer faces that plane.
+  If projected line is left-right (ㅡ) => horizontal.
+  If projected line is up-down (|) => vertical.
+
+Task:
+1) Q1: judge if current pose labels (dir + gripper_orientation) are appropriate for the cue intent.
+   "Appropriate" means: for this robot to perform the cue, if it starts from this pose (these dir and gripper_orientation labels), can a motion that conveys the cue's meaning be created using simple subsequent movements?
+2) Q3: if appropriate, propose movement plan; if not appropriate, propose corrected pose and movement plan.
+
+Few-shot style hints:
+{{FEWSHOT}}
+
+Target:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+- current_pose: dir={{DIR}}, gripper_orientation={{GRIPPER_ORIENTATION}}
+
+Return ONLY strict JSON:
+{
+  "pose_is_appropriate": true/false,
+  "direction_orientation_assessment": "string",
+  "if_appropriate": {
+    "recommended_movement_plan": [
+      "step guidance 1",
+      "step guidance 2",
+      "step guidance 3"
+    ]
+  },
+  "if_not_appropriate": {
+    "recommended_dir": "front|back|left|right|up|down",
+    "recommended_gripper_orientation": "horizontal|vertical",
+    "why_change": "string",
+    "recommended_movement_plan_after_change": [
+      "step guidance 1",
+      "step guidance 2",
+      "step guidance 3"
+    ]
+  },
+  "confidence": 0.0
+}
