@@ -57,6 +57,11 @@ echo "  model_size=$MODEL_SIZE only=$ONLY resume=$RESUME"
 echo "  pairwise_specs=$PAIRWISE_SPECS"
 nvidia-smi || true
 
-git pull --ff-only || git pull
+# Optional sync; never fail the job on a dirty tree (rsync / local edits are common).
+if [[ "${SKIP_GIT_PULL:-0}" != "1" ]]; then
+  if ! git pull --ff-only 2>/dev/null && ! git pull 2>/dev/null; then
+    echo "[warn] git pull skipped — dirty working tree; using checkout on disk" >&2
+  fi
+fi
 
 bash scripts/run_pilot90_qwen_suite.sh
