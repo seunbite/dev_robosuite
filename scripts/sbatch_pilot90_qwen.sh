@@ -20,6 +20,7 @@
 #   RESUME=0 recommended for exp10 (49-cue v5 specs; ignores stale 88-cue results)
 #   PAIRWISE_SPECS=.../pairwise_specs_motion_gt_correct.json  (default)
 #   MOTION_PREPARE_MP4=0   MOTION_PREPARE_PAIRWISE=0  (skip re-render on cluster)
+#   VLM env: y/envs/robosuite-vlm — if CUDA fails once on GPU: bash scripts/install_vlm_transformers.sh
 
 set -euo pipefail
 ROOT="${SLURM_SUBMIT_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
@@ -38,18 +39,9 @@ export MOTION_PREPARE_MP4="${MOTION_PREPARE_MP4:-0}"
 export MOTION_PREPARE_PAIRWISE="${MOTION_PREPARE_PAIRWISE:-0}"
 export PAIRWISE_SPECS="${PAIRWISE_SPECS:-data/results/verify/samples/motion_gt_neg_pairwise_pilot90/pairwise_specs_motion_gt_correct.json}"
 
-if [[ -n "${CONDA_SH:-}" && -f "${CONDA_SH}" ]]; then
-  # shellcheck disable=SC1090
-  source "${CONDA_SH}"
-  conda activate "${CONDA_ENV:-m2m_caption32b}"
-elif command -v micromamba >/dev/null 2>&1; then
-  eval "$(micromamba shell hook --shell bash)"
-  micromamba activate robosuite-vlm
-elif [[ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]]; then
-  # shellcheck disable=SC1091
-  source "$HOME/miniconda3/etc/profile.d/conda.sh"
-  conda activate robosuite-vlm
-fi
+# Babel: use <repo>/y/envs/robosuite-vlm (not m2m_caption32b — miniconda path in sbg2 alias is often stale).
+# shellcheck disable=SC1091
+source "$ROOT/scripts/activate_cluster_vlm.sh" "$ROOT"
 
 echo "=== sbatch pilot90 qwen ==="
 echo "  host=$(hostname) job=${SLURM_JOB_ID:-local} partition=${SLURM_JOB_PARTITION:-?}"
