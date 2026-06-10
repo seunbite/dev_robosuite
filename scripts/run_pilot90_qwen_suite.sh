@@ -5,6 +5,8 @@
 #   MODEL_SIZE=7b RESUME=1 bash scripts/run_pilot90_qwen_suite.sh
 #   SUMMARY_ONLY=1 bash scripts/run_pilot90_qwen_suite.sh
 #   bash scripts/run_pilot90_qwen_all_models.sh   # 32b → 7b → 3b
+#   ONLY=10 MOTION_PREPARE_PAIRWISE=0 MODEL_SIZE=32b bash scripts/run_pilot90_qwen_suite.sh
+#   sbg2 --export=ALL,MODEL_SIZE=32b,ONLY=10,MOTION_PREPARE_PAIRWISE=0 scripts/sbatch_pilot90_qwen.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -73,6 +75,9 @@ echo "  HF_HOME=$HF_HOME"
 echo "  pose_cfg=$POSE_CFG"
 echo "  motion_gt=$MOTION_GT"
 echo "  out=$OUT_DIR"
+echo "  only=${ONLY:-all}"
+echo "  pairwise_specs=${PAIRWISE_SPECS:-data/results/verify/samples/motion_gt_neg_pairwise_pilot90/pairwise_specs_motion_gt_correct.json}"
+echo "  motion_prepare_mp4=${MOTION_PREPARE_MP4:-1} motion_prepare_pairwise=${MOTION_PREPARE_PAIRWISE:-1}"
 echo "  resume=${RESUME:-1}"
 echo ""
 
@@ -155,10 +160,11 @@ if [[ "${SEPARATE_STEPS:-0}" == "1" ]]; then
     "${COMMON[@]}" "${RESUME_FLAG[@]}" \
     --out-json "$OUT_DIR/exp09_motion_verify_text.json"
 
+  PAIRWISE_SPECS="${PAIRWISE_SPECS:-data/results/verify/samples/motion_gt_neg_pairwise_pilot90/pairwise_specs_motion_gt_correct.json}"
   $PY adhoc/generation/robotarm/verify_motion_gt_neg_pairwise_vlm.py \
     --motion-cfg "$POSE_CFG" \
     --pairwise-dir data/results/verify/samples/motion_gt_neg_pairwise_pilot90 \
-    --pairwise-jsons data/results/verify/samples/motion_gt_neg_pairwise_pilot90/pairwise_specs_pilot90.json \
+    --pairwise-jsons "$PAIRWISE_SPECS" \
     "${COMMON[@]}" "${RESUME_FLAG[@]}" \
     --out-json "$OUT_DIR/exp10_motion_pairwise_mp4.json"
 

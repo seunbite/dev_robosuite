@@ -342,7 +342,8 @@ def _run_motion_verify_text(args: argparse.Namespace, out_json: Path) -> None:
 def _run_motion_pairwise_mp4(args: argparse.Namespace, out_json: Path) -> None:
     from verify_motion_gt_neg_pairwise_vlm import run
 
-    pairwise_json = MOTION_PAIRWISE_DIR / "pairwise_specs_pilot90.json"
+    specs_env = os.getenv("PAIRWISE_SPECS")
+    pairwise_json = Path(specs_env) if specs_env else MOTION_PAIRWISE_DIR / "pairwise_specs_pilot90.json"
     ns = argparse.Namespace(
         out_json=out_json,
         model=args.model,
@@ -455,7 +456,11 @@ def main() -> None:
 
     needs_pairwise_media = any(s["kind"] == "motion_pairwise_mp4" for s in specs)
     if needs_pairwise_media:
-        ready, _ = _prepare_pairwise_mp4_if_needed()
+        if os.getenv("MOTION_PREPARE_PAIRWISE", "1") == "0":
+            ready = len(list(MOTION_PAIRWISE_DIR.glob("*_pair_axis.mp4")))
+            print(f"[suite] MOTION_PREPARE_PAIRWISE=0 — {ready} pairwise mp4 on disk", flush=True)
+        else:
+            ready, _ = _prepare_pairwise_mp4_if_needed()
         if ready == 0:
             raise SystemExit(
                 "Step 10 aborted: no pilot90 pairwise MP4s built.\n"

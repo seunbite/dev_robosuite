@@ -144,15 +144,27 @@ def run(args: argparse.Namespace) -> None:
         fixed = row.get("gt_fixed_first_pose") or _first_pose(row)
         prompt = spec.get("prompt")
         if not prompt:
-            prompt = _fill_prompt(
-                template,
-                cue=cue,
-                description=str(row.get("description", "")),
-                fixed=fixed,
-                left_kind=left_kind,
-                right_kind=right_kind,
-                row=row,
-            )
+            ls = spec.get("left_tail_summary")
+            rs = spec.get("right_tail_summary")
+            if ls and rs:
+                prompt = (
+                    template.replace("{{CUE}}", cue)
+                    .replace("{{DESCRIPTION}}", str(row.get("description", "")))
+                    .replace("{{FIXED_DIR}}", str(fixed.get("dir", "?")))
+                    .replace("{{FIXED_GRIPPER_ORIENTATION}}", str(fixed.get("gripper_orientation", "?")))
+                    .replace("{{LEFT_TAIL_SUMMARY}}", str(ls))
+                    .replace("{{RIGHT_TAIL_SUMMARY}}", str(rs))
+                )
+            else:
+                prompt = _fill_prompt(
+                    template,
+                    cue=cue,
+                    description=str(row.get("description", "")),
+                    fixed=fixed,
+                    left_kind=left_kind,
+                    right_kind=right_kind,
+                    row=row,
+                )
 
         if vlm is not None:
             text = vlm.generate(prompt, videos=[str(mp4_path.resolve())])

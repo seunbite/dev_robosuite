@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import re
 from typing import Any
 
 _MAG = 22.0
@@ -131,7 +132,96 @@ def build_tail_from_component(comp: dict[str, Any] | None) -> list[dict[str, Any
     ]
 
 
+def _parse_gt_poses(groundtruth: str) -> list[tuple[str, str]]:
+    return [(a.strip(), b.strip()) for a, b in re.findall(r"\(([^,]+),\s*([^)]+)\)", groundtruth)]
+
+
+def _generation_pose_steps(row: dict[str, Any]) -> list[dict[str, Any]]:
+    poses: list[dict[str, Any]] = []
+    for step in row.get("movements") or []:
+        if step.get("type") != "pose":
+            continue
+        pose = (step.get("parameters") or {}).get("pose") or {}
+        if pose.get("dir") and pose.get("gripper_orientation"):
+            poses.append(copy.deepcopy(step))
+    return poses
+
+
+def pose_generation_matches_human_gt(row: dict[str, Any], groundtruth: str) -> bool | None:
+    """True when any generated pose step matches human GT (o=primary, x=any listed)."""
+    gt = str(groundtruth or "").strip()
+    if not gt:
+        return None
+    targets = _parse_gt_poses(gt)
+    if not targets:
+        return None
+    gen_set = {
+        (
+            str((step.get("parameters") or {}).get("pose", {}).get("dir", "")).strip(),
+            str((step.get("parameters") or {}).get("pose", {}).get("gripper_orientation", "")).strip(),
+        )
+        for step in _generation_pose_steps(row)
+    }
+    if gt.lower().startswith("o"):
+        return targets[0] in gen_set
+    if gt.lower().startswith("x"):
+        return any(t in gen_set for t in targets)
+    return None
+
+
+def human_gt_fixed_pose_from_row(row: dict[str, Any]) -> dict[str, Any] | None:
+    """Human tile-pick pose for the primary GT (dir, gripper_orientation) group."""
+    gt = str(row.get("groundtruth") or "").strip()
+    poses = _parse_gt_poses(gt)
+    if not poses:
+        return None
+    from generate_motion_from_gt_pose import (  # noqa: WPS433 — shared tile-pick helper
+        _build_fixed_pose,
+        _first_pose_from_cfg,
+        _load_tile_pick,
+    )
+
+    d, g = poses[0]
+    return _build_fixed_pose(d, g, _first_pose_from_cfg(row), _load_tile_pick())
+
+
+def resolve_first_pose_step(row: dict[str, Any]) -> tuple[dict[str, Any] | None, str]:
+    """Pick start pose: generation if human-GT-correct, else human GT tile-pick."""
+    gen_steps = _generation_pose_steps(row)
+    gen_step = gen_steps[0] if gen_steps else None
+    groundtruth = str(row.get("groundtruth") or "").strip()
+    correct = pose_generation_matches_human_gt(row, groundtruth) if groundtruth else None
+
+    if correct is True and gen_step is not None:
+        return gen_step, "generation"
+
+    human = human_gt_fixed_pose_from_row(row)
+    if human:
+        return (
+            {
+                "type": "pose",
+                "parameters": {"pose": human, "speed": 1.0, "hold_time": 0.0},
+            },
+            "human_gt_tile_pick",
+        )
+
+    if gen_step is not None:
+        return gen_step, "fallback_generation"
+
+    fixed = row.get("gt_fixed_first_pose") or {}
+    if not fixed:
+        return None, "missing"
+    return (
+        {
+            "type": "pose",
+            "parameters": {"pose": dict(fixed), "speed": 1.0, "hold_time": 0.0},
+        },
+        "gt_fixed_field",
+    )
+
+
 def first_pose_step(row: dict[str, Any]) -> dict[str, Any] | None:
+    """First pose step from the generated motion config (legacy pairwise start)."""
     for st in row.get("movements") or []:
         if st.get("type") == "pose":
             return copy.deepcopy(st)
@@ -148,6 +238,151 @@ def first_pose_step(row: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
+_AXIS_CYCLIC_FWD = {"x": "y", "y": "z", "z": "x"}
+_AXIS_CYCLIC_REV = {"x": "z", "z": "y", "y": "x"}
+
+
+def extract_generation_choreography_tail(base_row: dict[str, Any]) -> list[dict[str, Any]]:
+    """All choreography after the fixed start pose: intermediate poses + movements + paths."""
+    tail: list[dict[str, Any]] = []
+    saw_first_pose = False
+    for st in base_row.get("movements") or []:
+        if st.get("type") == "pose":
+            if not saw_first_pose:
+                saw_first_pose = True
+                continue
+        elif not saw_first_pose:
+            continue
+        tail.append(copy.deepcopy(st))
+    return tail
+
+
+def extract_generation_movement_tail(base_row: dict[str, Any]) -> list[dict[str, Any]]:
+    """Movement-only tail (legacy); prefer extract_generation_choreography_tail."""
+    return [st for st in extract_generation_choreography_tail(base_row) if st.get("type") == "movement"]
+
+
+def tail_has_intermediate_poses(tail: list[dict[str, Any]]) -> bool:
+    return any(st.get("type") == "pose" for st in tail)
+
+
+def tail_has_multi_axis_degrees(tail: list[dict[str, Any]]) -> bool:
+    for st in tail:
+        if st.get("type") != "movement":
+            continue
+        for d in (st.get("parameters") or {}).get("directions") or []:
+            if len((d.get("degrees") or {})) >= 2:
+                return True
+    return False
+
+
+def _permute_degree_axes(deg: dict[str, Any], mapping: dict[str, str]) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    for ax, val in deg.items():
+        key = str(ax).lower()
+        out[mapping.get(key, key)] = val
+    return out
+
+
+def _degree_vec(deg: dict[str, Any]) -> tuple[float, float, float]:
+    return (
+        float(deg.get("x", 0.0) or 0.0),
+        float(deg.get("y", 0.0) or 0.0),
+        float(deg.get("z", 0.0) or 0.0),
+    )
+
+
+def pick_axis_permutation_mapping(deg: dict[str, Any]) -> dict[str, str]:
+    """Pick cyclic permutation most orthogonal to GT degrees (x,y,z all present or not)."""
+    import math
+
+    gx, gy, gz = _degree_vec(deg)
+    gmag = math.sqrt(gx * gx + gy * gy + gz * gz)
+    if gmag < 1e-6:
+        return dict(_AXIS_CYCLIC_FWD)
+
+    best_map = _AXIS_CYCLIC_FWD
+    best_score = -1.0
+    for mapping in (_AXIS_CYCLIC_FWD, _AXIS_CYCLIC_REV):
+        perm = _permute_degree_axes(deg, mapping)
+        px, py, pz = _degree_vec(perm)
+        pmag = math.sqrt(px * px + py * py + pz * pz)
+        if pmag < 1e-6:
+            continue
+        cos = (gx * px + gy * py + gz * pz) / (gmag * pmag)
+        score = 1.0 - abs(cos)
+        if score > best_score:
+            best_score = score
+            best_map = mapping
+    return dict(best_map)
+
+
+def apply_multi_axis_permutation(
+    cfg: dict[str, Any],
+    *,
+    mapping: dict[str, str] | None = None,
+) -> dict[str, Any] | None:
+    """Neg control: relabel x/y/z on every direction entry (keeps joint + magnitudes)."""
+    v = copy.deepcopy(cfg)
+    ref_deg: dict[str, Any] | None = None
+    for st in v.get("movements") or []:
+        if st.get("type") != "movement":
+            continue
+        for d in (st.get("parameters") or {}).get("directions") or []:
+            deg = d.get("degrees") or {}
+            if len(deg) >= 2 and ref_deg is None:
+                ref_deg = deg
+    if ref_deg is None:
+        return None
+
+    perm = mapping or pick_axis_permutation_mapping(ref_deg)
+    true_axes = sorted({str(k).lower() for st in v.get("movements") or [] if st.get("type") == "movement" for d in (st.get("parameters") or {}).get("directions") or [] for k in (d.get("degrees") or {})})
+    neg_axes = sorted({perm.get(ax, ax) for ax in true_axes})
+
+    for st in v.get("movements") or []:
+        if st.get("type") != "movement":
+            continue
+        p = st.get("parameters") or {}
+        new_dirs: list[dict[str, Any]] = []
+        for d in p.get("directions") or []:
+            nd = dict(d)
+            nd["degrees"] = _permute_degree_axes(d.get("degrees") or {}, perm)
+            new_dirs.append(nd)
+        p["directions"] = new_dirs
+
+    v["neg_axis_meta"] = {
+        "variant": "multi_axis_permute",
+        "true_axis": "+".join(true_axes),
+        "neg_axis": "+".join(neg_axes),
+        "axis_mapping": perm,
+        "same_joint": True,
+    }
+    return v
+
+
+def build_config_from_resolved_pose_and_tail(
+    base_row: dict[str, Any],
+    tail: list[dict[str, Any]],
+    *,
+    state_tag: str = "motion_component_gt",
+) -> dict[str, Any] | None:
+    pose, start_pose_source = resolve_first_pose_step(base_row)
+    if pose is None or not tail:
+        return None
+    fixed_pose = copy.deepcopy((pose.get("parameters") or {}).get("pose") or {})
+    return {
+        "idx": int(base_row["idx"]),
+        "cue": base_row["cue"],
+        "description": base_row.get("description", ""),
+        "groundtruth": base_row.get("groundtruth", ""),
+        "gt_fixed_first_pose": fixed_pose,
+        "start_pose_source": start_pose_source,
+        "movements": [pose, *copy.deepcopy(tail)],
+        "state": state_tag,
+        "generation_mode": state_tag,
+    }
+
+
 def build_config_from_gt_pose_and_component(
     base_row: dict[str, Any],
     comp: dict[str, Any] | None,
@@ -160,12 +395,14 @@ def build_config_from_gt_pose_and_component(
     tail = build_tail_from_component(comp)
     if comp and not tail:
         return None
+    fixed_pose = copy.deepcopy((pose.get("parameters") or {}).get("pose") or {})
     out = {
         "idx": int(base_row["idx"]),
         "cue": base_row["cue"],
         "description": base_row.get("description", ""),
         "groundtruth": base_row.get("groundtruth", ""),
-        "gt_fixed_first_pose": copy.deepcopy(base_row.get("gt_fixed_first_pose") or {}),
+        "gt_fixed_first_pose": fixed_pose,
+        "start_pose_source": "generation",
         "movements": [pose, *tail],
         "state": state_tag,
         "generation_mode": state_tag,
@@ -174,12 +411,25 @@ def build_config_from_gt_pose_and_component(
 
 
 def _first_tail_step(cfg: dict[str, Any]) -> dict[str, Any] | None:
+    """First non-start step after the leading pose (pose, movement, or path)."""
     seen_pose = False
     for st in cfg.get("movements") or []:
         if st.get("type") == "pose":
             seen_pose = True
             continue
         if seen_pose:
+            return st
+    return None
+
+
+def _first_tail_movement_step(cfg: dict[str, Any]) -> dict[str, Any] | None:
+    """First movement step after the leading pose (skips intermediate poses)."""
+    seen_pose = False
+    for st in cfg.get("movements") or []:
+        if st.get("type") == "pose":
+            seen_pose = True
+            continue
+        if seen_pose and st.get("type") == "movement":
             return st
     return None
 
@@ -196,8 +446,9 @@ def apply_single_element_variant(
     kind: str,
     *,
     primary_axis: str | None = None,
+    same_joint: bool = False,
 ) -> dict[str, Any] | None:
-    """Flip one structural element (axis / joint / direction) on the first tail step."""
+    """Flip one structural element (axis / joint / direction) on the first tail movement."""
     v = copy.deepcopy(cfg)
     st = _first_tail_step(v)
     if st is None:
@@ -206,7 +457,7 @@ def apply_single_element_variant(
     t = st.get("type")
 
     if kind == "axis":
-        from motion_neg_axis_pick import pick_neg_arc_plane, pick_separated_axis_and_joint
+        from motion_neg_axis_pick import pick_neg_arc_plane, pick_separated_axis, pick_separated_axis_and_joint
 
         if t == "movement":
             dirs = p.get("directions") or []
@@ -214,9 +465,14 @@ def apply_single_element_variant(
                 return None
             ax = (primary_axis or next(iter((dirs[0].get("degrees") or {}).keys()))).lower()
             base_joint = str(p.get("joint") or "shoulder")
-            new_ax, neg_joint, probe = pick_separated_axis_and_joint(
-                v, ax, joint_preference=base_joint
-            )
+            if same_joint:
+                new_ax, sep = pick_separated_axis(v, ax, joint_preference=base_joint)
+                neg_joint = base_joint
+                probe = {"separation": sep, "same_joint": True}
+            else:
+                new_ax, neg_joint, probe = pick_separated_axis_and_joint(
+                    v, ax, joint_preference=base_joint
+                )
 
             # GT z+- (etc.): swap axis on every direction entry, not only the first —
             # otherwise neg looks stepwise (e.g. y+ then z-).
