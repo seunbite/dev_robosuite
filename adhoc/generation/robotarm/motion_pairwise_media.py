@@ -42,6 +42,7 @@ ROBOT = "IIWA"
 HZ = 10
 N_OUT_FRAMES = 9
 PAIRWISE_SPECS_NAME = "pairwise_specs_pilot90.json"
+PAIRWISE_SPECS_MOTION_GT_CORRECT = "pairwise_specs_motion_gt_correct.json"
 PROMPT_TEMPLATE = _REPO / "data/seed/prompt/pilot40/exp10_motion_pairwise_mp4.txt"
 
 

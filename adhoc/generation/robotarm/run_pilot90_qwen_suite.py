@@ -339,11 +339,50 @@ def _run_motion_verify_text(args: argparse.Namespace, out_json: Path) -> None:
     run(ns)
 
 
+def _default_pairwise_specs() -> Path:
+    from motion_pairwise_media import PAIRWISE_SPECS_MOTION_GT_CORRECT  # noqa: WPS433
+
+    env = os.getenv("PAIRWISE_SPECS")
+    if env:
+        return Path(env)
+    return MOTION_PAIRWISE_DIR / PAIRWISE_SPECS_MOTION_GT_CORRECT
+
+
+def _validate_pairwise_specs(pairwise_json: Path) -> int:
+    if not pairwise_json.is_file():
+        raise SystemExit(
+            f"Step 10 aborted: missing pairwise specs {pairwise_json}\n"
+            "  • Run: bash scripts/build_pilot90_pairwise_media.sh\n"
+            "  • Or rsync from local: bash scripts/rsync_to_babel.sh"
+        )
+    data = json.loads(pairwise_json.read_text(encoding="utf-8"))
+    entries = data.get("mp4") or []
+    missing = [
+        str(e.get("cue", e.get("idx")))
+        for e in entries
+        if not (_REPO / str(e["pair_mp4"])).is_file()
+    ]
+    if missing:
+        raise SystemExit(
+            f"Step 10 aborted: {len(missing)}/{len(entries)} pairwise MP4s missing "
+            f"(specs={pairwise_json.name}).\n"
+            f"  • First missing: {missing[0]}\n"
+            "  • bash scripts/rsync_to_babel.sh"
+        )
+    n = int(data.get("n_with_mp4") or data.get("n") or len(entries))
+    print(
+        f"[suite] exp10 specs: {pairwise_json.name} n={n} "
+        f"version={data.get('version')} layout={data.get('layout')}",
+        flush=True,
+    )
+    return n
+
+
 def _run_motion_pairwise_mp4(args: argparse.Namespace, out_json: Path) -> None:
     from verify_motion_gt_neg_pairwise_vlm import run
 
-    specs_env = os.getenv("PAIRWISE_SPECS")
-    pairwise_json = Path(specs_env) if specs_env else MOTION_PAIRWISE_DIR / "pairwise_specs_pilot90.json"
+    pairwise_json = _default_pairwise_specs()
+    _validate_pairwise_specs(pairwise_json)
     ns = argparse.Namespace(
         out_json=out_json,
         model=args.model,

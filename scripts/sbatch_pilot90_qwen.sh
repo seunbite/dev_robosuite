@@ -7,7 +7,7 @@
 # Pilot-90 Qwen suite via existing run_pilot90_qwen_suite.sh (ONLY= subset).
 # Partition / GPU count — pass at submit time (your sbg2 / sbg4 aliases).
 #
-#   sbg2 --export=ALL,MODEL_SIZE=32b,ONLY=10,MOTION_PREPARE_PAIRWISE=0 \
+#   sbg2 --export=ALL,MODEL_SIZE=32b,ONLY=10,RESUME=0,MOTION_PREPARE_PAIRWISE=0 \
 #     scripts/sbatch_pilot90_qwen.sh
 #   sbg2 --export=ALL,MODEL_SIZE=32b,ONLY=5,6 \
 #     scripts/sbatch_pilot90_qwen.sh
@@ -17,8 +17,8 @@
 # Env (optional):
 #   MODEL_SIZE=32b|7b|3b   (default 32b)
 #   ONLY=10                (default 10; e.g. 5,6 or 5,6,10)
-#   RESUME=1|0
-#   PAIRWISE_SPECS=.../pairwise_specs_motion_gt_correct.json
+#   RESUME=0 recommended for exp10 (49-cue v5 specs; ignores stale 88-cue results)
+#   PAIRWISE_SPECS=.../pairwise_specs_motion_gt_correct.json  (default)
 #   MOTION_PREPARE_MP4=0   MOTION_PREPARE_PAIRWISE=0  (skip re-render on cluster)
 
 set -euo pipefail

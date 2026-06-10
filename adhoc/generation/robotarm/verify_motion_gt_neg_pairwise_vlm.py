@@ -52,6 +52,35 @@ NEG_LABELS = {
 }
 
 
+def _specs_meta(json_paths: list[Path]) -> dict[str, Any]:
+    for fp in json_paths:
+        if not fp.is_file():
+            continue
+        data = json.loads(fp.read_text(encoding="utf-8"))
+        rel = str(fp.relative_to(_REPO)) if fp.is_relative_to(_REPO) else str(fp)
+        return {
+            "pairwise_specs": rel,
+            "spec_version": data.get("version"),
+            "spec_n": data.get("n_with_mp4") or data.get("n"),
+            "layout": data.get("layout"),
+        }
+    return {}
+
+
+def _resume_compatible(prev: dict[str, Any], meta: dict[str, Any]) -> bool:
+    if not prev.get("mp4"):
+        return True
+    keys = ("pairwise_specs", "spec_version", "spec_n", "layout")
+    for key in keys:
+        if key in prev and key in meta and prev[key] != meta[key]:
+            return False
+    prev_n = prev.get("spec_n") or prev.get("n")
+    meta_n = meta.get("spec_n")
+    if prev_n is not None and meta_n is not None and int(prev_n) != int(meta_n):
+        return False
+    return True
+
+
 def _load_pair_specs(json_paths: list[Path]) -> list[dict[str, Any]]:
     by_idx: dict[int, dict[str, Any]] = {}
     for fp in json_paths:
@@ -102,6 +131,7 @@ def run(args: argparse.Namespace) -> None:
     pairwise_dir = Path(getattr(args, "pairwise_dir", None) or MOTION_PAIRWISE_DIR)
     cfg_rows = {int(r["idx"]): r for r in json.loads(motion_cfg.read_text(encoding="utf-8"))}
     json_paths = args.pairwise_jsons or DEFAULT_PAIRWISE_JSONS
+    spec_meta = _specs_meta(json_paths)
     specs = _load_pair_specs(json_paths)
     if args.limit:
         specs = specs[: args.limit]
@@ -111,11 +141,20 @@ def run(args: argparse.Namespace) -> None:
     done: set[int] = set()
     if args.resume and out_path.is_file():
         prev = json.loads(out_path.read_text(encoding="utf-8"))
-        existing = prev.get("mp4") or []
-        done = load_verify_done_indices(out_path, rows_key="mp4", idx_key="idx")
-        if done:
+        if _resume_compatible(prev, spec_meta):
+            existing = prev.get("mp4") or []
+            done = load_verify_done_indices(out_path, rows_key="mp4", idx_key="idx")
+            if done:
+                print(
+                    f"[resume] skipping {len(done)} pairwise cues already in {out_path.name}",
+                    flush=True,
+                )
+        else:
             print(
-                f"[resume] skipping {len(done)} pairwise cues already in {out_path.name}",
+                "[resume] pairwise specs changed "
+                f"({prev.get('pairwise_specs') or prev.get('n')} → "
+                f"{spec_meta.get('pairwise_specs') or spec_meta.get('spec_n')}); "
+                "ignoring prior results",
                 flush=True,
             )
 
@@ -213,6 +252,7 @@ def run(args: argparse.Namespace) -> None:
         "mode": "motion_gt_neg_pairwise_mp4",
         "vlm_backend": backend,
         "model": args.model,
+        **spec_meta,
         "n": len(results),
         "n_scored": scored,
         "accuracy": ok / scored if scored else None,

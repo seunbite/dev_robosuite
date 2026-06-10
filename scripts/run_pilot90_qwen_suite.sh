@@ -96,8 +96,16 @@ for f in "$PROMPT_LOADER" "$PROMPT_PILOT40"; do
   fi
 done
 
-# Step 10 pairwise spec manifest (MP4 paths filled when media exists)
-$PY adhoc/generation/robotarm/build_pilot90_motion_pairwise_specs.py 2>/dev/null || true
+# Step 10 uses motion_gt_correct subset (49 cues, v5 MP4s). Skip full 88-cue rebuild.
+if [[ "${ONLY:-}" != *"10"* ]] || [[ "${ONLY:-}" == *","* ]] || [[ "${MOTION_PREPARE_PAIRWISE:-1}" == "1" ]]; then
+  $PY adhoc/generation/robotarm/build_pilot90_motion_pairwise_specs.py 2>/dev/null || true
+fi
+GT_SPECS="data/results/verify/samples/motion_gt_neg_pairwise_pilot90/pairwise_specs_motion_gt_correct.json"
+if [[ "${ONLY:-}" == *"10"* ]] && [[ ! -f "$GT_SPECS" ]]; then
+  echo "Missing exp10 specs: $GT_SPECS" >&2
+  echo "  → bash scripts/build_pilot90_pairwise_media.sh  (or rsync from local)" >&2
+  exit 1
+fi
 
 if [[ "${SEPARATE_STEPS:-0}" == "1" ]]; then
   echo "=== SEPARATE_STEPS=1: one Python process per step ==="
