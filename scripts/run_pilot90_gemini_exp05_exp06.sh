@@ -37,12 +37,18 @@ COMMON=(
   --tile-pick-json "$TILE_PICK"
   --cues "$CUES"
 )
+# verify_pose_multitile_gt_gemini.py only supports --resume (no --no-resume).
+# RESUME=0 → delete out-json for a fresh run.
 RESUME_FLAG=()
-[[ "${RESUME:-1}" == "1" ]] && RESUME_FLAG=(--resume)
+if [[ "${RESUME:-1}" == "1" ]]; then
+  RESUME_FLAG=(--resume)
+fi
 MAX_CUES="${LIMIT:-90}"
 
 run_exp05() {
   echo "=== pilot90 gemini exp05 (Pose grid-6) ===" >&2
+  OUT05="data/results/verify/pilot90_gemini/exp05_pose_multitile_grid6.json"
+  [[ "${RESUME:-1}" == "0" && -f "$OUT05" ]] && rm -f "$OUT05"
   nohup "$PY" adhoc/generation/robotarm/verify_pose_multitile_gt_gemini.py \
     "${COMMON[@]}" \
     --image-dir data/results/visualize/pose_multitile_gt_pilot90_grid6 \
@@ -56,6 +62,8 @@ run_exp05() {
 
 run_exp06() {
   echo "=== pilot90 gemini exp06 (Pose grid-12) ===" >&2
+  OUT06="data/results/verify/pilot90_gemini/exp06_pose_multitile_grid12.json"
+  [[ "${RESUME:-1}" == "0" && -f "$OUT06" ]] && rm -f "$OUT06"
   nohup "$PY" adhoc/generation/robotarm/verify_pose_multitile_gt_gemini.py \
     "${COMMON[@]}" \
     --image-dir data/results/visualize/pose_multitile_gt_pilot90_grid12 \
