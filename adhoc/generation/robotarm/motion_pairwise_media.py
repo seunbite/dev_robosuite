@@ -35,8 +35,8 @@ from score_pilot40_motion_gt_components import (  # noqa: E402
     _tail_matches_component,
     _tail_steps,
 )
-from verify_pose_pairwise_12_gemini import _stitch_pair  # noqa: E402
-from verify_pose_tiles_gemini import _movement_summary  # noqa: E402
+from compare_pose_2 import _stitch_pair  # noqa: E402
+from verify_pose_vlm import _movement_summary  # noqa: E402
 
 ROBOT = "IIWA"
 HZ = 10
