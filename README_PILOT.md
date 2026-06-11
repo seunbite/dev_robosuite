@@ -154,7 +154,8 @@ Older 39-cue suite; paths and shared-config scoring remain in `pilot40_experimen
 | `Disk quota exceeded` | `source scripts/cluster_env.sh /data/user_data/$USER/hf_cache` |
 | `CUDA not available` | `salloc` with `--gres=gpu` |
 | Step 8 `no mp4` | sync `run/IIWA/*.gif`, then `prepare_pilot90_motion_mp4.sh` |
-| Step 10 missing MP4 | `prepare_pilot90_motion_pairwise_mp4.sh` |
+| Step 10 `EGL_BAD_DISPLAY` | GPU **compute** node 필요 (login node X). `export MUJOCO_GL=egl CUDA_VISIBLE_DEVICES=0 MUJOCO_EGL_DEVICE_ID=0` 후 `prepare_pilot90_motion_pairwise_mp4.sh`. 당장은 `ONLY=1,2,3,4,5,6,7,8,9 bash exp.sh` |
+| Step 10 missing MP4 | `prepare_pilot90_motion_pairwise_mp4.sh` 또는 rsync |
 | Gemini `RESOURCE_EXHAUSTED` | quota / billing cap; resume with `RESUME=1` |
 
 ---

@@ -127,6 +127,8 @@ MODEL_SIZE="${MODEL_SIZE:-32b}"
 RESUME="${RESUME:-1}"
 GENERATE="${GENERATE:-1}"
 export GENERATE RESUME MOTION_PREPARE_MP4 MOTION_PREPARE_PAIRWISE
+# MuJoCo offscreen render (exp10 pairwise MP4) — needs GPU compute node + EGL
+export MUJOCO_GL="${MUJOCO_GL:-egl}"
 
 NEED_QWEN_ENV=1
 [[ "$MODEL_SIZE" == "gemini" ]] && NEED_QWEN_ENV=0

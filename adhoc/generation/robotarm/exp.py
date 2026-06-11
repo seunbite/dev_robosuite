@@ -233,9 +233,20 @@ def _prepare_motion_media_if_needed(
     return ready, failures
 
 
+def _count_pairwise_mp4() -> int:
+    return len(list(MOTION_PAIRWISE_DIR.glob("*_pair_axis.mp4")))
+
+
 def _prepare_pairwise_mp4_if_needed() -> tuple[int, list[str]]:
     if os.getenv("MOTION_PREPARE_PAIRWISE", "1") == "0":
-        return 0, []
+        return _count_pairwise_mp4(), []
+    existing = _count_pairwise_mp4()
+    if existing > 0:
+        from build_pilot90_motion_pairwise_specs import main as refresh_pairwise_specs  # noqa: WPS433
+
+        refresh_pairwise_specs()
+        print(f"[suite] pairwise mp4: {existing} already on disk → {MOTION_PAIRWISE_DIR}", flush=True)
+        return existing, []
     from build_pilot90_motion_pairwise_specs import main as refresh_pairwise_specs  # noqa: WPS433
     from motion_pairwise_media import prepare_pilot90_pairwise_mp4s  # noqa: WPS433
 
@@ -407,6 +418,25 @@ def _run_one(spec: dict[str, Any], args: argparse.Namespace) -> Path:
     elif kind == "motion_verify_text":
         _run_motion_verify_text(args, out_json, motion_cfg)
     elif kind == "motion_pairwise_mp4":
+        if not motion_cfg.is_file():
+            raise FileNotFoundError(
+                f"exp10 needs exp7 config: {motion_cfg}\n"
+                "  Include task 7 before 10 (e.g. bash exp.sh or ONLY=7,10 bash exp.sh)"
+            )
+        ready = _count_pairwise_mp4()
+        if ready == 0 and os.getenv("MOTION_PREPARE_PAIRWISE", "1") != "0":
+            ready, failures = _prepare_pairwise_mp4_if_needed()
+            if ready == 0:
+                raise SystemExit(
+                    "Step 10 aborted: no pilot90 pairwise MP4s built.\n"
+                    "  • MuJoCo EGL needs a GPU compute node (not login node):\n"
+                    "      salloc --gres=gpu:1 ...\n"
+                    "      export MUJOCO_GL=egl CUDA_VISIBLE_DEVICES=0 MUJOCO_EGL_DEVICE_ID=0\n"
+                    "      bash scripts/prepare_pilot90_motion_pairwise_mp4.sh\n"
+                    "  • Or skip exp10 for now: ONLY=1,2,3,4,5,6,7,8,9 bash exp.sh\n"
+                    "  • Or rsync prebuilt MP4s: bash scripts/rsync_to_babel.sh\n"
+                    + (f"  • First render error: {failures[0]}" if failures else "")
+                )
         _run_motion_pairwise_mp4(args, out_json, motion_cfg)
     else:
         raise ValueError(kind)
@@ -508,21 +538,6 @@ def main(argv: list[str] | None = None) -> None:
         summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
         print(f"\nWrote suite summary → {summary_path}\n", flush=True)
         return
-
-    needs_pairwise_media = any(s["kind"] == "motion_pairwise_mp4" for s in specs)
-    if needs_pairwise_media:
-        if os.getenv("MOTION_PREPARE_PAIRWISE", "1") == "0":
-            ready = len(list(MOTION_PAIRWISE_DIR.glob("*_pair_axis.mp4")))
-            print(f"[suite] MOTION_PREPARE_PAIRWISE=0 — {ready} pairwise mp4 on disk", flush=True)
-        else:
-            ready, _ = _prepare_pairwise_mp4_if_needed()
-        if ready == 0:
-            raise SystemExit(
-                "Step 10 aborted: no pilot90 pairwise MP4s built.\n"
-                "  • Run: bash scripts/prepare_pilot90_motion_pairwise_mp4.sh\n"
-                "  • Needs closest_poses_results.jsonl + ffmpeg + MuJoCo display/offscreen\n"
-                "  • Set MOTION_PREPARE_PAIRWISE=0 to skip auto-build"
-            )
 
     motion_cfg = config_for_experiment("7", args.model_tag)
 
