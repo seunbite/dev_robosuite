@@ -541,12 +541,20 @@ def main(argv: list[str] | None = None) -> None:
 
     motion_cfg = config_for_experiment("7", args.model_tag)
 
-    needs_model = True
+    needs_model = any(
+        s["kind"]
+        not in {"pose_generation_score", "motion_generation_score", "pose_pairwise", "multitile"}
+        for s in specs
+    )
     if needs_model and not args.skip_model_load:
-        _init_model(args)
+        backend = _vlm_backend_name(args.backend)
         from vlm_client import VLMClient  # noqa: WPS433
 
-        args.vlm = VLMClient(backend=_vlm_backend_name(args.backend), model=args.model)
+        if backend == "gemini":
+            args.vlm = VLMClient(backend="gemini", model=args.model)
+        else:
+            _init_model(args)
+            args.vlm = VLMClient(backend=backend, model=args.model)
     else:
         args.vlm = None
 
