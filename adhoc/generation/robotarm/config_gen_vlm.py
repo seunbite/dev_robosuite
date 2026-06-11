@@ -246,7 +246,7 @@ def generate_exp1_row(
             validation_errors = [f"JSON parse failed: {e}"]
             continue
         parsed = _normalize_motion_config(parsed)
-        validation_errors = list(_validate_reasoning(reasoning_text))
+        validation_errors = list(_validate_reasoning(reasoning_text)) if require_reasoning else []
         validation_errors.extend(_validate_config(parsed, cue_name=cue))
         if not validation_errors:
             new_config = parsed
@@ -348,7 +348,7 @@ def generate_exp7_row(
         _clamp_speeds(tail_movements)
         full = {"cue": cue, "movements": [fixed_step, *tail_movements]}
         validation_errors = []
-        if not reasoning_text.strip():
+        if _require_planning_comments(backend, env_key="EXP7_REQUIRE_REASONING") and not reasoning_text.strip():
             validation_errors.append("Missing planning comments before JSON")
         validation_errors.extend(_validate_tail(tail_movements, cue_name=cue))
         validation_errors.extend(_validate_config(full, cue_name=cue))
