@@ -132,7 +132,7 @@ def _parsed_object_score(obj: Any) -> int:
     if not isinstance(obj, dict):
         return -1
     score = 0
-    if "movements" in obj:
+    if "movements" in obj or "sequence" in obj:
         score += 8
     if "description" in obj:
         score += 2
@@ -227,6 +227,98 @@ def _validate_reasoning(reasoning_text: str) -> List[str]:
     return errors
 
 
+def _coerce_step_parameters(step: Dict[str, Any]) -> Dict[str, Any]:
+    """Hoist flat / alternate-schema fields into parameters (Gemini essence outputs)."""
+    step = dict(step)
+    step.pop("name", None)
+    if step.get("parameters"):
+        return step
+
+    stype = step.get("type")
+    params: Dict[str, Any] = {}
+
+    if stype == "pose":
+        pose: Dict[str, Any] = {}
+        for k in ("dir", "gripper_orientation", "x", "y", "z", "pose_id"):
+            if k in step:
+                pose[k] = step.pop(k)
+        loc = step.pop("location", None)
+        if loc is not None:
+            if isinstance(loc, dict):
+                pose["x"] = int(float(loc.get("x", 0.55)) * 100) if float(loc.get("x", 0.55)) <= 1.5 else int(loc["x"])
+                pose["y"] = int(float(loc.get("y", 0.5)) * 100) if abs(float(loc.get("y", 0.5))) <= 1.5 else int(loc["y"])
+                pose["z"] = int(float(loc.get("z", 0.55)) * 100) if float(loc.get("z", 0.55)) <= 1.5 else int(loc["z"])
+            elif isinstance(loc, (list, tuple)) and len(loc) >= 3:
+                pose["x"] = min(90, max(35, int(abs(float(loc[0])) * 100)))
+                pose["y"] = min(70, max(30, int((float(loc[1]) + 0.5) * 50)))
+                pose["z"] = min(85, max(35, int(float(loc[2]) * 100)))
+        pose.setdefault("dir", "front")
+        pose.setdefault("gripper_orientation", "vertical")
+        pose.setdefault("x", 55)
+        pose.setdefault("y", 50)
+        pose.setdefault("z", 55)
+        params["pose"] = pose
+        if "speed" in step:
+            params["speed"] = step.pop("speed")
+        if "hold_time" in step:
+            params["hold_time"] = step.pop("hold_time")
+        elif "duration" in step:
+            params["hold_time"] = step.pop("duration")
+
+    elif stype == "movement":
+        if step.get("action") == "pause" or (step.get("axis") is None and step.get("joint") is None and "duration" in step):
+            hold = float(step.pop("duration", step.pop("hold_time", 0.3)))
+            step.pop("action", None)
+            params = {
+                "joint": "wrist",
+                "directions": [{"degrees": {"z": 0}, "speed": 0.5, "hold_time": hold}],
+            }
+        elif "axis" in step and "distance" in step:
+            step["type"] = "path"
+            params = {
+                "shape": "line",
+                "axis": step.pop("axis"),
+                "distance": abs(float(step.pop("distance"))),
+                "speed": float(step.pop("speed", 1.5)),
+            }
+            step.pop("duration", None)
+        else:
+            for k in list(step.keys()):
+                if k not in ("type", "parameters"):
+                    params[k] = step.pop(k)
+
+    elif stype == "path":
+        for k in list(step.keys()):
+            if k not in ("type", "parameters"):
+                params[k] = step.pop(k)
+
+    if params:
+        step["parameters"] = params
+    return step
+
+
+def _normalize_motion_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize generated configs (e.g. strip legacy path.joint when EE fields exist)."""
+    from legacy.path_ee_ik import normalize_path_parameters
+
+    out = dict(config)
+    raw = config.get("movements") or config.get("sequence") or []
+    movements = []
+    for step in raw:
+        if not isinstance(step, dict):
+            continue
+        step = _coerce_step_parameters(step)
+        if step.get("type") == "path":
+            params = dict(step.get("parameters") or {})
+            params = normalize_path_parameters(params)
+            step["parameters"] = params
+        movements.append(step)
+    out["movements"] = movements
+    if "sequence" in out:
+        out.pop("sequence", None)
+    return out
+
+
 def _validate_config(config: Dict[str, Any], cue_name: str | None = None) -> List[str]:
     """Validate a generated motion config. Returns list of error strings (empty = valid)."""
     errors = []
@@ -277,6 +369,11 @@ def _validate_config(config: Dict[str, Any], cue_name: str | None = None) -> Lis
                     if abs(val) > 55:
                         errors.append(f"Extreme degree value {axis}={val} (max ±50 recommended)")
 
+        if m_type == "path":
+            from legacy.path_ee_ik import validate_path_parameters
+
+            errors.extend(validate_path_parameters(params))
+
     target_cue = cue_name or config.get("cue", "")
     if "Beckon" in target_cue or "Come here" in target_cue:
         first_pose = next((m for m in movements if m.get("type") == "pose"), None)
@@ -319,8 +416,12 @@ def generate_motion_config(
     max_handmade_examples: int = 10,
     max_correction_examples: int = 10,
     temperature: float | None = None,
+    generation_seed: int | None = None,
+    fewshot_seed: int | None = None,
+    deterministic_fewshot: bool = False,
     use_shots: bool = True,
     require_reasoning: bool = True,
+    max_attempts: int = 2,
 ):
     """
     Generate one few-shot motion config using Gemini.
@@ -382,9 +483,22 @@ def generate_motion_config(
 
         # Add handmade examples (good examples)
         num_handmade = min(max_handmade_examples, len(handmade_configs))
-        import random
+        if deterministic_fewshot:
+            ordered = sorted(handmade_configs, key=lambda c: str(c.get("cue", "")))
+            selected_handmade = ordered[:num_handmade]
+        elif fewshot_seed is not None:
+            import random
 
-        selected_handmade = random.sample(handmade_configs, num_handmade) if handmade_configs else []
+            rng = random.Random(fewshot_seed)
+            selected_handmade = (
+                rng.sample(handmade_configs, num_handmade) if handmade_configs else []
+            )
+        else:
+            import random
+
+            selected_handmade = (
+                random.sample(handmade_configs, num_handmade) if handmade_configs else []
+            )
         for hm in selected_handmade:
             examples_parts.append(_format_example_block(hm))
 
@@ -427,10 +541,13 @@ def generate_motion_config(
     prompt = prompt.replace("{{CUE_NAME}}", cue_name)
 
     print(f"Generating config for cue: '{cue_name}'...")
-    print(f"  model={model_name} temperature={temperature if temperature is not None else 'default'}")
+    print(
+        f"  model={model_name} temperature={temperature if temperature is not None else 'default'}"
+        f" generation_seed={generation_seed if generation_seed is not None else 'none'}"
+        f" fewshot={'deterministic' if deterministic_fewshot else fewshot_seed if fewshot_seed is not None else 'random'}"
+    )
     
     # 4. Inference with validation + retry
-    max_attempts = 2
     new_config = None
     validation_errors: List[str] = []
     reasoning_text = ""
@@ -445,9 +562,12 @@ def generate_motion_config(
             )
             attempt_prompt = prompt + fix_msg
 
-        gen_config = None
+        gen_kwargs: dict[str, Any] = {}
         if temperature is not None:
-            gen_config = types.GenerateContentConfig(temperature=float(temperature))
+            gen_kwargs["temperature"] = float(temperature)
+        if generation_seed is not None:
+            gen_kwargs["seed"] = int(generation_seed)
+        gen_config = types.GenerateContentConfig(**gen_kwargs) if gen_kwargs else None
         response = client.models.generate_content(
             model=model_name,
             contents=attempt_prompt,
@@ -468,6 +588,7 @@ def generate_motion_config(
             ]
             continue
 
+        new_config = _normalize_motion_config(new_config)
         validation_errors = _validate_reasoning(reasoning_text) if require_reasoning else []
         validation_errors.extend(_validate_config(new_config, cue_name=cue_name))
         if not validation_errors:
