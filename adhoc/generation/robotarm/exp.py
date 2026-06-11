@@ -199,6 +199,12 @@ def _prepare_motion_media_if_needed(
 ) -> tuple[int, list[str]]:
     if os.getenv("MOTION_PREPARE_MP4", "1") == "0":
         return 0, []
+    if not motion_cfg.is_file():
+        print(
+            f"[suite] skip MP4 prep — exp7 config not found yet: {motion_cfg}",
+            flush=True,
+        )
+        return 0, []
     from motion_media_paths import prepare_pilot90_motion_mp4s, write_pilot90_manifest  # noqa: WPS433
     from motion_verify_shared import load_verify_done_indices  # noqa: WPS433
 
@@ -375,6 +381,28 @@ def _run_one(spec: dict[str, Any], args: argparse.Namespace) -> Path:
         score_exp7(motion_cfg, out_json)
         print(f"[7] scored {out_json}", flush=True)
     elif kind == "motion_verify_vlm":
+        if not motion_cfg.is_file():
+            raise FileNotFoundError(
+                f"exp8 needs exp7 config: {motion_cfg}\n"
+                "  Include task 7 before 8 (e.g. bash exp.sh or ONLY=7,8 bash exp.sh)"
+            )
+        exp08 = verify_result_path(8, tag)
+        ready, failures = _prepare_motion_media_if_needed(motion_cfg, exp08, resume=args.resume)
+        from motion_verify_shared import load_verify_done_indices  # noqa: WPS433
+
+        already = len(load_verify_done_indices(exp08)) if args.resume and exp08.is_file() else 0
+        if ready == 0 and already == 0:
+            raise SystemExit(
+                "Step 8 aborted: no pilot90 motion MP4s found or built.\n"
+                "  • GIFs expected under run/IIWA/ (from render_manipulator_20260608)\n"
+                "  • Or run: bash scripts/prepare_pilot90_motion_mp4.sh\n"
+                "  • Set MOTION_PREPARE_MP4=0 to skip auto-build"
+            )
+        if failures and ready == 0 and already == 0:
+            raise SystemExit(
+                "Step 8 aborted: MP4 prep failed for all pending cues.\n"
+                f"  • First issue: {failures[0]}"
+            )
         _run_motion_verify_vlm(args, out_json, motion_cfg)
     elif kind == "motion_verify_text":
         _run_motion_verify_text(args, out_json, motion_cfg)
@@ -497,25 +525,6 @@ def main(argv: list[str] | None = None) -> None:
             )
 
     motion_cfg = config_for_experiment("7", args.model_tag)
-    needs_motion_media = any(s["kind"] == "motion_verify_vlm" for s in specs)
-    if needs_motion_media:
-        exp08 = verify_result_path(8, args.model_tag)
-        ready, failures = _prepare_motion_media_if_needed(motion_cfg, exp08, resume=args.resume)
-        from motion_verify_shared import load_verify_done_indices  # noqa: WPS433
-
-        already = len(load_verify_done_indices(exp08)) if args.resume and exp08.is_file() else 0
-        if ready == 0 and already == 0:
-            raise SystemExit(
-                "Step 8 aborted: no pilot90 motion MP4s found or built.\n"
-                "  • GIFs expected under run/IIWA/ (from render_manipulator_20260608)\n"
-                "  • Or run: bash scripts/prepare_pilot90_motion_mp4.sh\n"
-                "  • Set MOTION_PREPARE_MP4=0 to skip auto-build"
-            )
-        if failures and ready == 0 and already == 0:
-            raise SystemExit(
-                "Step 8 aborted: MP4 prep failed for all pending cues.\n"
-                f"  • First issue: {failures[0]}"
-            )
 
     needs_model = True
     if needs_model and not args.skip_model_load:
