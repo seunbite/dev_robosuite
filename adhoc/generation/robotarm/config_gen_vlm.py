@@ -60,6 +60,14 @@ def _legacy():
     )
 
 
+def _require_planning_comments(backend: str, *, env_key: str) -> bool:
+    """Gemini enforces Q1–Q4 comments; Qwen/transformers skip unless env overrides."""
+    env = os.getenv(env_key)
+    if env is not None:
+        return env.strip().lower() not in {"0", "false", "no", "off"}
+    return backend.lower() == "gemini"
+
+
 def _llm_generate(
     prompt: str,
     *,
@@ -201,7 +209,7 @@ def generate_exp1_row(
     model: str,
     backend: str = "gemini",
     vlm: Any | None = None,
-    max_attempts: int = 2,
+    max_attempts: int | None = None,
 ) -> dict[str, Any]:
     (
         _extract_reasoning_and_json,
@@ -214,6 +222,9 @@ def generate_exp1_row(
         _validate_reasoning,
         *_rest,
     ) = _legacy()
+    require_reasoning = _require_planning_comments(backend, env_key="EXP1_REQUIRE_REASONING")
+    if max_attempts is None:
+        max_attempts = 3 if backend.lower() != "gemini" else 2
     prompt_template = prompt_exp_path(1).read_text(encoding="utf-8")
     examples = _fewshot_block(prompt_exp_path(1), SHOTS)
     prompt = prompt_template.replace("{{FEW_SHOT_EXAMPLES}}", examples).replace("{{CUE_NAME}}", cue)
