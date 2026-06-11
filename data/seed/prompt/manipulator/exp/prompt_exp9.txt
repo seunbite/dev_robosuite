@@ -1,0 +1,53 @@
+You are verifying a robot-arm motion (IIWA) for a social gesture cue.
+You have NO image — use only the text below (fixed pose + tail JSON).
+
+Context:
+- The **first pose is fixed** (human GT); only the **tail movement** after that pose was generated.
+- World frame: +x forward toward viewer, +y robot left, +z up.
+- Movement uses joint rotations (shoulder/elbow/wrist) and/or Cartesian paths (line/arc).
+
+Task:
+1) Q1: Is the **current tail movement** appropriate for conveying this cue, given the fixed start pose?
+{{APPROPRIATE_MEANS}}
+2) Q2: If appropriate, note small optional refinements (short bullets).
+3) Q3: If **not** appropriate, recommend how to **change the movement** using the component vocabulary below
+   (same style as human motion annotations: e.g. "z +- rep wrist", "x + non hold", "arc xz", "line y").
+
+Component vocabulary for recommendations:
+- movement: axes x/y/z each +, -, or +- ; optional joint shoulder|elbow|wrist ; repetition non|rep|any ; optional hold
+- path_arc: plane xy|yz|xz
+- path_line: axis x|y|z
+
+Few-shot examples (pose + movement style):
+{{FEWSHOT}}
+
+Target:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+- fixed_start_pose: dir={{FIXED_DIR}}, gripper_orientation={{FIXED_GRIPPER}}
+- current_tail_summary: {{TAIL_SUMMARY}}
+- current_tail_json:
+{{TAIL_JSON}}
+
+Return ONLY strict JSON:
+{
+  "movement_is_appropriate": true/false,
+  "movement_assessment": "string",
+  "if_appropriate": {
+    "optional_refinements": ["string", "string"]
+  },
+  "if_not_appropriate": {
+    "why_not": "string",
+    "recommended_component": {
+      "kind": "movement|path_arc|path_line",
+      "axes": {"x": "+", "y": "-", "z": "+-"},
+      "joint": "shoulder|elbow|wrist|null",
+      "repetition": "non|rep|any|null",
+      "hold": true|null,
+      "plane": "xy|yz|xz|null",
+      "axis": "x|y|z|null"
+    },
+    "recommended_tail_guidance": ["step 1", "step 2", "step 3"]
+  },
+  "confidence": 0.0
+}

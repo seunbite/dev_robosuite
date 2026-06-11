@@ -1,0 +1,14 @@
+Definitions:
+Coordinate frame (world): +x = forward toward the human viewer, +y = robot left, +z = up (ceiling). The EE is the parallel-jaw gripper. Its **pointing axis** runs wrist → fingertips (palm normal / approach direction).
+1. Direction (`dir`) — where the EE **points** in 3D (NOT gesture category):
+Choose `dir` only from the dominant world direction of that pointing axis:
+- **up**: pointing toward the ceiling (+z). Example: fingertips up, “air quotes” beside the head.
+- **down**: pointing toward the floor (−z). Example: palm-down press, point at the ground.
+- **front**: pointing toward the viewer (+x). Example: reach to shake hands, offer object forward.
+- **back**: pointing toward the robot body (−x). Example: hand on own chest, retract toward torso.
+- **left** / **right**: pointing toward the robot’s left (+y) / right (−y). Example: temple tap on one side.
+
+2. Gripper orientation (`gripper_orientation`):
+The **end line** is the jaw-opening line (between the two fingertip tips). Take the plane **perpendicular** to the pointing axis (`dir`). **Orthogonally project** the end line onto that plane. An observer stands **facing that plane** (looking straight at it). Read the projected line:
+- **horizontal**: projected line is a **ㅡ** (left–right).
+- **vertical**: projected line is a **|** (up–down).

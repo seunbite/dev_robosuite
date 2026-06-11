@@ -1,173 +1,149 @@
 # Pilot gesture experiments (dev_robosuite)
 
-**Main benchmark:** 39 iconic cues × **10 experiments** (pose + motion), evaluated with Gemini baselines and Qwen2.5-VL reruns.
-
-| Item | Location |
-|------|----------|
-| Experiment registry (code) | `adhoc/generation/robotarm/pilot40_experiment_suite.py` |
-| Suite runner | `scripts/run_pilot40_qwen_suite.sh` → `run_pilot40_qwen_suite.py` |
-| Verify / eval prompts | `data/seed/prompt/pilot40/` |
-| Generation prompts | `data/seed/prompt/manipulator/` |
-| Gemini results | `data/results/verify/pilot40_*` and `pose_*_gemini.json` |
-| Qwen results | `data/results/verify/pilot40_qwen32b/` (or `pilot40_qwen7b` via `OUT_DIR`) |
-| Planned backlog | `data/seed/experiments/planned_backlog.yml` |
+**Main benchmark:** Pilot-90 — 90 non-essence cues × **10 experiments**, same protocol for **Gemini** and **Qwen2.5-VL** (only the model differs).
 
 ---
 
-## Directory layout
+## Design principles (Pilot-90)
+
+1. **Same experiment for every model** — generation, verify, and scoring use identical prompts, shots, and GT.
+2. **Per-model outputs** — each model writes its own config / verify JSONs (no shared motion config for scoring).
+3. **Task chain**
+   - **Exp 1:** cue → LLM generates **full pose config** (`prompt_exp1`) → score vs `pose_gt`
+   - **Exp 2–3:** verify **exp1 config** (VLM tile / text)
+   - **Exp 7:** cue + **fixed human pose** → LLM generates **movement tail** (`prompt_exp7`) → score vs `movement_gt`
+   - **Exp 8–9:** verify **exp7 config** (VLM MP4 / text)
+   - **Exp 4–6, 10:** discriminative VLM benchmarks (pairwise / multitile / motion pairwise)
+
+---
+
+## Directory layout (Pilot-90)
 
 ```
-data/seed/prompt/
-  manipulator/          # LLM generation prompts (steps 1, 7)
-  pilot40/              # VLM verify prompts (steps 2–6, 8–10) + shared snippets
+data/seed/
+  groundtruth/gt_manipulator.json          # 90 cues: pose_gt + movement_gt
+  prompt/manipulator/exp/
+    prompt_exp1.txt … prompt_exp10.txt     # all experiment prompts
+    _shared_*.txt                          # snippets for verify prompts
+  shots/manipulator/shot_configs_v19_sophisticated.json   # few-shot (exp1, exp7)
 
-data/results/
-  motion_configs/manipulator/   # generated motion JSON (pose + motion configs)
-  verify/
-    pilot40_*                   # Gemini baselines, consolidated GT, metrics
-    pilot40_qwen32b/            # Qwen suite outputs exp01..exp10
-  render/manipulator/           # GIF/MP4 renders for VLM inputs
-  visualize/                    # pose tiles, pairwise composites, multitile grids
-  html/manipulator/             # human review HTML
+data/results/motion_configs/manipulator/exp/
+  result_exp1_{model_tag}.json             # JSON array, 90 motion configs (exp1)
+  result_exp7_{model_tag}.json             # JSON array, 90 motion configs (exp7)
 
-adhoc/generation/robotarm/
-  run_pilot40_qwen_suite.py     # orchestrator (single model load)
-  pilot40_experiment_suite.py   # step specs + metrics
-  verify_*.py                   # per-step runners (Gemini or Qwen)
-  prompt_loader.py              # load data/seed/prompt/pilot40/*.txt
+data/results/verify/manipulator/exp/
+  score_exp1_{model_tag}.json              # exp1 accuracy
+  score_exp7_{model_tag}.json              # exp7 accuracy
+  result_exp2_{model_tag}.json … result_exp10_{model_tag}.json
+  pilot90_suite_summary_{model_tag}.json
+
+data/results/html/
+  exp1_{model_tag}.html … exp10_{model_tag}.html   # per-task review tables
+```
+
+`{model_tag}` examples: `gemini-2.5-pro`, `qwen32b`, `qwen7b`, `qwen3b`
+
+Regenerate GT after pose/motion annotation changes:
+
+```bash
+python adhoc/generation/robotarm/build_gt_manipulator.py
 ```
 
 ---
 
-## Main suite — 10 experiments (39 cues)
+## Experiment table (Pilot-90)
 
-Run on a GPU node (cluster):
+| # | Task | Prompt | Input config | JSON result | HTML review |
+|---|------|--------|--------------|-------------|-------------|
+| 1 | Pose generation vs GT | `prompt_exp1.txt` | — | `verify/.../score_exp1_{tag}.json` | `html/exp1_{tag}.html` |
+| 2 | Pose verify VLM | `prompt_exp2.txt` | `result_exp1_{tag}.json` | `result_exp2_{tag}.json` | `html/exp2_{tag}.html` |
+| 3 | Pose verify text | `prompt_exp3.txt` | `result_exp1_{tag}.json` | `result_exp3_{tag}.json` | `html/exp3_{tag}.html` |
+| 4 | Pose pairwise 2-way | `prompt_exp4.txt` | tiles + GT | `result_exp4_{tag}.json` | `html/exp4_{tag}.html` |
+| 5 | Multitile grid 6 | `prompt_exp5.txt` | multitile + GT | `result_exp5_{tag}.json` | `html/exp5_{tag}.html` |
+| 6 | Multitile grid 12 | `prompt_exp6.txt` | multitile + GT | `result_exp6_{tag}.json` | `html/exp6_{tag}.html` |
+| 7 | Movement generation vs GT | `prompt_exp7.txt` | GT pose fixed | `score_exp7_{tag}.json` | `html/exp7_{tag}.html` |
+| 8 | Movement verify VLM | `prompt_exp8.txt` | `result_exp7_{tag}.json` + MP4 | `result_exp8_{tag}.json` | `html/exp8_{tag}.html` |
+| 9 | Movement verify text | `prompt_exp9.txt` | `result_exp7_{tag}.json` | `result_exp9_{tag}.json` | `html/exp9_{tag}.html` |
+| 10 | Motion pairwise MP4 | `prompt_exp10.txt` | `result_exp7_{tag}.json` + pairwise MP4 | `result_exp10_{tag}.json` | `html/exp10_{tag}.html` |
+
+JSON paths are under `data/results/verify/manipulator/exp/` (scores + verify). HTML paths are under `data/results/html/`.  
+`{tag}` examples: `gemini-2.5-pro`, `qwen32b`, `qwen7b`, `qwen3b`. Run via `bash exp.sh` or `exp.py`.
+
+**Orchestrator:** `adhoc/generation/robotarm/exp.py` — `exp.py 1`, `exp.py all`, `exp.py all --summary`  
+**Code registry:** `adhoc/generation/robotarm/pilot90_experiment_suite.py`  
+**Path helpers:** `adhoc/generation/robotarm/pilot90_paths.py`  
+**Unified LLM generation:** `adhoc/generation/robotarm/config_gen_vlm.py` (exp7 rows include `groundtruth` = human pose GT)
+
+---
+
+## Server commands (cluster)
 
 ```bash
 git pull
 salloc --partition=YOUR_PART --gres=gpu:2 --mem=128G --time=24:00:00
-conda activate m2m_caption32b
+conda activate m2m_caption32b   # or robosuite-vlm
 cd dev_robosuite
 source scripts/cluster_env.sh /data/user_data/$USER/hf_cache
-
-bash scripts/run_pilot40_qwen_suite.sh              # all 10 steps
-ONLY=5,6 bash scripts/run_pilot40_qwen_suite.sh     # subset
-RESUME=1 bash scripts/run_pilot40_qwen_suite.sh      # skip finished JSONs
-SUMMARY_ONLY=1 bash scripts/run_pilot40_qwen_suite.sh  # accuracy table only
 ```
 
-Smaller model ablation:
+### Where to run
+
+| Machine | Command |
+|---------|---------|
+| **Server (cluster)** | `cd ~/sblee/dev_robosuite && bash exp.sh` — all 10 tasks, full rerun |
+| **Local (Mac)** | `cd ~/Downloads/workspace/dev_robosuite && ONLY=1,2,3,7 bash exp.sh` |
+
+### `exp.sh` — one entry point
+
+Defaults: **all 10 tasks**, **Qwen 32B**, resume on.  
+`exp.sh` picks repo + Python env automatically:
+
+| Site | Path | Env |
+|------|------|-----|
+| cluster (auto) | `~/sblee/dev_robosuite` | `conda activate m2m_caption32b` |
+| local (auto) | `~/Downloads/workspace/dev_robosuite` | `micromamba activate robosuite` |
+
+Override: `EXP_SITE=local|cluster`, `SKIP_ENV=1` (already activated).
 
 ```bash
-VLM_MODEL=Qwen/Qwen2.5-VL-7B-Instruct \
-  OUT_DIR=data/results/verify/pilot40_qwen7b \
-  bash scripts/run_pilot40_qwen_suite.sh
+bash exp.sh                              # full suite (32b)
+SUMMARY=1 bash exp.sh                    # scores only
+ONLY=1,2,3 bash exp.sh                   # subset
+MODEL_SIZE=gemini bash exp.sh            # Gemini API (source APIKEY.sh)
+MODEL_SIZE=7b bash exp.sh
+GENERATE=0 ONLY=2,3 bash exp.sh          # verify only (needs prior exp1/7 configs)
+ALL_MODELS=1 bash exp.sh                 # 32b → 7b → 3b, then summary
 ```
 
-| # | Experiment | Prompt | Input / media | Code | Gemini result | Qwen result |
-|---|------------|--------|---------------|------|---------------|-------------|
-| 1 | Pose generation vs human GT | `manipulator/prompt_v19_sophisticated.txt` | `motion_configs_prompt_v19_generation_pose_pilot40.json` | score in `run_pilot40_qwen_suite.py` | `pilot40_pose_eval_consolidated_scored.tsv` | `pilot40_qwen32b/exp01_pose_generation_score.json` |
-| 2 | Pose verify — VLM (tile) | `pilot40/exp02_pose_verify_vlm.txt` | pose config + tile PNG | `verify_pose_tiles_gemini.py` | `pose_tile_verify_pilot{10,20,20_more}_gemini.json` | `exp02_pose_verify_vlm.json` |
-| 3 | Pose verify — text | `pilot40/exp03_pose_verify_text.txt` | pose config (no image) | `verify_pose_textonly_gemini.py` | `pose_textonly_verify_pilot{10,20,20_more}_gemini.json` | `exp03_pose_verify_text.json` |
-| 4 | Pose pairwise 2-way | `pilot40/exp04_pose_pairwise_2way.txt` | `visualize/pose_pairwise_12_pilot40/` | `verify_pose_pairwise_12_gemini.py` | `pilot40_pose_pairwise_12_gemini.json` | `exp04_pose_pairwise_2way.json` |
-| 5 | Multitile grid 6 | `pilot40/exp05_pose_multitile_grid.txt` | `visualize/pose_multitile_gt_pilot40_grid6/` | `verify_pose_multitile_gt_gemini.py` | *(no pilot-40 baseline; pilot20 only)* | `exp05_pose_multitile_grid6.json` |
-| 6 | Multitile grid 12 | `pilot40/exp05_pose_multitile_grid.txt` | `visualize/pose_multitile_gt_pilot40_grid12/` | `verify_pose_multitile_gt_gemini.py` | *(no pilot-40 baseline; pilot20 only)* | `exp06_pose_multitile_grid12.json` |
-| 7 | Motion generation vs component GT | `manipulator/prompt_gt_fixed_first_pose.txt` | `motion_configs_prompt_v19_gt_fixed_pose_pilot40.json` | score in `run_pilot40_qwen_suite.py` | `pilot40_motion_verify_metrics.json` | `exp07_motion_generation_score.json` |
-| 8 | Motion verify — VLM (MP4) | `pilot40/exp08_motion_verify_vlm.txt` | `render/.../motion_vlm_verify_pilot40/mp4/` | `verify_motion_component_gemini.py` | `pilot40_motion_component_verify_gemini.json` | `exp08_motion_verify_vlm.json` |
-| 9 | Motion verify — text | `pilot40/exp09_motion_verify_text.txt` | motion config JSON | `verify_motion_component_text_gemini.py` | `pilot40_motion_component_verify_text_gemini.json` | `exp09_motion_verify_text.json` |
-| 10 | Motion pairwise (MP4) | `pilot40/exp10_motion_pairwise_mp4.txt` | neg-pairwise MP4 composites | `verify_motion_gt_neg_pairwise_vlm.py` | `samples/motion_gt_neg_pairwise/pairwise_eval_results*.json` | `exp10_motion_pairwise_mp4.json` |
-
-Paths in the **Qwen result** column are relative to `data/results/verify/pilot40_qwen32b/` unless `OUT_DIR` is set.
-
-**Human GT anchor:** `data/results/verify/pilot40_pose_eval_consolidated.json`
-
-**Suite summary JSON:** `data/results/verify/pilot40_qwen32b/pilot40_qwen_suite_summary.json`
-
----
-
-## Pilot-90 suite — 10 experiments (90 non-essence cues)
-
-| Item | Location |
-|------|----------|
-| Experiment registry | `adhoc/generation/robotarm/pilot90_experiment_suite.py` |
-| Suite runner | `scripts/run_pilot90_qwen_suite.sh` → `run_pilot90_qwen_suite.py` |
-| Pose configs | `motion_configs_prompt_v19_sophisticated_ee_pilot90_non_essence.json` |
-| Pose human GT | `pilot40_pose_eval_consolidated.json` (any-pose scoring) |
-| Motion component GT | `pilot40_motion_component_gt.json` (90 cues) |
-| Qwen outputs | `pilot90_qwen32b/`, `pilot90_qwen7b/`, `pilot90_qwen3b/` |
-
-Run on cluster (**`RESUME=1` default** — skips cues already in output JSONs):
+Motion media (exp8, exp10) — run once before verify if needed:
 
 ```bash
 bash scripts/prepare_pilot90_motion_mp4.sh
-bash scripts/run_pilot90_qwen_suite.sh
-MODEL_SIZE=7b bash scripts/run_pilot90_qwen_suite.sh
-RESUME=0 bash scripts/run_pilot90_qwen_suite.sh   # fresh run
-SUMMARY_ONLY=1 bash scripts/run_pilot90_qwen_suite.sh
-bash scripts/run_pilot90_qwen_all_models.sh       # 32b → 7b → 3b
+bash scripts/prepare_pilot90_motion_pairwise_mp4.sh
+ONLY=8,9,10 bash exp.sh
 ```
 
-| # | Experiment | Qwen result |
-|---|------------|-------------|
-| 1 | Pose generation vs human GT (any-pose) | `exp01_pose_generation_score.json` |
-| 2 | Pose verify — VLM (tile) | `exp02_pose_verify_vlm.json` |
-| 3 | Pose verify — text | `exp03_pose_verify_text.json` |
-| 4 | Pose pairwise 2-way | `exp04_pose_pairwise_2way.json` |
-| 5 | Multitile grid 6 | `exp05_pose_multitile_grid6.json` |
-| 6 | Multitile grid 12 | `exp06_pose_multitile_grid12.json` |
-| 7 | Motion generation vs component GT | `exp07_motion_generation_score.json` |
-| 8 | Motion verify — VLM (MP4) | `exp08_motion_verify_vlm.json` |
-| 9 | Motion verify — text | `exp09_motion_verify_text.json` |
-| 10 | Motion pairwise (MP4) | `exp10_motion_pairwise_mp4.json` |
+### Direct Python CLI (optional)
 
-**Suite summary JSON:** `data/results/verify/pilot90_qwen32b/pilot90_qwen_suite_summary.json`
+```bash
+python adhoc/generation/robotarm/exp.py all --summary
+python adhoc/generation/robotarm/generate_all.py --backend gemini
+python adhoc/generation/robotarm/generate_only_move.py --backend gemini --resume
+```
+
+### Motion media prep (exp8, exp10)
+
+```bash
+bash scripts/prepare_pilot90_motion_mp4.sh
+bash scripts/prepare_pilot90_motion_pairwise_mp4.sh
+ONLY=8,9,10 bash scripts/run_pilot90_qwen_suite.sh
+```
 
 ---
 
-## Step 8 prep (motion MP4)
+## Pilot-40 (legacy, 39 cues)
 
-Before step 8 on cluster:
-
-```bash
-bash scripts/prepare_pilot40_motion_mp4.sh   # pilot-40 (auto-renders missing GIFs)
-bash scripts/prepare_pilot90_motion_mp4.sh   # pilot-90: GIF→MP4 only (expects run/IIWA)
-# or inside suite: MOTION_PREPARE_MP4=1 (default)
-```
-
-**Pilot-90 needs 88 motion GIFs** under `run/IIWA/` (not in git). Step 8 skips cues without GIF.
-
-**Option A — sync from local** (fastest if you already rendered 90 cues locally):
-
-```bash
-# on laptop (repo root):
-rsync -avz run/IIWA/ USER@login2.babel.cs.cmu.edu:PATH/TO/dev_robosuite/run/IIWA/
-
-# on cluster:
-bash scripts/prepare_pilot90_motion_mp4.sh   # expect 88/88 or 90/90 mp4 ready
-```
-
-**Option B — render on cluster** (needs `data/seed/_remainder/closest_poses_results.jsonl`):
-
-```bash
-bash scripts/prepare_pilot90_motion_mp4.sh --render-missing
-# or: MOTION_RENDER_MISSING=1 bash scripts/prepare_pilot90_motion_mp4.sh
-```
-
-Then resume step 8–10 (default **resume on** — skips cues already in output JSON):
-
-```bash
-ONLY=8,9,10 bash scripts/run_pilot90_qwen_suite.sh
-# exp08 with 39 done → [resume] skipping 39 cues; only remaining cues inferenced
-```
-
-**Step 10 prep (pairwise MP4)** — GT vs neg-axis side-by-side composites:
-
-```bash
-bash scripts/prepare_pilot90_motion_pairwise_mp4.sh
-# → data/results/verify/samples/motion_gt_neg_pairwise_pilot90/*_pair_axis.mp4
-# then refresh specs + run step 10:
-ONLY=10 bash scripts/run_pilot90_qwen_suite.sh
-```
+Older 39-cue suite; paths and shared-config scoring remain in `pilot40_experiment_suite.py` / `run_pilot40_qwen_suite.sh`. Prefer Pilot-90 for new work.
 
 ---
 
@@ -175,57 +151,55 @@ ONLY=10 bash scripts/run_pilot90_qwen_suite.sh
 
 | Error | Fix |
 |-------|-----|
-| `Disk quota exceeded` | `source scripts/cluster_env.sh /data/user_data/$USER/hf_cache`; clear `~/.cache/huggingface` |
-| `CUDA not available` | use `salloc` / sbatch with `--gres=gpu` |
-| `'joint' parameter is required for 'path'` | pull latest `path_ee_ik.py` + `motion_generation_core.py` |
-| Step 8 `no mp4` (pilot-40) | `bash scripts/prepare_pilot40_motion_mp4.sh` until 39/39 ready |
-| Step 8 `no mp4` (pilot-90) | sync `run/IIWA/*.gif` from local, then `prepare_pilot90_motion_mp4.sh`; or `--render-missing` |
-| Step 10 `missing mp4 None` | `bash scripts/prepare_pilot90_motion_pairwise_mp4.sh` (needs jsonl + MuJoCo); then `ONLY=10` |
-
-Env: `m2m_caption32b` or `robosuite-vlm` (hyphen). Set `HF_HOME=/data/user_data/$USER/hf_cache`.
+| `Disk quota exceeded` | `source scripts/cluster_env.sh /data/user_data/$USER/hf_cache` |
+| `CUDA not available` | `salloc` with `--gres=gpu` |
+| Step 8 `no mp4` | sync `run/IIWA/*.gif`, then `prepare_pilot90_motion_mp4.sh` |
+| Step 10 missing MP4 | `prepare_pilot90_motion_pairwise_mp4.sh` |
+| Gemini `RESOURCE_EXHAUSTED` | quota / billing cap; resume with `RESUME=1` |
 
 ---
 
-## Planned experiments (not in main 10)
-
-See `data/seed/experiments/planned_backlog.yml`:
-
-| ID | Title | Status |
-|----|-------|--------|
-| `temporal_multitile` | Rhythmic cues — multitile with tempo-aware prompt | not run |
-| `google_robot_vlm_compare` | TIAGo mobile ~40-cue pairwise VLM | not run |
-| `google_robot_component_verify` | Google Robot component verify (Gemini) | not run |
-| `pilot100_multitile` | Multitile 6+12 on full pilot-100 manifest | not run |
-| `pilot100_batch_motion` | batch20/21 motion pipeline after pose batches | partial |
-| `qwen7b_full_suite` | 7B model ablation on all 10 steps | not run |
-| `humanoid_bimanual` | GR1 bimanual gestures | future |
-
----
-
-## Review HTML
-
-| Report | Path |
-|--------|------|
-| Pose generation eval | `data/results/html/manipulator/pose_generation_eval_review_pilot40.html` |
-| Wrong-answer notebook | `data/results/html/manipulator/pilot40_wrong_answer_notebook.html` |
-| Motion GT-fixed review | `data/results/html/manipulator/pilot40_motion_vlm_verify_gt_fixed.html` |
-| Google Robot renders | `data/results/html/google_robot/render_google_robot_*.html` |
-
----
-
-## Paper figures (pilot-90)
-
-After Qwen suite finishes (`SUMMARY_ONLY=1 bash scripts/run_pilot90_qwen_suite.sh`):
+## Paper figures
 
 ```bash
 bash scripts/build_paper_figures.sh acc
-IDX=1,5,8,2,15,28 bash scripts/build_paper_figures.sh qual-pose
-IDX=7,59,60 bash scripts/build_paper_figures.sh qual-movement
-IDX=0,1,0,1 bash scripts/build_paper_figures.sh pairwise
-bash scripts/build_paper_figures.sh components
-bash scripts/build_paper_figures.sh persona      # GOOGLE_API_KEY
-bash scripts/build_paper_figures.sh essence10    # GOOGLE_API_KEY
 ```
 
-Outputs: `data/results/paper_figures/` (PDF line plots, PNG grids, captions).
-CLI: `python adhoc/generation/robotarm/paper_figures/cli.py <acc|qual|pairwise|components|persona|essence10>`.
+Outputs: `data/results/paper_figures/`
+
+---
+
+## Files safe to delete (cleanup)
+
+After migrating to per-model `result_exp*` paths, these are **candidates for removal** (archive first if unsure):
+
+**Deprecated merged / shared configs**
+- `data/results/motion_configs/manipulator/motion_configs_prompt_v19_sophisticated_ee_pilot90_non_essence.json`
+- `adhoc/generation/robotarm/run_pilot90_gemini_pose_generation.py` (superseded by `run_pilot90_exp_generation.py`)
+
+**Old Qwen verify trees** (shared-config era; scores not per-model valid)
+- `data/results/verify/pilot90_qwen32b/`
+- `data/results/verify/pilot90_qwen7b/`
+- `data/results/verify/pilot90_qwen3b/`
+
+**Old Gemini partial runs** (mixed protocols)
+- `data/results/verify/pilot90_gemini/exp01_pose_generation_score.json` (rescored shared config, not per-model generation)
+- `data/results/verify/pilot90_gemini/pose_generation_checkpoint.json`
+
+**Duplicate prompts** (copied to `prompt/manipulator/exp/`; keep one copy)
+- `data/seed/prompt/pilot40/exp02_*.txt` … `exp10_*.txt` — optional once all code uses `prompt_loader` aliases
+
+**Stale scoring / paper artifacts** (regenerate after new runs)
+- `data/results/paper_figures/pilot90_acc_table.json` (manual table from wrong protocol)
+- `data/results/verify/pilot40_pose_eval_consolidated_scored.tsv` (pilot-40 only)
+
+**Temp / debug**
+- `data/results/verify/_tmp_*.json`
+- `data/results/verify/exp10_debug_sample/`
+
+**Do not delete**
+- `data/seed/groundtruth/gt_manipulator.json`
+- `data/seed/prompt/manipulator/exp/prompt_exp*.txt`
+- `data/seed/shots/manipulator/shot_configs_v19_sophisticated.json`
+- `data/results/visualize/pose_*_pilot90/`
+- `run/IIWA/` GIFs, pairwise MP4 prep outputs
