@@ -43,7 +43,13 @@ class TransformersLocalEngine:
         print(f"[transformers] load_path={load_path} local_files_only={local_only}", flush=True)
         print(f"[transformers] hub_cache={cache_dir}", flush=True)
         load_kw = {"trust_remote_code": True, "local_files_only": local_only}
+        print("[transformers] loading processor…", flush=True)
         self.processor = AutoProcessor.from_pretrained(load_path, **load_kw)
+        print(
+            "[transformers] loading model weights to GPU (7B ~2–5 min, 32B ~10–20 min; "
+            "no output until done)…",
+            flush=True,
+        )
         self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
             load_path,
             dtype=torch.bfloat16,
