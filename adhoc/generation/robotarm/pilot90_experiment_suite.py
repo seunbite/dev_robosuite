@@ -349,6 +349,5 @@ def pose_generation_correct_any(row: dict[str, Any], groundtruth: str) -> bool |
     gen_set = {
         (str(p.get("dir", "")).strip(), str(p.get("gripper_orientation", "")).strip()) for p in poses
     }
-    if groundtruth.strip().lower().startswith("o"):
-        return targets[0] in gen_set
+    # any_pose_in_config: any listed GT (dir, orientation) may appear in any pose step
     return any(t in gen_set for t in targets)
