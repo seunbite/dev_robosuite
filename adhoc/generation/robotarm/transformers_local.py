@@ -100,8 +100,10 @@ class TransformersLocalEngine:
             )
             inputs = inputs.to(self.model.device)
 
+            from vlm_sampling import transformers_generate_kwargs
+
             with torch.inference_mode():
-                out_ids = self.model.generate(**inputs, max_new_tokens=1024, do_sample=False)
+                out_ids = self.model.generate(**inputs, **transformers_generate_kwargs())
 
             trimmed = [
                 o[len(i) :]

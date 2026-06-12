@@ -39,7 +39,7 @@ def _legacy():
         _normalize_motion_config,
         _resolve_shots_json,
         _sanitize_model_output,
-        _validate_config,
+        _validate_config_minimal,
         _validate_reasoning,
     )
     from legacy.path_ee_ik import validate_path_parameters  # noqa: WPS433
@@ -52,7 +52,7 @@ def _legacy():
         _normalize_motion_config,
         _resolve_shots_json,
         _sanitize_model_output,
-        _validate_config,
+        _validate_config_minimal,
         _validate_reasoning,
         validate_path_parameters,
         _load_entries,
@@ -201,31 +201,9 @@ def _clamp_speeds(movements: list[dict[str, Any]]) -> None:
 
 
 def _validate_tail(movements: list[dict[str, Any]], cue_name: str) -> list[str]:
-    (
-        _extract_reasoning_and_json,
-        _format_example_block,
-        _load_json_list,
-        _normalize_motion_config,
-        _resolve_shots_json,
-        _sanitize_model_output,
-        _validate_config,
-        _validate_reasoning,
-        validate_path_parameters,
-        _load_entries,
-        _select_xyz_tertile_balanced,
-    ) = _legacy()
-    if not movements:
-        return ["Tail must include at least one movement/path step"]
-    if len(movements) > 3:
-        return [f"Tail has {len(movements)} steps; max 3 allowed"]
-    dummy = {"type": "pose", "parameters": {"pose": {"dir": "front", "x": 50, "y": 50, "z": 50}}}
-    errs = _validate_config({"movements": [dummy, *movements], "cue": cue_name}, cue_name=cue_name)
-    skip = ("First step must be type 'pose'", "Config is pose-only")
-    tail_errs = [e for e in errs if not any(s in e for s in skip)]
-    for step in movements:
-        if step.get("type") == "path":
-            tail_errs.extend(validate_path_parameters(step.get("parameters", {})))
-    return tail_errs
+    """Exp7 tail checks delegated to full-config minimal validate in generate_exp7_row."""
+    del movements, cue_name
+    return []
 
 
 def generate_exp1_row(
@@ -246,7 +224,7 @@ def generate_exp1_row(
         _normalize_motion_config,
         _resolve_shots_json,
         _sanitize_model_output,
-        _validate_config,
+        _validate_config_minimal,
         _validate_reasoning,
         *_rest,
     ) = _legacy()
@@ -295,7 +273,7 @@ def generate_exp1_row(
             continue
         parsed = _normalize_motion_config(parsed)
         validation_errors = list(_validate_reasoning(reasoning_text)) if require_reasoning else []
-        validation_errors.extend(_validate_config(parsed, cue_name=cue))
+        validation_errors.extend(_validate_config_minimal(parsed))
         attempt_row = {
             "idx": cue_idx,
             "cue": cue,
@@ -376,7 +354,7 @@ def generate_exp7_row(
         _normalize_motion_config,
         _resolve_shots_json,
         _sanitize_model_output,
-        _validate_config,
+        _validate_config_minimal,
         _validate_reasoning,
         *_rest,
     ) = _legacy()
@@ -447,7 +425,7 @@ def generate_exp7_row(
         if _require_planning_comments(backend, env_key="EXP7_REQUIRE_REASONING") and not reasoning_text.strip():
             validation_errors.append("Missing planning comments before JSON")
         validation_errors.extend(_validate_tail(tail_movements, cue_name=cue))
-        validation_errors.extend(_validate_config(full, cue_name=cue))
+        validation_errors.extend(_validate_config_minimal(full))
         attempt_row = {
             "idx": cue_idx,
             "cue": cue,

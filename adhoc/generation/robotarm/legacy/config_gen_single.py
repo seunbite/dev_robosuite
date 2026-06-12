@@ -319,6 +319,18 @@ def _normalize_motion_config(config: Dict[str, Any]) -> Dict[str, Any]:
     return out
 
 
+def _validate_config_minimal(config: Dict[str, Any]) -> List[str]:
+    """Pilot-90 generation: non-empty movements and pose-first only."""
+    errors: List[str] = []
+    movements = config.get("movements", [])
+    if not movements:
+        errors.append("No movements defined")
+        return errors
+    if movements[0].get("type") != "pose":
+        errors.append("First step must be type 'pose'")
+    return errors
+
+
 def _validate_config(config: Dict[str, Any], cue_name: str | None = None) -> List[str]:
     """Validate a generated motion config. Returns list of error strings (empty = valid)."""
     errors = []

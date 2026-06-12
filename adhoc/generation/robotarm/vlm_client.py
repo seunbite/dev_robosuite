@@ -178,10 +178,13 @@ class VLMClient:
                         "image_url": {"url": f"data:image/png;base64,{_pil_to_b64_png(img)}"},
                     }
                 )
+            from vlm_sampling import sampling_temperature
+
+            temp = sampling_temperature()
             resp = self._client.chat.completions.create(
                 model=self.model,
                 messages=[{"role": "user", "content": parts}],
-                temperature=0.0,
+                temperature=max(0.0, temp),
             )
             return (resp.choices[0].message.content or "").strip()
 

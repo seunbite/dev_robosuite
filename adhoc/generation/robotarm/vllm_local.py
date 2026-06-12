@@ -48,7 +48,9 @@ class VLLMLocalEngine:
             limit_mm_per_prompt={"image": 4},
             trust_remote_code=True,
         )
-        self.sampling = SamplingParams(temperature=0.0, max_tokens=1024)
+        from vlm_sampling import vllm_sampling_params
+
+        self._sampling_factory = vllm_sampling_params
         print("[vllm-local] ready", flush=True)
 
     def generate(
@@ -90,7 +92,7 @@ class VLLMLocalEngine:
 
             outputs = self.llm.generate(
                 {"prompt": prompt_text, "multi_modal_data": mm_data},
-                sampling_params=self.sampling,
+                sampling_params=self._sampling_factory(),
             )
             return (outputs[0].outputs[0].text or "").strip()
         finally:
