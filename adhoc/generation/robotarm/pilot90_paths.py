@@ -163,3 +163,14 @@ def upsert_config_row(path: Path, row: dict[str, Any]) -> list[dict[str, Any]]:
     rows.sort(key=lambda r: int(r.get("idx", 0)))
     save_config_list(path, rows)
     return rows
+
+
+def row_generation_done(row: dict[str, Any] | None) -> bool:
+    """True when a cue row finished generation (valid output, or legacy row without flag)."""
+    if not row:
+        return False
+    if row.get("generation_valid") is True:
+        return True
+    if row.get("generation_valid") is None and row.get("movements"):
+        return True
+    return False

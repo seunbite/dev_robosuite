@@ -90,10 +90,10 @@ def _maybe_generate(spec: dict[str, Any], args: argparse.Namespace) -> None:
     out_cfg = result_config_path(eid, tag)
     need = os.getenv("FORCE_GENERATE", "0") == "1"
     if not need and out_cfg.is_file():
-        rows = json.loads(out_cfg.read_text(encoding="utf-8"))
-        have = {r["cue"] for r in rows if r.get("movements")}
-        from pilot90_paths import manifest90_cue_names  # noqa: WPS433
+        from pilot90_paths import manifest90_cue_names, row_generation_done  # noqa: WPS433
 
+        rows = json.loads(out_cfg.read_text(encoding="utf-8"))
+        have = {r["cue"] for r in rows if row_generation_done(r)}
         if len(have) >= len(manifest90_cue_names()):
             return
     print(f"[suite] generating exp{eid} configs → {out_cfg}", flush=True)

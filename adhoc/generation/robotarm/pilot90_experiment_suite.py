@@ -50,8 +50,13 @@ def manifest90_cues_csv() -> str:
 
 
 def manifest90_rows_from_cfg(cfg_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    from pilot90_paths import row_generation_done  # noqa: WPS433
+
     manifest = set(manifest90_cue_names())
-    return [r for r in cfg_rows if r.get("cue") in manifest]
+    return [
+        r for r in cfg_rows
+        if r.get("cue") in manifest and row_generation_done(r)
+    ]
 
 
 def _first_pose(row: dict[str, Any]) -> dict[str, Any]:
@@ -125,7 +130,7 @@ def score_exp1(config_path: Path, out_path: Path) -> dict[str, Any]:
         ev = gt.get(cue or "")
         if not ev or not ev.get("pose_gt"):
             continue
-        correct = pose_generation_correct_first(row, ev["pose_gt"])
+        correct = pose_generation_correct_any(row, ev["pose_gt"])
         if correct is not None:
             n += 1
             if correct:
@@ -136,12 +141,12 @@ def score_exp1(config_path: Path, out_path: Path) -> dict[str, Any]:
                 "cue": cue,
                 "pose_gt": ev["pose_gt"],
                 "generation_correct": correct,
-                "scoring": "first_pose_vs_gt",
+                "scoring": "any_pose_in_config",
             }
         )
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),
-        "mode": "exp1_pose_generation_vs_gt",
+        "mode": "pose_generation_vs_human_gt_any_pose",
         "config_json": str(config_path),
         "groundtruth": str(GT_PATH),
         "n": n,

@@ -18,7 +18,7 @@ from pilot90_paths import (
     load_gt_by_cue,
     manifest90_cue_names,
     prompt_exp_path,
-    save_config_list,
+    row_generation_done,
     upsert_config_row,
 )
 
@@ -57,6 +57,33 @@ def _legacy():
         validate_path_parameters,
         _load_entries,
         _select_xyz_tertile_balanced,
+    )
+
+
+def _persist_generation_row(
+    out_path: Path,
+    *,
+    row: dict[str, Any],
+    attempt: int,
+    valid: bool,
+    validation_errors: list[str],
+) -> None:
+    """Write cue row to result JSON immediately after each LLM inference."""
+    payload = dict(row)
+    payload["generation_valid"] = valid
+    payload["generation_attempt"] = attempt + 1
+    if validation_errors:
+        payload["validation_errors"] = validation_errors
+    else:
+        payload.pop("validation_errors", None)
+    upsert_config_row(out_path, payload)
+    status = "OK" if valid else "INVALID"
+    cue = row.get("cue", "?")
+    n_mov = len(row.get("movements") or [])
+    err = f" — {validation_errors[0]}" if validation_errors else ""
+    print(
+        f"[save] {cue} attempt {attempt + 1} {status} ({n_mov} steps){err}",
+        flush=True,
     )
 
 
@@ -210,6 +237,7 @@ def generate_exp1_row(
     backend: str = "gemini",
     vlm: Any | None = None,
     max_attempts: int | None = None,
+    out_path: Path | None = None,
 ) -> dict[str, Any]:
     (
         _extract_reasoning_and_json,
@@ -232,6 +260,7 @@ def generate_exp1_row(
     validation_errors: list[str] = []
     reasoning_text = ""
     new_config: dict[str, Any] | None = None
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     for attempt in range(max_attempts):
         attempt_prompt = prompt
@@ -240,15 +269,55 @@ def generate_exp1_row(
                 f"# - {e}" for e in validation_errors
             )
         raw = _sanitize_model_output(_llm_generate(attempt_prompt, model=model, backend=backend, vlm=vlm))
+        parsed: dict[str, Any] = {}
         try:
             reasoning_text, parsed = _extract_reasoning_and_json(raw)
         except (json.JSONDecodeError, ValueError) as e:
             validation_errors = [f"JSON parse failed: {e}"]
+            attempt_row = {
+                "idx": cue_idx,
+                "cue": cue,
+                "description": description,
+                "movements": [],
+                "state": "exp1_pose_generation",
+                "model": model,
+                "time": now,
+                "experiment": "exp1",
+            }
+            if out_path is not None:
+                _persist_generation_row(
+                    out_path,
+                    row=attempt_row,
+                    attempt=attempt,
+                    valid=False,
+                    validation_errors=validation_errors,
+                )
             continue
         parsed = _normalize_motion_config(parsed)
         validation_errors = list(_validate_reasoning(reasoning_text)) if require_reasoning else []
         validation_errors.extend(_validate_config(parsed, cue_name=cue))
-        if not validation_errors:
+        attempt_row = {
+            "idx": cue_idx,
+            "cue": cue,
+            "description": parsed.get("description") or description,
+            "movements": parsed.get("movements") or [],
+            "state": "exp1_pose_generation",
+            "model": model,
+            "time": now,
+            "experiment": "exp1",
+        }
+        if reasoning_text:
+            attempt_row["reasoning"] = reasoning_text
+        valid = not validation_errors
+        if out_path is not None:
+            _persist_generation_row(
+                out_path,
+                row=attempt_row,
+                attempt=attempt,
+                valid=valid,
+                validation_errors=validation_errors,
+            )
+        if valid:
             new_config = parsed
             break
 
@@ -262,8 +331,10 @@ def generate_exp1_row(
         "movements": new_config.get("movements") or [],
         "state": "exp1_pose_generation",
         "model": model,
-        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "time": now,
         "experiment": "exp1",
+        "generation_valid": True,
+        "generation_attempt": attempt + 1,
     }
     if reasoning_text:
         out["reasoning"] = reasoning_text
@@ -283,6 +354,7 @@ def generate_exp7_row(
     vlm: Any | None = None,
     tile_pick: dict[tuple[str, str], int] | None = None,
     max_attempts: int = 3,
+    out_path: Path | None = None,
 ) -> dict[str, Any]:
     targets = _parse_gt_poses(pose_gt)
     if not targets:
@@ -331,6 +403,7 @@ def generate_exp7_row(
     reasoning_text = ""
     tail_cfg: dict[str, Any] | None = None
     final_tail: list[dict[str, Any]] = []
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     for attempt in range(max_attempts):
         attempt_prompt = prompt
@@ -339,10 +412,33 @@ def generate_exp7_row(
                 f"# - {e}" for e in validation_errors
             )
         raw = _sanitize_model_output(_llm_generate(attempt_prompt, model=model, backend=backend, vlm=vlm))
+        parsed: dict[str, Any] = {}
         try:
             reasoning_text, parsed = _extract_reasoning_and_json(raw)
         except (json.JSONDecodeError, ValueError) as e:
             validation_errors = [f"JSON parse failed: {e}"]
+            attempt_row = {
+                "idx": cue_idx,
+                "cue": cue,
+                "description": description,
+                "groundtruth": pose_gt,
+                "pose_gt": pose_gt,
+                "gt_fixed_first_pose": fixed,
+                "movements": [fixed_step],
+                "state": "exp7_motion_generation",
+                "model": model,
+                "time": now,
+                "experiment": "exp7",
+                "generation_mode": "gt_fixed_first_pose_tail_from_llm",
+            }
+            if out_path is not None:
+                _persist_generation_row(
+                    out_path,
+                    row=attempt_row,
+                    attempt=attempt,
+                    valid=False,
+                    validation_errors=validation_errors,
+                )
             continue
         tail_movements = _strip_leading_poses(parsed.get("movements", []))
         _clamp_speeds(tail_movements)
@@ -352,7 +448,31 @@ def generate_exp7_row(
             validation_errors.append("Missing planning comments before JSON")
         validation_errors.extend(_validate_tail(tail_movements, cue_name=cue))
         validation_errors.extend(_validate_config(full, cue_name=cue))
-        if not validation_errors:
+        attempt_row = {
+            "idx": cue_idx,
+            "cue": cue,
+            "description": parsed.get("description") or description,
+            "groundtruth": pose_gt,
+            "pose_gt": pose_gt,
+            "gt_fixed_first_pose": fixed,
+            "movements": [fixed_step, *tail_movements],
+            "state": "exp7_motion_generation",
+            "model": model,
+            "time": now,
+            "experiment": "exp7",
+            "generation_mode": "gt_fixed_first_pose_tail_from_llm",
+            "reasoning": reasoning_text,
+        }
+        valid = not validation_errors
+        if out_path is not None:
+            _persist_generation_row(
+                out_path,
+                row=attempt_row,
+                attempt=attempt,
+                valid=valid,
+                validation_errors=validation_errors,
+            )
+        if valid:
             tail_cfg = parsed
             final_tail = tail_movements
             break
@@ -370,10 +490,12 @@ def generate_exp7_row(
         "movements": [fixed_step, *final_tail],
         "state": "exp7_motion_generation",
         "model": model,
-        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "time": now,
         "experiment": "exp7",
         "generation_mode": "gt_fixed_first_pose_tail_from_llm",
         "reasoning": reasoning_text,
+        "generation_valid": True,
+        "generation_attempt": attempt + 1,
     }
     if movement_gt is not None:
         out["movement_gt"] = movement_gt
@@ -404,7 +526,7 @@ def run_exp_generation(
 
     ok = failed = 0
     for cue in work_names:
-        if resume and cue in existing and existing[cue].get("movements"):
+        if resume and row_generation_done(existing.get(cue)):
             continue
         row_gt = gt_rows.get(cue)
         if not row_gt:
@@ -415,13 +537,14 @@ def run_exp_generation(
         cue_idx = int(row_gt["cue_idx"])
         try:
             if eid == "1":
-                gen = generate_exp1_row(
+                generate_exp1_row(
                     cue=cue,
                     cue_idx=cue_idx,
                     description=str(row_gt.get("description") or ""),
                     model=model,
                     backend=backend,
                     vlm=vlm,
+                    out_path=out_path,
                 )
             else:
                 pose_gt = str(row_gt.get("pose_gt") or "")
@@ -431,7 +554,7 @@ def run_exp_generation(
                     if step.get("type") == "pose":
                         ref_pose = step.get("parameters", {}).get("pose") or {}
                         break
-                gen = generate_exp7_row(
+                generate_exp7_row(
                     cue=cue,
                     cue_idx=cue_idx,
                     pose_gt=pose_gt,
@@ -442,8 +565,8 @@ def run_exp_generation(
                     backend=backend,
                     vlm=vlm,
                     tile_pick=tile_pick,
+                    out_path=out_path,
                 )
-            upsert_config_row(out_path, gen)
             ok += 1
             if on_progress:
                 on_progress(cue, True)
