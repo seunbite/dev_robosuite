@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-_REPO = Path(__file__).resolve().parents[2]
+_REPO = Path(__file__).resolve().parent.parents[2]
 
 # User backlog (7 settings), all Qwen2.5-VL-32B
 EXPERIMENT_SPECS: list[dict[str, Any]] = [

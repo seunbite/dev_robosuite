@@ -10,7 +10,31 @@ _REPO = Path(__file__).resolve().parent.parents[2]
 ROBOT = "manipulator"
 
 PROMPT_EXP_DIR = _REPO / "data/seed/prompt" / ROBOT / "exp"
+PROMPT_V19_NOTBACK = _REPO / "data/seed/prompt" / ROBOT / "prompt_v19_notback.txt"
+
+# First-30 FALSE cues re-generated with prompt_v19_notback.txt (exp1 ablation).
+NOTBACK_RERUN_CUES: tuple[str, ...] = (
+    "raise_fists_victory",
+    "fist_pump",
+    "flex_bicep",
+    "shrug_idk",
+    "self_scratch_head_confused",
+    "facepalm",
+    "pat_stomach",
+    "fan_face_hot",
+    "cover_yawn_sleepy",
+    "rub_eye_tired",
+    "lean_forward_interest",
+    "cover_mouth_gasp",
+    "highfive_invite",
+    "pat_self_back",
+    "salute",
+    "visor_search",
+    "yield_turn",
+    "guiding_arm",
+)
 GT_PATH = _REPO / "data/seed/groundtruth" / f"gt_{ROBOT}.json"
+POSE_JSONL = _REPO / "data/seed/_remainder/closest_poses_results.jsonl"
 SHOTS = _REPO / "data/seed/shots" / ROBOT / "shot_configs_v19_sophisticated.json"
 MANIFEST_TSV = _REPO / "data/seed/yml/pilot100_manifest.tsv"
 

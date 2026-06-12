@@ -12,6 +12,7 @@ from typing import Any, Callable
 
 from pilot90_paths import (
     GT_PATH,
+    POSE_JSONL,
     SHOTS,
     TILE_PICK,
     load_config_list,
@@ -22,7 +23,7 @@ from pilot90_paths import (
     upsert_config_row,
 )
 
-_REPO = Path(__file__).resolve().parents[2]
+_REPO = Path(__file__).resolve().parent.parents[2]
 _LEGACY = Path(__file__).resolve().parent / "legacy"
 
 import sys
@@ -146,7 +147,7 @@ def _pose_id_for_group(d: str, g: str, tile_pick: dict[tuple[str, str], int]) ->
     from collections import defaultdict
 
     *_, validate_path_parameters, _load_entries, _select_xyz_tertile_balanced = _legacy()
-    jsonl = _REPO / "data/seed/_remainder/closest_poses_results.jsonl"
+    jsonl = POSE_JSONL
     entries = [e for e in _load_entries(jsonl) if e.get("robot") == "IIWA"]
     buckets: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for e in entries:
@@ -216,6 +217,7 @@ def generate_exp1_row(
     vlm: Any | None = None,
     max_attempts: int | None = None,
     out_path: Path | None = None,
+    prompt_path: Path | None = None,
 ) -> dict[str, Any]:
     (
         _extract_reasoning_and_json,
@@ -231,8 +233,9 @@ def generate_exp1_row(
     require_reasoning = _require_planning_comments(backend, env_key="EXP1_REQUIRE_REASONING")
     if max_attempts is None:
         max_attempts = 3 if backend.lower() != "gemini" else 2
-    prompt_template = prompt_exp_path(1).read_text(encoding="utf-8")
-    examples = _fewshot_block(prompt_exp_path(1), SHOTS)
+    ppath = prompt_path or prompt_exp_path(1)
+    prompt_template = ppath.read_text(encoding="utf-8")
+    examples = _fewshot_block(ppath, SHOTS)
     prompt = prompt_template.replace("{{FEW_SHOT_EXAMPLES}}", examples).replace("{{CUE_NAME}}", cue)
 
     validation_errors: list[str] = []
@@ -316,6 +319,10 @@ def generate_exp1_row(
     }
     if reasoning_text:
         out["reasoning"] = reasoning_text
+    if prompt_path is not None:
+        out["prompt_file"] = prompt_path.name
+    if out_path is not None:
+        upsert_config_row(out_path, out)
     return out
 
 
@@ -490,6 +497,7 @@ def run_exp_generation(
     cues: list[str] | None = None,
     resume: bool = True,
     delay: float = 2.0,
+    prompt_path: Path | None = None,
     on_progress: Callable[[str, bool], None] | None = None,
 ) -> tuple[int, int]:
     """Generate missing cues for exp 1 or 7. Returns (ok, failed)."""
@@ -523,6 +531,7 @@ def run_exp_generation(
                     backend=backend,
                     vlm=vlm,
                     out_path=out_path,
+                    prompt_path=prompt_path,
                 )
             else:
                 pose_gt = str(row_gt.get("pose_gt") or "")
