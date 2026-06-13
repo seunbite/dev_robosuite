@@ -23,7 +23,8 @@ from typing import Any
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parents[2]
 _ROBOTARM = _REPO / "adhoc/generation/robotarm"
-for p in (_REPO, _HERE, _ROBOTARM):
+# google_robot must precede robotarm on sys.path — both have a `legacy` package.
+for p in (_REPO, _ROBOTARM, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 

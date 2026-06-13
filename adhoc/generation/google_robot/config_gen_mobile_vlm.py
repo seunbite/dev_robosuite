@@ -28,7 +28,7 @@ _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parents[2]
 import sys
 
-for p in (_REPO, _HERE, _HERE / "legacy"):
+for p in (_REPO, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
@@ -70,7 +70,10 @@ def _cue_catalog() -> str:
 
 
 def _fewshot_block(max_examples: int = 6) -> str:
-    from legacy.config_gen_single_mobile import _format_example_block, _load_json_list
+    from adhoc.generation.google_robot.legacy.config_gen_single_mobile import (  # noqa: WPS433
+        _format_example_block,
+        _load_json_list,
+    )
 
     shots = _load_json_list(str(FEWSHOT_SHOTS)) if FEWSHOT_SHOTS.is_file() else []
     parts = [_format_example_block(sc) for sc in shots[:max_examples]]
@@ -129,7 +132,7 @@ def generate_exp1_row(
     out_path: Path | None = None,
     prompt_path: Path | None = None,
 ) -> dict[str, Any]:
-    from legacy.config_gen_single_mobile import (
+    from adhoc.generation.google_robot.legacy.config_gen_single_mobile import (  # noqa: WPS433
         _extract_reasoning_and_json,
         _sanitize_model_output,
         _validate_config,
@@ -198,7 +201,7 @@ def generate_exp7_row(
     out_path: Path | None = None,
     prompt_path: Path | None = None,
 ) -> dict[str, Any]:
-    from legacy.config_gen_single_mobile import (
+    from adhoc.generation.google_robot.legacy.config_gen_single_mobile import (  # noqa: WPS433
         _extract_reasoning_and_json,
         _sanitize_model_output,
         _validate_config,
