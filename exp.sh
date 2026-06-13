@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 cd ~/sblee/dev_robosuite
+conda init
 conda activate m2m_caption32b
 
 task=${1:-"all"}
