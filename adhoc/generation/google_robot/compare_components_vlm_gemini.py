@@ -94,10 +94,13 @@ def _fill_prompt(template: str, component: str, ra: dict[str, Any], rb: dict[str
 
 
 def run(args: argparse.Namespace) -> None:
-    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise SystemExit("Set GOOGLE_API_KEY (or GEMINI_API_KEY).")
-    client = genai.Client(api_key=api_key)
+    vlm = getattr(args, "vlm", None)
+    client = None
+    if vlm is None:
+        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise SystemExit("Set GOOGLE_API_KEY (or GEMINI_API_KEY).")
+        client = genai.Client(api_key=api_key)
 
     rows_a = sorted(_load_json(args.config_a), key=lambda r: int(r.get("idx", 0)))
     rows_b = sorted(_load_json(args.config_b), key=lambda r: int(r.get("idx", 0)))
@@ -118,6 +121,11 @@ def run(args: argparse.Namespace) -> None:
         prompt = _fill_prompt(template, args.component, ra, rb)
         if not ga or not gb:
             parsed: dict[str, Any] = {"error": "missing_gif", "gif_a": str(ga) if ga else None, "gif_b": str(gb) if gb else None}
+        elif vlm is not None:
+            from vlm_infer_shared import load_vlm_image, parse_json_response  # noqa: WPS433
+
+            text = vlm.generate(prompt, images=[load_vlm_image(ga), load_vlm_image(gb)])
+            parsed = parse_json_response(text)
         else:
             pa = types.Part.from_bytes(data=ga.read_bytes(), mime_type="image/gif")
             pb = types.Part.from_bytes(data=gb.read_bytes(), mime_type="image/gif")

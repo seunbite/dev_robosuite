@@ -141,13 +141,73 @@ def _fill_prompt(template: str, row: dict[str, Any]) -> str:
     )
 
 
-def _call_text(client: genai.Client, model: str, prompt: str) -> dict[str, Any]:
-    resp = client.models.generate_content(model=model, contents=[prompt])
-    txt = (resp.text or "").strip()
-    try:
-        return _extract_json(txt)
-    except Exception as e:
-        return {"parse_error": str(e), "raw_text": txt}
+def _call_text(
+    prompt: str,
+    *,
+    model: str,
+    vlm: Any | None = None,
+    client: genai.Client | None = None,
+) -> dict[str, Any]:
+    from vlm_infer_shared import vlm_generate_json  # noqa: WPS433
+
+    return vlm_generate_json(prompt, model=model, vlm=vlm, client=client)
+
+
+def _call_vlm_image(
+    prompt: str,
+    img_path: Path,
+    *,
+    model: str,
+    vlm: Any | None = None,
+    client: genai.Client | None = None,
+) -> dict[str, Any]:
+    from vlm_infer_shared import load_vlm_image, vlm_generate_json  # noqa: WPS433
+
+    return vlm_generate_json(
+        prompt,
+        model=model,
+        vlm=vlm,
+        client=client,
+        images=[load_vlm_image(img_path)],
+    )
+
+
+def _call_vlm_video(
+    prompt: str,
+    mp4_path: Path,
+    *,
+    model: str,
+    vlm: Any | None = None,
+    client: genai.Client | None = None,
+) -> dict[str, Any]:
+    from vlm_infer_shared import vlm_generate_json  # noqa: WPS433
+
+    return vlm_generate_json(
+        prompt,
+        model=model,
+        vlm=vlm,
+        client=client,
+        videos=[str(mp4_path.resolve())],
+    )
+
+
+def _call_vlm(
+    prompt: str,
+    gif_path: Path,
+    *,
+    model: str,
+    vlm: Any | None = None,
+    client: genai.Client | None = None,
+) -> dict[str, Any]:
+    from vlm_infer_shared import load_vlm_image, vlm_generate_json  # noqa: WPS433
+
+    return vlm_generate_json(
+        prompt,
+        model=model,
+        vlm=vlm,
+        client=client,
+        images=[load_vlm_image(gif_path)],
+    )
 
 
 def _media_stem(row: dict[str, Any]) -> str:
@@ -166,41 +226,14 @@ def _mp4_for_row(media_dir: Path, row: dict[str, Any]) -> Path | None:
     return p if p.is_file() else None
 
 
-def _call_vlm_image(client: genai.Client, model: str, prompt: str, img_path: Path) -> dict[str, Any]:
-    part = types.Part.from_bytes(data=img_path.read_bytes(), mime_type="image/png")
-    resp = client.models.generate_content(model=model, contents=[part, prompt])
-    txt = (resp.text or "").strip()
-    try:
-        return _extract_json(txt)
-    except Exception as e:
-        return {"parse_error": str(e), "raw_text": txt}
-
-
-def _call_vlm_video(client: genai.Client, model: str, prompt: str, mp4_path: Path) -> dict[str, Any]:
-    part = types.Part.from_bytes(data=mp4_path.read_bytes(), mime_type="video/mp4")
-    resp = client.models.generate_content(model=model, contents=[part, prompt])
-    txt = (resp.text or "").strip()
-    try:
-        return _extract_json(txt)
-    except Exception as e:
-        return {"parse_error": str(e), "raw_text": txt}
-
-
-def _call_vlm(client: genai.Client, model: str, prompt: str, gif_path: Path) -> dict[str, Any]:
-    part = types.Part.from_bytes(data=gif_path.read_bytes(), mime_type="image/gif")
-    resp = client.models.generate_content(model=model, contents=[part, prompt])
-    txt = (resp.text or "").strip()
-    try:
-        return _extract_json(txt)
-    except Exception as e:
-        return {"parse_error": str(e), "raw_text": txt}
-
-
 def run(args: argparse.Namespace) -> None:
-    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise SystemExit("Set GOOGLE_API_KEY (or GEMINI_API_KEY).")
-    client = genai.Client(api_key=api_key)
+    vlm = getattr(args, "vlm", None)
+    client = None
+    if vlm is None:
+        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise SystemExit("Set GOOGLE_API_KEY (or GEMINI_API_KEY).")
+        client = genai.Client(api_key=api_key)
 
     rows = sorted(_load_json(args.config_json), key=lambda r: int(r.get("idx", 0)))
     if args.limit:
@@ -209,40 +242,41 @@ def run(args: argparse.Namespace) -> None:
     template = _prompt_path(args.component, args.modality, args.prompt_file, args.exp_id).read_text(encoding="utf-8")
     media_dir = Path(args.media_dir)
     out_rows: list[dict[str, Any]] = []
+    infer_kw = {"model": args.model, "vlm": vlm, "client": client}
 
     for row in rows:
         prompt = _fill_prompt(template, row)
         media_path: Path | None = None
         if args.modality == "text":
-            parsed = _call_text(client, args.model, prompt)
+            parsed = _call_text(prompt, **infer_kw)
         elif args.component == "pose" and args.modality == "vlm":
             media_path = _pose_png_for_row(media_dir, row)
             if not media_path:
                 media_path = _gif_for_row(args.render_dir, row)
                 if media_path:
-                    parsed = _call_vlm(client, args.model, prompt, media_path)
+                    parsed = _call_vlm(prompt, media_path, **infer_kw)
                 else:
                     parsed = {"error": "missing_pose_png_or_gif"}
             else:
-                parsed = _call_vlm_image(client, args.model, prompt, media_path)
+                parsed = _call_vlm_image(prompt, media_path, **infer_kw)
         elif args.component == "movement" and args.modality == "vlm":
             media_path = _mp4_for_row(media_dir, row)
             if not media_path:
                 gif_path = _gif_for_row(args.render_dir, row)
                 if gif_path:
                     media_path = gif_path
-                    parsed = _call_vlm(client, args.model, prompt, gif_path)
+                    parsed = _call_vlm(prompt, gif_path, **infer_kw)
                 else:
                     parsed = {"error": "missing_mp4_or_gif"}
             else:
-                parsed = _call_vlm_video(client, args.model, prompt, media_path)
+                parsed = _call_vlm_video(prompt, media_path, **infer_kw)
         else:
             gif_path = _gif_for_row(args.render_dir, row)
             if not gif_path:
                 parsed = {"error": "missing_gif_for_vlm"}
             else:
                 media_path = gif_path
-                parsed = _call_vlm(client, args.model, prompt, gif_path)
+                parsed = _call_vlm(prompt, gif_path, **infer_kw)
 
         out_rows.append(
             {
@@ -262,6 +296,7 @@ def run(args: argparse.Namespace) -> None:
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "model": args.model,
+        "vlm_backend": getattr(args, "vlm_backend", None),
         "component": args.component,
         "modality": args.modality,
         "config_json": str(args.config_json),

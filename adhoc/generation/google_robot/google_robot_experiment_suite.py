@@ -290,11 +290,78 @@ def experiment_specs_all(model_tag: str = DEFAULT_GEN_TAG) -> list[dict[str, Any
     return experiment_specs(model_tag_gen=model_tag, model_tag_verify=model_to_tag(model_tag))
 
 
+_ARM_TO_DIR = {
+    "front": "front",
+    "back": "back",
+    "in": "right",
+    "out": "left",
+    "up": "up",
+    "down": "down",
+}
+
+
+def _first_mobile_pose(row: dict[str, Any]) -> dict[str, Any]:
+    for step in row.get("movements") or []:
+        if step.get("type") == "pose":
+            return (step.get("parameters") or {}).get("pose") or {}
+    return {}
+
+
+def _mobile_pose_to_dir_grip(pose: dict[str, Any]) -> dict[str, str]:
+    arm = str(pose.get("arm_position", "")).strip().lower()
+    return {
+        "dir": _ARM_TO_DIR.get(arm, arm),
+        "gripper_orientation": str(pose.get("gripper_orientation", "")).strip().lower(),
+    }
+
+
+def score_exp1_from_config(config_path: Path) -> dict[str, Any]:
+    """Score exp1 configs directly against consolidated GT (no legacy score JSON)."""
+    gt_by = {
+        str(r["cue"]): r
+        for r in json.loads(GT_CONSOLIDATED.read_text(encoding="utf-8")).get("rows") or []
+        if r.get("cue")
+    }
+    rows_out: list[dict[str, Any]] = []
+    ok = n = 0
+    for row in load_config_list(config_path):
+        cue = str(row.get("cue", ""))
+        gt_row = gt_by.get(cue)
+        if not gt_row:
+            continue
+        pose = _first_mobile_pose(row)
+        correct = pose_generation_correct(
+            _mobile_pose_to_dir_grip(pose),
+            str(gt_row.get("groundtruth") or ""),
+        )
+        if correct is not None:
+            n += 1
+            if correct:
+                ok += 1
+        rows_out.append(
+            {
+                "cue_idx": row.get("idx"),
+                "cue": cue,
+                "generation_correct": correct,
+                "scoring": "config_vs_consolidated_gt",
+            }
+        )
+    return {
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "mode": "pose_generation_vs_manipulator_gt",
+        "config_json": str(config_path),
+        "groundtruth": str(GT_CONSOLIDATED),
+        "n": n,
+        "n_correct": ok,
+        "accuracy": ok / n if n else None,
+        "rows": rows_out,
+    }
+
+
 def score_exp1(config_path: Path, out_path: Path) -> dict[str, Any]:
     """Score generated exp1 configs vs consolidated manipulator GT (mobile nominal map)."""
     if not LEGACY_SCORE.is_file():
-        payload = score_exp1_from_legacy()
-        payload["config_json"] = str(config_path)
+        payload = score_exp1_from_config(config_path)
         save_json(out_path, payload)
         return payload
     data = json.loads(LEGACY_SCORE.read_text(encoding="utf-8"))

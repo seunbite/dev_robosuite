@@ -22,7 +22,8 @@ from typing import Any
 
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parents[2]
-for p in (_REPO, _HERE):
+_ROBOTARM = _REPO / "adhoc/generation/robotarm"
+for p in (_REPO, _HERE, _ROBOTARM):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
@@ -62,6 +63,31 @@ def _vlm_backend_name(backend: str) -> str:
     return "local" if backend == "vllm" else backend
 
 
+def _init_model(args: argparse.Namespace) -> None:
+    from gpu_check import require_cuda_gpu  # noqa: WPS433
+    from vlm_client import init_inprocess_engine, is_vllm_local_backend  # noqa: WPS433
+
+    backend = _vlm_backend_name(args.backend)
+    os.environ["VLM_BACKEND"] = backend
+    os.environ["VLM_MODEL"] = args.model
+    require_cuda_gpu()
+    print(
+        f"\n{'=' * 72}\nLoading {args.model} (backend={backend}, once)\n{'=' * 72}\n",
+        flush=True,
+    )
+    if is_vllm_local_backend(backend):
+        from vllm_local import get_vllm_engine  # noqa: WPS433
+
+        get_vllm_engine(
+            model=args.model,
+            tensor_parallel_size=args.tensor_parallel_size,
+            max_model_len=args.max_model_len,
+            gpu_memory_utilization=args.gpu_memory_utilization,
+        )
+    else:
+        init_inprocess_engine(backend, args.model)
+
+
 def _gemini_client(model: str) -> Any:
     from google import genai
 
@@ -97,6 +123,13 @@ def _maybe_generate(spec: dict[str, Any], args: argparse.Namespace) -> None:
         resume=not (os.getenv("FORCE_GENERATE", "0") == "1"),
         delay=float(os.getenv("GEN_DELAY", "2.0")),
     )
+
+
+def _vlm_ns(args: argparse.Namespace) -> dict[str, Any]:
+    return {
+        "vlm": getattr(args, "vlm", None),
+        "vlm_backend": _vlm_backend_name(args.backend),
+    }
 
 
 def _prepare_media(config_path: Path) -> None:
@@ -136,6 +169,7 @@ def _run_pose_verify(args: argparse.Namespace, out_json: Path, pose_cfg: Path, *
         media_dir=MEDIA_DIR,
         limit=int(os.getenv("LIMIT", "0") or 0),
         out_json=out_json,
+        **_vlm_ns(args),
     )
     run(ns)
 
@@ -156,6 +190,7 @@ def _run_motion_verify(args: argparse.Namespace, out_json: Path, motion_cfg: Pat
         media_dir=MEDIA_DIR,
         limit=int(os.getenv("LIMIT", "0") or 0),
         out_json=out_json,
+        **_vlm_ns(args),
     )
     run(ns)
 
@@ -175,6 +210,7 @@ def _run_multitile(spec: dict[str, Any], args: argparse.Namespace, out_json: Pat
         cues=os.getenv("CUES"),
         max_cues=int(os.getenv("MAX_CUES", "0") or 0),
         resume=args.resume,
+        **_vlm_ns(args),
     )
     if not TILE_DIR.is_dir() or not any(TILE_DIR.glob("group_*.png")):
         gen_script = _HERE / "generate_pose_group_tiles.py"
@@ -200,6 +236,7 @@ def _run_pose_pairwise(args: argparse.Namespace, out_json: Path) -> None:
         prompt_file=_REPO / "data/seed/prompt/google_robot/exp/prompt_exp4.txt",
         limit=int(os.getenv("LIMIT", "0") or 0),
         out_json=out_json,
+        **_vlm_ns(args),
     )
     run(ns)
 
@@ -218,6 +255,7 @@ def _run_motion_pairwise(args: argparse.Namespace, out_json: Path, motion_cfg: P
         prompt_file=_REPO / "data/seed/prompt/google_robot/exp/prompt_exp10.txt",
         limit=int(os.getenv("LIMIT", "0") or 0),
         out_json=out_json,
+        **_vlm_ns(args),
     )
     run(ns)
 
@@ -269,6 +307,14 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("target", nargs="?", default="all", help="1–10, comma list, or all")
     p.add_argument("--backend", default=os.getenv("BACKEND", "gemini"))
     p.add_argument("--model", default=os.getenv("VLM_MODEL", "gemini-2.5-pro"))
+    p.add_argument("--tensor-parallel-size", type=int, default=int(os.getenv("VLLM_TENSOR_PARALLEL_SIZE", "1")))
+    p.add_argument("--max-model-len", type=int, default=int(os.getenv("VLLM_MAX_MODEL_LEN", "8192")))
+    p.add_argument("--gpu-memory-utilization", type=float, default=float(os.getenv("VLLM_GPU_MEMORY_UTILIZATION", "0.90")))
+    p.add_argument(
+        "--skip-model-load",
+        action="store_true",
+        help="Do not load in-process VLM (summary / scoring only)",
+    )
     p.add_argument("--resume", action=argparse.BooleanOptionalAction, default=os.getenv("RESUME", "1") != "0")
     p.add_argument("--summary", action="store_true", help="Scores only from existing JSONs")
     p.add_argument("--force", action="store_true", help="Re-copy legacy artifacts into exp/")
@@ -301,7 +347,24 @@ def main(argv: list[str] | None = None) -> None:
         print_summary_table(args.model_tag)
         return
 
-    args.vlm = None
+    backend = _vlm_backend_name(args.backend)
+    needs_model = any(
+        s["kind"]
+        not in {"pose_generation_score", "motion_generation_score"}
+        for s in specs
+    ) or os.getenv("GENERATE", "1") != "0"
+    if needs_model and not args.skip_model_load:
+        from vlm_client import VLMClient  # noqa: WPS433
+
+        if backend == "gemini":
+            args.vlm = VLMClient(backend="gemini", model=args.model)
+        else:
+            _init_model(args)
+            args.vlm = VLMClient(backend=backend, model=args.model)
+        print(f"[suite] shared_vlm=yes backend={backend}", flush=True)
+    else:
+        args.vlm = None
+
     all_metrics: list[dict[str, Any]] = []
     for spec in specs:
         try:

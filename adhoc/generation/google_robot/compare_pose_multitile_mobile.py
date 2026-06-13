@@ -122,12 +122,15 @@ def _pick_groups(gt_set: set[tuple[str, str]], gt_primary: tuple[str, str], *, n
 
 
 def run(args: argparse.Namespace) -> None:
-    from google import genai
+    vlm = getattr(args, "vlm", None)
+    client = None
+    if vlm is None:
+        from google import genai
 
-    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise SystemExit("Set GOOGLE_API_KEY")
-    client = genai.Client(api_key=api_key)
+        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise SystemExit("Set GOOGLE_API_KEY")
+        client = genai.Client(api_key=api_key)
 
     consolidated = json.loads(Path(args.consolidated_json).read_text(encoding="utf-8"))
     rows = sorted(consolidated.get("rows") or [], key=lambda r: int(r.get("cue_idx", 0)))
@@ -194,11 +197,17 @@ def run(args: argparse.Namespace) -> None:
                 rows=rows_n,
                 labels=labels,
             )
-            resp = client.models.generate_content(model=args.model, contents=[grid_img, prompt])
-            try:
-                parsed = _extract_json(resp.text or "")
-            except Exception as e:
-                parsed = {"parse_error": str(e), "raw_text": (resp.text or "")[:500]}
+            if vlm is not None:
+                from vlm_infer_shared import parse_json_response  # noqa: WPS433
+
+                text = vlm.generate(prompt, images=[grid_img])
+                parsed = parse_json_response(text)
+            else:
+                resp = client.models.generate_content(model=args.model, contents=[grid_img, prompt])
+                try:
+                    parsed = _extract_json(resp.text or "")
+                except Exception as e:
+                    parsed = {"parse_error": str(e), "raw_text": (resp.text or "")[:500]}
             pick = parsed.get("best_tile_index")
             try:
                 pick_i = int(pick)
