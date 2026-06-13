@@ -1,0 +1,40 @@
+You are verifying robot movement suitability (text-only, no video).
+
+The fixed start pose is human GT. Judge only the proposed movement tail.
+
+Task:
+1) Judge whether the movement tail conveys the cue from the fixed start pose.
+{{APPROPRIATE_MEANS}}
+2) If not appropriate: propose corrected movement tail component(s).
+
+Few-shot movement style examples:
+{{FEWSHOT}}
+
+Target cue:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+- fixed start pose:
+{{POSE_COMPONENT_JSON}}
+- current movement tail JSON:
+{{TAIL_JSON}}
+- movement summary: {{TAIL_SUMMARY}}
+
+Return ONLY strict JSON:
+{
+  "movement_is_appropriate": true/false,
+  "movement_assessment": "string",
+  "if_appropriate": {
+    "recommended_refinements": ["optional tweak 1", "optional tweak 2"]
+  },
+  "if_not_appropriate": {
+    "corrected_movement_component": [
+      {
+        "type": "movement|path|pose_to_pose",
+        "duration": <seconds optional>,
+        "parameters": { ... }
+      }
+    ],
+    "why_change": "string"
+  },
+  "confidence": 0.0
+}

@@ -141,11 +141,20 @@ _BILATERAL_MIRROR_SIGN = np.array([1.0, -1.0, 1.0, -1.0, 1.0, -1.0], dtype=np.fl
 _JAC_MIN_USEFUL = 0.08  # below this, joint-space inverse is ill-posed; expand search to all arm DOFs
 
 
-def _find_best_dof_for_axis(env, q, ee_body, arm_qvel, axis_idx, joint_group="elbow"):
+def _find_best_dof_for_axis(
+    env,
+    q,
+    ee_body,
+    arm_qvel,
+    axis_idx,
+    joint_group="elbow",
+    *,
+    restrict_to_group: bool = False,
+):
     """Use Jacobian to find which DOF in *joint_group* moves EE most along *axis_idx*.
 
     If the best coupling in that group is tiny (near kinematic singularities), scan all six
-    arm joints — otherwise Cartesian ``displacement / jac`` explodes (violent spins).
+    arm joints — unless *restrict_to_group* (explicit movement joint name must not leak).
     """
     local_dofs = list(_JOINT_LOCAL_DOFS.get(joint_group, _JOINT_LOCAL_DOFS["elbow"]))
     env.sim.data.qpos[:] = q
@@ -157,7 +166,7 @@ def _find_best_dof_for_axis(env, q, ee_body, arm_qvel, axis_idx, joint_group="el
         if abs(val) > abs(best_val):
             best_val = val
             best_local = li
-    if abs(best_val) < _JAC_MIN_USEFUL:
+    if not restrict_to_group and abs(best_val) < _JAC_MIN_USEFUL:
         best_local, best_val = 0, 0.0
         for li in range(6):
             val = jacp[axis_idx, arm_qvel[li]]
@@ -210,7 +219,22 @@ def _stagger_if_overlapping(env, q_frame):
         q_frame[18 + 2] += np.deg2rad(-3) * (gap / _OVERLAP_THRESHOLD)  # elbow pitch up
 
 
-def _make_env():
+def _apply_frontview_framing(env, *, cam_pos_scale: float = 1.09, cam_fovy: float = 58.0) -> None:
+    try:
+        for cname in ["sideview", "birdview"]:
+            cid = env.sim.model.camera_name2id(cname)
+            env.sim.model.cam_fovy[cid] = 55.0
+        cid = env.sim.model.camera_name2id(CAM)
+        p = env.sim.model.cam_pos[cid].copy()
+        pn = float(np.linalg.norm(p))
+        if pn > 1e-6:
+            env.sim.model.cam_pos[cid] = p * float(cam_pos_scale)
+        env.sim.model.cam_fovy[cid] = float(cam_fovy)
+    except Exception:
+        pass
+
+
+def _make_env(*, cam_pos_scale: float = 1.09, cam_fovy: float = 58.0):
     arm_cfg = suite.load_part_controller_config(default_controller="OSC_POSE")
     ctrl = refactor_composite_controller_config(arm_cfg, "Tiago", ["right", "left"])
     env = suite.make(
@@ -226,19 +250,7 @@ def _make_env():
         controller_configs=ctrl,
     )
     env.reset()
-    try:
-        for cname in ["sideview", "birdview"]:
-            cid = env.sim.model.camera_name2id(cname)
-            env.sim.model.cam_fovy[cid] = 55.0
-        # frontview: pull slightly back from the scene origin and widen FOV (same 512×512 aspect).
-        cid = env.sim.model.camera_name2id(CAM)
-        p = env.sim.model.cam_pos[cid].copy()
-        pn = float(np.linalg.norm(p))
-        if pn > 1e-6:
-            env.sim.model.cam_pos[cid] = p * 1.09
-        env.sim.model.cam_fovy[cid] = 58.0
-    except Exception:
-        pass
+    _apply_frontview_framing(env, cam_pos_scale=cam_pos_scale, cam_fovy=cam_fovy)
     return env
 
 
@@ -308,37 +320,41 @@ def _torso_forward_world_unit(sim) -> np.ndarray:
     return v / n if n > 1e-9 else np.array([1.0, 0.0, 0.0], dtype=float)
 
 
-def _right_elbow_forward_vs_torso_head_ok(sim) -> bool:
-    """False if right elbow (arm_right_4) is posterior to torso/head along chest +X.
+def _gesture_ee_body(pose: dict) -> str:
+    """End-effector body for the gesturing arm (pose-bank r_arm_rad drives the active side)."""
+    left = pose.get("left_arm", "still")
+    arm = str(pose.get("arm_position", "down+right")).strip().lower()
+    if left == "still" and arm != "still":
+        return R_EE_BODY
+    return L_EE_BODY
 
-    Tune with env: MOBILE_POSE_ELBOW_MARGIN_TORSO, MOBILE_POSE_ELBOW_MARGIN_HEAD,
-    MOBILE_POSE_CHEST_FWD_PAD_M (virtual chest plane offset forward from torso_lift).
-    """
-    margin_torso = float(os.environ.get("MOBILE_POSE_ELBOW_MARGIN_TORSO", "0.055"))
-    margin_head = float(os.environ.get("MOBILE_POSE_ELBOW_MARGIN_HEAD", "0.06"))
-    chest_fwd_pad = float(os.environ.get("MOBILE_POSE_CHEST_FWD_PAD_M", "0.06"))
 
-    fwd = _torso_forward_world_unit(sim)
+def _hand_head_x_gap_ok(sim, ee_body: str = R_EE_BODY) -> bool:
+    """True when hand_x - head_x >= gap_min (default -0.1 m; negative allows hand behind head)."""
+    gap_min = float(os.environ.get("MOBILE_POSE_HEAD_HAND_X_GAP", "-0.1"))
     try:
-        eid = sim.model.body_name2id(R_ELBOW_BODY)
-        tid = sim.model.body_name2id(TORSO_REF_BODY)
-        hid = sim.model.body_name2id(HEAD_REF_BODY)
+        ee = sim.data.body_xpos[sim.model.body_name2id(ee_body)]
+        head = sim.data.body_xpos[sim.model.body_name2id(HEAD_REF_BODY)]
     except Exception:
         return True
+    hand_x = float(ee[0])
+    head_x = float(head[0])
+    return hand_x - head_x >= gap_min
 
-    p_e = sim.data.body_xpos[eid]
-    p_t = sim.data.body_xpos[tid]
-    p_h = sim.data.body_xpos[hid]
-    # Virtual chest/front plane: torso origin shifted slightly along outward normal.
-    p_front = np.asarray(p_t, dtype=float) + chest_fwd_pad * fwd
 
-    # Too far behind chest plane (+ margin slack).
-    if float(np.dot(p_e - p_front, fwd)) < -margin_torso:
-        return False
-    # Not posterior to head (horizontal depth along same fwd).
-    if float(np.dot(p_e - p_h, fwd)) < -margin_head:
-        return False
-    return True
+def _hand_forward_vs_torso_head_ok(sim, ee_body: str = R_EE_BODY) -> bool:
+    """Deprecated alias — use _hand_head_x_gap_ok."""
+    return _hand_head_x_gap_ok(sim, ee_body)
+
+
+def _right_hand_forward_vs_torso_head_ok(sim) -> bool:
+    """Deprecated alias — prefer _hand_forward_vs_torso_head_ok with _gesture_ee_body(pose)."""
+    return _hand_forward_vs_torso_head_ok(sim, R_EE_BODY)
+
+
+def _right_elbow_forward_vs_torso_head_ok(sim) -> bool:
+    """Deprecated alias — use hand (EE) check for pose-bank filtering."""
+    return _right_hand_forward_vs_torso_head_ok(sim)
 
 
 def _apply_pose_nominal(q, pose: dict) -> None:
@@ -366,36 +382,107 @@ def _apply_pose_nominal(q, pose: dict) -> None:
     q[QI_HEAD_TILT] = hp[1]
 
 
-def _resolve_right_arm_rad_from_bank(env, pose: dict) -> list[float]:
-    bank = _get_pose_bank_entries()
+def _apply_bank_r_arm(q, pose: dict, r_arm_rad: list[float]) -> None:
+    """Apply pose template with a pose-bank r_arm_rad entry (matches tile renderer)."""
+    torso = pose.get("torso_height", "mid")
+    q[QI_TORSO] = TORSO_MAP.get(torso, 0.18)
+    q[QI_R_ARM] = list(r_arm_rad)
+
     arm = pose.get("arm_position", "down+right")
     grip = pose.get("gripper_orientation", "vertical")
-    if str(arm).strip().lower() == "still":
-        return R_ARM_REST[:]
-    nominal = _arm_rad(arm, grip)
-    if not bank:
-        return nominal
+    left = pose.get("left_arm", "still")
+    if left == "still" and str(arm).strip().lower() == "still":
+        q[QI_L_ARM] = L_ARM_REST[:]
+    elif left == "still":
+        q[QI_L_ARM] = L_ARM_REST[:]
+    elif left == "mirror":
+        l_rad = list(r_arm_rad)
+        _mirror_offset(l_rad, arm)
+        q[QI_L_ARM] = l_rad
+    else:
+        q[QI_L_ARM] = _arm_rad(left, grip)
 
-    tx = float(pose.get("x", 50))
-    ty = float(pose.get("y", 50))
-    tz = float(pose.get("z", 50))
+    head = pose.get("head", "center")
+    hp = HEAD_PRESETS.get(head, [0, 0])
+    q[QI_HEAD_PAN] = hp[0]
+    q[QI_HEAD_TILT] = hp[1]
 
-    qn = _default_qpos(env)
-    _apply_pose_nominal(qn, pose)
-    env.sim.data.qpos[:] = qn
-    env.sim.forward()
-    from adhoc.generation.google_robot.legacy import render_mobile_manip_schema as sch
 
-    arm_label = str(pose.get("arm_position", "")).strip().lower()
-    desired_dir = DISPLAY_DIR_TO_SOURCE.get(arm_label)
-    d = desired_dir if desired_dir else sch._dir_six_way_from_anchor(env, qn, cam_name=sch.CAM)
-    o = sch._gripper_horizontal_vertical_by_reach_dir(env.sim, d)
-    if d == "?" or o == "?":
-        return nominal
+def _resolve_level(val: str | float, axis: str) -> float:
+    """Map categorical levels (low, med, high) to numeric percentiles based on plausible pose distribution."""
+    if isinstance(val, (int, float)):
+        return float(val)
+    v = str(val).lower()
+    if axis == "x":
+        if v == "low": return 44.0
+        if v == "med": return 57.0
+        if v == "high": return 83.0
+    if axis == "y":
+        if v == "low": return 17.0
+        if v == "med": return 48.0
+        if v == "high": return 80.0
+    if axis == "z":
+        if v == "low": return 19.0
+        if v == "med": return 53.0
+        if v == "high": return 84.0
+    return 50.0
 
-    cand = [e for e in bank if e.get("dir") == d and e.get("orient") == o]
-    if not cand:
-        return nominal
+
+_PLAUSIBLE_POSES: list[dict] | None = None
+
+
+def _get_plausible_poses() -> list[dict]:
+    global _PLAUSIBLE_POSES
+    if _PLAUSIBLE_POSES is not None:
+        return _PLAUSIBLE_POSES
+    p = os.path.join(_REPO_ROOT, "data", "seed", "google_robot", "plausible_poses_metadata.jsonl")
+    if not os.path.isfile(p):
+        _PLAUSIBLE_POSES = []
+        return []
+    out = []
+    with open(p, "r", encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                out.append(json.loads(line))
+    _PLAUSIBLE_POSES = out
+    return out
+
+
+def rank_pose_bank_topk(env, pose: dict, *, top_k: int = 10) -> dict:
+    """Rank pose-bank entries: filter dir+orient, hand-forward OK, sort by xyz distance.
+    Prioritizes selection from the 'plausible set' if matches are found.
+    """
+    arm = pose.get("arm_position", "down+right")
+    grip = pose.get("gripper_orientation", "vertical")
+    arm_label = str(arm).strip().lower()
+    if arm_label == "still":
+        return {
+            "arm_position": "still",
+            "target_xyz": None,
+            "bank_dir": None,
+            "bank_orient": None,
+            "n_pool": 0,
+            "n_hand_ok": 0,
+            "entries": [],
+        }
+
+    tx = _resolve_level(pose.get("x", 50), "x")
+    ty = _resolve_level(pose.get("y", 50), "y")
+    tz = _resolve_level(pose.get("z", 50), "z")
+
+    # 1. Try plausible set first
+    plausible = _get_plausible_poses()
+    desired_dir = DISPLAY_DIR_TO_SOURCE.get(arm_label, arm_label)
+    cand = [
+        e for e in plausible 
+        if e.get("arm_position") == arm_label and e.get("gripper_orientation") == grip
+    ]
+    
+    # Optional: Filter by elbow_bended
+    eb_target = pose.get("elbow_bended")
+    if eb_target is not None:
+        eb_target = bool(eb_target)
+        cand = [e for e in cand if e.get("elbow_bended") == eb_target]
 
     def _dist2(e: dict) -> float:
         return (
@@ -404,24 +491,132 @@ def _resolve_right_arm_rad_from_bank(env, pose: dict) -> list[float]:
             + (float(e.get("z", 50)) - tz) ** 2
         )
 
-    def _elbow_acceptable_bank_entry(e: dict) -> bool:
-        qc = np.asarray(qn, dtype=float).copy()
-        qc[QI_R_ARM] = np.asarray(e["r_arm_rad"], dtype=float)
+    # Optional: pin exact plausible tile
+    tile_idx = pose.get("plausible_tile_idx")
+    if tile_idx is not None and cand:
+        pinned = [e for e in cand if int(e.get("tile_idx", -1)) == int(tile_idx)]
+        if pinned:
+            e = pinned[0]
+            return {
+                "arm_position": arm_label,
+                "gripper_orientation": str(grip),
+                "target_xyz": (tx, ty, tz),
+                "n_pool": len(cand),
+                "entries": [{
+                    "rank": 1,
+                    "dist2": 0.0,
+                    "x": float(e.get("x", 50)),
+                    "y": float(e.get("y", 50)),
+                    "z": float(e.get("z", 50)),
+                    "r_arm_rad": [float(x) for x in e["r_arm_rad"]],
+                    "selected": True,
+                    "head_hand_gap_ok": True,
+                    "source": "plausible_set",
+                    "tile_idx": int(tile_idx),
+                }],
+                "source": "plausible_set",
+            }
+
+    if cand:
+        ranked_raw = sorted(cand, key=_dist2)[:top_k]
+        entries = []
+        for i, e in enumerate(ranked_raw, start=1):
+            entries.append({
+                "rank": i,
+                "dist2": _dist2(e),
+                "x": float(e.get("x", 50)),
+                "y": float(e.get("y", 50)),
+                "z": float(e.get("z", 50)),
+                "r_arm_rad": [float(x) for x in e["r_arm_rad"]],
+                "selected": i == 1,
+                "head_hand_gap_ok": True,
+                "source": "plausible_set"
+            })
+        return {
+            "arm_position": arm_label,
+            "gripper_orientation": str(grip),
+            "target_xyz": (tx, ty, tz),
+            "n_pool": len(cand),
+            "entries": entries,
+            "source": "plausible_set"
+        }
+
+    # 2. Fallback to full bank if no plausible matches
+    bank = _get_pose_bank_entries()
+    qn = _default_qpos(env)
+    _apply_pose_nominal(qn, pose)
+    env.sim.forward()
+    from adhoc.generation.google_robot.legacy import render_mobile_manip_schema as sch
+
+    d = desired_dir if desired_dir else sch._dir_six_way_from_anchor(env, qn, cam_name=sch.CAM)
+    o = sch._gripper_horizontal_vertical_by_reach_dir(env.sim, d)
+    
+    cand = [e for e in bank if e.get("dir") == d and e.get("orient") == o]
+    if eb_target is not None:
+        cand = [
+            e for e in cand 
+            if (abs(float(e.get("joint_deg", [0]*6)[3])) >= 15) == eb_target
+        ]
+
+    ee_body = _gesture_ee_body(pose)
+    def _head_hand_gap_ok(e: dict) -> bool:
+        qc = _default_qpos(env)
+        _apply_bank_r_arm(qc, pose, e["r_arm_rad"])
         env.sim.data.qpos[:] = qc
         env.sim.forward()
-        return _right_elbow_forward_vs_torso_head_ok(env.sim)
+        return _hand_head_x_gap_ok(env.sim, ee_body)
 
-    elbow_ok = [e for e in cand if _elbow_acceptable_bank_entry(e)]
-    cand_pick = elbow_ok if elbow_ok else []
+    hand_ok = [e for e in cand if _head_hand_gap_ok(e)]
+    ranked_raw = sorted(hand_ok, key=_dist2)[:top_k]
 
-    # No bank pose keeps elbow anterior: fall back to nominal preset (still dir/orient-consistent-ish).
-    if not cand_pick:
-        env.sim.data.qpos[:] = qn
-        env.sim.forward()
+    entries: list[dict] = []
+    for i, e in enumerate(ranked_raw, start=1):
+        entries.append(
+            {
+                "rank": i,
+                "dist2": _dist2(e),
+                "x": float(e.get("x", 50)),
+                "y": float(e.get("y", 50)),
+                "z": float(e.get("z", 50)),
+                "r_arm_rad": [float(x) for x in e["r_arm_rad"]],
+                "selected": i == 1,
+                "head_hand_gap_ok": True,
+                "source": "full_bank"
+            }
+        )
+    return {
+        "arm_position": arm_label,
+        "gripper_orientation": str(grip),
+        "target_xyz": (tx, ty, tz),
+        "bank_dir": d,
+        "bank_orient": o,
+        "n_pool": len(cand),
+        "n_hand_ok": len(hand_ok),
+        "n_ranked": len(entries),
+        "entries": entries,
+        "fallback": "nominal" if not entries and not bank else None,
+        "source": "full_bank"
+    }
+
+
+def _resolve_right_arm_rad_from_bank(env, pose: dict) -> list[float]:
+    arm = pose.get("arm_position", "down+right")
+    grip = pose.get("gripper_orientation", "vertical")
+    if str(arm).strip().lower() == "still":
+        return R_ARM_REST[:]
+    nominal = _arm_rad(arm, grip)
+    if not _get_pose_bank_entries():
         return nominal
 
-    best = min(cand_pick, key=_dist2)
-    return [float(x) for x in best["r_arm_rad"]]
+    ranked = rank_pose_bank_topk(env, pose, top_k=1)
+    if ranked.get("entries"):
+        return ranked["entries"][0]["r_arm_rad"]
+
+    qn = _default_qpos(env)
+    _apply_pose_nominal(qn, pose)
+    env.sim.data.qpos[:] = qn
+    env.sim.forward()
+    return nominal
 
 
 def _apply_pose(env, q, pose: dict) -> None:
@@ -470,6 +665,47 @@ def _capture(env, q, camera=CAM):
 def _pingpong(t01: float) -> float:
     """Map [0,1] to triangle wave [0→1→0]."""
     return 1.0 - abs(2.0 * t01 - 1.0)
+
+
+def _movement_beat_frames(speed: float) -> int:
+    """Manipulator-style: one direction beat lasts 1/speed seconds."""
+    return max(1, int((1.0 / max(0.3, float(speed))) * FPS))
+
+
+def _movement_degrees_are_cartesian_meters(lo: float, hi: float) -> bool:
+    """x/y/z on arm joints use meters when |value| <= 1 (EE deltas); larger values are degrees."""
+    return max(abs(float(lo)), abs(float(hi))) <= 1.0
+
+
+def _movement_pp_frames(reps: int, speed: float, joints_work: list[dict]) -> list[float]:
+    """Build per-frame pp values via discrete beats (manipulator-style).
+
+    - repetition=1 + degrees [lo,hi]: one-way lo→hi, hold at hi (bows, transitions).
+    - repetition≥2 + degrees [lo,hi]: ping-pong lo→hi→lo per rep (nods, waves).
+    """
+    beat_frames = _movement_beat_frames(speed)
+    has_range = any(
+        isinstance(j.get("degrees"), (list, tuple)) and len(j.get("degrees")) >= 2
+        for j in joints_work
+    )
+    reps = max(1, int(reps))
+    pp_frames: list[float] = []
+
+    def _append_ramp(forward: bool) -> None:
+        for fi in range(beat_frames):
+            t = (fi + 1) / beat_frames
+            pp_frames.append(t if forward else 1.0 - t)
+
+    if has_range and reps >= 2:
+        for _ in range(reps):
+            _append_ramp(True)
+            _append_ramp(False)
+    elif has_range:
+        _append_ramp(True)
+    else:
+        for _ in range(reps):
+            _append_ramp(True)
+    return pp_frames
 
 
 def _snapshots_for_base_path(
@@ -701,6 +937,18 @@ def tiago_trajectory_track_policy(config: dict) -> dict[str, bool]:
                 if sp.get(k) != ep.get(k):
                     show_ee = True
                     break
+        elif st == "path":
+            path = (params.get("path") or {})
+            mode = str(path.get("mode", "")).lower().strip()
+            is_ee = mode == "ee" or (
+                mode != "base"
+                and path.get("axis") in CART_AXES
+                and path.get("distance") is not None
+            )
+            if is_ee:
+                show_ee = True
+            else:
+                show_torso = True
     return {"show_head": show_head, "show_torso": show_torso, "show_ee": show_ee}
 
 
@@ -755,42 +1003,24 @@ def render_config(
         elif stype == "movement":
             mv = params.get("movement", {})
             raw_joints = list(mv.get("joints") or [])
-            joints = tiago_preprocess_movement_joints(raw_joints)
-
-            base_specs = [
-                j for j in joints if canonical_joint_keyword(j.get("joint")) == "base" and isinstance(j.get("path"), dict)
+            joints = [
+                j
+                for j in tiago_preprocess_movement_joints(raw_joints)
+                if canonical_joint_keyword(j.get("joint")) != "base"
             ]
-            arm_joints = [j for j in joints if j not in base_specs]
-
-            if base_specs and not arm_joints:
-                bx, by, yaw = base_x, base_y, base_yaw
-                for bspec in base_specs:
-                    snaps, bx, by, yaw = _snapshots_for_base_path(bx, by, yaw, bspec["path"])
-                    for nx, ny, nyaw in snaps:
-                        qc = q.copy()
-                        qc[QI_FWD] = nx
-                        qc[QI_SIDE] = ny
-                        qc[QI_YAW] = nyaw
-                        frames.append(_capture(env, qc, camera))
-                base_x, base_y, base_yaw = bx, by, yaw
-                _push_span("path", span_start)
-                continue
-
-            reps = mv.get("repetition", 1)
-            total_cycles = reps
-            base_snapshots: list[tuple[float, float, float]] = []
-            bx_prog, by_prog, yaw_prog = base_x, base_y, base_yaw
-            for bspec in base_specs:
-                seg, bx_prog, by_prog, yaw_prog = _snapshots_for_base_path(
-                    bx_prog, by_prog, yaw_prog, bspec["path"]
+            if not joints:
+                raise ValueError(
+                    "movement step has no arm/head/torso joints; "
+                    "use type: path with path.mode='base' for locomotion"
                 )
-                base_snapshots.extend(seg)
-            nb = len(base_snapshots)
 
-            joints_work = arm_joints
+            reps = int(mv.get("repetition", 1))
+            mv_speed = float(mv.get("speed", 1.0))
 
-            duration_frames = max(1, int(duration * FPS))
-            total_frames = max(duration_frames, nb) if nb else duration_frames
+            joints_work = joints
+
+            pp_frames = _movement_pp_frames(reps, mv_speed, joints_work)
+            total_frames = len(pp_frames)
 
             base_q = q.copy()
 
@@ -800,7 +1030,18 @@ def render_config(
                 axis = jspec.get("axis", "")
                 jgroup = jspec.get("joint", "")
                 mshape = str(jspec.get("_motion_shape") or "line").lower()
-                cart_ok = axis in CART_AXES and jgroup in _JOINT_LOCAL_DOFS and mshape == "line"
+                deg = jspec.get("degrees", [0, 0])
+                if isinstance(deg, (int, float)):
+                    lo_d, hi_d = 0.0, float(deg)
+                else:
+                    lo_d, hi_d = float(deg[0]), float(deg[1])
+                cart_meters = _movement_degrees_are_cartesian_meters(lo_d, hi_d)
+                cart_ok = (
+                    axis in CART_AXES
+                    and jgroup in _JOINT_LOCAL_DOFS
+                    and mshape == "line"
+                    and cart_meters
+                )
                 if cart_ok:
                     joint_mode.append("cartesian")
                     side = jspec.get("side", "right")
@@ -808,18 +1049,47 @@ def render_config(
                     info: dict[str, tuple] = {}
                     if side == "both":
                         li, jv = _find_best_dof_for_axis(
-                            env, base_q, R_EE_BODY, R_ARM_QVEL, ax_idx, jgroup
+                            env, base_q, R_EE_BODY, R_ARM_QVEL, ax_idx, jgroup,
+                            restrict_to_group=True,
                         )
                         info["_bilateral"] = (li, jv)
                     else:
                         if side == "right":
                             li, jv = _find_best_dof_for_axis(
-                                env, base_q, R_EE_BODY, R_ARM_QVEL, ax_idx, jgroup
+                                env, base_q, R_EE_BODY, R_ARM_QVEL, ax_idx, jgroup,
+                                restrict_to_group=True,
                             )
                             info["right"] = (6 + li, jv)
                         if side == "left":
                             li, jv = _find_best_dof_for_axis(
-                                env, base_q, L_EE_BODY, L_ARM_QVEL, ax_idx, jgroup
+                                env, base_q, L_EE_BODY, L_ARM_QVEL, ax_idx, jgroup,
+                                restrict_to_group=True,
+                            )
+                            sign = -1.0 if ax_idx == 1 else 1.0
+                            info["left"] = (18 + li, jv * sign)
+                    cart_elbow[ji] = info
+                elif axis in CART_AXES and jgroup in _JOINT_LOCAL_DOFS and mshape == "line":
+                    joint_mode.append("world_aligned_deg")
+                    side = jspec.get("side", "right")
+                    ax_idx = CART_AXES[str(axis).lower()]
+                    info: dict[str, tuple] = {}
+                    if side == "both":
+                        li, jv = _find_best_dof_for_axis(
+                            env, base_q, R_EE_BODY, R_ARM_QVEL, ax_idx, jgroup,
+                            restrict_to_group=True,
+                        )
+                        info["_bilateral"] = (li, jv)
+                    else:
+                        if side == "right":
+                            li, jv = _find_best_dof_for_axis(
+                                env, base_q, R_EE_BODY, R_ARM_QVEL, ax_idx, jgroup,
+                                restrict_to_group=True,
+                            )
+                            info["right"] = (6 + li, jv)
+                        if side == "left":
+                            li, jv = _find_best_dof_for_axis(
+                                env, base_q, L_EE_BODY, L_ARM_QVEL, ax_idx, jgroup,
+                                restrict_to_group=True,
                             )
                             sign = -1.0 if ax_idx == 1 else 1.0
                             info["left"] = (18 + li, jv * sign)
@@ -836,13 +1106,9 @@ def render_config(
             )
 
             q_seed = base_q.copy()
-            sm0 = _sample_base_snap(base_snapshots, 0, total_frames)
-            if sm0 is not None:
-                q_seed[QI_FWD], q_seed[QI_SIDE], q_seed[QI_YAW] = sm0
-            else:
-                q_seed[QI_FWD] = base_x
-                q_seed[QI_SIDE] = base_y
-                q_seed[QI_YAW] = base_yaw
+            q_seed[QI_FWD] = base_x
+            q_seed[QI_SIDE] = base_y
+            q_seed[QI_YAW] = base_yaw
             env.sim.data.qpos[:] = q_seed
             env.sim.forward()
             arc_seed = {
@@ -851,21 +1117,12 @@ def render_config(
             }
 
             for fi in range(total_frames):
-                t_global = fi / max(1, total_frames - 1)
-                if total_cycles == 1:
-                    pp = t_global
-                else:
-                    cycle_t = (t_global * total_cycles) % 1.0
-                    pp = _pingpong(cycle_t)
+                pp = pp_frames[min(fi, len(pp_frames) - 1)]
 
                 q_frame = base_q.copy()
-                sm = _sample_base_snap(base_snapshots, fi, total_frames)
-                if sm is not None:
-                    q_frame[QI_FWD], q_frame[QI_SIDE], q_frame[QI_YAW] = sm
-                else:
-                    q_frame[QI_FWD] = base_x
-                    q_frame[QI_SIDE] = base_y
-                    q_frame[QI_YAW] = base_yaw
+                q_frame[QI_FWD] = base_x
+                q_frame[QI_SIDE] = base_y
+                q_frame[QI_YAW] = base_yaw
 
                 for ji, jspec in enumerate(joints_work):
                     jname = jspec.get("joint", "")
@@ -895,6 +1152,20 @@ def render_config(
                                 lo_rad = _safe_jacobian_div(lo, jac_val)
                                 hi_rad = _safe_jacobian_div(hi, jac_val)
                                 q_frame[qi] = base_q[qi] + lo_rad + (hi_rad - lo_rad) * pp
+                    elif joint_mode[ji] == "world_aligned_deg":
+                        elbow_info = cart_elbow[ji]
+                        bilateral = elbow_info.get("_bilateral")
+                        delta_rad = np.deg2rad(lo + (hi - lo) * pp)
+                        if bilateral is not None:
+                            li, _jv_r = bilateral
+                            qi_r = 6 + li
+                            q_frame[qi_r] = base_q[qi_r] + delta_rad
+                            qi_l = 18 + li
+                            m = float(_BILATERAL_MIRROR_SIGN[li])
+                            q_frame[qi_l] = base_q[qi_l] + m * delta_rad
+                        else:
+                            for _arm_label, (qi, _jac_val) in elbow_info.items():
+                                q_frame[qi] = base_q[qi] + delta_rad
                     elif joint_mode[ji] == "cart_arc":
                         if side == "both":
                             continue
@@ -914,25 +1185,34 @@ def render_config(
                             side=str(side),
                         )
                     else:
+                        delta_deg = lo + (hi - lo) * pp
+                        use_relative = jname in ("shoulder", "elbow", "wrist", "head")
                         if side == "both":
                             qr = JOINT_QPOS_MAP.get((jname, axis))
                             ql = L_JOINT_QPOS_MAP.get((jname, axis))
                             if jname == "torso" and axis == "height" and qr is not None:
                                 q_frame[qr] = lo + (hi - lo) * pp
                             elif qr is not None and ql is not None and 6 <= qr < 12 and 18 <= ql < 24:
-                                val_r = np.deg2rad(lo + (hi - lo) * pp)
-                                dq = val_r - base_q[qr]
-                                i = int(qr - 6)
-                                q_frame[qr] = base_q[qr] + dq
-                                q_frame[ql] = base_q[ql] + float(_BILATERAL_MIRROR_SIGN[i]) * dq
+                                val_r = np.deg2rad(delta_deg)
+                                if use_relative:
+                                    q_frame[qr] = base_q[qr] + val_r
+                                    i = int(qr - 6)
+                                    q_frame[ql] = base_q[ql] + float(_BILATERAL_MIRROR_SIGN[i]) * val_r
+                                else:
+                                    dq = val_r - base_q[qr]
+                                    i = int(qr - 6)
+                                    q_frame[qr] = base_q[qr] + dq
+                                    q_frame[ql] = base_q[ql] + float(_BILATERAL_MIRROR_SIGN[i]) * dq
                             else:
                                 for qi in (qr, ql):
                                     if qi is None:
                                         continue
                                     if jname == "torso" and axis == "height":
                                         val = lo + (hi - lo) * pp
+                                    elif use_relative:
+                                        val = base_q[qi] + np.deg2rad(delta_deg)
                                     else:
-                                        val = np.deg2rad(lo + (hi - lo) * pp)
+                                        val = np.deg2rad(delta_deg)
                                     q_frame[qi] = val
                         elif side == "left":
                             qis = [L_JOINT_QPOS_MAP.get((jname, axis))]
@@ -941,8 +1221,10 @@ def render_config(
                                     continue
                                 if jname == "torso" and axis == "height":
                                     val = lo + (hi - lo) * pp
+                                elif use_relative:
+                                    val = base_q[qi] + np.deg2rad(delta_deg)
                                 else:
-                                    val = np.deg2rad(lo + (hi - lo) * pp)
+                                    val = np.deg2rad(delta_deg)
                                 q_frame[qi] = val
                         else:
                             qis = [JOINT_QPOS_MAP.get((jname, axis))]
@@ -951,8 +1233,10 @@ def render_config(
                                     continue
                                 if jname == "torso" and axis == "height":
                                     val = lo + (hi - lo) * pp
+                                elif use_relative:
+                                    val = base_q[qi] + np.deg2rad(delta_deg)
                                 else:
-                                    val = np.deg2rad(lo + (hi - lo) * pp)
+                                    val = np.deg2rad(delta_deg)
                                 q_frame[qi] = val
 
                 if has_bilateral_cart:
@@ -961,8 +1245,6 @@ def render_config(
                 _clamp_arm_deltas(base_q, q_frame, np.deg2rad(95))
                 frames.append(_capture(env, q_frame, camera))
             q = q_frame.copy()
-            if base_specs:
-                base_x, base_y, base_yaw = bx_prog, by_prog, yaw_prog
             _push_span("movement", span_start)
 
         elif stype == "pose_to_pose":
@@ -1007,13 +1289,21 @@ def render_config(
                 speed = float(path.get("speed", 1.0))
                 reps = max(1, int(path.get("repetition", 1) or 1))
                 side = str(path.get("side", "right"))
-                if side not in ("right", "left"):
+                if side not in ("right", "left", "both"):
                     side = "right"
 
                 env.sim.data.qpos[:] = q
                 env.sim.forward()
-                rid = env.sim.model.body_name2id(R_EE_BODY if side == "right" else L_EE_BODY)
-                ee_start = env.sim.data.body_xpos[rid].copy()
+                if side == "both":
+                    ee_start_r = env.sim.data.body_xpos[
+                        env.sim.model.body_name2id(R_EE_BODY)
+                    ].copy()
+                    ee_start_l = env.sim.data.body_xpos[
+                        env.sim.model.body_name2id(L_EE_BODY)
+                    ].copy()
+                else:
+                    rid = env.sim.model.body_name2id(R_EE_BODY if side == "right" else L_EE_BODY)
+                    ee_start = env.sim.data.body_xpos[rid].copy()
                 total_frames = max(1, int(duration * FPS))
                 if shape == "line":
                     distance_m = float(path.get("distance", 0.0))
@@ -1041,29 +1331,75 @@ def render_config(
                     else:
                         cycle_t = (t_global * reps) % 1.0
                         pp = _pingpong(cycle_t)
+                    # Smoothstep easing for smoother wave-like motion
+                    pp = pp * pp * (3.0 - 2.0 * pp)
 
                     q_before = q_frame.copy()
                     if shape == "line":
-                        _apply_arm_cartesian_line_step(
-                            env,
-                            q_frame,
-                            ee_start,
-                            axis=str(path.get("axis", "x")),
-                            distance_m=float(path.get("distance", 0.0)),
-                            pp=pp,
-                            side=side,
-                        )
+                        if side == "both":
+                            _apply_arm_cartesian_line_step(
+                                env,
+                                q_frame,
+                                ee_start_r,
+                                axis=str(path.get("axis", "x")),
+                                distance_m=float(path.get("distance", 0.0)),
+                                pp=pp,
+                                side="right",
+                            )
+                            _apply_arm_cartesian_line_step(
+                                env,
+                                q_frame,
+                                ee_start_l,
+                                axis=str(path.get("axis", "x")),
+                                distance_m=float(path.get("distance", 0.0)),
+                                pp=pp,
+                                side="left",
+                            )
+                            _stagger_if_overlapping(env, q_frame)
+                        else:
+                            _apply_arm_cartesian_line_step(
+                                env,
+                                q_frame,
+                                ee_start,
+                                axis=str(path.get("axis", "x")),
+                                distance_m=float(path.get("distance", 0.0)),
+                                pp=pp,
+                                side=side,
+                            )
                     else:
-                        _apply_arm_cartesian_arc_step(
-                            env,
-                            q_frame,
-                            ee_start,
-                            plane=str(path.get("plane", "xy")),
-                            radius_m=float(path.get("radius", 0.12)),
-                            sweep_rad=sweep_rad,
-                            pp=pp,
-                            side=side,
-                        )
+                        if side == "both":
+                            _apply_arm_cartesian_arc_step(
+                                env,
+                                q_frame,
+                                ee_start_r,
+                                plane=str(path.get("plane", "xy")),
+                                radius_m=float(path.get("radius", 0.12)),
+                                sweep_rad=sweep_rad,
+                                pp=pp,
+                                side="right",
+                            )
+                            _apply_arm_cartesian_arc_step(
+                                env,
+                                q_frame,
+                                ee_start_l,
+                                plane=str(path.get("plane", "xy")),
+                                radius_m=float(path.get("radius", 0.12)),
+                                sweep_rad=sweep_rad,
+                                pp=pp,
+                                side="left",
+                            )
+                            _stagger_if_overlapping(env, q_frame)
+                        else:
+                            _apply_arm_cartesian_arc_step(
+                                env,
+                                q_frame,
+                                ee_start,
+                                plane=str(path.get("plane", "xy")),
+                                radius_m=float(path.get("radius", 0.12)),
+                                sweep_rad=sweep_rad,
+                                pp=pp,
+                                side=side,
+                            )
                     _gripper_qpos_keep(path_anchor_q, q_frame)
                     _clamp_arm_deltas(q_before, q_frame, np.deg2rad(35))
                     frames.append(_capture(env, q_frame, camera))
@@ -1142,9 +1478,11 @@ def render_config_with_trajectory(
     *,
     overlay_progress_bar: bool = True,
     progress_bar_style: str = "typed",
+    cam_pos_scale: float = 1.09,
+    cam_fovy: float = 58.0,
 ):
     """Render TIAGo frames; record right EE + head + torso for trajectory overlays."""
-    env = _make_env()
+    env = _make_env(cam_pos_scale=cam_pos_scale, cam_fovy=cam_fovy)
     trajectory: list[dict] = []
     orig_capture = _capture
 

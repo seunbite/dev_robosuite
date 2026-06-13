@@ -1,0 +1,34 @@
+You are comparing two robot motions for the SAME iconic gesture cue.
+
+The image is a side-by-side composite (LEFT | RIGHT). Each panel is an **alpha_frame_trajectory**:
+- Semi-transparent stack of motion frames (faded trail of the arm moving).
+- End-effector path drawn yellow → purple (time order).
+- **Both sides use the identical fixed start pose** (human GT). Only the **tail movement after that pose** differs.
+
+Coordinate frame (world): +x forward toward the viewer, +y robot left, +z up.
+Movements use joint-space (shoulder/elbow/wrist/head/torso) and/or Cartesian path (line/arc).
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?
+{{APPROPRIATE_MEANS}}
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, hold/pause if visible).
+- Do **NOT** assume either side is labeled ground truth.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+
+Fixed start pose (same on both sides; do not choose based on changing this):
+- arm_position={{FIXED_ARM_POSITION}}, gripper_orientation={{FIXED_GRIPPER_ORIENTATION}}
+
+Side labels (motion hints only — neither side is marked correct):
+- LEFT: {{LEFT_TAIL_SUMMARY}}
+- RIGHT: {{RIGHT_TAIL_SUMMARY}}
+
+Return ONLY strict JSON:
+{
+  "better_side": "left" or "right",
+  "motion_assessment": "string: which side better conveys the cue and why (trajectory, axis, repetition, hold)",
+  "confidence": 0.0
+}

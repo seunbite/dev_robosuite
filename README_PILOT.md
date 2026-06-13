@@ -90,7 +90,8 @@ source scripts/cluster_env.sh /data/user_data/$USER/hf_cache
 
 | Machine | Command |
 |---------|---------|
-| **Server (cluster)** | `cd ~/sblee/dev_robosuite && bash exp.sh` — all 10 tasks, full rerun |
+| **Server (cluster)** | `cd ~/sblee/dev_robosuite && bash exp.sh` — manipulator, all 10 tasks |
+| **Server (cluster)** | `DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all` — mobile bimanipulator |
 | **Local (Mac)** | `cd ~/Downloads/workspace/dev_robosuite && ONLY=1,2,3,7 bash exp.sh` |
 
 ### `exp.sh` — one entry point
@@ -106,7 +107,8 @@ Defaults: **all 10 tasks**, **Qwen 32B**, resume on.
 Override: `EXP_SITE=local|cluster`, `SKIP_ENV=1` (already activated).
 
 ```bash
-bash exp.sh                              # full suite (32b)
+bash exp.sh                              # manipulator full suite (32b)
+DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all   # Google Robot pilot-40
 SUMMARY=1 bash exp.sh                    # scores only
 ONLY=1,2,3 bash exp.sh                   # subset
 MODEL_SIZE=gemini bash exp.sh            # Gemini API (source APIKEY.sh)
@@ -141,7 +143,106 @@ ONLY=8,9,10 bash scripts/run_pilot90_qwen_suite.sh
 
 ---
 
-## Pilot-40 (legacy, 39 cues)
+## Pilot-40 Google Robot (39 cues, mobile bimanipulator)
+
+Same **exp 1–10 protocol** as manipulator pilot-90, adapted to TIAGo pose/movement/path schema.
+
+### Run (server)
+
+```bash
+cd ~/sblee/dev_robosuite
+source APIKEY.sh                    # Gemini
+DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all
+ONLY=1,2,3,7 bash exp.sh all        # subset (DOMAIN still google_robot)
+SUMMARY=1 DOMAIN=google_robot bash exp.sh all
+```
+
+Local Mac:
+
+```bash
+cd ~/Downloads/workspace/dev_robosuite
+DOMAIN=google_robot MODEL_SIZE=gemini ONLY=1 bash exp.sh all
+```
+
+**Orchestrator:** `adhoc/generation/google_robot/exp.py`  
+**Generation:** `adhoc/generation/google_robot/config_gen_mobile_vlm.py` (exp 1 & 7)  
+**Path helpers:** `adhoc/generation/google_robot/pilot40_paths.py`  
+**Prompts:** `data/seed/prompt/google_robot/exp/prompt_exp{1..10}.txt` + `_shared_*.txt`
+
+### Directory layout (symmetric to manipulator)
+
+```
+data/seed/
+  shots/google_robot/shot_configs_pilot40_mobile.json   # 39 cue list + few-shot source
+  shots/google_robot/diverse_shots_mobile.json          # few-shot examples (exp1)
+  prompt/google_robot/exp/prompt_exp1.txt … prompt_exp10.txt
+  prompt/google_robot/exp/_shared_appropriate_means.txt
+  prompt/google_robot/exp/_shared_pose_definitions.txt
+  prompt/google_robot/exp/_shared_representative_means.txt
+  yml/_cues_new.yml                                     # cue catalog (exp1)
+
+data/results/motion_configs/google_robot/exp/
+  result_exp1_{model_tag}.json
+  result_exp7_{model_tag}.json
+
+data/results/verify/google_robot/exp/
+  score_exp1_{model_tag}.json
+  score_exp7_{model_tag}.json
+  result_exp2_{model_tag}.json … result_exp10_{model_tag}.json
+  pilot40_suite_summary_{model_tag}.json
+
+data/results/render/google_robot/
+  mm19_g*.gif                                           # rendered motions
+  pilot40_media/{pose,mp4}/                             # exp2 PNG + exp8 MP4
+
+data/results/visualize/
+  google_pose_groups_12/                                # pose tiles (exp5/6)
+  google_robot/pose_multitile_gt_pilot40_grid{6,12}/    # stitched grids
+
+data/results/html/google_robot/
+  exp{N}_{model_tag}.html
+  index.html
+```
+
+`{model_tag}` examples: `gemini-2.5-pro`, `mobile-map` (legacy migrated configs)
+
+### Experiment table (Pilot-40 Google Robot)
+
+| # | Task | Prompt | Input | JSON result | HTML |
+|---|------|--------|-------|-------------|------|
+| 1 | Pose generation vs GT | `prompt_exp1.txt` | — | `score_exp1_{tag}.json` | `exp1_{tag}.html` |
+| 2 | Pose verify VLM (PNG) | `prompt_exp2.txt` | `result_exp1_{tag}.json` | `result_exp2_{tag}.json` | `exp2_{tag}.html` |
+| 3 | Pose verify text | `prompt_exp3.txt` | `result_exp1_{tag}.json` | `result_exp3_{tag}.json` | `exp3_{tag}.html` |
+| 4 | Pose pairwise 2-way | `prompt_exp4.txt` | exp1 vs reference GIFs | `result_exp4_{tag}.json` | — |
+| 5 | Multitile grid 6 | `prompt_exp5.txt` | pose tiles + GT | `result_exp5_{tag}.json` | `exp5_{tag}.html` |
+| 6 | Multitile grid 12 | `prompt_exp6.txt` | pose tiles + GT | `result_exp6_{tag}.json` | — |
+| 7 | Movement generation vs GT | `prompt_exp7.txt` | fixed human pose | `score_exp7_{tag}.json` | `exp7_{tag}.html` |
+| 8 | Movement verify VLM (MP4) | `prompt_exp8.txt` | `result_exp7_{tag}.json` + MP4 | `result_exp8_{tag}.json` | `exp8_{tag}.html` |
+| 9 | Movement verify text | `prompt_exp9.txt` | `result_exp7_{tag}.json` | `result_exp9_{tag}.json` | `exp9_{tag}.html` |
+| 10 | Movement pairwise | `prompt_exp10.txt` | `result_exp7_{tag}.json` + GIF/MP4 | `result_exp10_{tag}.json` | — |
+
+### Media prep (exp 2, 8, 10)
+
+```bash
+# After rendering GIFs under data/results/render/google_robot/
+python adhoc/generation/google_robot/prepare_pilot40_media.py \
+  --config-json data/results/motion_configs/google_robot/exp/result_exp7_gemini-2.5-pro.json
+
+# Pose tiles for exp 5/6 (once)
+python adhoc/generation/google_robot/generate_pose_group_tiles.py \
+  --output-root data/results/visualize/google_pose_groups_12
+```
+
+### Legacy migrate (optional)
+
+```bash
+python adhoc/generation/google_robot/exp.py migrate --force
+python adhoc/generation/google_robot/exp.py summary
+```
+
+---
+
+## Pilot-40 (legacy manipulator, 39 cues)
 
 Older 39-cue suite; paths and shared-config scoring remain in `pilot40_experiment_suite.py` / `run_pilot40_qwen_suite.sh`. Prefer Pilot-90 for new work.
 

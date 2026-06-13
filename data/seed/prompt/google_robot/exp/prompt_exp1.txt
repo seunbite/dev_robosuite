@@ -1,0 +1,98 @@
+You are an expert in TIAGo-like mobile manipulator gesture design.
+
+Goal:
+- Generate ONE complete cue motion (`movements`) using three core components: `pose`, `movement`, and `path`.
+- Create representative and expressive gestures by utilizing the robot's unique capabilities.
+
+[Required Reasoning Process]
+You MUST output exactly four planning lines as # comments before the JSON.
+# Q1: How would a human perform this motion? (One sentence)
+# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.
+# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.
+# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.
+
+[pose Selection Rules]
+Coordinate frame (world): +x = forward toward the human viewer, +y = robot left, +z = up (ceiling). The right arm is the primary gesturing arm unless `left_arm` says otherwise.
+
+1. Arm position (`arm_position`) — dominant reach direction of the right arm:
+Choose from where the arm extends relative to the torso:
+- **front**: reach toward the viewer (+x). Example: offer object, point forward, handshake reach.
+- **back**: reach toward own torso (−x). Example: hand on chest, retract inward.
+- **in**: reach inward across the body (+y from the right arm). Example: beckon, touch face, rub chest.
+- **out**: reach outward to the side (−y). Example: side wave, lateral present, open branch.
+- **up**: reach toward the ceiling (+z). Example: stretch, surrender, hail.
+- **down**: reach downward (−z). Example: point at floor, lowered palm.
+
+3. Gripper orientation (`gripper_orientation`):
+The **end line** is the jaw-opening line (between fingertip tips). Take the plane **perpendicular** to the arm reach direction. **Orthogonally project** the end line onto that plane. An observer stands **facing that plane** (looking straight at it). Read the projected line:
+- **horizontal**: projected line is a **ㅡ** (left–right). Example: wave, high-five, stop palm-out.
+- **vertical**: projected line is a **|** (up–down). Example: handshake, point, beckon flick.
+
+Examples: wave → out + horizontal; handshake → front + vertical; stretch → up + horizontal.
+
+4. Head (`head`) — preset gaze from the robot's perspective:
+- **center**: look forward. **left** / **right**: pan sideways. **up** / **down**: tilt toward ceiling / floor.
+
+5. Left arm (`left_arm`, optional, default still):
+- **still**: left arm stays at rest.
+- **mirror**: left arm copies the right arm's `arm_position` (symmetric gestures: stretch, surrender, hug).
+- Or any `arm_position` value for independent left-arm placement.
+
+6. Elbow bended (`elbow_bended`, optional):
+- **true** / **false** — refines which joint configuration is used within the same (`arm_position`, `gripper_orientation`) class.
+
+7. EE percentile (`x`, `y`, `z`, optional, each 0–100):
+Percentile coordinates of the right-hand gripper fingertip in the workspace. They refine **which sample** is chosen for the same `arm_position` + `gripper_orientation` (+ `elbow_bended`). Default when all omitted: **(50, 50, 50)**. If any is set, treat missing ones as **50**. Use higher `z` for face/head-height, lower for waist; adjust `x`/`y` for forward/back and inward/outward bias.
+
+[movement & path (brief)]
+- **movement**: joint-space motion. joints: shoulder|elbow|wrist|head|torso; axis per joint; `degrees` [lo, hi]; `repetition` 1=one-way hold, ≥2=ping-pong; `speed` 0.3–4.0. torso height = meters (low=0.05, mid=0.18, high=0.34). head pan|tilt = ° relative to pose. Arm |value|>1 → °; |value|≤1 → meters. No `base` in movement.
+- **path**: Cartesian motion. `mode` ee|base; `shape` line|arc. ee line: axis x|y|z + distance (m); ee arc: plane xy|xz|yz + radius + sweep; `side` right|left|both. base line: x/y (m); base arc: radius + degrees.
+
+Output exactly 4 # lines, then the JSON object starting with {.
+
+Output JSON schema (strict):
+{
+  "cue": "{{CUE_NAME}}",
+  "description": "one sentence",
+  "movements": [
+    {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": {
+        "pose": {
+          "torso_height": "low|mid|high",
+          "arm_position": "front|back|in|out|up|down",
+          "gripper_orientation": "horizontal|vertical",
+          "head": "center|left|right|up|down",
+          "left_arm": "still|mirror",
+          "elbow_bended": <true|false optional>,
+          "x": <low|med|high or 0..100 optional>,
+          "y": <low|med|high or 0..100 optional>,
+          "z": <low|med|high or 0..100 optional>
+        }
+      }
+    },
+    {
+      "type": "movement|path",
+      "duration": <seconds optional>,
+      "parameters": { ... }
+    }
+  ]
+}
+
+Constraints:
+- First step MUST be `pose`.
+- Total steps: 2~8.
+- Speed range: 0.3~4.0.
+- If step.type is `path`, set `path.mode` explicitly (ee|base).
+- Be expressive! Use `torso_height` and `head` to match the cue's emotion.
+- JSON only (no markdown fences, no extra prose).
+
+Cue catalog:
+{{CUE_CATALOG}}
+
+Few-shot examples:
+{{FEW_SHOT_EXAMPLES}}
+
+Target cue:
+{{CUE_NAME}}

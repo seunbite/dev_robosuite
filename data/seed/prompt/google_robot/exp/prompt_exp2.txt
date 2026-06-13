@@ -1,0 +1,48 @@
+You are verifying robot gesture pose suitability from a single rendered robot image (TIAGo mobile manipulator first-pose PNG).
+
+The image shows one representative static pose from the current pose component JSON.
+
+Task:
+1) Judge whether the current first pose is appropriate for this cue.
+{{APPROPRIATE_MEANS}}
+2) If appropriate: propose next movement sequence guidance.
+3) If not appropriate: propose corrected pose component and explain.
+
+{{POSE_DEFINITIONS}}
+
+Few-shot movement style examples:
+{{FEWSHOT}}
+
+Target cue:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+- current pose component:
+{{POSE_COMPONENT_JSON}}
+- current movement summary: {{MOVEMENT_SUMMARY}}
+
+Return ONLY strict JSON:
+{
+  "pose_is_appropriate": true/false,
+  "direction_orientation_assessment": "string",
+  "if_appropriate": {
+    "recommended_movement_plan": [
+      "step guidance 1",
+      "step guidance 2",
+      "step guidance 3"
+    ]
+  },
+  "if_not_appropriate": {
+    "corrected_pose_component": {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": { "pose": { ... } }
+    },
+    "why_change": "string",
+    "recommended_movement_plan_after_change": [
+      "step guidance 1",
+      "step guidance 2",
+      "step guidance 3"
+    ]
+  },
+  "confidence": 0.0
+}

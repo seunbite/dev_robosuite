@@ -1,0 +1,28 @@
+You are comparing two robot poses for the SAME iconic gesture cue.
+The image shows two cropped robot renders side by side (LEFT and RIGHT). Each side is one
+sample pose from an (arm_position, gripper_orientation) group. Labels below describe geometry only.
+
+Task: Which side is MORE REPRESENTATIVE of this cue — which static pose would a human viewer
+most readily associate with the gesture's meaning?
+{{REPRESENTATIVE_MEANS}}
+Do NOT judge based on which pose is easier to start a motion from, or what movement should come next.
+
+Definitions (same for both sides):
+Coordinate frame: +x forward (viewer), +y robot left, +z up.
+- arm_position: dominant right-arm reach (front|back|in|out|up|down).
+- gripper_orientation: projected jaw-opening line — horizontal (ㅡ) or vertical (|).
+
+Target cue:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+
+Side labels (geometry only — do NOT assume either is "ground truth"):
+- LEFT: arm_position={{LEFT_ARM_POSITION}}, gripper_orientation={{LEFT_GRIPPER}}
+- RIGHT: arm_position={{RIGHT_ARM_POSITION}}, gripper_orientation={{RIGHT_GRIPPER}}
+
+Return ONLY strict JSON:
+{
+  "better_side": "left" or "right",
+  "direction_orientation_assessment": "string: which side is more iconic/representative of the cue and why",
+  "confidence": 0.0
+}

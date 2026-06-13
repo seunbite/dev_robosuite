@@ -32,6 +32,8 @@ from adhoc.utils.repo_paths import (  # noqa: E402
     seed_yml_dir,
 )
 
+from adhoc.generation.joint_motion_schema import canonical_joint_keyword  # noqa: E402
+
 _DEFAULT_PROMPT = str(resolve_seed_prompt_txt("google_robot"))
 _DEFAULT_SHOTS = str(resolve_seed_shots_json("google_robot"))
 _DEFAULT_CONFIG = str(motion_configs_results_dir("google_robot") / "motion_configs_19_mobile.json")
@@ -138,7 +140,7 @@ def _validate_reasoning(reasoning_text: str) -> list[str]:
     if not reasoning_text.strip():
         return ["Missing planning comments before JSON"]
     lines = [line.strip() for line in reasoning_text.splitlines() if line.strip()]
-    for expected in ("Q1", "Q2", "Q3"):
+    for expected in ("Q1", "Q2", "Q3", "Q4"):
         if not any(line.startswith(f"# {expected}:") for line in lines):
             errors.append(f"Missing '# {expected}:' planning line")
     return errors
@@ -163,10 +165,10 @@ def _validate_config(config: dict[str, Any]) -> list[str]:
 
     valid_types = {"pose", "movement", "path", "pose_to_pose"}
     valid_torso = {"low", "mid", "high"}
-    valid_arm = {"up", "front", "back", "right", "down+front", "down+right", "down+back", "fold"}
+    valid_arm = {"front", "back", "in", "out", "up", "down", "still"}
     valid_grip = {"horizontal", "vertical"}
     valid_head = {"center", "left", "right", "up", "down"}
-    valid_joints = {"shoulder", "elbow", "wrist", "torso", "head"}
+    valid_joints = {"shoulder", "elbow", "wrist", "torso", "head", "right_arm", "left_arm"}
     cartesian_axes = {"x", "y", "z"}
     valid_axes = {
         "shoulder": {"pitch", "roll"} | cartesian_axes,
@@ -175,7 +177,33 @@ def _validate_config(config: dict[str, Any]) -> list[str]:
         "torso": {"height"},
         "head": {"pan", "tilt"},
     }
-    valid_shapes = {"line", "arc"}
+    valid_path_shapes = {"line", "arc"}
+    valid_left_arm = {"still", "mirror"} | valid_arm
+
+    def _pose_field_errors(pose: dict, label: str) -> list[str]:
+        pe: list[str] = []
+        if pose.get("torso_height") and pose["torso_height"] not in valid_torso:
+            pe.append(f"{label}: invalid torso_height {pose['torso_height']!r}")
+        if pose.get("arm_position") and pose["arm_position"] not in valid_arm:
+            pe.append(f"{label}: invalid arm_position {pose['arm_position']!r}")
+        if pose.get("gripper_orientation") and pose["gripper_orientation"] not in valid_grip:
+            pe.append(f"{label}: invalid gripper_orientation {pose['gripper_orientation']!r}")
+        if pose.get("head") and pose["head"] not in valid_head:
+            pe.append(f"{label}: invalid head {pose['head']!r}")
+        la = pose.get("left_arm")
+        if la is not None and la not in valid_left_arm:
+            pe.append(f"{label}: invalid left_arm {la!r}")
+        for coord in ("x", "y", "z"):
+            if coord not in pose or pose[coord] is None:
+                continue
+            try:
+                v = float(pose[coord])
+            except (TypeError, ValueError):
+                pe.append(f"{label}.{coord} must be a number in [0,100]")
+                continue
+            if not (0.0 <= v <= 100.0):
+                pe.append(f"{label}.{coord} must be in [0,100], got {v}")
+        return pe
 
     for m in movements:
         mtype = m.get("type")
@@ -186,14 +214,19 @@ def _validate_config(config: dict[str, Any]) -> list[str]:
 
         if mtype == "pose":
             pose = params.get("pose", {})
-            if pose.get("torso_height") and pose["torso_height"] not in valid_torso:
-                errors.append(f"Invalid torso_height: {pose['torso_height']}")
-            if pose.get("arm_position") and pose["arm_position"] not in valid_arm:
-                errors.append(f"Invalid arm_position: {pose['arm_position']}")
-            if pose.get("gripper_orientation") and pose["gripper_orientation"] not in valid_grip:
-                errors.append(f"Invalid gripper_orientation: {pose['gripper_orientation']}")
-            if pose.get("head") and pose["head"] not in valid_head:
-                errors.append(f"Invalid head: {pose['head']}")
+            errors.extend(_pose_field_errors(pose, "pose"))
+
+        elif mtype == "pose_to_pose":
+            sp = params.get("start_pose")
+            ep = params.get("end_pose")
+            if not isinstance(sp, dict):
+                errors.append("pose_to_pose requires parameters.start_pose (object)")
+            else:
+                errors.extend(_pose_field_errors(sp, "start_pose"))
+            if not isinstance(ep, dict):
+                errors.append("pose_to_pose requires parameters.end_pose (object)")
+            else:
+                errors.extend(_pose_field_errors(ep, "end_pose"))
 
         elif mtype == "movement":
             mv = params.get("movement", {})
@@ -201,9 +234,41 @@ def _validate_config(config: dict[str, Any]) -> list[str]:
             if not joints:
                 errors.append("Movement step has no joints")
             for j in joints:
-                jname = j.get("joint", "")
+                key = j.get("joint", "")
+                cj = canonical_joint_keyword(key) or str(key).strip().lower()
+                if cj == "base":
+                    errors.append(
+                        "joint 'base' is not supported in movement; use type: path with path.mode='base'"
+                    )
+                    continue
+                if cj in ("right_arm", "left_arm"):
+                    mshape = str(j.get("shape", "line")).lower()
+                    if mshape == "arc":
+                        if not j.get("plane"):
+                            errors.append("right_arm/left_arm arc requires 'plane' (xy | xz | yz)")
+                        if j.get("radius") is None:
+                            errors.append("right_arm/left_arm arc requires 'radius' (m)")
+                        if j.get("sweep", j.get("degrees")) is None:
+                            errors.append("right_arm/left_arm arc requires 'sweep' or 'degrees'")
+                        continue
+                    axis = j.get("axis", "")
+                    if not axis:
+                        errors.append("right_arm / left_arm requires 'axis'")
+                        continue
+                    if "degrees" not in j:
+                        errors.append(f"Missing 'degrees' for {key}.{axis}")
+                    limb = (
+                        str(j.get("link", "elbow" if axis in cartesian_axes else "shoulder")).strip().lower()
+                    )
+                    if limb not in valid_axes:
+                        errors.append(f"Invalid link/group for arm alias: {limb}")
+                    elif isinstance(axis, str) and axis not in valid_axes.get(limb, set()):
+                        errors.append(f"Invalid axis '{axis}' for link '{limb}' on arm alias")
+                    continue
+
+                jname = str(key).strip().lower()
                 if jname not in valid_joints:
-                    errors.append(f"Invalid joint: {jname}")
+                    errors.append(f"Invalid joint: {key}")
                     continue
                 axis = j.get("axis", "")
                 if axis not in valid_axes.get(jname, set()):
@@ -213,9 +278,30 @@ def _validate_config(config: dict[str, Any]) -> list[str]:
 
         elif mtype == "path":
             path = params.get("path", {})
+            mode = path.get("mode")
+            if mode is not None and mode not in {"ee", "base"}:
+                errors.append(f"Invalid path mode: {mode!r} (use 'ee' or 'base')")
             shape = path.get("shape")
-            if shape and shape not in valid_shapes:
+            if shape and shape not in valid_path_shapes:
                 errors.append(f"Invalid path shape: {shape}")
+            if mode == "ee":
+                if shape == "line":
+                    if path.get("axis") not in cartesian_axes:
+                        errors.append("path.mode='ee' + line requires axis in {x,y,z}")
+                    if path.get("distance") is None:
+                        errors.append("path.mode='ee' + line requires distance (meters)")
+                elif shape == "arc":
+                    if path.get("plane") not in {"xy", "xz", "yz"}:
+                        errors.append("path.mode='ee' + arc requires plane in {xy,xz,yz}")
+                    if path.get("radius") is None:
+                        errors.append("path.mode='ee' + arc requires radius (meters)")
+            elif mode == "base":
+                if shape == "line":
+                    if path.get("x") is None and path.get("y") is None:
+                        errors.append("path.mode='base' + line requires x and/or y (meters)")
+                elif shape == "arc":
+                    if path.get("degrees") is None:
+                        errors.append("path.mode='base' + arc requires degrees")
 
     return errors
 
@@ -224,11 +310,15 @@ def _format_cue_catalog(yaml_path: str) -> str:
     with open(yaml_path, "r", encoding="utf-8") as f:
         cues_dict = yaml.safe_load(f)
     parts: list[str] = []
-    for group_name in ("iconic", "contextual"):
-        if group_name not in cues_dict:
+    group_names = [g for g in ("iconic", "contextual") if g in cues_dict]
+    if not group_names and isinstance(cues_dict, dict):
+        group_names = [k for k, v in cues_dict.items() if isinstance(v, dict)]
+    for group_name in group_names:
+        grp = cues_dict.get(group_name)
+        if not isinstance(grp, dict):
             continue
         parts.append(f"[Available {group_name} cues]")
-        for cue, text in cues_dict[group_name].items():
+        for cue, text in grp.items():
             parts.append(f"- {cue}: {text}")
         parts.append("")
     return "\n".join(parts)

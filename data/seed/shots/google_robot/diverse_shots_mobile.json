@@ -1,0 +1,248 @@
+[
+  {
+    "cue": "nod_yes",
+    "description": "The robot performs two quick, small vertical head nods to signal 'yes'.",
+    "reasoning": "# Q1: Human analogue: A simple vertical head nod.\n# Q2: First-pose: Neutral mid-height torso with forward-facing head. Winner=mid torso + center head.\n# Q3: Structure: Use 'movement' for head tilt joints. Winner=2-step vertical oscillation.\n# Q4: Self-check: 100. Standard affirmative signal.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "still",
+            "gripper_orientation": "vertical",
+            "head": "center"
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [0, -20]
+              }
+            ],
+            "repetition": 2,
+            "speed": 2.0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "cue": "approach_gradual",
+    "description": "The robot moves forward slowly and cautiously toward the partner.",
+    "reasoning": "# Q1: Human analogue: Walking forward slowly with a friendly posture.\n# Q2: First-pose: Neutral mid-height torso, arms at sides. Winner=mid torso + still arms.\n# Q3: Structure: Use 'path' with mode 'base' for locomotion. Winner=slow forward line.\n# Q4: Self-check: 100. Clear intentional approach.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "still",
+            "gripper_orientation": "vertical",
+            "head": "center"
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 2.0,
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "line",
+            "x": 0.5,
+            "y": 0.0,
+            "speed": 0.8
+          }
+        }
+      }
+    ]
+  },
+  {
+    "cue": "apology_forward_lowered_hold",
+    "description": "The robot starts upright facing forward, then bows by lowering its torso and dipping its head in a respectful apology.",
+    "reasoning": "# Q1: Human analogue: Apologizing with a forward-facing bow — shrink down and lower the head.\n# Q2: First-pose: Upright mid torso, head center (looking forward). Winner=neutral attentive stance before the bow.\n# Q3: Structure: movement with torso.height [0.18→0.05] + head.tilt [0→-35°] together; hold bowed pose. Winner=coordinated sink, not instant pose snap.\n# Q4: Self-check: 95. Clear regretful bow with torso+head diversity.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.6,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "still",
+            "gripper_orientation": "vertical",
+            "head": "center"
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "torso",
+                "axis": "height",
+                "degrees": [0.18, 0.05]
+              },
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [0, -35]
+              }
+            ],
+            "repetition": 1,
+            "speed": 0.8
+          }
+        }
+      },
+      {
+        "type": "pose",
+        "duration": 1.2,
+        "parameters": {
+          "pose": {
+            "torso_height": "low",
+            "arm_position": "still",
+            "gripper_orientation": "vertical",
+            "head": "down"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "cue": "stretch_arms_up",
+    "description": "The robot raises its torso and extends both arms upward in a stretch, lifting its head to look up as the stretch unfolds.",
+    "reasoning": "# Q1: Human analogue: Stretching upward — both arms reach up while the gaze lifts to follow.\n# Q2: First-pose: out_horizontal with left_arm mirror (bilateral start), head center (forward), not already looking up.\n# Q3: Structure: head tilt movement [0→up] then bilateral EE z path (side: both, distance 0.2m > 0.1). Winner=sequential head-then-arms stretch.\n# Q4: Self-check: 95. Clear bilateral stretch with head raised via movement, not baked into first pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "high",
+            "arm_position": "out",
+            "gripper_orientation": "horizontal",
+            "head": "center",
+            "elbow_bended": false,
+            "y": "low",
+            "left_arm": "mirror"
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [0, 29]
+              }
+            ],
+            "repetition": 1,
+            "speed": 1.0
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 1.2,
+        "parameters": {
+          "path": {
+            "mode": "ee",
+            "shape": "line",
+            "axis": "z",
+            "distance": 0.2,
+            "speed": 1.5,
+            "side": "both",
+            "hold_time": 0.5
+          }
+        }
+      }
+    ]
+  },
+  {
+    "cue": "beckon_come_here",
+    "description": "The robot extends its arm inward and performs a repetitive 'come here' wrist flick.",
+    "reasoning": "# Q1: Human analogue: Beckoning someone closer with a hand gesture.\n# Q2: First-pose: in_vertical #14 from plausible set (elbow_bended: true, x: high).\n# Q3: Structure: Small wrist x flick; manipulator-style timing (1 beat = 1/speed sec).\n# Q4: Self-check: 95. Subtle inviting beckon.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "in",
+            "gripper_orientation": "vertical",
+            "head": "center",
+            "elbow_bended": true,
+            "x": "high",
+            "plausible_tile_idx": 14
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "wrist",
+                "axis": "x",
+                "degrees": [45, -45]
+              }
+            ],
+            "repetition": 2,
+            "speed": 2.5
+          }
+        }
+      }
+    ]
+  },
+  {
+    "cue": "wave_hi",
+    "description": "The robot raises its arm and performs a side-to-side waving motion.",
+    "reasoning": "# Q1: Human analogue: Friendly hand wave.\n# Q2: First-pose: Arm raised high with elbow bend. Winner=mid torso + up arm + elbow_bended: true + y: med.\n# Q3: Structure: Use 'path' for side-to-side EE motion. Winner=y-axis oscillation.\n# Q4: Self-check: 100. Common greeting gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "up",
+            "gripper_orientation": "horizontal",
+            "head": "center",
+            "elbow_bended": true,
+            "y": "med",
+            "left_arm": "still"
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 1.2,
+        "parameters": {
+          "path": {
+            "mode": "ee",
+            "shape": "line",
+            "axis": "y",
+            "distance": 0.12,
+            "speed": 3.0,
+            "repetition": 3
+          }
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,39 @@
+You are designing ONLY the movement tail for a TIAGo-like mobile manipulator cue.
+
+The **first pose is FIXED** (human ground truth). You must NOT change its pose fields.
+
+[Required Reasoning Process]
+You MUST output exactly four planning lines as # comments before the JSON.
+# Q1: Given the fixed start pose, what small joint/path motion reads the cue? (One sentence)
+# Q2: Structure Comparison. Compare 2+ tail sequences (e.g., movement vs path). State the winner and why.
+# Q3: Axis/joint choice: why these joints/axes for this cue from this pose?
+# Q4: Context Reinforcement. What small hold or repetition makes the gesture clearer?
+
+Output exactly 4 # lines, then JSON starting with {.
+
+Output JSON (strict):
+{
+  "cue": "{{CUE_NAME}}",
+  "movements": [
+    {
+      "type": "movement|path|pose_to_pose",
+      "duration": <seconds optional>,
+      "parameters": { ... }
+    }
+  ]
+}
+
+Constraints:
+- Do NOT include a leading pose step; append tail only.
+- Total tail steps: 1–4.
+- Speed: 0.3–4.0.
+- JSON only (no markdown fences).
+
+Fixed first pose (do not modify):
+{{FIXED_FIRST_POSE_JSON}}
+
+Cue: {{CUE_NAME}}
+Description: {{CUE_DESCRIPTION}}
+
+Few-shot tail examples:
+{{FEW_SHOT_EXAMPLES}}
