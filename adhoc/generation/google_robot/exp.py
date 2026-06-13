@@ -65,11 +65,14 @@ def _vlm_backend_name(backend: str) -> str:
 
 def _init_model(args: argparse.Namespace) -> None:
     from gpu_check import require_cuda_gpu  # noqa: WPS433
+    from hf_cache_setup import setup_hf_cache  # noqa: WPS433
     from vlm_client import init_inprocess_engine, is_vllm_local_backend  # noqa: WPS433
 
     backend = _vlm_backend_name(args.backend)
     os.environ["VLM_BACKEND"] = backend
     os.environ["VLM_MODEL"] = args.model
+    cache_root = setup_hf_cache(os.environ.get("HF_HOME"))
+    print(f"[hf] cache root: {cache_root}", flush=True)
     require_cuda_gpu()
     print(
         f"\n{'=' * 72}\nLoading {args.model} (backend={backend}, once)\n{'=' * 72}\n",
@@ -329,6 +332,10 @@ def main(argv: list[str] | None = None) -> None:
             print(f"  [migrate] {a}")
 
     args.model_tag = model_to_tag(args.model)
+    from hf_cache_setup import setup_hf_cache  # noqa: WPS433
+
+    cache_root = setup_hf_cache(os.environ.get("HF_HOME"))
+    print(f"[hf] cache root: {cache_root}", flush=True)
     print(f"[suite] robot=google_robot model_tag={args.model_tag} n_cues={N_CUES}", flush=True)
 
     specs = experiment_specs_all(args.model_tag)

@@ -36,6 +36,13 @@ elif command -v micromamba >/dev/null 2>&1; then
   set -e
 fi
 
+# Babel: keep HuggingFace weights on /data (not ~/.cache — home quota is tiny).
+if [[ -f "${ROOT}/scripts/cluster_env.sh" ]]; then
+  HF_ROOT="${HF_HOME:-/data/user_data/${USER}/hf_cache}"
+  # shellcheck source=/dev/null
+  source "${ROOT}/scripts/cluster_env.sh" "${HF_ROOT}"
+fi
+
 task=${1:-"all"}
 backend=${3:-"transformers"}
 domain="${DOMAIN:-${4:-robotarm}}"
@@ -98,5 +105,9 @@ fi
 
 echo "[exp.sh] cwd=${ROOT}"
 echo "[exp.sh] domain=${domain} backend=${backend} model=${model}"
+if [[ -n "${HF_HOME:-}" ]]; then
+  echo "[exp.sh] HF_HOME=${HF_HOME}"
+  echo "[exp.sh] HUGGINGFACE_HUB_CACHE=${HUGGINGFACE_HUB_CACHE:-}"
+fi
 echo "[exp.sh] ${cmd[*]}"
 exec "${cmd[@]}"

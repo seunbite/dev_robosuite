@@ -43,8 +43,13 @@ class VLLMLocalEngine:
         }
         self.max_num_seqs = int(os.getenv("VLLM_MAX_NUM_SEQS", "10"))
 
+        from hf_cache_setup import hub_model_cache_dir, resolve_model_load_path, setup_hf_cache
         from vllm import LLM, SamplingParams
         from transformers import AutoProcessor
+
+        cache_root = setup_hf_cache(os.environ.get("HF_HOME"))
+        load_path, local_only, cache_msg = resolve_model_load_path(self.model)
+        hub_cache = hub_model_cache_dir(self.model)
 
         print(
             f"[vllm-local] loading {self.model} "
@@ -52,9 +57,14 @@ class VLLMLocalEngine:
             f"eager={self.enforce_eager} max_num_seqs={self.max_num_seqs}",
             flush=True,
         )
-        self.processor = AutoProcessor.from_pretrained(self.model)
+        print(f"[vllm-local] hf_cache={cache_root} hub_cache={hub_cache}", flush=True)
+        print(f"[vllm-local] {cache_msg}", flush=True)
+        print(f"[vllm-local] load_path={load_path} local_files_only={local_only}", flush=True)
+
+        load_kw = {"trust_remote_code": True, "local_files_only": local_only}
+        self.processor = AutoProcessor.from_pretrained(load_path, **load_kw)
         self.llm = LLM(
-            model=self.model,
+            model=load_path,
             tensor_parallel_size=self.tensor_parallel_size,
             max_model_len=self.max_model_len,
             gpu_memory_utilization=self.gpu_memory_utilization,
