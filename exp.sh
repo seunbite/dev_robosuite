@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+source ~/.bashrc
 cd ~/sblee/dev_robosuite
-conda init
+# Source conda initialization script
+source /data/user_data/hoyeonk/miniconda3/etc/profile.d/conda.sh
 conda activate m2m_caption32b
 
 task=${1:-"all"}
