@@ -32,12 +32,14 @@ from verify_pose_vlm import (  # noqa: E402
     _load_tile_pick,
     _resolve_pose_image,
 )
+from vlm_batch_util import vlm_generate_texts  # noqa: E402
 from vlm_client import (  # noqa: E402
     VLMClient,
     init_inprocess_engine,
     is_inprocess_backend,
     is_vllm_http_backend,
     require_vllm_server,
+    vlm_batch_size,
 )
 
 from prompt_loader import fill_template, load_snippet  # noqa: E402
@@ -236,6 +238,44 @@ def run(args: argparse.Namespace) -> None:
 
     comparisons: list[dict[str, Any]] = list(existing)
     one_pair = args.one_pair_per_cue or (args.max_pairs_per_cue == 1)
+    batch_size = vlm_batch_size(args.vlm_backend) if vlm else 1
+    pending: list[dict[str, Any]] = []
+
+    def _finalize_pair(item: dict[str, Any], text: str) -> None:
+        record = item["record"]
+        gt_side = item["gt_side"]
+        cue = item["cue"]
+        gd, gg, wd, wg = item["gd"], item["gg"], item["wd"], item["wg"]
+        try:
+            parsed = _extract_json(text)
+        except Exception as e:
+            parsed = {"parse_error": str(e), "raw_text": text}
+        better = str(parsed.get("better_side", "")).lower().strip()
+        vlm_correct = better == gt_side
+        record["vlm_result"] = parsed
+        record["vlm_better_side"] = better
+        record["vlm_correct"] = vlm_correct
+        comparisons.append(record)
+        mark = "OK" if vlm_correct else "MISS"
+        print(
+            f"[{mark}] {cue} gt={gd},{gg} vs {wd},{wg} "
+            f"gt_side={gt_side} vlm={better}",
+            flush=True,
+        )
+        _write_checkpoint(out_json, args, comparisons)
+
+    def _flush_pending() -> None:
+        nonlocal pending
+        if not pending or vlm is None:
+            return
+        texts = vlm_generate_texts(
+            vlm,
+            args.vlm_backend,
+            [{"prompt": item["prompt"], "images": [item["pair_img"]]} for item in pending],
+        )
+        for item, text in zip(pending, texts):
+            _finalize_pair(item, text.strip())
+        pending = []
 
     for ev in rows:
         cue = ev["cue"]
@@ -340,26 +380,23 @@ def run(args: argparse.Namespace) -> None:
                 right_d=right_d,
                 right_g=right_g,
             )
-            resp_text = vlm.generate(prompt, images=[pair_img])
-            text = resp_text.strip()
-            try:
-                parsed = _extract_json(text)
-            except Exception as e:
-                parsed = {"parse_error": str(e), "raw_text": text}
-
-            better = str(parsed.get("better_side", "")).lower().strip()
-            vlm_correct = better == gt_side
-            record["vlm_result"] = parsed
-            record["vlm_better_side"] = better
-            record["vlm_correct"] = vlm_correct
-            comparisons.append(record)
-            mark = "OK" if vlm_correct else "MISS"
-            print(
-                f"[{mark}] {cue} gt={gd},{gg} vs {wd},{wg} "
-                f"gt_side={gt_side} vlm={better}",
-                flush=True,
+            pending.append(
+                {
+                    "record": record,
+                    "prompt": prompt,
+                    "pair_img": pair_img,
+                    "gt_side": gt_side,
+                    "cue": cue,
+                    "gd": gd,
+                    "gg": gg,
+                    "wd": wd,
+                    "wg": wg,
+                }
             )
-            _write_checkpoint(out_json, args, comparisons)
+            if len(pending) >= batch_size:
+                _flush_pending()
+
+    _flush_pending()
 
     ok = sum(1 for c in comparisons if c.get("vlm_correct"))
     scored = sum(1 for c in comparisons if "vlm_correct" in c)

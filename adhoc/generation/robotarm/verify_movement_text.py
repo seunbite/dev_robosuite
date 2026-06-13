@@ -23,7 +23,8 @@ from motion_verify_shared import (  # noqa: E402
     resume_default,
 )
 from verify_pose_vlm import _fewshot_block  # noqa: E402
-from vlm_client import setup_vlm_from_args  # noqa: E402
+from vlm_batch_util import vlm_generate_texts  # noqa: E402
+from vlm_client import setup_vlm_from_args, vlm_batch_size  # noqa: E402
 from vlm_json import extract_json  # noqa: E402
 
 BASE_CFG = (
@@ -41,6 +42,13 @@ def _gemini_client():
     if not api_key:
         raise RuntimeError("Set GOOGLE_API_KEY or GEMINI_API_KEY.")
     return genai.Client(api_key=api_key)
+
+
+def _call_text_parse(text: str) -> dict[str, Any]:
+    try:
+        return extract_json(text)
+    except Exception as e:
+        return {"parse_error": str(e), "raw_text": text}
 
 
 def _call_text(
@@ -90,17 +98,14 @@ def run(args: argparse.Namespace) -> None:
                 flush=True,
             )
 
-    for row in rows:
-        idx = int(row["idx"])
-        if idx in done and not args.force:
-            continue
-        parsed = _call_text(
-            args.model,
-            motion_verify_prompt(row, fewshot, modality="text"),
-            vlm_backend=backend,
-            vlm=vlm,
-        )
+    batch_size = vlm_batch_size(backend) if vlm else 1
+    pending: list[tuple[dict[str, Any], str]] = []
+
+    def _append_text_row(row: dict[str, Any], text: str) -> None:
+        nonlocal out_rows, done
+        parsed = _call_text_parse(text)
         rec = record_from_parsed(parsed)
+        idx = int(row["idx"])
         out_rows = [r for r in out_rows if int(r["cue_idx"]) != idx] + [
             {"cue_idx": idx, "cue": row["cue"], **rec}
         ]
@@ -124,6 +129,34 @@ def run(args: argparse.Namespace) -> None:
                 ),
                 encoding="utf-8",
             )
+
+    def _flush_pending() -> None:
+        nonlocal pending
+        if not pending:
+            return
+        if vlm is not None:
+            texts = vlm_generate_texts(
+                vlm,
+                backend,
+                [{"prompt": prompt} for _, prompt in pending],
+            )
+            for (row, _), text in zip(pending, texts):
+                _append_text_row(row, text)
+        else:
+            client = _gemini_client()
+            for row, prompt in pending:
+                resp = client.models.generate_content(model=args.model, contents=[prompt])
+                _append_text_row(row, (resp.text or "").strip())
+        pending = []
+
+    for row in rows:
+        idx = int(row["idx"])
+        if idx in done and not args.force:
+            continue
+        pending.append((row, motion_verify_prompt(row, fewshot, modality="text")))
+        if len(pending) >= batch_size:
+            _flush_pending()
+    _flush_pending()
 
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),

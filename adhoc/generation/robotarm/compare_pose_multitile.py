@@ -38,12 +38,14 @@ from verify_pose_vlm import (  # noqa: E402
     _load_tile_pick,
     _resolve_pose_image,
 )
+from vlm_batch_util import vlm_generate_texts  # noqa: E402
 from vlm_client import (  # noqa: E402
     VLMClient,
     init_inprocess_engine,
     is_inprocess_backend,
     is_vllm_http_backend,
     require_vllm_server,
+    vlm_batch_size,
 )
 
 CONSOLIDATED = _REPO / "data/results/verify/pilot40_pose_eval_consolidated.json"
@@ -171,6 +173,68 @@ def _grid_prompt(
     )
 
 
+def _apply_multitile_vlm_result(record: dict[str, Any], text: str) -> dict[str, Any]:
+    try:
+        parsed = _extract_json(text)
+    except Exception as e:
+        parsed = {"parse_error": str(e), "raw_text": text}
+
+    pick_raw = parsed.get("best_tile_index")
+    try:
+        pick_index = int(pick_raw)
+    except (TypeError, ValueError):
+        pick_index = None
+
+    gt_indices = record.get("gt_indices") or []
+    vlm_correct = pick_index in gt_indices if pick_index is not None else False
+    picked_meta = next(
+        (t for t in (record.get("tiles") or []) if t.get("display_index") == pick_index),
+        None,
+    )
+
+    record["vlm_result"] = parsed
+    record["vlm_pick_index"] = pick_index
+    record["vlm_correct"] = vlm_correct
+    if picked_meta:
+        record["vlm_pick_pose"] = {
+            "dir": picked_meta["dir"],
+            "gripper_orientation": picked_meta["gripper_orientation"],
+        }
+    return record
+
+
+def _flush_multitile_batch(
+    batch_state: dict[str, Any],
+    *,
+    out_json: Path,
+    args: argparse.Namespace,
+    results: list[dict[str, Any]],
+) -> None:
+    pending = batch_state.get("pending") or []
+    vlm = batch_state.get("vlm")
+    if not pending or vlm is None:
+        batch_state["pending"] = []
+        return
+
+    texts = vlm_generate_texts(
+        vlm,
+        batch_state["backend"],
+        [{"prompt": item["prompt"], "images": [item["grid_img"]]} for item in pending],
+    )
+    for item, text in zip(pending, texts):
+        rec = _apply_multitile_vlm_result(item["record"], text.strip())
+        results.append(rec)
+        mark = "OK" if rec.get("vlm_correct") else "MISS"
+        print(
+            f"[{mark}] c{rec.get('cue_idx')} {rec.get('cue')} grid{rec.get('grid_n')} "
+            f"pick={rec.get('vlm_pick_index')} gt={rec.get('gt_indices')}",
+            flush=True,
+        )
+    if not args.dry_run:
+        _write_checkpoint(out_json, args, results, batch_state["rows"], batch_state["grid_sizes"])
+    batch_state["pending"] = []
+
+
 def _evaluate_one_grid(
     *,
     ev: dict[str, Any],
@@ -182,7 +246,8 @@ def _evaluate_one_grid(
     vlm: VLMClient | None,
     dry_run: bool,
     temporal_prompt: bool = False,
-) -> dict[str, Any]:
+    batch_state: dict[str, Any] | None = None,
+) -> dict[str, Any] | None:
     cue = ev["cue"]
     gt_poses = _parse_gt_poses(ev["groundtruth"])
     if not gt_poses:
@@ -264,30 +329,21 @@ def _evaluate_one_grid(
         tile_labels=labels,
         temporal_prompt=temporal_prompt,
     )
-    text = vlm.generate(prompt, images=[grid_img])
-    try:
-        parsed = _extract_json(text)
-    except Exception as e:
-        parsed = {"parse_error": str(e), "raw_text": text}
+    if batch_state is not None and vlm is not None:
+        batch_state["pending"].append(
+            {"record": record, "prompt": prompt, "grid_img": grid_img}
+        )
+        if len(batch_state["pending"]) >= int(batch_state["batch_size"]):
+            _flush_multitile_batch(
+                batch_state,
+                out_json=batch_state["out_json"],
+                args=batch_state["args"],
+                results=batch_state["results"],
+            )
+        return None
 
-    pick_raw = parsed.get("best_tile_index")
-    try:
-        pick_index = int(pick_raw)
-    except (TypeError, ValueError):
-        pick_index = None
-
-    vlm_correct = pick_index in gt_indices if pick_index is not None else False
-    picked_meta = next((t for t in tile_meta if t["display_index"] == pick_index), None)
-
-    record["vlm_result"] = parsed
-    record["vlm_pick_index"] = pick_index
-    record["vlm_correct"] = vlm_correct
-    if picked_meta:
-        record["vlm_pick_pose"] = {
-            "dir": picked_meta["dir"],
-            "gripper_orientation": picked_meta["gripper_orientation"],
-        }
-    return record
+    text = vlm.generate(prompt, images=[grid_img]) if vlm is not None else ""
+    return _apply_multitile_vlm_result(record, text)
 
 
 def run(args: argparse.Namespace) -> None:
@@ -335,6 +391,20 @@ def run(args: argparse.Namespace) -> None:
         vlm = VLMClient(backend=args.vlm_backend, model=args.model)
 
     results: list[dict[str, Any]] = list(existing)
+    batch_state: dict[str, Any] | None = None
+    if vlm is not None and vlm_batch_size(args.vlm_backend) > 1:
+        batch_state = {
+            "pending": [],
+            "batch_size": vlm_batch_size(args.vlm_backend),
+            "vlm": vlm,
+            "backend": args.vlm_backend,
+            "out_json": out_json,
+            "args": args,
+            "results": results,
+            "rows": rows,
+            "grid_sizes": grid_sizes,
+        }
+
     for ev in rows:
         for n_tiles in grid_sizes:
             if (ev.get("cue"), n_tiles) in done_keys:
@@ -349,7 +419,10 @@ def run(args: argparse.Namespace) -> None:
                 vlm=vlm,
                 dry_run=args.dry_run,
                 temporal_prompt=getattr(args, "temporal_prompt", False),
+                batch_state=batch_state,
             )
+            if rec is None:
+                continue
             results.append(rec)
             if args.dry_run:
                 print(f"[dry] c{rec.get('cue_idx')} {rec.get('cue')} grid{n_tiles}", flush=True)
@@ -362,8 +435,16 @@ def run(args: argparse.Namespace) -> None:
                 )
             else:
                 print(f"[err] c{rec.get('cue_idx')} {rec.get('cue')} grid{n_tiles}: {rec.get('error')}", flush=True)
-            if not args.dry_run:
+            if not args.dry_run and batch_state is None:
                 _write_checkpoint(out_json, args, results, rows, grid_sizes)
+
+    if batch_state is not None:
+        _flush_multitile_batch(
+            batch_state,
+            out_json=out_json,
+            args=args,
+            results=results,
+        )
 
     summary: dict[str, Any] = {}
     for n in grid_sizes:

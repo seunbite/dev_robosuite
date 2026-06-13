@@ -89,12 +89,14 @@ def run(args: argparse.Namespace) -> None:
         _here = Path(__file__).resolve().parent
         if str(_here) not in sys.path:
             sys.path.insert(0, str(_here))
+        from vlm_batch_util import vlm_generate_texts  # noqa: WPS433
         from vlm_client import (  # noqa: WPS433
             VLMClient,
             init_inprocess_engine,
             is_inprocess_backend,
             is_vllm_http_backend,
             require_vllm_server,
+            vlm_batch_size,
         )
 
         if is_vllm_http_backend(backend):
@@ -116,22 +118,16 @@ def run(args: argparse.Namespace) -> None:
         if done_idx:
             print(f"[resume] skipping {len(done_idx)} cues already in {args.out_json.name}", flush=True)
 
-    for r in sorted(rows, key=lambda x: int(x.get("idx", 0))):
-        idx = int(r.get("idx", 0))
-        if idx in done_idx:
-            continue
-        pose = _first_pose(r)
-        prompt = _prompt(r, fewshot_text)
-        if vlm is not None:
-            text = vlm.generate(prompt)
-        else:
-            resp = client.models.generate_content(model=args.model, contents=[prompt])
-            text = (resp.text or "").strip()
+    batch_size = vlm_batch_size(backend) if vlm is not None else 1
+    pending: list[tuple[dict[str, Any], dict[str, Any], str]] = []
+
+    def _append_text_result(r: dict[str, Any], pose: dict[str, Any], text: str) -> None:
+        nonlocal out
         try:
             parsed = _extract_json(text)
         except Exception as e:
             parsed = {"parse_error": str(e), "raw_text": text}
-        out = [x for x in out if int(x.get("idx", -1)) != idx] + [
+        out = [x for x in out if int(x.get("idx", -1)) != int(r.get("idx", -1))] + [
             {
                 "idx": r.get("idx"),
                 "cue": r.get("cue"),
@@ -160,6 +156,35 @@ def run(args: argparse.Namespace) -> None:
                 ),
                 encoding="utf-8",
             )
+
+    def _flush_pending() -> None:
+        nonlocal pending
+        if not pending:
+            return
+        if vlm is not None:
+            texts = vlm_generate_texts(
+                vlm,
+                backend,
+                [{"prompt": prompt} for _, _, prompt in pending],
+            )
+            for (r, pose, _), text in zip(pending, texts):
+                _append_text_result(r, pose, text)
+        else:
+            for r, pose, prompt in pending:
+                resp = client.models.generate_content(model=args.model, contents=[prompt])
+                _append_text_result(r, pose, (resp.text or "").strip())
+        pending = []
+
+    for r in sorted(rows, key=lambda x: int(x.get("idx", 0))):
+        idx = int(r.get("idx", 0))
+        if idx in done_idx:
+            continue
+        pose = _first_pose(r)
+        prompt = _prompt(r, fewshot_text)
+        pending.append((r, pose, prompt))
+        if len(pending) >= batch_size:
+            _flush_pending()
+    _flush_pending()
 
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),

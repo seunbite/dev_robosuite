@@ -23,7 +23,8 @@ from pilot40_experiment_suite import (  # noqa: E402
     PROMPT_MOTION_PAIRWISE,
 )
 from verify_pose_vlm import _first_pose, _movement_summary  # noqa: E402
-from vlm_client import setup_vlm_from_args  # noqa: E402
+from vlm_batch_util import vlm_generate_texts  # noqa: E402
+from vlm_client import setup_vlm_from_args, vlm_batch_size  # noqa: E402
 from vlm_json import extract_json  # noqa: E402
 
 DEFAULT_PAIRWISE_JSONS = [
@@ -159,6 +160,70 @@ def run(args: argparse.Namespace) -> None:
             )
 
     results: list[dict[str, Any]] = list(existing)
+    batch_size = vlm_batch_size(backend) if vlm else 1
+    pending: list[dict[str, Any]] = []
+
+    def _append_pairwise(item: dict[str, Any], text: str) -> None:
+        nonlocal results
+        try:
+            parsed = extract_json(text)
+        except Exception as e:
+            parsed = {"parse_error": str(e), "raw_text": text}
+        better = str(parsed.get("better_side", "")).lower().strip()
+        vlm_correct = better == item["gt_side"]
+        record: dict[str, Any] = {
+            "idx": item["idx"],
+            "cue": item["cue"],
+            "gt_side": item["gt_side"],
+            "left": item["left_kind"],
+            "right": item["right_kind"],
+            "pair_mp4": item["mp4_rel"],
+            "prompt": item["prompt"],
+            "parsed": parsed,
+            "pred": better,
+            "better_side": better,
+            "vlm_correct": vlm_correct,
+            "correct": vlm_correct,
+        }
+        results = [r for r in results if int(r.get("idx", -1)) != item["idx"]] + [record]
+        mark = "OK" if vlm_correct else "MISS"
+        print(f"[{mark}] {item['cue']} gt={item['gt_side']} vlm={better}", flush=True)
+        if not args.dry_run:
+            _checkpoint(out_path, args, results)
+
+    def _flush_pending() -> None:
+        nonlocal pending
+        if not pending:
+            return
+        if vlm is not None:
+            texts = vlm_generate_texts(
+                vlm,
+                backend,
+                [
+                    {
+                        "prompt": item["prompt"],
+                        "videos": [item["mp4_path"]],
+                    }
+                    for item in pending
+                ],
+            )
+            for item, text in zip(pending, texts):
+                _append_pairwise(item, text)
+        else:
+            from google.genai import types
+
+            for item in pending:
+                part = types.Part.from_bytes(
+                    data=Path(item["mp4_path"]).read_bytes(),
+                    mime_type="video/mp4",
+                )
+                resp = client.models.generate_content(
+                    model=args.model,
+                    contents=[part, item["prompt"]],
+                )
+                _append_pairwise(item, (resp.text or "").strip())
+        pending = []
+
     for spec in specs:
         idx = int(spec["idx"])
         if idx in done and not args.force:
@@ -205,45 +270,21 @@ def run(args: argparse.Namespace) -> None:
                     row=row,
                 )
 
-        if vlm is not None:
-            text = vlm.generate(prompt, videos=[str(mp4_path.resolve())])
-        elif client is not None:
-            from google.genai import types
-
-            part = types.Part.from_bytes(data=mp4_path.read_bytes(), mime_type="video/mp4")
-            resp = client.models.generate_content(model=args.model, contents=[part, prompt])
-            text = (resp.text or "").strip()
-        else:
-            raise RuntimeError(
-                f"Non-gemini backend {backend!r} requires an in-process VLMClient (got vlm=None)."
-            )
-
-        try:
-            parsed = extract_json(text)
-        except Exception as e:
-            parsed = {"parse_error": str(e), "raw_text": text}
-
-        better = str(parsed.get("better_side", "")).lower().strip()
-        vlm_correct = better == gt_side
-        record: dict[str, Any] = {
-            "idx": idx,
-            "cue": cue,
-            "gt_side": gt_side,
-            "left": left_kind,
-            "right": right_kind,
-            "pair_mp4": str(mp4_rel),
-            "prompt": prompt,
-            "parsed": parsed,
-            "pred": better,
-            "better_side": better,
-            "vlm_correct": vlm_correct,
-            "correct": vlm_correct,
-        }
-        results = [r for r in results if int(r.get("idx", -1)) != idx] + [record]
-        mark = "OK" if vlm_correct else "MISS"
-        print(f"[{mark}] {cue} gt={gt_side} vlm={better}", flush=True)
-        if not args.dry_run:
-            _checkpoint(out_path, args, results)
+        pending.append(
+            {
+                "idx": idx,
+                "cue": cue,
+                "gt_side": gt_side,
+                "left_kind": left_kind,
+                "right_kind": right_kind,
+                "mp4_rel": str(mp4_rel),
+                "mp4_path": str(mp4_path.resolve()),
+                "prompt": prompt,
+            }
+        )
+        if len(pending) >= batch_size:
+            _flush_pending()
+    _flush_pending()
 
     ok = sum(1 for r in results if r.get("vlm_correct"))
     scored = sum(1 for r in results if "vlm_correct" in r)

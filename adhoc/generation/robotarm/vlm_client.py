@@ -67,6 +67,13 @@ def is_vllm_local_backend(backend: str | None = None) -> bool:
     return b in _VLLM_LOCAL_BACKENDS
 
 
+def vlm_batch_size(backend: str | None = None) -> int:
+    """In-process vLLM batch size (default 10); 1 for other backends."""
+    if is_vllm_local_backend(backend):
+        return max(1, int(os.getenv("VLM_BATCH_SIZE", "10")))
+    return 1
+
+
 def is_vllm_http_backend(backend: str | None = None) -> bool:
     b = (backend or os.getenv("VLM_BACKEND", "transformers")).lower()
     return b in _VLLM_HTTP_BACKENDS
@@ -192,3 +199,21 @@ class VLMClient:
         contents.extend(images)
         resp = self._client.models.generate_content(model=self.model, contents=contents)
         return (resp.text or "").strip()
+
+    def generate_many(
+        self,
+        requests: list[dict[str, Any]],
+    ) -> list[str]:
+        """Batch generate when vLLM local supports it; else sequential."""
+        if not requests:
+            return []
+        if self._kind == "vllm_local" and len(requests) > 1:
+            return self._client.generate_batch(requests)
+        return [
+            self.generate(
+                r["prompt"],
+                images=r.get("images"),
+                videos=r.get("videos"),
+            )
+            for r in requests
+        ]

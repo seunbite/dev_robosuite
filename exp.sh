@@ -1,34 +1,44 @@
 #!/usr/bin/env bash
 # Pilot experiment entry point (manipulator pilot-90 | google_robot pilot-40).
 #
+# IMPORTANT: use bash, not sh:
+#   bash exp.sh all Qwen/Qwen2.5-VL-3B-Instruct vllm google_robot
+#
 # Examples:
 #   bash exp.sh all                                    # manipulator, Qwen 32B
 #   DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all
 #   DOMAIN=google_robot ONLY=1,2,3,7 bash exp.sh all
 #   SUMMARY=1 DOMAIN=google_robot bash exp.sh all
-set -euo pipefail
+if [ -z "${BASH_VERSION:-}" ]; then
+  exec bash "$0" "$@"
+fi
 
-source ~/.bashrc 2>/dev/null || true
+set -eo pipefail
 
-# Repo + env (cluster vs local)
-if [[ -d "${HOME}/sblee/dev_robosuite" ]]; then
-  cd "${HOME}/sblee/dev_robosuite"
-  source /data/user_data/hoyeonk/miniconda3/etc/profile.d/conda.sh 2>/dev/null || true
-  conda activate m2m_caption32b 2>/dev/null || true
-elif [[ -d "${HOME}/Downloads/workspace/dev_robosuite" ]]; then
-  cd "${HOME}/Downloads/workspace/dev_robosuite"
-  if command -v micromamba >/dev/null 2>&1; then
-    eval "$(micromamba shell hook -s zsh 2>/dev/null || micromamba shell hook -s bash)"
-    micromamba activate robosuite 2>/dev/null || true
-  fi
-else
-  echo "dev_robosuite repo not found" >&2
-  exit 1
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${ROOT}"
+
+# Optional shell init (do not fail the run if missing)
+set +e
+source ~/.bashrc 2>/dev/null
+set -e
+
+# Cluster conda env (Babel)
+if [[ -f /data/user_data/hoyeonk/miniconda3/etc/profile.d/conda.sh ]]; then
+  set +e
+  source /data/user_data/hoyeonk/miniconda3/etc/profile.d/conda.sh
+  conda activate m2m_caption32b 2>/dev/null
+  set -e
+elif command -v micromamba >/dev/null 2>&1; then
+  set +e
+  eval "$(micromamba shell hook -s bash 2>/dev/null)"
+  micromamba activate robosuite 2>/dev/null
+  set -e
 fi
 
 task=${1:-"all"}
 backend=${3:-"transformers"}
-domain=${4:-"robotarm"}
+domain="${DOMAIN:-${4:-robotarm}}"
 
 # Model selection
 case "${MODEL_SIZE:-32b}" in
@@ -42,12 +52,12 @@ case "${MODEL_SIZE:-32b}" in
   *)   model="${MODEL:-Qwen/Qwen2.5-VL-32B-Instruct}" ;;
 esac
 
-# Allow positional override: exp.sh all <model> <backend> <domain>
+# Positional override: exp.sh <task> <model> <backend> [domain]
 if [[ -n "${2:-}" ]]; then
   model="$2"
 fi
-if [[ -n "${5:-}" ]]; then
-  domain="$5"
+if [[ -n "${4:-}" ]]; then
+  domain="$4"
 fi
 
 export BACKEND="${backend}"
@@ -58,6 +68,8 @@ export RESUME="${RESUME:-1}"
 # vLLM v1 + flashinfer often breaks when torch ABI != torch_c_dlpack_ext wheel.
 if [[ "${backend}" == "vllm" || "${backend}" == "local" ]]; then
   export VLLM_USE_V1="${VLLM_USE_V1:-0}"
+  export VLLM_MAX_NUM_SEQS="${VLLM_MAX_NUM_SEQS:-10}"
+  export VLM_BATCH_SIZE="${VLM_BATCH_SIZE:-10}"
 fi
 
 extra=()
@@ -66,7 +78,25 @@ if [[ "${SUMMARY:-0}" == "1" ]]; then
 fi
 
 target="${ONLY:-$task}"
+exp_py="adhoc/generation/${domain}/exp.py"
 
-cmd="python adhoc/generation/${domain}/exp.py ${target} --backend ${backend} --model ${model} ${extra[*]:-}"
-echo "${cmd}"
-eval "${cmd}"
+if [[ ! -f "${exp_py}" ]]; then
+  echo "exp.py not found: ${ROOT}/${exp_py}" >&2
+  echo "domain=${domain} — use robotarm or google_robot" >&2
+  exit 1
+fi
+
+if ! command -v python >/dev/null 2>&1; then
+  echo "python not found in PATH (activate conda/micromamba first)" >&2
+  exit 1
+fi
+
+cmd=(python "${exp_py}" "${target}" --backend "${backend}" --model "${model}")
+if ((${#extra[@]})); then
+  cmd+=("${extra[@]}")
+fi
+
+echo "[exp.sh] cwd=${ROOT}"
+echo "[exp.sh] domain=${domain} backend=${backend} model=${model}"
+echo "[exp.sh] ${cmd[*]}"
+exec "${cmd[@]}"

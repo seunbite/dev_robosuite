@@ -35,7 +35,8 @@ from verify_pose_vlm import (  # noqa: E402
     _first_pose,
     _movement_summary,
 )
-from vlm_client import setup_vlm_from_args  # noqa: E402
+from vlm_batch_util import vlm_generate_texts  # noqa: E402
+from vlm_client import setup_vlm_from_args, vlm_batch_size  # noqa: E402
 from vlm_json import extract_json  # noqa: E402
 
 BASE_CFG = (
@@ -80,6 +81,22 @@ def _vlm_prompt(row: dict[str, Any], fewshot_text: str) -> str:
             "TAIL_SUMMARY": _movement_summary(row),
         },
     )
+
+
+def _parse_motion_text(text: str) -> dict[str, Any]:
+    try:
+        return extract_json(text)
+    except Exception as e:
+        return {"parse_error": str(e), "raw_text": text}
+
+
+def _gemini_mp4_text(model_id: str, prompt: str, mp4: Path) -> str:
+    from google.genai import types
+
+    client = _gemini_client()
+    part = types.Part.from_bytes(data=mp4.read_bytes(), mime_type="video/mp4")
+    resp = client.models.generate_content(model=model_id, contents=[part, prompt])
+    return (resp.text or "").strip()
 
 
 def _vlm_mp4(
@@ -183,6 +200,59 @@ def run(args: argparse.Namespace) -> None:
     if args.limit:
         manifest_rows = manifest_rows[: args.limit]
 
+    batch_size = vlm_batch_size(backend) if vlm else 1
+    pending: list[dict[str, Any]] = []
+
+    def _append_motion_result(item: dict[str, Any], text: str) -> None:
+        nonlocal out_rows, done
+        parsed = _parse_motion_text(text)
+        rec_comp = None
+        if not parsed.get("movement_is_appropriate"):
+            rec_comp = _normalize_component(
+                (parsed.get("if_not_appropriate") or {}).get("recommended_component")
+            )
+        record = {
+            "cue_idx": item["idx"],
+            "cue": item["cue"],
+            "mp4": item["mp4"],
+            "verify_result": parsed,
+            "movement_is_appropriate": parsed.get("movement_is_appropriate"),
+            "recommended_component": rec_comp,
+        }
+        out_rows = [r for r in out_rows if int(r["cue_idx"]) != item["idx"]] + [record]
+        done.add(item["idx"])
+        print(
+            f"[verify] {item['cue']} appropriate={parsed.get('movement_is_appropriate')} "
+            f"rec={rec_comp is not None}",
+            flush=True,
+        )
+        if not args.dry_run:
+            _checkpoint(out_rows, args.model, out_path)
+
+    def _flush_pending() -> None:
+        nonlocal pending
+        if not pending:
+            return
+        if vlm is not None:
+            texts = vlm_generate_texts(
+                vlm,
+                backend,
+                [
+                    {
+                        "prompt": item["prompt"],
+                        "videos": [item["mp4"]],
+                    }
+                    for item in pending
+                ],
+            )
+            for item, text in zip(pending, texts):
+                _append_motion_result(item, text)
+        else:
+            for item in pending:
+                text = _gemini_mp4_text(args.model, item["prompt"], Path(item["mp4"]))
+                _append_motion_result(item, text)
+        pending = []
+
     prepare_media = getattr(args, "prepare_media", True)
     if prepare_media and not args.dry_run:
         todo = [
@@ -224,36 +294,17 @@ def run(args: argparse.Namespace) -> None:
             print(f"[skip] {item['cue']}: {skip_reason or 'no mp4'}", flush=True)
             continue
 
-        parsed = _vlm_mp4(
-            args.model,
-            _vlm_prompt(row, fewshot),
-            mp4_path,
-            vlm_backend=backend,
-            vlm=vlm,
+        pending.append(
+            {
+                "idx": idx,
+                "cue": item["cue"],
+                "mp4": str(mp4_path.resolve()),
+                "prompt": _vlm_prompt(row, fewshot),
+            }
         )
-        rec_comp = None
-        if not parsed.get("movement_is_appropriate"):
-            rec_comp = _normalize_component(
-                (parsed.get("if_not_appropriate") or {}).get("recommended_component")
-            )
-
-        record = {
-            "cue_idx": idx,
-            "cue": item["cue"],
-            "mp4": str(mp4_path),
-            "verify_result": parsed,
-            "movement_is_appropriate": parsed.get("movement_is_appropriate"),
-            "recommended_component": rec_comp,
-        }
-        out_rows = [r for r in out_rows if int(r["cue_idx"]) != idx] + [record]
-        done.add(idx)
-        print(
-            f"[verify] {item['cue']} appropriate={parsed.get('movement_is_appropriate')} "
-            f"rec={rec_comp is not None}",
-            flush=True,
-        )
-        if not args.dry_run:
-            _checkpoint(out_rows, args.model, out_path)
+        if len(pending) >= batch_size:
+            _flush_pending()
+    _flush_pending()
 
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),

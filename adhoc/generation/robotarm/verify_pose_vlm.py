@@ -16,12 +16,14 @@ _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
+from vlm_batch_util import vlm_generate_texts  # noqa: E402
 from vlm_client import (  # noqa: E402
     VLMClient,
     init_inprocess_engine,
     is_inprocess_backend,
     is_vllm_http_backend,
     require_vllm_server,
+    vlm_batch_size,
 )
 
 # Must match generate_pose_group_tiles.py layout
@@ -252,6 +254,46 @@ def run(args: argparse.Namespace) -> None:
         if done_idx:
             print(f"[resume] skipping {len(done_idx)} cues already in {out_json.name}", flush=True)
 
+    batch_size = vlm_batch_size(args.vlm_backend)
+    pending: list[dict[str, Any]] = []
+
+    def _append_result(item: dict[str, Any], text: str) -> None:
+        try:
+            parsed = _extract_json(text)
+        except Exception as e:
+            parsed = {"parse_error": str(e), "raw_text": text}
+        results.append(
+            {
+                "idx": item["idx"],
+                "cue": item["cue"],
+                "current_dir": item["d"],
+                "current_gripper_orientation": item["g"],
+                "group_tile_image": item["group_path"],
+                "tile_index": item["tile_index"],
+                "selected_tile_image": item["saved_path"],
+                "result": parsed,
+            }
+        )
+        print(
+            f"[ok] idx={item['idx']} cue={item['cue']} tile={item['tile_index']}",
+            flush=True,
+        )
+        if not getattr(args, "no_checkpoint", False):
+            _write_checkpoint(out_json, args, tile_pick, selected_dir, results)
+
+    def _flush_pending() -> None:
+        nonlocal pending
+        if not pending:
+            return
+        texts = vlm_generate_texts(
+            vlm,
+            args.vlm_backend,
+            [{"prompt": item["prompt"], "images": [item["img"]]} for item in pending],
+        )
+        for item, text in zip(pending, texts):
+            _append_result(item, text)
+        pending = []
+
     for row in sorted(cfg_rows, key=lambda x: int(x.get("idx", 0))):
         idx = int(row.get("idx", 0))
         if idx in done_idx:
@@ -302,27 +344,23 @@ def run(args: argparse.Namespace) -> None:
             continue
 
         prompt = _prompt(row, fewshot_text)
-        text = vlm.generate(prompt, images=[img])
-        try:
-            parsed = _extract_json(text)
-        except Exception as e:
-            parsed = {"parse_error": str(e), "raw_text": text}
-
-        results.append(
+        pending.append(
             {
                 "idx": row.get("idx"),
                 "cue": row.get("cue"),
-                "current_dir": d,
-                "current_gripper_orientation": g,
-                "group_tile_image": str(group_path),
+                "d": d,
+                "g": g,
+                "group_path": str(group_path),
                 "tile_index": tile_index,
-                "selected_tile_image": str(saved_path) if saved_path else None,
-                "result": parsed,
+                "saved_path": str(saved_path) if saved_path else None,
+                "img": img,
+                "prompt": prompt,
             }
         )
-        print(f"[ok] idx={row.get('idx')} cue={row.get('cue')} tile={tile_index}", flush=True)
-        if not getattr(args, "no_checkpoint", False):
-            _write_checkpoint(out_json, args, tile_pick, selected_dir, results)
+        if len(pending) >= batch_size:
+            _flush_pending()
+
+    _flush_pending()
 
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),
