@@ -16,6 +16,16 @@ fi
 set -eo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# sbatch copies the job script to /var/spool/slurmd/job* — adhoc/ is not there.
+if [[ ! -f "${ROOT}/adhoc/generation/robotarm/exp.py" ]]; then
+  if [[ -n "${SLURM_SUBMIT_DIR:-}" && -f "${SLURM_SUBMIT_DIR}/exp.sh" ]]; then
+    ROOT="${SLURM_SUBMIT_DIR}"
+  elif [[ -n "${DEV_ROBOSUITE_ROOT:-}" && -f "${DEV_ROBOSUITE_ROOT}/exp.sh" ]]; then
+    ROOT="${DEV_ROBOSUITE_ROOT}"
+  elif [[ -f "${HOME}/sblee/dev_robosuite/exp.sh" ]]; then
+    ROOT="${HOME}/sblee/dev_robosuite"
+  fi
+fi
 cd "${ROOT}"
 
 # Optional shell init (do not fail the run if missing)
