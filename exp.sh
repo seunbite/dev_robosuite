@@ -109,5 +109,8 @@ if [[ -n "${HF_HOME:-}" ]]; then
   echo "[exp.sh] HF_HOME=${HF_HOME}"
   echo "[exp.sh] HUGGINGFACE_HUB_CACHE=${HUGGINGFACE_HUB_CACHE:-}"
 fi
+if [[ "${backend}" == "vllm" || "${backend}" == "local" ]]; then
+  echo "[exp.sh] VLM_BATCH_SIZE=${VLM_BATCH_SIZE:-10} (parallel vLLM requests, not cue limit)"
+fi
 echo "[exp.sh] ${cmd[*]}"
 exec "${cmd[@]}"

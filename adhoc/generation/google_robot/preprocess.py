@@ -10,7 +10,10 @@ _REPO = Path(__file__).resolve().parents[3]
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
+from adhoc.generation.utils import announce_output  # noqa: E402
+
 def run(run_motion_generation: bool = True, cue_group: str = "iconic"):
+    announce_output(_REPO / "data" / "results" / "motion_configs" / "google_robot", 0, kind="cache")
     print("google_robot preprocess: no simulator cache step.")
     if run_motion_generation:
         from motion_generation import run as motion_run

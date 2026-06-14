@@ -14,7 +14,9 @@ _REPO = Path(__file__).resolve().parents[3]
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
-from adhoc.utils.repo_paths import motion_configs_results_dir, resolve_seed_prompt_txt, resolve_seed_shots_json, seed_yml_dir  # noqa: E402
+from adhoc.generation.embodiment_sources import repo_rel_to_path, resolve_embodiment_paths  # noqa: E402
+from adhoc.generation.utils import announce_output  # noqa: E402
+from adhoc.utils.repo_paths import seed_yml_dir  # noqa: E402
 from legacy.config_gen_single_mobile import generate_motion_config  # noqa: E402
 
 
@@ -24,17 +26,21 @@ def run(
     prompt_file: str | None = None,
     shots_json: str | None = None,
     config_json: str | None = None,
+    sources_yml: str | None = None,
     model: str = "gemini-2.5-pro",
     delay: float = 2.0,
     max_retries: int = 2,
     generate_only: list[int] | None = None,
     skip_fewshot_cues: bool = False,
     run_render: bool = True,
+    do_html: bool = False,
 ) -> None:
     ypath = Path(yaml_path) if yaml_path else seed_yml_dir() / "cues_new.yml"
-    prompt = str(Path(prompt_file)) if prompt_file else str(resolve_seed_prompt_txt("google_robot"))
-    shots = str(Path(shots_json)) if shots_json else str(resolve_seed_shots_json("google_robot"))
-    out = Path(config_json) if config_json else motion_configs_results_dir("google_robot") / f"motion_configs_{cue_group}.json"
+    src_opt = Path(sources_yml) if sources_yml else None
+    y_prompt, y_shots, y_out, blk = resolve_embodiment_paths("google_robot", src_opt)
+    prompt = str(Path(prompt_file)) if prompt_file else str(y_prompt)
+    shots = str(Path(shots_json)) if shots_json else str(y_shots)
+    out = Path(config_json) if config_json else y_out
     os.makedirs(out.parent, exist_ok=True)
 
     with open(ypath, "r", encoding="utf-8") as f:
@@ -52,6 +58,7 @@ def run(
             shot_list = json.load(f)
         few = {s.get("cue") for s in shot_list if isinstance(s, dict)}
         indexed = [(i, (k, d)) for i, (k, d) in indexed if k not in few]
+    announce_output(repo_rel_to_path(blk["render_dir"]), len(indexed), kind="gif")
 
     failed = 0
     for cue_idx, (cue_name, _desc) in tqdm(indexed, desc="motion_generation[google_robot]"):
@@ -82,7 +89,7 @@ def run(
     if run_render:
         from render import run as render_run
 
-        render_run(config_json=str(out))
+        render_run(config_json=str(out), do_html=do_html, sources_yml=sources_yml)
 
 
 if __name__ == "__main__":

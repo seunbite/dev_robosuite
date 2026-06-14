@@ -14,6 +14,7 @@ from pilot40_paths import (
     EXPERIMENT_TITLES,
     GT_CONSOLIDATED,
     MEDIA_DIR,
+    N_CUES,
     SHOTS,
     TOPK_GRID_DIR,
     html_result_path,
@@ -35,9 +36,20 @@ def _rel_href(out_html: Path, asset: Path) -> str:
     return Path(os.path.relpath(asset.resolve(), out_html.parent.resolve())).as_posix()
 
 
+def _cue_idx(row: dict[str, Any], *, gt: dict[str, dict[str, Any]] | None = None) -> int:
+    if row.get("idx") is not None:
+        return int(row["idx"])
+    cue = str(row.get("cue", ""))
+    if gt and cue in gt:
+        ev = gt[cue]
+        if ev.get("cue_idx") is not None:
+            return int(ev["cue_idx"])
+    return 0
+
+
 def _stem(row: dict[str, Any]) -> str:
     cue = str(row["cue"]).replace("/", "_").replace("\\", "_").replace(" ", "_")
-    return f"mm19_g{int(row['idx']):02d}_{cue}"
+    return f"mm19_g{_cue_idx(row):02d}_{cue}"
 
 
 def _badge(val: bool | None) -> str:
@@ -79,17 +91,35 @@ th{background:#1a1d24}
     return out
 
 
+def _shots_lookup() -> tuple[dict[int, dict[str, Any]], dict[str, dict[str, Any]]]:
+    shots = load_config_list(SHOTS)
+    by_idx = {_cue_idx(r): r for r in shots}
+    by_cue = {str(r.get("cue", "")): r for r in shots if r.get("cue")}
+    return by_idx, by_cue
+
+
+def _cfg_for_row(
+    by_idx: dict[int, dict[str, Any]],
+    by_cue: dict[str, dict[str, Any]],
+    *,
+    idx: int,
+    cue: str,
+) -> dict[str, Any]:
+    return by_idx.get(idx) or by_cue.get(cue) or {"idx": idx, "cue": cue}
+
+
 def write_exp1_html(model_tag: str = DEFAULT_GEN_TAG) -> Path | None:
     score = score_result_path(1, model_tag)
     if not score.is_file():
         return None
     data = json.loads(score.read_text(encoding="utf-8"))
-    rows_cfg = {int(r["idx"]): r for r in load_config_list(SHOTS)}
+    rows_cfg, rows_cfg_by_cue = _shots_lookup()
     out = html_result_path(1, model_tag)
     cards = []
     for r in data.get("rows") or []:
         idx = int(r.get("cue_idx", 0))
-        cfg = rows_cfg.get(idx, {"idx": idx, "cue": r.get("cue")})
+        cue = str(r.get("cue", ""))
+        cfg = _cfg_for_row(rows_cfg, rows_cfg_by_cue, idx=idx, cue=cue)
         stem = _stem(cfg)
         mp4 = MEDIA_DIR / "mp4" / f"{stem}.mp4"
         href = _rel_href(out, mp4)
@@ -107,12 +137,13 @@ def write_exp7_html(model_tag: str = DEFAULT_GEN_TAG) -> Path | None:
     if not score.is_file():
         return None
     data = json.loads(score.read_text(encoding="utf-8"))
-    rows_cfg = {int(r["idx"]): r for r in load_config_list(SHOTS)}
+    rows_cfg, rows_cfg_by_cue = _shots_lookup()
     out = html_result_path(7, model_tag)
     cards = []
     for r in data.get("rows") or []:
         idx = int(r.get("cue_idx", 0))
-        cfg = rows_cfg.get(idx, {"idx": idx, "cue": r.get("cue")})
+        cue = str(r.get("cue", ""))
+        cfg = _cfg_for_row(rows_cfg, rows_cfg_by_cue, idx=idx, cue=cue)
         stem = _stem(cfg)
         mp4 = MEDIA_DIR / "mp4" / f"{stem}.mp4"
         href = _rel_href(out, mp4)
@@ -132,12 +163,12 @@ def _verify_cards(
     pose_key: str,
     media: str,
 ) -> str:
-    rows_cfg = {int(r["idx"]): r for r in load_config_list(SHOTS)}
+    rows_cfg, rows_cfg_by_cue = _shots_lookup()
     cards = []
     for r in data.get("results") or []:
         idx = int(r.get("idx", 0))
         cue = str(r.get("cue", ""))
-        cfg = rows_cfg.get(idx, {"idx": idx, "cue": cue})
+        cfg = _cfg_for_row(rows_cfg, rows_cfg_by_cue, idx=idx, cue=cue)
         stem = _stem(cfg)
         res = r.get("result") or {}
         ok = res.get(pose_key)
@@ -226,12 +257,21 @@ def write_exp5_html(model_tag: str = DEFAULT_VERIFY_TAG) -> Path | None:
             f'<section class="card"><h2>g{idx} · {_esc(cue)}</h2>{img}'
             f'<p class="desc">pick: {_esc(pick_txt)}</p></section>'
         )
-    meta = f"partial: {len(picks)} cues (target {39})"
+    meta = f"partial: {len(picks)} cues (target {N_CUES})"
     return _write_page(out, title=f"Exp5 Google Robot — {EXPERIMENT_TITLES['5']}", meta=meta, body="".join(cards))
 
 
-def write_combined_verify_html() -> Path:
-    from build_pilot40_verify_review_html import build as build_combined
+def write_combined_verify_html() -> Path | None:
+    try:
+        from adhoc.generation.google_robot.build_pilot40_verify_review_html import (  # noqa: WPS433
+            build as build_combined,
+        )
+    except ImportError:
+        try:
+            from build_pilot40_verify_review_html import build as build_combined  # noqa: WPS433
+        except ImportError as e:
+            print(f"[html] skip combined verify page: {e}", flush=True)
+            return None
     import argparse
     from pilot40_paths import LEGACY_VERIFY_DIR
 
@@ -311,6 +351,8 @@ def write_all_html() -> list[Path]:
         p = fn()
         if p:
             paths.append(p)
-    paths.append(write_combined_verify_html())
+    combined = write_combined_verify_html()
+    if combined:
+        paths.append(combined)
     paths.append(write_index_html())
-    return paths
+    return [p for p in paths if p]

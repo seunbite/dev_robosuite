@@ -28,6 +28,7 @@ from pilot40_paths import (  # noqa: E402
     DEFAULT_VERIFY_TAG,
     EXPERIMENT_TITLES,
     GT_CONSOLIDATED,
+    GT_PATH,
     HTML_EXP_DIR,
     LEGACY_CFG,
     LEGACY_VERIFY_DIR,
@@ -41,12 +42,20 @@ from pilot40_paths import (  # noqa: E402
     config_for_experiment,
     html_result_path,
     load_config_list,
+    load_gt_by_cue,
+    manifest90_cue_names,
     model_to_tag,
     prompt_exp_path,
     result_config_path,
+    row_generation_done,
     save_json,
     score_result_path,
     verify_result_path,
+)
+from score_mobile_motion_gt import (  # noqa: E402
+    mobile_tail_matches_component,
+    mobile_tail_steps,
+    pose_generation_correct_any_mobile,
 )
 
 LEGACY_SCORE = LEGACY_VERIFY_DIR / "pilot40_manipulator_gt_score.json"
@@ -95,8 +104,15 @@ def experiment_specs(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: str
 
 
 def _gt_by_cue() -> dict[str, dict[str, Any]]:
-    data = json.loads(GT_CONSOLIDATED.read_text(encoding="utf-8"))
-    return {str(r["cue"]): r for r in (data.get("rows") or []) if r.get("cue")}
+    return load_gt_by_cue()
+
+
+def manifest90_rows_from_cfg(cfg_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    manifest = set(manifest90_cue_names())
+    return [
+        r for r in cfg_rows
+        if r.get("cue") in manifest and row_generation_done(r)
+    ]
 
 
 def score_exp1_from_legacy(score_path: Path = LEGACY_SCORE) -> dict[str, Any]:
@@ -191,7 +207,9 @@ def metrics_from_json(path: Path, kind: str) -> dict[str, Any]:
             if model_ok is None or not cue:
                 continue
             agree_n += 1
-            human_ok = human_gt_pose_ok(str((gt.get(cue) or {}).get("groundtruth", "")))
+            human_ok = human_gt_pose_ok(
+                str((gt.get(cue) or {}).get("pose_gt") or (gt.get(cue) or {}).get("groundtruth", ""))
+            )
             if bool(model_ok) == human_ok:
                 agree_ok += 1
         acc = agree_ok / agree_n if agree_n else None
@@ -252,12 +270,15 @@ def migrate_pilot40_layout(*, force: bool = False) -> list[str]:
                 shutil.copy2(LEGACY_CFG, dst)
                 actions.append(f"result_exp{eid}_{gen_tag} <- motion_configs_pilot40_mobile.json")
 
-    s1 = score_exp1_from_legacy()
-    s7 = score_exp7_from_legacy()
-    save_json(score_result_path(1, gen_tag), s1)
-    save_json(score_result_path(7, gen_tag), s7)
-    actions.append(f"score_exp1_{gen_tag} ({s1['n_correct']}/{s1['n']})")
-    actions.append(f"score_exp7_{gen_tag} ({s7['n_correct']}/{s7['n']})")
+    if LEGACY_SCORE.is_file() and LEGACY_CFG.is_file():
+        s1 = score_exp1_from_legacy()
+        s7 = score_exp7_from_legacy()
+        save_json(score_result_path(1, gen_tag), s1)
+        save_json(score_result_path(7, gen_tag), s7)
+        actions.append(f"score_exp1_{gen_tag} ({s1['n_correct']}/{s1['n']})")
+        actions.append(f"score_exp7_{gen_tag} ({s7['n_correct']}/{s7['n']})")
+    elif LEGACY_CFG.is_file():
+        actions.append("skipped legacy score (pilot40_manipulator_gt_score.json missing)")
 
     for eid, (legacy_name, tag) in LEGACY_MAP.items():
         src = LEGACY_VERIFY_DIR / legacy_name
@@ -340,7 +361,7 @@ def score_exp1_from_config(config_path: Path) -> dict[str, Any]:
                 ok += 1
         rows_out.append(
             {
-                "cue_idx": row.get("idx"),
+                "cue_idx": row.get("idx") or gt_row.get("cue_idx"),
                 "cue": cue,
                 "generation_correct": correct,
                 "scoring": "config_vs_consolidated_gt",
@@ -359,40 +380,34 @@ def score_exp1_from_config(config_path: Path) -> dict[str, Any]:
 
 
 def score_exp1(config_path: Path, out_path: Path) -> dict[str, Any]:
-    """Score generated exp1 configs vs consolidated manipulator GT (mobile nominal map)."""
-    if not LEGACY_SCORE.is_file():
-        payload = score_exp1_from_config(config_path)
-        save_json(out_path, payload)
-        return payload
-    data = json.loads(LEGACY_SCORE.read_text(encoding="utf-8"))
-    gt_rows = {str(r["cue"]): r for r in (data.get("rows") or []) if r.get("cue")}
-    cfg_rows = {str(r["cue"]): r for r in load_config_list(config_path) if r.get("cue")}
+    """Score generated exp1 mobile configs vs gt_google_robot.json pose_gt."""
+    gt = load_gt_by_cue()
     rows_out: list[dict[str, Any]] = []
     ok = n = 0
-    for cue, gt in gt_rows.items():
-        row = cfg_rows.get(cue)
-        if not row:
+    for row in manifest90_rows_from_cfg(load_config_list(config_path)):
+        cue = str(row.get("cue", ""))
+        ev = gt.get(cue)
+        if not ev or not ev.get("pose_gt"):
             continue
-        correct = gt.get("generation_pose_correct")
-        if correct is None:
-            correct = gt.get("sim_pose_correct")
+        correct = pose_generation_correct_any_mobile(row, str(ev["pose_gt"]))
         if correct is not None:
             n += 1
             if correct:
                 ok += 1
         rows_out.append(
             {
-                "cue_idx": gt.get("idx"),
+                "cue_idx": row.get("idx") or ev.get("cue_idx"),
                 "cue": cue,
+                "pose_gt": ev.get("pose_gt"),
                 "generation_correct": correct,
-                "scoring": "legacy_nominal_map_proxy",
+                "scoring": "any_mobile_pose_in_config",
             }
         )
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),
-        "mode": "pose_generation_vs_manipulator_gt",
+        "mode": "pose_generation_vs_human_gt_mobile",
         "config_json": str(config_path),
-        "groundtruth": str(GT_CONSOLIDATED),
+        "groundtruth": str(GT_PATH),
         "n": n,
         "n_correct": ok,
         "accuracy": ok / n if n else None,
@@ -403,8 +418,46 @@ def score_exp1(config_path: Path, out_path: Path) -> dict[str, Any]:
 
 
 def score_exp7(config_path: Path, out_path: Path) -> dict[str, Any]:
-    payload = score_exp7_from_legacy()
-    payload["config_json"] = str(config_path)
+    """Score exp7 mobile movement tails vs gt_google_robot.json movement_gt."""
+    gt = load_gt_by_cue()
+    rows_out: list[dict[str, Any]] = []
+    ok = n = 0
+    for row in manifest90_rows_from_cfg(load_config_list(config_path)):
+        cue = str(row.get("cue", ""))
+        ev = gt.get(cue) or {}
+        mg = ev.get("movement_gt") or {}
+        comp = mg.get("component")
+        raw = (mg.get("annotation_raw") or "").strip()
+        if not comp and not mg.get("always_correct") and raw.lower() != "none":
+            continue
+        tail = mobile_tail_steps(row.get("movements") or [])
+        if mg.get("always_correct") or (comp and comp.get("kind") == "any"):
+            match = True
+        elif comp:
+            match, _ = mobile_tail_matches_component(tail, comp)
+        else:
+            continue
+        n += 1
+        if match:
+            ok += 1
+        rows_out.append(
+            {
+                "cue_idx": row.get("idx") or ev.get("cue_idx"),
+                "cue": cue,
+                "annotation_raw": raw,
+                "component_match": match,
+            }
+        )
+    payload = {
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "mode": "exp7_motion_generation_vs_component_gt_mobile",
+        "config_json": str(config_path),
+        "groundtruth_json": str(GT_PATH),
+        "n": n,
+        "n_correct": ok,
+        "accuracy": ok / n if n else None,
+        "rows": rows_out,
+    }
     save_json(out_path, payload)
     return payload
 
@@ -412,7 +465,7 @@ def score_exp7(config_path: Path, out_path: Path) -> dict[str, Any]:
 def print_summary_table(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: str | None = None) -> None:
     tag_v = model_tag_verify or model_to_tag(model_tag_gen)
     print("\n" + "=" * 92)
-    print("PILOT-40 Google Robot — summary")
+    print(f"PILOT-90 Google Robot ({N_CUES} cues) — summary")
     print("=" * 92)
     for spec in experiment_specs(model_tag_gen, tag_v):
         eid = spec["id"]

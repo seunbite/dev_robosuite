@@ -1,11 +1,11 @@
-"""Unified LLM config generation (Gemini API) for pilot-40 Google Robot exp 1 & 7."""
+"""Unified LLM config generation (Gemini API or vLLM) for pilot-40 Google Robot exp 1 & 7."""
 from __future__ import annotations
 
 import json
 import os
 import re
+import sys
 import time
-from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -15,20 +15,20 @@ import yaml
 from pilot40_paths import (
     CUES_YAML,
     FEWSHOT_SHOTS,
-    GT_CONSOLIDATED,
-    SHOTS,
+    GT_PATH,
     load_config_list,
-    pilot40_cue_names,
+    load_gt_by_cue,
+    manifest90_cue_names,
     prompt_exp_path,
     row_generation_done,
+    save_json,
     upsert_config_row,
 )
 
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parents[2]
-import sys
-
-for p in (_REPO, _HERE):
+_ROBOTARM = _REPO / "adhoc/generation/robotarm"
+for p in (_REPO, _ROBOTARM, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
@@ -47,13 +47,35 @@ def _parse_gt_poses(groundtruth: str) -> list[tuple[str, str]]:
 
 
 def _gt_by_cue() -> dict[str, dict[str, Any]]:
-    if not GT_CONSOLIDATED.is_file():
-        return {}
-    data = json.loads(GT_CONSOLIDATED.read_text(encoding="utf-8"))
-    return {str(r["cue"]): r for r in (data.get("rows") or []) if r.get("cue")}
+    return load_gt_by_cue()
 
 
-def _cue_catalog() -> str:
+def _cue_idx(row: dict[str, Any], *, gt: dict[str, dict[str, Any]] | None = None) -> int:
+    if row.get("idx") is not None:
+        return int(row["idx"])
+    cue = str(row.get("cue", ""))
+    if gt and cue in gt:
+        ev = gt[cue]
+        if ev.get("cue_idx") is not None:
+            return int(ev["cue_idx"])
+    return 0
+
+
+def _require_planning_comments(backend: str, *, env_key: str) -> bool:
+    env = os.getenv(env_key)
+    # Empty export (EXP7_REQUIRE_REASONING=) must not enable validation.
+    if env is not None and env.strip():
+        return env.strip().lower() not in {"0", "false", "no", "off"}
+    return backend.lower() == "gemini"
+
+
+def _is_local_backend(backend: str) -> bool:
+    return backend.lower() in {"local", "vllm-local", "transformers", "hf", "vllm"}
+
+
+def _cue_catalog(*, cue: str, backend: str) -> str:
+    if _is_local_backend(backend):
+        return f"(single target cue: {cue})"
     if not CUES_YAML.is_file():
         return ""
     data = yaml.safe_load(CUES_YAML.read_text(encoding="utf-8"))
@@ -63,34 +85,65 @@ def _cue_catalog() -> str:
         if not isinstance(block, dict):
             continue
         parts.append(f"[Available {grp} cues]")
-        for cue, text in block.items():
-            parts.append(f"- {cue}: {text}")
+        for name, text in block.items():
+            parts.append(f"- {name}: {text}")
         parts.append("")
     return "\n".join(parts)
 
 
-def _fewshot_block(max_examples: int = 6) -> str:
+def _fewshot_block(*, max_examples: int = 6, backend: str = "gemini") -> str:
     from adhoc.generation.google_robot.legacy.config_gen_single_mobile import (  # noqa: WPS433
         _format_example_block,
         _load_json_list,
     )
 
+    cap = 2 if _is_local_backend(backend) else max_examples
     shots = _load_json_list(str(FEWSHOT_SHOTS)) if FEWSHOT_SHOTS.is_file() else []
-    parts = [_format_example_block(sc) for sc in shots[:max_examples]]
+    parts = [_format_example_block(sc) for sc in shots[:cap]]
     return "\n\n".join(parts)
 
 
-def _llm_generate(prompt: str, *, model: str, vlm: Any | None = None) -> str:
+def _vllm_json_hint(backend: str) -> str:
+    if not _is_local_backend(backend):
+        return ""
+    return (
+        "\n\n# Model output requirement:\n"
+        "# End with one JSON object containing \"movements\" (array). "
+        "Optional # Q1–Q4 lines above JSON are allowed.\n"
+    )
+
+
+def _llm_generate(prompt: str, *, model: str, backend: str = "gemini", vlm: Any | None = None) -> str:
     if vlm is not None:
         return vlm.generate(prompt)
-    from google import genai
+    if backend.lower() == "gemini":
+        from google import genai
 
-    key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-    if not key:
-        raise RuntimeError("Set GOOGLE_API_KEY or GEMINI_API_KEY")
-    client = genai.Client(api_key=key)
-    resp = client.models.generate_content(model=model, contents=prompt)
-    return (resp.text or "").strip()
+        key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+        if not key:
+            raise RuntimeError("Set GOOGLE_API_KEY or GEMINI_API_KEY")
+        client = genai.Client(api_key=key)
+        resp = client.models.generate_content(model=model, contents=prompt)
+        return (resp.text or "").strip()
+    from vlm_client import VLMClient
+
+    client = VLMClient(backend=backend, model=model)
+    return client.generate(prompt)
+
+
+def _llm_generate_many(
+    prompts: list[str],
+    *,
+    model: str,
+    backend: str = "gemini",
+    vlm: Any | None = None,
+) -> list[str]:
+    if not prompts:
+        return []
+    from vlm_batch_util import vlm_generate_texts  # noqa: WPS433
+
+    requests = [{"prompt": p} for p in prompts]
+    return vlm_generate_texts(vlm, backend, requests)
 
 
 def _mobile_pose_from_gt_pair(d: str, g: str, ref: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -122,15 +175,48 @@ def _strip_leading_poses(movements: list[dict[str, Any]]) -> list[dict[str, Any]
     return out
 
 
+def _build_exp1_prompt(*, cue: str, backend: str, prompt_path: Path | None = None) -> str:
+    ppath = prompt_path or prompt_exp_path(1)
+    template = ppath.read_text(encoding="utf-8")
+    return (
+        template.replace("{{CUE_CATALOG}}", _cue_catalog(cue=cue, backend=backend))
+        .replace("{{FEW_SHOT_EXAMPLES}}", _fewshot_block(backend=backend))
+        .replace("{{CUE_NAME}}", cue)
+        + _vllm_json_hint(backend)
+    )
+
+
+def _build_exp7_prompt(
+    *,
+    cue: str,
+    description: str,
+    fixed_pose: dict[str, Any],
+    backend: str,
+    prompt_path: Path | None = None,
+) -> str:
+    ppath = prompt_path or prompt_exp_path(7)
+    template = ppath.read_text(encoding="utf-8")
+    return (
+        template.replace("{{FEW_SHOT_EXAMPLES}}", _fewshot_block(max_examples=4, backend=backend))
+        .replace("{{FIXED_FIRST_POSE_JSON}}", json.dumps(fixed_pose, ensure_ascii=False, indent=2))
+        .replace("{{FIXED_START_POSE_JSON}}", json.dumps(fixed_pose, ensure_ascii=False, indent=2))
+        .replace("{{CUE_NAME}}", cue)
+        .replace("{{CUE_DESCRIPTION}}", description)
+        + _vllm_json_hint(backend)
+    )
+
+
 def generate_exp1_row(
     *,
     cue: str,
     cue_idx: int,
     description: str,
     model: str,
+    backend: str = "gemini",
     vlm: Any | None = None,
     out_path: Path | None = None,
     prompt_path: Path | None = None,
+    raw_override: str | None = None,
 ) -> dict[str, Any]:
     from adhoc.generation.google_robot.legacy.config_gen_single_mobile import (  # noqa: WPS433
         _extract_reasoning_and_json,
@@ -139,32 +225,35 @@ def generate_exp1_row(
         _validate_reasoning,
     )
 
-    ppath = prompt_path or prompt_exp_path(1)
-    template = ppath.read_text(encoding="utf-8")
-    prompt = (
-        template.replace("{{CUE_CATALOG}}", _cue_catalog())
-        .replace("{{FEW_SHOT_EXAMPLES}}", _fewshot_block())
-        .replace("{{CUE_NAME}}", cue)
-    )
+    require_reasoning = _require_planning_comments(backend, env_key="EXP1_REQUIRE_REASONING")
+    max_attempts = 3 if _is_local_backend(backend) else 2
+    prompt = _build_exp1_prompt(cue=cue, backend=backend, prompt_path=prompt_path)
     validation_errors: list[str] = []
     reasoning_text = ""
     parsed: dict[str, Any] | None = None
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    max_attempts = 2
 
     for attempt in range(max_attempts):
-        attempt_prompt = prompt
-        if attempt > 0 and validation_errors:
-            attempt_prompt += "\n\n# Fix these issues:\n" + "\n".join(
-                f"# - {e}" for e in validation_errors
-            )
-        raw = _sanitize_model_output(_llm_generate(attempt_prompt, model=model, vlm=vlm))
+        if raw_override is not None and attempt == 0:
+            raw = _sanitize_model_output(raw_override)
+            raw_override = None
+        else:
+            attempt_prompt = prompt
+            if attempt > 0 and validation_errors:
+                attempt_prompt += "\n\n# Fix these issues:\n" + "\n".join(
+                    f"# - {e}" for e in validation_errors
+                )
+            raw = _sanitize_model_output(_llm_generate(attempt_prompt, model=model, backend=backend, vlm=vlm))
         try:
             reasoning_text, parsed = _extract_reasoning_and_json(raw)
         except (json.JSONDecodeError, ValueError) as e:
             validation_errors = [f"JSON parse failed: {e}"]
+            if not raw.strip():
+                validation_errors.append("model returned empty output")
+            else:
+                validation_errors.append(f"raw preview: {raw[:240]!r}")
             continue
-        validation_errors = list(_validate_reasoning(reasoning_text))
+        validation_errors = list(_validate_reasoning(reasoning_text)) if require_reasoning else []
         validation_errors.extend(_validate_config(parsed))
         if not validation_errors:
             break
@@ -197,9 +286,11 @@ def generate_exp7_row(
     description: str,
     fixed_pose: dict[str, Any],
     model: str,
+    backend: str = "gemini",
     vlm: Any | None = None,
     out_path: Path | None = None,
     prompt_path: Path | None = None,
+    raw_override: str | None = None,
 ) -> dict[str, Any]:
     from adhoc.generation.google_robot.legacy.config_gen_single_mobile import (  # noqa: WPS433
         _extract_reasoning_and_json,
@@ -208,32 +299,39 @@ def generate_exp7_row(
         _validate_reasoning,
     )
 
-    ppath = prompt_path or prompt_exp_path(7)
-    template = ppath.read_text(encoding="utf-8")
-    prompt = (
-        template.replace("{{FEW_SHOT_EXAMPLES}}", _fewshot_block(max_examples=4))
-        .replace("{{FIXED_FIRST_POSE_JSON}}", json.dumps(fixed_pose, ensure_ascii=False, indent=2))
-        .replace("{{FIXED_START_POSE_JSON}}", json.dumps(fixed_pose, ensure_ascii=False, indent=2))
-        .replace("{{CUE_NAME}}", cue)
-        .replace("{{CUE_DESCRIPTION}}", description)
+    require_reasoning = _require_planning_comments(backend, env_key="EXP7_REQUIRE_REASONING")
+    max_attempts = 3 if _is_local_backend(backend) else 2
+    prompt = _build_exp7_prompt(
+        cue=cue,
+        description=description,
+        fixed_pose=fixed_pose,
+        backend=backend,
+        prompt_path=prompt_path,
     )
     validation_errors: list[str] = []
     reasoning_text = ""
     tail: list[dict[str, Any]] = []
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    max_attempts = 2
 
     for attempt in range(max_attempts):
-        attempt_prompt = prompt
-        if attempt > 0 and validation_errors:
-            attempt_prompt += "\n\n# Fix these issues:\n" + "\n".join(
-                f"# - {e}" for e in validation_errors
-            )
-        raw = _sanitize_model_output(_llm_generate(attempt_prompt, model=model, vlm=vlm))
+        if raw_override is not None and attempt == 0:
+            raw = _sanitize_model_output(raw_override)
+            raw_override = None
+        else:
+            attempt_prompt = prompt
+            if attempt > 0 and validation_errors:
+                attempt_prompt += "\n\n# Fix these issues:\n" + "\n".join(
+                    f"# - {e}" for e in validation_errors
+                )
+            raw = _sanitize_model_output(_llm_generate(attempt_prompt, model=model, backend=backend, vlm=vlm))
         try:
             reasoning_text, parsed = _extract_reasoning_and_json(raw)
         except (json.JSONDecodeError, ValueError) as e:
             validation_errors = [f"JSON parse failed: {e}"]
+            if not raw.strip():
+                validation_errors.append("model returned empty output")
+            else:
+                validation_errors.append(f"raw preview: {raw[:240]!r}")
             continue
         tail = parsed.get("movements") or parsed.get("movement_component") or []
         tail = _strip_leading_poses(tail)
@@ -241,7 +339,7 @@ def generate_exp7_row(
             "cue": cue,
             "movements": [_fixed_pose_step(fixed_pose)] + tail,
         }
-        validation_errors = list(_validate_reasoning(reasoning_text))
+        validation_errors = list(_validate_reasoning(reasoning_text)) if require_reasoning else []
         validation_errors.extend(_validate_config(full))
         if not tail:
             validation_errors.append("exp7 produced empty movement tail")
@@ -280,65 +378,145 @@ def run_exp_generation(
     resume: bool = True,
     delay: float = 2.0,
 ) -> None:
-    del backend
-    shots = load_config_list(SHOTS)
-    if not shots:
-        raise FileNotFoundError(f"Missing shots list: {SHOTS}")
+    from vlm_client import vlm_batch_size  # noqa: WPS433
+
+    if not GT_PATH.is_file():
+        raise FileNotFoundError(
+            f"Missing ground truth: {GT_PATH}\n"
+            "Run: python adhoc/generation/google_robot/build_gt_google_robot.py"
+        )
+
     gt = _gt_by_cue()
+    if not gt:
+        raise FileNotFoundError(f"Empty ground truth: {GT_PATH}")
+
+    work_names = manifest90_cue_names()
+    if not work_names:
+        raise FileNotFoundError("No cues in pilot100_manifest.tsv (manifest90)")
+
+    cue_filter = os.getenv("CUES", "").strip()
+    if cue_filter:
+        want = {c.strip() for c in cue_filter.split(",") if c.strip()}
+        work_names = [c for c in work_names if c in want]
+        if not work_names:
+            raise ValueError(f"No manifest cues matched CUES={cue_filter!r}")
+
+    shots_by_cue = {
+        str(r.get("cue", "")): r
+        for r in load_config_list(_REPO / "data/seed/shots/google_robot/shot_configs_pilot40_mobile.json")
+        if r.get("cue")
+    }
+
+    if not out_path.is_file():
+        save_json(out_path, [])
+
     existing = {r["cue"]: r for r in load_config_list(out_path) if r.get("cue")}
     catalog = yaml.safe_load(CUES_YAML.read_text(encoding="utf-8")) if CUES_YAML.is_file() else {}
+    batch_size = vlm_batch_size(backend) if vlm is not None else 1
 
-    def _desc(cue: str) -> str:
+    def _desc(cue: str, gt_row: dict[str, Any]) -> str:
+        if gt_row.get("description"):
+            return str(gt_row["description"])
         for grp in ("iconic", "contextual"):
             block = catalog.get(grp) if isinstance(catalog, dict) else None
             if isinstance(block, dict) and cue in block:
                 return str(block[cue])
-        row = next((r for r in shots if r.get("cue") == cue), {})
-        return str(row.get("description") or row.get("cue_text") or "")
+        shot = shots_by_cue.get(cue) or {}
+        return str(shot.get("description") or shot.get("cue_text") or "")
 
-    for row in shots:
-        cue = str(row.get("cue", ""))
-        if not cue:
-            continue
+    work: list[dict[str, Any]] = []
+    for cue in work_names:
         if resume and row_generation_done(existing.get(cue)):
             continue
-        cue_idx = int(row.get("idx", 0))
-        description = _desc(cue)
+        gt_row = gt.get(cue)
+        if not gt_row:
+            print(f"[gen] exp{exp_id} SKIP {cue}: missing from {GT_PATH.name}", flush=True)
+            continue
+        cue_idx = int(gt_row.get("cue_idx", 0))
+        description = _desc(cue, gt_row)
+        item: dict[str, Any] = {
+            "cue": cue,
+            "cue_idx": cue_idx,
+            "description": description,
+            "shot_row": shots_by_cue.get(cue, {}),
+        }
+        if exp_id == "7":
+            ev = gt_row
+            gt_pairs = _parse_gt_poses(str(ev.get("pose_gt") or ev.get("groundtruth", "")))
+            ref_pose = {}
+            for step in (shots_by_cue.get(cue) or {}).get("movements") or []:
+                if step.get("type") == "pose":
+                    ref_pose = (step.get("parameters") or {}).get("pose") or {}
+                    break
+            if gt_pairs:
+                d, g = gt_pairs[0]
+                fixed = _mobile_pose_from_gt_pair(d, g, ref_pose)
+            else:
+                fixed = ref_pose or {
+                    "torso_height": "mid",
+                    "arm_position": "front",
+                    "gripper_orientation": "horizontal",
+                    "head": "center",
+                }
+            item["fixed_pose"] = fixed
+        work.append(item)
+
+    def _run_one(item: dict[str, Any], *, raw_override: str | None = None) -> None:
+        cue = item["cue"]
         try:
             if exp_id == "1":
                 generate_exp1_row(
                     cue=cue,
-                    cue_idx=cue_idx,
-                    description=description,
+                    cue_idx=item["cue_idx"],
+                    description=item["description"],
                     model=model,
+                    backend=backend,
                     vlm=vlm,
                     out_path=out_path,
+                    raw_override=raw_override,
                 )
             elif exp_id == "7":
-                ev = gt.get(cue) or {}
-                gt_pairs = _parse_gt_poses(str(ev.get("groundtruth", "")))
-                ref_pose = {}
-                for step in row.get("movements") or []:
-                    if step.get("type") == "pose":
-                        ref_pose = (step.get("parameters") or {}).get("pose") or {}
-                        break
-                if gt_pairs:
-                    d, g = gt_pairs[0]
-                    fixed = _mobile_pose_from_gt_pair(d, g, ref_pose)
-                else:
-                    fixed = ref_pose or {"torso_height": "mid", "arm_position": "front", "gripper_orientation": "horizontal", "head": "center"}
                 generate_exp7_row(
                     cue=cue,
-                    cue_idx=cue_idx,
-                    description=description,
-                    fixed_pose=fixed,
+                    cue_idx=item["cue_idx"],
+                    description=item["description"],
+                    fixed_pose=item["fixed_pose"],
                     model=model,
+                    backend=backend,
                     vlm=vlm,
                     out_path=out_path,
+                    raw_override=raw_override,
                 )
             else:
                 raise ValueError(f"Unsupported generation exp: {exp_id}")
             print(f"[gen] exp{exp_id} OK {cue}", flush=True)
         except Exception as e:
             print(f"[gen] exp{exp_id} FAIL {cue}: {e}", flush=True)
-        time.sleep(delay)
+
+    i = 0
+    while i < len(work):
+        chunk = work[i : i + batch_size]
+        i += len(chunk)
+        if batch_size > 1 and vlm is not None and len(chunk) > 1:
+            if exp_id == "1":
+                prompts = [_build_exp1_prompt(cue=item["cue"], backend=backend) for item in chunk]
+            else:
+                prompts = [
+                    _build_exp7_prompt(
+                        cue=item["cue"],
+                        description=item["description"],
+                        fixed_pose=item["fixed_pose"],
+                        backend=backend,
+                    )
+                    for item in chunk
+                ]
+            raws = _llm_generate_many(prompts, model=model, backend=backend, vlm=vlm)
+            for item, raw in zip(chunk, raws):
+                _run_one(item, raw_override=raw)
+                if delay > 0:
+                    time.sleep(delay)
+        else:
+            for item in chunk:
+                _run_one(item)
+                if delay > 0:
+                    time.sleep(delay)

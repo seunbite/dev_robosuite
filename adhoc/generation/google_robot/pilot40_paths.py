@@ -1,4 +1,4 @@
-"""Canonical paths for pilot-40 Google Robot — mirrors manipulator pilot90_paths."""
+"""Canonical paths for Google Robot pilot-90 (90 cues) — mirrors manipulator pilot90_paths."""
 from __future__ import annotations
 
 import json
@@ -14,7 +14,9 @@ PROMPT_LEGACY_DIR = _REPO / "data/seed/prompt" / ROBOT
 SHOTS = _REPO / "data/seed/shots" / ROBOT / "shot_configs_pilot40_mobile.json"
 FEWSHOT_SHOTS = _REPO / "data/seed/shots" / ROBOT / "diverse_shots_mobile.json"
 CUES_YAML = _REPO / "data/seed/yml/_cues_new.yml"
-GT_CONSOLIDATED = _REPO / "data/results/verify/pilot40_pose_eval_consolidated.json"
+MANIFEST_TSV = _REPO / "data/seed/yml/pilot100_manifest.tsv"
+GT_PATH = _REPO / "data/seed/groundtruth" / "gt_google_robot.json"
+GT_CONSOLIDATED = GT_PATH
 MEDIA_DIR = _REPO / "data/results/render/google_robot/pilot40_media"
 RENDER_DIR = _REPO / "data/results/render/google_robot"
 TILE_DIR = _REPO / "data/results/visualize/google_pose_groups_12"
@@ -32,7 +34,7 @@ HTML_EXP_DIR = _REPO / "data/results/html" / ROBOT
 LEGACY_VERIFY_DIR = _REPO / "data/results/verify" / ROBOT
 LEGACY_CFG = _REPO / "data/results/motion_configs" / ROBOT / "motion_configs_pilot40_mobile.json"
 
-N_CUES = 39
+N_CUES = 90
 DEFAULT_GEN_TAG = "mobile-map"
 DEFAULT_VERIFY_TAG = "gemini-2.5-flash"
 
@@ -116,7 +118,50 @@ def config_for_experiment(exp_id: str | int, model_tag: str) -> Path:
     raise KeyError(f"No config input for experiment {eid}")
 
 
+def manifest90_cue_names() -> list[str]:
+    if not MANIFEST_TSV.is_file():
+        return []
+    out: list[str] = []
+    for line in MANIFEST_TSV.read_text(encoding="utf-8").splitlines()[1:]:
+        parts = line.split("\t")
+        if len(parts) < 4 or parts[1] == "pending_essence10":
+            continue
+        out.append(parts[3].strip())
+    return out
+
+
+def manifest90_cue_indices() -> dict[str, int]:
+    gt = load_gt_by_cue() if GT_PATH.is_file() else {}
+    out: dict[str, int] = {}
+    for line in MANIFEST_TSV.read_text(encoding="utf-8").splitlines()[1:]:
+        parts = line.split("\t")
+        if len(parts) < 4 or parts[1] == "pending_essence10":
+            continue
+        cue = parts[3].strip()
+        idx_raw = parts[2].strip()
+        if idx_raw.isdigit():
+            out[cue] = int(idx_raw)
+        elif cue in gt:
+            out[cue] = int(gt[cue]["cue_idx"])
+    return out
+
+
+def load_gt_rows() -> list[dict[str, Any]]:
+    if not GT_PATH.is_file():
+        return []
+    data = json.loads(GT_PATH.read_text(encoding="utf-8"))
+    return list(data.get("rows") or [])
+
+
+def load_gt_by_cue() -> dict[str, dict[str, Any]]:
+    return {str(r["cue"]): r for r in load_gt_rows() if r.get("cue")}
+
+
 def pilot40_cue_names() -> list[str]:
+    """Backward-compat alias — full suite uses manifest90 (90 cues)."""
+    names = manifest90_cue_names()
+    if names:
+        return names
     if not SHOTS.is_file():
         return []
     return [str(r["cue"]) for r in load_config_list(SHOTS) if r.get("cue")]

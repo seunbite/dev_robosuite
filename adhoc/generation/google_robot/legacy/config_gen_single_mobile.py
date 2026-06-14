@@ -13,6 +13,7 @@ import sys
 import fire
 import yaml
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 from google import genai
@@ -21,7 +22,7 @@ from google.genai import types
 _CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-_REPO_ROOT = os.path.abspath(os.path.join(_SCRIPT_DIR, "..", "..", ".."))
+_REPO_ROOT = str(Path(_SCRIPT_DIR).resolve().parents[4])
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 

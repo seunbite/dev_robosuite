@@ -16,12 +16,13 @@ from PIL import Image, ImageDraw, ImageFont
 
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parents[2]
-for p in (_REPO, _HERE):
+_ROBOTARM = _REPO / "adhoc/generation/robotarm"
+for p in (_REPO, _ROBOTARM, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
 from prompt_loader import exp_prompt_path, load_snippet  # noqa: E402
-from pilot40_paths import GT_CONSOLIDATED, MULTITILE_IMG_DIR, TILE_DIR  # noqa: E402
+from pilot40_paths import GT_PATH, MULTITILE_IMG_DIR, TILE_DIR, manifest90_cue_names  # noqa: E402
 
 DIR_TO_ARM = {
     "front": "front",
@@ -121,8 +122,90 @@ def _pick_groups(gt_set: set[tuple[str, str]], gt_primary: tuple[str, str], *, n
     return chosen[:n]
 
 
+def _append_result(
+    results: list[dict[str, Any]],
+    *,
+    ev: dict[str, Any],
+    n_tiles: int,
+    tile_meta: list[dict[str, Any]],
+    img_path: Path,
+    parsed: dict[str, Any],
+) -> None:
+    pick = parsed.get("best_tile_index")
+    try:
+        pick_i = int(pick)
+    except (TypeError, ValueError):
+        pick_i = None
+    gt_idx = [t["display_index"] for t in tile_meta if t["is_gt"]]
+    cue = str(ev.get("cue", ""))
+    results.append(
+        {
+            "cue_idx": ev.get("cue_idx"),
+            "cue": cue,
+            "groundtruth": ev.get("groundtruth"),
+            "grid_n": n_tiles,
+            "gt_indices": gt_idx,
+            "grid_image": str(img_path),
+            "vlm_result": parsed,
+            "vlm_pick_index": pick_i,
+            "vlm_correct": pick_i in gt_idx if pick_i is not None else False,
+            "tiles": tile_meta,
+        }
+    )
+    print(f"[ok] {cue} grid{n_tiles} pick={pick_i} gt={gt_idx}")
+
+
+def _flush_multitile_batch(
+    pending: list[dict[str, Any]],
+    *,
+    vlm: Any,
+    backend: str,
+    client: Any,
+    model: str,
+    results: list[dict[str, Any]],
+    n_tiles: int,
+) -> None:
+    if not pending:
+        return
+    if vlm is not None:
+        from vlm_batch_util import vlm_generate_texts  # noqa: WPS433
+        from vlm_infer_shared import parse_json_response  # noqa: WPS433
+
+        texts = vlm_generate_texts(
+            vlm,
+            backend,
+            [{"prompt": item["prompt"], "images": [item["grid_img"]]} for item in pending],
+        )
+        for item, text in zip(pending, texts):
+            _append_result(
+                results,
+                ev=item["ev"],
+                n_tiles=n_tiles,
+                tile_meta=item["tile_meta"],
+                img_path=item["img_path"],
+                parsed=parse_json_response(text),
+            )
+    else:
+        for item in pending:
+            resp = client.models.generate_content(model=model, contents=[item["grid_img"], item["prompt"]])
+            try:
+                parsed = _extract_json(resp.text or "")
+            except Exception as e:
+                parsed = {"parse_error": str(e), "raw_text": (resp.text or "")[:500]}
+            _append_result(
+                results,
+                ev=item["ev"],
+                n_tiles=n_tiles,
+                tile_meta=item["tile_meta"],
+                img_path=item["img_path"],
+                parsed=parsed,
+            )
+    pending.clear()
+
+
 def run(args: argparse.Namespace) -> None:
     vlm = getattr(args, "vlm", None)
+    backend = getattr(args, "vlm_backend", None) or os.getenv("VLM_BACKEND", "gemini")
     client = None
     if vlm is None:
         from google import genai
@@ -137,6 +220,10 @@ def run(args: argparse.Namespace) -> None:
     if args.cues:
         want = {c.strip() for c in args.cues.split(",") if c.strip()}
         rows = [r for r in rows if r.get("cue") in want]
+    else:
+        manifest = set(manifest90_cue_names())
+        if manifest:
+            rows = [r for r in rows if r.get("cue") in manifest]
     if args.max_cues:
         rows = rows[: int(args.max_cues)]
 
@@ -153,6 +240,13 @@ def run(args: argparse.Namespace) -> None:
     done = {r.get("cue") for r in existing if r.get("vlm_pick_index") is not None}
 
     results = list(existing)
+    pending: list[dict[str, Any]] = []
+    batch_size = 1
+    if vlm is not None:
+        from vlm_client import vlm_batch_size  # noqa: WPS433
+
+        batch_size = vlm_batch_size(backend)
+
     for ev in rows:
         cue = str(ev.get("cue", ""))
         if cue in done:
@@ -197,38 +291,62 @@ def run(args: argparse.Namespace) -> None:
                 rows=rows_n,
                 labels=labels,
             )
-            if vlm is not None:
+            if batch_size > 1 and vlm is not None:
+                pending.append(
+                    {
+                        "ev": ev,
+                        "tile_meta": tile_meta,
+                        "img_path": img_path,
+                        "grid_img": grid_img,
+                        "prompt": prompt,
+                    }
+                )
+                if len(pending) >= batch_size:
+                    _flush_multitile_batch(
+                        pending,
+                        vlm=vlm,
+                        backend=backend,
+                        client=client,
+                        model=args.model,
+                        results=results,
+                        n_tiles=n_tiles,
+                    )
+            elif vlm is not None:
                 from vlm_infer_shared import parse_json_response  # noqa: WPS433
 
                 text = vlm.generate(prompt, images=[grid_img])
-                parsed = parse_json_response(text)
+                _append_result(
+                    results,
+                    ev=ev,
+                    n_tiles=n_tiles,
+                    tile_meta=tile_meta,
+                    img_path=img_path,
+                    parsed=parse_json_response(text),
+                )
             else:
                 resp = client.models.generate_content(model=args.model, contents=[grid_img, prompt])
                 try:
                     parsed = _extract_json(resp.text or "")
                 except Exception as e:
                     parsed = {"parse_error": str(e), "raw_text": (resp.text or "")[:500]}
-            pick = parsed.get("best_tile_index")
-            try:
-                pick_i = int(pick)
-            except (TypeError, ValueError):
-                pick_i = None
-            gt_idx = [t["display_index"] for t in tile_meta if t["is_gt"]]
-            results.append(
-                {
-                    "cue_idx": ev.get("cue_idx"),
-                    "cue": cue,
-                    "groundtruth": ev.get("groundtruth"),
-                    "grid_n": n_tiles,
-                    "gt_indices": gt_idx,
-                    "grid_image": str(img_path),
-                    "vlm_result": parsed,
-                    "vlm_pick_index": pick_i,
-                    "vlm_correct": pick_i in gt_idx if pick_i is not None else False,
-                    "tiles": tile_meta,
-                }
-            )
-            print(f"[ok] {cue} grid{n_tiles} pick={pick_i} gt={gt_idx}")
+                _append_result(
+                    results,
+                    ev=ev,
+                    n_tiles=n_tiles,
+                    tile_meta=tile_meta,
+                    img_path=img_path,
+                    parsed=parsed,
+                )
+
+    _flush_multitile_batch(
+        pending,
+        vlm=vlm,
+        backend=backend,
+        client=client,
+        model=args.model,
+        results=results,
+        n_tiles=n_tiles,
+    )
 
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),
@@ -245,7 +363,7 @@ def run(args: argparse.Namespace) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--consolidated-json", type=Path, default=GT_CONSOLIDATED)
+    ap.add_argument("--consolidated-json", type=Path, default=GT_PATH)
     ap.add_argument("--tile-dir", type=Path, default=TILE_DIR)
     ap.add_argument("--image-dir", type=Path, default=MULTITILE_IMG_DIR)
     ap.add_argument("--out-json", type=Path, required=True)

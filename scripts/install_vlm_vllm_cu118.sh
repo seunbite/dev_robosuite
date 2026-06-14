@@ -26,12 +26,18 @@ echo "→ torch (${CUDA_TAG}) first (do NOT let vLLM upgrade this)"
 pip install "torch==${TORCH_VER}" "torchvision==0.19.0" \
   --index-url "https://download.pytorch.org/whl/${CUDA_TAG}"
 
+echo "→ remove mismatched flashinfer / dlpack wheels (torch ABI errors)"
+pip uninstall -y flashinfer tvm_ffi torch_c_dlpack_ext 2>/dev/null || true
+
 echo "→ vLLM ${VLLM_VER} + vision deps"
 pip install "vllm==${VLLM_VER}" \
   "transformers>=4.45.0" \
   "qwen-vl-utils>=0.0.8" \
   "accelerate>=0.30.0" \
   pillow pyyaml openai httpx
+
+echo "→ default to legacy vLLM engine (avoids flashinfer on torch 2.4 clusters)"
+echo "  export VLLM_USE_V1=0   # set VLLM_USE_V1=1 only after torch/flashinfer align"
 
 python - <<'PY'
 import torch

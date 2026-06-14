@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Pilot-40 Google Robot experiment runner (exp 1–10).
+Pilot-90 Google Robot experiment runner (exp 1–10, 90 cues).
 
   python adhoc/generation/google_robot/exp.py 1
   python adhoc/generation/google_robot/exp.py 7 --backend gemini --model gemini-2.5-pro
@@ -110,10 +110,13 @@ def _maybe_generate(spec: dict[str, Any], args: argparse.Namespace) -> None:
     tag = args.model_tag
     out_cfg = result_config_path(eid, tag)
     if os.getenv("FORCE_GENERATE", "0") != "1" and out_cfg.is_file():
-        from pilot40_paths import load_config_list, row_generation_done
+        from pilot40_paths import load_config_list, manifest90_cue_names, row_generation_done
 
         rows = load_config_list(out_cfg)
-        if rows and all(row_generation_done(r) for r in rows):
+        by_cue = {r["cue"]: r for r in rows if r.get("cue")}
+        if len(manifest90_cue_names()) > 0 and all(
+            row_generation_done(by_cue.get(c)) for c in manifest90_cue_names()
+        ):
             return
     print(f"[suite] generating exp{eid} → {out_cfg}", flush=True)
     from config_gen_mobile_vlm import run_exp_generation  # noqa: WPS433
@@ -406,9 +409,13 @@ def main(argv: list[str] | None = None) -> None:
     )
     print(f"\nWrote suite summary → {summary_path}\n", flush=True)
 
-    from pilot40_exp_html import write_all_html  # noqa: WPS433
+    if want is None and os.getenv("SKIP_HTML", "0") != "1":
+        from pilot40_exp_html import write_all_html  # noqa: WPS433
 
-    write_all_html()
+        try:
+            write_all_html()
+        except Exception as e:
+            print(f"[html] write_all_html skipped: {e}", flush=True)
 
     if args.open and sys.platform == "darwin":
         idx = _REPO / "data/results/html/google_robot/index.html"

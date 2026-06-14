@@ -32,7 +32,7 @@ for p in (_REPO, Path(__file__).resolve().parent, _LEGACY):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-def _legacy():
+def _legacy_core():
     from legacy.config_gen_single import (  # noqa: WPS433
         _extract_reasoning_and_json,
         _format_example_block,
@@ -43,8 +43,6 @@ def _legacy():
         _validate_config_minimal,
         _validate_reasoning,
     )
-    from legacy.path_ee_ik import validate_path_parameters  # noqa: WPS433
-    from generate_pose_group_tiles import _load_entries, _select_xyz_tertile_balanced  # noqa: WPS433
 
     return (
         _extract_reasoning_and_json,
@@ -55,10 +53,14 @@ def _legacy():
         _sanitize_model_output,
         _validate_config_minimal,
         _validate_reasoning,
-        validate_path_parameters,
-        _load_entries,
-        _select_xyz_tertile_balanced,
     )
+
+
+def _legacy():
+    from legacy.path_ee_ik import validate_path_parameters  # noqa: WPS433
+    from generate_pose_group_tiles import _load_entries, _select_xyz_tertile_balanced  # noqa: WPS433
+
+    return _legacy_core() + (validate_path_parameters, _load_entries, _select_xyz_tertile_balanced)
 
 
 def _persist_generation_row(
@@ -91,7 +93,7 @@ def _persist_generation_row(
 def _require_planning_comments(backend: str, *, env_key: str) -> bool:
     """Gemini enforces Q1–Q4 comments; Qwen/transformers skip unless env overrides."""
     env = os.getenv(env_key)
-    if env is not None:
+    if env is not None and env.strip():
         return env.strip().lower() not in {"0", "false", "no", "off"}
     return backend.lower() == "gemini"
 
@@ -122,7 +124,7 @@ def _llm_generate(
 
 
 def _fewshot_block(prompt_path: Path, shots_json: Path, *, max_examples: int = 6) -> str:
-    _, _format_example_block, _load_json_list, _, _resolve_shots_json, *_ = _legacy()
+    _, _format_example_block, _load_json_list, _, _resolve_shots_json, *_ = _legacy_core()
     shots = _load_json_list(_resolve_shots_json(str(prompt_path), str(shots_json)))
     handmade = [c for c in shots if c.get("state") == "handmade"][:max_examples]
     parts = [_format_example_block(ex, "# EXAMPLE:") for ex in handmade]
@@ -229,7 +231,7 @@ def generate_exp1_row(
         _validate_config_minimal,
         _validate_reasoning,
         *_rest,
-    ) = _legacy()
+    ) = _legacy_core()
     require_reasoning = _require_planning_comments(backend, env_key="EXP1_REQUIRE_REASONING")
     if max_attempts is None:
         max_attempts = 3 if backend.lower() != "gemini" else 2
@@ -364,7 +366,7 @@ def generate_exp7_row(
         _validate_config_minimal,
         _validate_reasoning,
         *_rest,
-    ) = _legacy()
+    ) = _legacy_core()
     prompt_template = prompt_exp_path(7).read_text(encoding="utf-8")
     shots = _load_json_list(_resolve_shots_json(str(prompt_exp_path(1)), str(SHOTS)))
     examples_parts: list[str] = []

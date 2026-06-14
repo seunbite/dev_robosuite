@@ -15,10 +15,12 @@ from google.genai import types
 
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parents[2]
+_ROBOTARM = _REPO / "adhoc/generation/robotarm"
 import sys
 
-if str(_HERE) not in sys.path:
-    sys.path.insert(0, str(_HERE))
+for p in (_REPO, _ROBOTARM, _HERE):
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
 
 from prompt_loader import exp_prompt_path, load_snippet  # noqa: E402
 
@@ -228,6 +230,7 @@ def _mp4_for_row(media_dir: Path, row: dict[str, Any]) -> Path | None:
 
 def run(args: argparse.Namespace) -> None:
     vlm = getattr(args, "vlm", None)
+    backend = getattr(args, "vlm_backend", None) or os.getenv("VLM_BACKEND", "gemini")
     client = None
     if vlm is None:
         api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
@@ -235,7 +238,8 @@ def run(args: argparse.Namespace) -> None:
             raise SystemExit("Set GOOGLE_API_KEY (or GEMINI_API_KEY).")
         client = genai.Client(api_key=api_key)
 
-    rows = sorted(_load_json(args.config_json), key=lambda r: int(r.get("idx", 0)))
+    cfg_path = Path(args.config_json)
+    rows = sorted(_load_json(cfg_path) if cfg_path.is_file() else [], key=lambda r: int(r.get("idx", 0)))
     if args.limit:
         rows = rows[: args.limit]
 
@@ -244,9 +248,46 @@ def run(args: argparse.Namespace) -> None:
     out_rows: list[dict[str, Any]] = []
     infer_kw = {"model": args.model, "vlm": vlm, "client": client}
 
+    batch_size = 1
+    if vlm is not None and args.modality == "text":
+        from vlm_client import vlm_batch_size  # noqa: WPS433
+
+        batch_size = vlm_batch_size(backend)
+
+    pending_text: list[tuple[dict[str, Any], str]] = []
+
+    def _flush_text_batch() -> None:
+        if not pending_text:
+            return
+        from vlm_batch_util import vlm_generate_texts  # noqa: WPS433
+        from vlm_infer_shared import parse_json_response  # noqa: WPS433
+
+        texts = vlm_generate_texts(
+            vlm,
+            backend,
+            [{"prompt": prompt} for _, prompt in pending_text],
+        )
+        for (row, _), text in zip(pending_text, texts):
+            out_rows.append(
+                {
+                    "idx": row.get("idx"),
+                    "cue": row.get("cue"),
+                    "component": args.component,
+                    "modality": args.modality,
+                    "media": None,
+                    "result": parse_json_response(text),
+                }
+            )
+        pending_text.clear()
+
     for row in rows:
         prompt = _fill_prompt(template, row)
         media_path: Path | None = None
+        if args.modality == "text" and batch_size > 1 and vlm is not None:
+            pending_text.append((row, prompt))
+            if len(pending_text) >= batch_size:
+                _flush_text_batch()
+            continue
         if args.modality == "text":
             parsed = _call_text(prompt, **infer_kw)
         elif args.component == "pose" and args.modality == "vlm":
@@ -292,6 +333,8 @@ def run(args: argparse.Namespace) -> None:
             "movement_is_appropriate"
         )
         print(f"[ok] idx={row.get('idx')} cue={row.get('cue')} ok={ok}")
+
+    _flush_text_batch()
 
     payload = {
         "time": datetime.now().isoformat(timespec="seconds"),
