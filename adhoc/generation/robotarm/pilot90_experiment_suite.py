@@ -118,6 +118,9 @@ def _kind_for_exp(eid: str) -> str:
         "8": "motion_verify_vlm",
         "9": "motion_verify_text",
         "10": "motion_pairwise_mp4",
+        "11": "motion_rep_pairwise_input",
+        "12": "context_variation",
+        "13": "baseline_fewshot_score",
     }[eid]
 
 
@@ -298,6 +301,30 @@ def metrics_from_json(path: Path, spec: dict[str, Any], *, motion_cfg: Path | No
         return p40.metrics_from_json(path, spec)
     finally:
         p40.MOTION_CFG = old_motion
+
+
+def _result_json_path(spec: dict[str, Any], model_tag: str) -> Path:
+    eid = str(spec["id"])
+    kind = spec["kind"]
+    if kind in {"pose_generation_score", "motion_generation_score", "context_variation", "baseline_fewshot_score"}:
+        return score_result_path(eid, model_tag)
+    return verify_result_path(eid, model_tag)
+
+
+def print_qwen_series_summary() -> None:
+    from qwen_cross_summary import print_qwen_cross_summary  # noqa: WPS433
+
+    specs = experiment_specs_all("qwen32b")
+    print_qwen_cross_summary(
+        suite_label=f"Manipulator pilot-90 ({N_CUES} cues, tasks 1–13)",
+        specs=specs,
+        result_path_for=_result_json_path,
+        metrics_for=lambda path, spec, **kw: metrics_from_json(
+            path, spec, motion_cfg=kw.get("motion_cfg"),
+        ),
+        repo=_REPO,
+        metrics_kwargs={"motion_cfg": config_for_experiment("7", "qwen32b")},
+    )
 
 
 def print_summary_table(

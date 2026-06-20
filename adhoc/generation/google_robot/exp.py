@@ -24,7 +24,7 @@ _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parents[2]
 _ROBOTARM = _REPO / "adhoc/generation/robotarm"
 # google_robot must precede robotarm on sys.path — both have a `legacy` package.
-for p in (_REPO, _ROBOTARM, _HERE):
+for p in (_REPO, _REPO / "adhoc/generation", _ROBOTARM, _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
@@ -34,6 +34,7 @@ from google_robot_experiment_suite import (  # noqa: E402
     SHOTS,
     experiment_specs_all,
     metrics_from_json,
+    print_qwen_series_summary,
     print_summary_table,
     score_exp1,
     score_exp7,
@@ -103,7 +104,7 @@ def _gemini_client(model: str) -> Any:
 
 def _maybe_generate(spec: dict[str, Any], args: argparse.Namespace) -> None:
     eid = spec["id"]
-    if eid not in {"1", "7"}:
+    if eid not in {"1", "7", "7_1"}:
         return
     if os.getenv("GENERATE", "1") == "0":
         return
@@ -267,6 +268,48 @@ def _run_motion_pairwise(args: argparse.Namespace, out_json: Path, motion_cfg: P
     run(ns)
 
 
+def _run_task_a(args: argparse.Namespace, out_json: Path) -> None:
+    from exp_pose_plausibility_all import run
+
+    ns = argparse.Namespace(
+        model=args.model,
+        model_tag=args.model_tag,
+        prompt=None,
+        out_json=out_json,
+        vis_dir=_REPO / "data/results/visualize/google_robot/expA_plausibility",
+        groups=os.getenv("GROUPS", ""),
+        grid_cols=int(os.getenv("GRID_COLS", "5")),
+        head_hand_gap_min=float(os.getenv("HEAD_HAND_GAP_MIN", "-0.1")),
+        dry_run=os.getenv("DRY_RUN", "0") == "1",
+        resume=args.resume,
+        open=False,
+    )
+    ns.prompt = _REPO / "data/seed/prompt/google_robot/exp/prompt_expA.txt"
+    run(ns)
+
+
+def _run_task_b(args: argparse.Namespace, out_json: Path) -> None:
+    from exp_pose_representative_pick import run
+
+    tag = args.model_tag
+    cfg = config_for_experiment("1", tag)
+    ns = argparse.Namespace(
+        config_json=cfg,
+        score_json=score_result_path(1, tag) if score_result_path(1, tag).is_file() else None,
+        model=args.model,
+        model_tag=tag,
+        prompt=None,
+        out_json=out_json,
+        grid_dir=_REPO / "data/results/visualize/google_robot/expB_representative",
+        cues=os.getenv("CUES", ""),
+        limit=int(os.getenv("LIMIT", "0") or 0),
+        dry_run=os.getenv("DRY_RUN", "0") == "1",
+        open=False,
+    )
+    ns.prompt = _REPO / "data/seed/prompt/google_robot/exp/prompt_expB.txt"
+    run(ns)
+
+
 def _run_one(spec: dict[str, Any], args: argparse.Namespace) -> Path:
     tag = args.model_tag
     eid = spec["id"]
@@ -277,7 +320,7 @@ def _run_one(spec: dict[str, Any], args: argparse.Namespace) -> Path:
         else verify_result_path(eid, tag)
     )
     pose_cfg = config_for_experiment("1", tag)
-    motion_cfg = config_for_experiment("7", tag)
+    motion_cfg = config_for_experiment(eid if eid in {"7", "7_1"} else "7", tag)
 
     print(f"\n{'=' * 72}\nEXP {eid}: {spec['title']}\n→ {out_json}\n{'=' * 72}", flush=True)
     _maybe_generate(spec, args)
@@ -300,18 +343,37 @@ def _run_one(spec: dict[str, Any], args: argparse.Namespace) -> Path:
         _run_motion_verify(args, out_json, motion_cfg, exp_id="9")
     elif kind == "motion_pairwise_mp4":
         _run_motion_pairwise(args, out_json, motion_cfg)
+    elif kind == "pose_plausibility_groups":
+        from build_task_a_neg_picker_html import run as run_neg_picker
+
+        ns = argparse.Namespace(
+            tile_root=_REPO / "data/results/visualize/google_robot/expA_neg_picker",
+            montage_root=_REPO / "data/results/visualize/google_pose_groups_12",
+            html_out=HTML_EXP_DIR / f"expA_neg_picker.html",
+            neg_json=_REPO / "data/seed/google_robot/task_a_neg_selection.json",
+            grid_cols=int(os.getenv("GRID_COLS", "5")),
+            head_hand_gap_min=float(os.getenv("HEAD_HAND_GAP_MIN", "-0.1")),
+            regen_montages=os.getenv("REGEN_MONTAGES", "0") == "1",
+            force_tiles=False,
+            open=False,
+        )
+        run_neg_picker(ns)
+        return out_json
+    elif kind == "pose_representative_pick":
+        _run_task_b(args, out_json)
     else:
         raise ValueError(kind)
 
-    from pilot40_exp_html import write_exp_html  # noqa: WPS433
+    if kind not in {"pose_plausibility_groups", "pose_representative_pick"}:
+        from pilot40_exp_html import write_exp_html  # noqa: WPS433
 
-    write_exp_html(eid, tag, out_json)
+        write_exp_html(eid, tag, out_json)
     return out_json
 
 
 def main(argv: list[str] | None = None) -> None:
-    p = argparse.ArgumentParser(description="Run pilot-40 Google Robot experiments (exp 1–10)")
-    p.add_argument("target", nargs="?", default="all", help="1–10, comma list, or all")
+    p = argparse.ArgumentParser(description="Run pilot-90 Google Robot experiments (exp 1–10, A, B)")
+    p.add_argument("target", nargs="?", default="all", help="1–10, A, B, comma list, or all")
     p.add_argument("--backend", default=os.getenv("BACKEND", "gemini"))
     p.add_argument("--model", default=os.getenv("VLM_MODEL", "gemini-2.5-pro"))
     p.add_argument("--tensor-parallel-size", type=int, default=int(os.getenv("VLLM_TENSOR_PARALLEL_SIZE", "1")))
@@ -355,7 +417,7 @@ def main(argv: list[str] | None = None) -> None:
         specs = [by_id[eid] for eid in want if eid in by_id]
 
     if args.summary:
-        print_summary_table(args.model_tag)
+        print_qwen_series_summary()
         return
 
     backend = _vlm_backend_name(args.backend)

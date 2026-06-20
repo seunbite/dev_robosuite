@@ -22,7 +22,7 @@ from typing import Any
 
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parents[2]
-for p in (_REPO, _HERE):
+for p in (_REPO, _REPO / "adhoc/generation", _HERE):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
@@ -41,6 +41,7 @@ from pilot90_experiment_suite import (  # noqa: E402
     manifest90_cues_csv,
     manifest90_rows_from_cfg,
     metrics_from_json,
+    print_qwen_series_summary,
     print_summary_table,
     score_exp1,
     score_exp7,
@@ -447,10 +448,10 @@ def _run_one(spec: dict[str, Any], args: argparse.Namespace) -> Path:
     return out_json
 
 
-def _parse_target(target: str | None) -> set[str] | None:
+def _parse_target(target: str | None) -> list[str] | None:
     if not target or target.lower() == "all":
         return None
-    return {x.strip() for x in target.split(",") if x.strip()}
+    return [x.strip() for x in target.split(",") if x.strip()]
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -490,53 +491,11 @@ def main(argv: list[str] | None = None) -> None:
     specs = experiment_specs_all(args.model_tag)
     want = _parse_target(args.only if args.only else args.target)
     if want is not None:
-        specs = [s for s in specs if s["id"] in want]
+        by_id = {s["id"]: s for s in specs}
+        specs = [by_id[eid] for eid in want if eid in by_id]
 
     if args.summary or args.summary_only:
-        from pilot90_exp_html import write_exp_review_html  # noqa: WPS433
-
-        all_metrics = []
-        for spec in specs:
-            path = (
-                score_result_path(spec["id"], args.model_tag)
-                if spec["kind"] in {"pose_generation_score", "motion_generation_score"}
-                else verify_result_path(spec["id"], args.model_tag)
-            )
-            motion_cfg = config_for_experiment("7", args.model_tag)
-            m = metrics_from_json(path, spec, motion_cfg=motion_cfg)
-            m["experiment_id"] = spec["id"]
-            m["title"] = spec["title"]
-            all_metrics.append(m)
-            write_exp_review_html(
-                spec["id"], args.model_tag, path, title=spec["title"], kind=spec["kind"]
-            )
-        print_summary_table(specs, all_metrics, model_tag=args.model_tag)
-        summary_path = VERIFY_EXP_DIR / f"pilot90_suite_summary_{args.model_tag}.json"
-        summary = {
-            "time": datetime.now().isoformat(timespec="seconds"),
-            "model": args.model,
-            "model_tag": args.model_tag,
-            "backend": args.backend,
-            "n_cues": N_CUES,
-            "groundtruth": str(GT_PATH),
-            "summary_only": True,
-            "table": [
-                {
-                    "id": spec["id"],
-                    "title": spec["title"],
-                    "json": str(
-                        score_result_path(spec["id"], args.model_tag)
-                        if spec["kind"] in {"pose_generation_score", "motion_generation_score"}
-                        else verify_result_path(spec["id"], args.model_tag)
-                    ),
-                    **{k: v for k, v in m.items() if k not in {"experiment_id", "title"}},
-                }
-                for spec, m in zip(specs, all_metrics)
-            ],
-        }
-        summary_path.parent.mkdir(parents=True, exist_ok=True)
-        summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"\nWrote suite summary → {summary_path}\n", flush=True)
+        print_qwen_series_summary()
         return
 
     motion_cfg = config_for_experiment("7", args.model_tag)

@@ -8,6 +8,7 @@
 #   bash exp.sh all                                    # manipulator, Qwen 32B
 #   DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all
 #   DOMAIN=google_robot ONLY=1,2,3,7 bash exp.sh all
+#   SUMMARY=1 bash exp.sh all                    # Qwen 32B/7B/3B cross-model tables
 #   SUMMARY=1 DOMAIN=google_robot bash exp.sh all
 if [ -z "${BASH_VERSION:-}" ]; then
   exec bash "$0" "$@"

@@ -21,8 +21,8 @@ _spec = importlib.util.spec_from_file_location("robotarm_pilot40_experiment_suit
 _robotarm_p40 = importlib.util.module_from_spec(_spec)
 assert _spec.loader is not None
 _spec.loader.exec_module(_robotarm_p40)
-human_gt_pose_ok = _robotarm_p40.human_gt_pose_ok
 pose_generation_correct = _robotarm_p40.pose_generation_correct
+from parse_pose_gt_mobile import human_gt_pose_ok  # noqa: E402
 from pilot40_paths import (  # noqa: E402
     DEFAULT_GEN_TAG,
     DEFAULT_VERIFY_TAG,
@@ -70,7 +70,10 @@ LEGACY_MAP: dict[str, tuple[str, str]] = {
 
 def experiment_specs(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: str = DEFAULT_VERIFY_TAG) -> list[dict[str, Any]]:
     specs: list[dict[str, Any]] = []
+    _SKIP_SUITE = frozenset({"12"})  # exp12 via exp12_context_variation.py
     for eid, title in EXPERIMENT_TITLES.items():
+        if eid in _SKIP_SUITE:
+            continue
         kind = {
             "1": "pose_generation_score",
             "2": "pose_verify_vlm",
@@ -79,11 +82,16 @@ def experiment_specs(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: str
             "5": "multitile",
             "6": "multitile",
             "7": "motion_generation_score",
+            "7_1": "motion_generation_score",
             "8": "motion_verify_vlm",
             "9": "motion_verify_text",
             "10": "motion_pairwise_mp4",
+            "A": "pose_plausibility_groups",
+            "B": "pose_representative_pick",
         }[eid]
-        tag = model_tag_gen if eid in {"1", "7"} else model_tag_verify
+        tag = model_tag_gen if eid in {"1", "7", "7_1"} else model_tag_verify
+        if eid in {"A", "B"}:
+            tag = model_tag_gen
         spec: dict[str, Any] = {
             "id": eid,
             "title": title,
@@ -92,13 +100,15 @@ def experiment_specs(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: str
             "prompt": str(prompt_exp_path(eid).relative_to(_REPO)),
             "html": str(html_result_path(eid, tag).relative_to(_REPO)),
         }
-        if eid in {"1", "7"}:
+        if eid in {"1", "7", "7_1"}:
             spec["result_config"] = str(result_config_path(eid, tag).relative_to(_REPO))
             spec["score_json"] = str(score_result_path(eid, tag).relative_to(_REPO))
-        elif eid in {"2", "3", "4", "5", "6", "8", "9", "10"}:
+        elif eid in {"2", "3", "4", "5", "6", "8", "9", "10", "A", "B"}:
             spec["verify_json"] = str(verify_result_path(eid, tag).relative_to(_REPO))
         if eid in {"2", "3", "4", "5", "6", "8", "9", "10"}:
             spec["input_config"] = str(config_for_experiment(eid, model_tag_gen).relative_to(_REPO))
+        if eid == "B":
+            spec["input_config"] = str(config_for_experiment("B", model_tag_gen).relative_to(_REPO))
         specs.append(spec)
     return specs
 
@@ -207,9 +217,7 @@ def metrics_from_json(path: Path, kind: str) -> dict[str, Any]:
             if model_ok is None or not cue:
                 continue
             agree_n += 1
-            human_ok = human_gt_pose_ok(
-                str((gt.get(cue) or {}).get("pose_gt") or (gt.get(cue) or {}).get("groundtruth", ""))
-            )
+            human_ok = human_gt_pose_ok(gt.get(cue) or {})
             if bool(model_ok) == human_ok:
                 agree_ok += 1
         acc = agree_ok / agree_n if agree_n else None
@@ -245,6 +253,26 @@ def metrics_from_json(path: Path, kind: str) -> dict[str, Any]:
         picks = data.get("picks") or data.get("results") or []
         n = len(picks)
         return {"status": "ok", "n": n, "headline": f"{n} cues picked (partial suite)"}
+    if kind == "pose_plausibility_groups":
+        summary = data.get("summary") or {}
+        n_merged = int(summary.get("n_merged_total", 0))
+        n_groups = int(summary.get("n_groups", 0))
+        return {
+            "status": "ok",
+            "n": n_merged,
+            "headline": f"merged {n_merged} poses / {n_groups} groups",
+        }
+    if kind == "pose_representative_pick":
+        n = int(data.get("n_cues", 0))
+        ok = int(data.get("n_with_pick", 0))
+        acc = ok / n if n else None
+        return {
+            "status": "ok",
+            "ok": ok,
+            "n": n,
+            "accuracy": acc,
+            "headline": f"picks {ok}/{n}" + (f" = {100 * acc:.1f}%" if acc is not None else ""),
+        }
     return {"status": "ok", "headline": str(path.name)}
 
 
@@ -387,9 +415,11 @@ def score_exp1(config_path: Path, out_path: Path) -> dict[str, Any]:
     for row in manifest90_rows_from_cfg(load_config_list(config_path)):
         cue = str(row.get("cue", ""))
         ev = gt.get(cue)
-        if not ev or not ev.get("pose_gt"):
+        if not ev:
             continue
-        correct = pose_generation_correct_any_mobile(row, str(ev["pose_gt"]))
+        if ev.get("pose_any"):
+            continue
+        correct = pose_generation_correct_any_mobile(row, ev)
         if correct is not None:
             n += 1
             if correct:
@@ -462,6 +492,26 @@ def score_exp7(config_path: Path, out_path: Path) -> dict[str, Any]:
     return payload
 
 
+def _result_json_path(spec: dict[str, Any], model_tag: str) -> Path:
+    eid = str(spec["id"])
+    if spec["kind"] in {"pose_generation_score", "motion_generation_score"}:
+        return score_result_path(eid, model_tag)
+    return verify_result_path(eid, model_tag)
+
+
+def print_qwen_series_summary() -> None:
+    from qwen_cross_summary import print_qwen_cross_summary  # noqa: WPS433
+
+    specs = experiment_specs_all("qwen32b")
+    print_qwen_cross_summary(
+        suite_label=f"Google Robot pilot-90 ({N_CUES} cues, tasks 1–10, 7_1, A, B)",
+        specs=specs,
+        result_path_for=_result_json_path,
+        metrics_for=lambda path, spec, **_kw: metrics_from_json(path, spec["kind"]),
+        repo=_REPO,
+    )
+
+
 def print_summary_table(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: str | None = None) -> None:
     tag_v = model_tag_verify or model_to_tag(model_tag_gen)
     print("\n" + "=" * 92)
@@ -469,7 +519,7 @@ def print_summary_table(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: 
     print("=" * 92)
     for spec in experiment_specs(model_tag_gen, tag_v):
         eid = spec["id"]
-        if eid in {"1", "7"}:
+        if spec["kind"] in {"pose_generation_score", "motion_generation_score"}:
             path = score_result_path(eid, spec["model_tag"])
         else:
             path = verify_result_path(eid, spec["model_tag"])
