@@ -6,8 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from pilot40_experiment_suite import human_gt_pose_ok
-from pilot90_paths import GT_PATH, html_result_path, load_gt_by_cue
+from pilot90_paths import GT_PATH, html_result_path
 
 
 def _esc(x: object) -> str:
@@ -29,7 +28,10 @@ def _headline(data: dict[str, Any], kind: str) -> str:
         pct = f"{100 * acc:.1f}%" if acc is not None else "n/a"
         return f"{ok}/{n} = {pct}"
     if kind in {"pose_verify_vlm", "pose_verify_text"}:
-        return str(data.get("total", len(data.get("results") or [])))
+        ok, n = int(data.get("n_correct", 0)), int(data.get("n", 0))
+        acc = data.get("accuracy")
+        pct = f"{100 * acc:.1f}%" if acc is not None else "n/a"
+        return f"verify-gt {ok}/{n} = {pct}" if n else str(data.get("total", len(data.get("results") or [])))
     if kind == "pose_pairwise":
         comps = data.get("comparisons") or data.get("results") or []
         scored = [c for c in comps if "vlm_correct" in c]
@@ -43,8 +45,11 @@ def _headline(data: dict[str, Any], kind: str) -> str:
                 parts.append(f"{k}: {s.get('ok')}/{s.get('n')}")
         return "; ".join(parts) if parts else "n/a"
     if kind in {"motion_verify_vlm", "motion_verify_text"}:
+        ok, n = int(data.get("n_correct", 0)), int(data.get("n", 0))
+        acc = data.get("accuracy")
+        pct = f"{100 * acc:.1f}%" if acc is not None else "n/a"
         rows = data.get("rows") or data.get("results") or []
-        return str(len(rows))
+        return f"verify-gt {ok}/{n} = {pct}" if n else str(len(rows))
     if kind == "motion_pairwise_mp4":
         rows = data.get("rows") or data.get("results") or []
         ok = sum(1 for r in rows if r.get("vlm_correct"))
@@ -54,7 +59,6 @@ def _headline(data: dict[str, Any], kind: str) -> str:
 
 
 def _rows_for_table(data: dict[str, Any], kind: str) -> tuple[list[str], list[list[str]]]:
-    gt = load_gt_by_cue()
     headers: list[str] = ["idx", "cue"]
     body: list[list[str]] = []
 
@@ -74,19 +78,18 @@ def _rows_for_table(data: dict[str, Any], kind: str) -> tuple[list[str], list[li
         return headers, body
 
     if kind in {"pose_verify_vlm", "pose_verify_text"}:
-        headers += ["model_ok", "human_ok", "agree"]
+        headers += ["appropriate", "gen_ok", "rec_ok", "verify"]
         for r in data.get("results") or []:
-            cue = r.get("cue") or ""
-            model_ok = (r.get("result") or {}).get("pose_is_appropriate")
-            human_ok = human_gt_pose_ok((gt.get(cue) or {}).get("pose_gt", ""))
-            agree = model_ok is not None and bool(model_ok) == human_ok
+            result = r.get("result") or {}
+            scored = r.get("verify_scoring") or {}
             body.append(
                 [
                     _esc(r.get("idx")),
-                    _esc(cue),
-                    _badge(model_ok if isinstance(model_ok, bool) else None),
-                    _badge(human_ok),
-                    _badge(agree if model_ok is not None else None),
+                    _esc(r.get("cue")),
+                    _badge(result.get("pose_is_appropriate") if isinstance(result.get("pose_is_appropriate"), bool) else None),
+                    _badge(scored.get("generation_correct")),
+                    _badge(scored.get("recommended_matches_gt")),
+                    _badge(scored.get("verify_correct")),
                 ]
             )
         return headers, body
@@ -120,15 +123,22 @@ def _rows_for_table(data: dict[str, Any], kind: str) -> tuple[list[str], list[li
         return headers, body
 
     if kind in {"motion_verify_vlm", "motion_verify_text"}:
-        headers += ["appropriate", "component"]
+        headers += ["appropriate", "gen_ok", "rec_ok", "verify"]
         for r in data.get("rows") or data.get("results") or []:
-            parsed = r.get("parsed") or r.get("result") or {}
+            parsed = r.get("parsed") or r.get("result") or r.get("verify_result") or {}
+            scored = r.get("verify_scoring") or {}
             body.append(
                 [
                     _esc(r.get("cue_idx")),
                     _esc(r.get("cue")),
-                    _badge(parsed.get("movement_is_appropriate")),
-                    _esc(parsed.get("recommended_component") or parsed.get("component")),
+                    _badge(
+                        r.get("movement_is_appropriate")
+                        if isinstance(r.get("movement_is_appropriate"), bool)
+                        else parsed.get("movement_is_appropriate")
+                    ),
+                    _badge(scored.get("generation_match")),
+                    _badge(scored.get("recommended_matches_gt")),
+                    _badge(scored.get("verify_correct")),
                 ]
             )
         return headers, body

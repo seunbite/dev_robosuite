@@ -15,6 +15,9 @@ QWEN_MODEL_COLUMNS: list[tuple[str, str]] = [
 def _fmt_acc(metrics: dict[str, Any]) -> str:
     if metrics.get("status") == "missing":
         return "-"
+    n = metrics.get("n")
+    if n == 0:
+        return "-"
     if metrics.get("accuracy") is not None:
         return f"{100 * float(metrics['accuracy']):.1f}%"
     if metrics.get("accuracy_pct") is not None:
@@ -69,7 +72,7 @@ def print_qwen_cross_summary(
         for _label, tag in QWEN_MODEL_COLUMNS:
             path = result_path_for(spec, tag)
             path_grid[eid][tag] = path
-            met = metrics_for(path, spec, **metrics_kwargs)
+            met = metrics_for(path, {**spec, "model_tag": tag}, model_tag=tag, **metrics_kwargs)
             row += f"  {_fmt_acc(met):>10}  {_fmt_mtime(path):>12}"
         print(row)
     print("=" * 120)

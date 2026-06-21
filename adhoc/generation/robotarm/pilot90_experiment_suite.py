@@ -39,6 +39,9 @@ from pilot90_paths import (  # noqa: F401
 
 _REPO = Path(__file__).resolve().parent.parents[2]
 
+VERIFY_SCORING = "gt_match"
+VERIFY_SCORING_VERSION = 1
+
 # Re-export for backward compat (CONSOLIDATED rows use groundtruth = pose_gt)
 CONSOLIDATED = GT_PATH  # noqa: F811 — same path, compatible row shape
 MOTION_COMPONENT_GT = GT_PATH
@@ -162,9 +165,256 @@ def score_exp1(config_path: Path, out_path: Path) -> dict[str, Any]:
     return payload
 
 
-def score_exp7(config_path: Path, out_path: Path) -> dict[str, Any]:
+def motion_generation_match(row: dict[str, Any], movement_gt: dict[str, Any]) -> bool | None:
+    """Exp7 rule: generated tail vs movement_gt component."""
     from score_pilot40_motion_gt_components import _tail_matches_component, _tail_steps  # noqa: WPS433
 
+    comp = movement_gt.get("component")
+    raw = (movement_gt.get("annotation_raw") or "").strip()
+    if not comp and not movement_gt.get("always_correct") and raw.lower() != "none":
+        return None
+    tail = _tail_steps(row.get("movements") or [])
+    if movement_gt.get("always_correct") or (comp and comp.get("kind") == "any"):
+        return True
+    if comp:
+        match, _ = _tail_matches_component(tail, comp)
+        return match
+    return None
+
+
+def _normalize_recommended_component(raw: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not raw or not isinstance(raw, dict):
+        return None
+    kind = raw.get("kind")
+    if kind not in ("movement", "path_arc", "path_line"):
+        return None
+    out: dict[str, Any] = {"kind": kind}
+    if kind == "path_arc":
+        plane = raw.get("plane") or "xz"
+        if plane == "null":
+            return None
+        out["plane"] = str(plane).lower()
+        return out
+    if kind == "path_line":
+        axis = raw.get("axis")
+        if not axis or axis == "null":
+            return None
+        out["axis"] = str(axis).lower()
+        return out
+    axes = raw.get("axes") or {}
+    if isinstance(axes, dict):
+        clean = {}
+        for ax in "xyz":
+            if ax in axes and axes[ax] in ("+", "-", "+-"):
+                clean[ax] = axes[ax]
+        if clean:
+            out["axes"] = clean
+    j = raw.get("joint")
+    if j and j != "null":
+        out["joint"] = str(j).lower()
+    rep = raw.get("repetition")
+    if rep and rep != "null":
+        out["repetition"] = str(rep).lower()
+    if raw.get("hold") is True:
+        out["hold"] = True
+    return out if len(out) > 1 else None
+
+
+def _recommended_component_matches_gt(
+    rec: dict[str, Any] | None, comp: dict[str, Any] | None
+) -> bool | None:
+    if not comp:
+        return None
+    from motion_gt_tail_builder import build_tail_from_component  # noqa: WPS433
+    from score_pilot40_motion_gt_components import _tail_matches_component  # noqa: WPS433
+
+    norm = _normalize_recommended_component(rec)
+    if not norm:
+        return False
+    built = build_tail_from_component(norm)
+    if not built:
+        return False
+    match, _ = _tail_matches_component(built, comp)
+    return match
+
+
+def _score_pose_verify_row(
+    row: dict[str, Any],
+    cfg_row: dict[str, Any] | None,
+    pose_gt: str,
+) -> dict[str, Any] | None:
+    result = row.get("result") or {}
+    appropriate = result.get("pose_is_appropriate")
+    if appropriate is None or not cfg_row or not pose_gt:
+        return None
+    generation_correct = pose_generation_correct_any(cfg_row, pose_gt)
+    recommended_matches_gt: bool | None = None
+    if appropriate:
+        verify_correct = bool(generation_correct)
+    else:
+        na = result.get("if_not_appropriate") or {}
+        rec_pose = {
+            "dir": na.get("recommended_dir"),
+            "gripper_orientation": na.get("recommended_gripper_orientation"),
+        }
+        recommended_matches_gt = pose_generation_correct(rec_pose, pose_gt)
+        verify_correct = bool(recommended_matches_gt)
+    return {
+        "pose_is_appropriate": bool(appropriate),
+        "generation_correct": generation_correct,
+        "recommended_matches_gt": recommended_matches_gt,
+        "verify_correct": verify_correct,
+        "scoring_mode": VERIFY_SCORING,
+    }
+
+
+def _score_motion_verify_row(
+    row: dict[str, Any],
+    cfg_row: dict[str, Any] | None,
+    movement_gt: dict[str, Any],
+) -> dict[str, Any] | None:
+    parsed = row.get("verify_result") or row.get("parsed") or row.get("result") or {}
+    appropriate = row.get("movement_is_appropriate")
+    if appropriate is None:
+        appropriate = parsed.get("movement_is_appropriate")
+    if appropriate is None or not cfg_row:
+        return None
+    comp = movement_gt.get("component")
+    generation_match = motion_generation_match(cfg_row, movement_gt)
+    recommended_matches_gt: bool | None = None
+    if appropriate:
+        verify_correct = bool(generation_match)
+    else:
+        rec = row.get("recommended_component")
+        if not rec:
+            rec = (parsed.get("if_not_appropriate") or {}).get("recommended_component")
+        recommended_matches_gt = _recommended_component_matches_gt(rec, comp)
+        verify_correct = bool(recommended_matches_gt)
+    return {
+        "movement_is_appropriate": bool(appropriate),
+        "generation_match": generation_match,
+        "recommended_matches_gt": recommended_matches_gt,
+        "verify_correct": verify_correct,
+        "scoring_mode": VERIFY_SCORING,
+    }
+
+
+def _resolve_generation_config(
+    *candidates: str | Path | None,
+    fallback: Path | None = None,
+) -> Path:
+    for cand in candidates:
+        if not cand:
+            continue
+        p = Path(cand)
+        if p.is_file():
+            return p
+        local = RESULT_CFG_DIR / p.name
+        if local.is_file():
+            return local
+    if fallback and fallback.is_file():
+        return fallback
+    raise FileNotFoundError("generation config not found")
+
+
+def score_verify_pose_json(
+    verify_path: Path,
+    pose_cfg_path: Path | None = None,
+    *,
+    write: bool = True,
+) -> dict[str, Any]:
+    """GT verify score for exp2/3: app→exp1 gen match; inapp→recommended pose vs pose_gt."""
+    if not verify_path.is_file():
+        raise FileNotFoundError(verify_path)
+    data = json.loads(verify_path.read_text(encoding="utf-8"))
+    cfg_path = _resolve_generation_config(
+        pose_cfg_path,
+        data.get("config_json"),
+        data.get("generation_config"),
+        fallback=pose_cfg_path,
+    )
+    if not cfg_path.is_file():
+        raise FileNotFoundError(f"pose generation config missing for {verify_path}")
+    gt = load_gt_by_cue()
+    cfg_by = {int(r["idx"]): r for r in load_config_list(cfg_path)}
+    ok = n = 0
+    for row in data.get("results") or []:
+        cue = str(row.get("cue") or "")
+        ev = gt.get(cue) or {}
+        pose_gt = str(ev.get("pose_gt") or "")
+        cfg_row = cfg_by.get(int(row.get("idx", 0)))
+        scored = _score_pose_verify_row(row, cfg_row, pose_gt)
+        if scored is None:
+            row.pop("verify_scoring", None)
+            continue
+        row["verify_scoring"] = scored
+        n += 1
+        if scored["verify_correct"]:
+            ok += 1
+    data["verify_scoring"] = VERIFY_SCORING
+    data["verify_scoring_version"] = VERIFY_SCORING_VERSION
+    data["generation_config"] = str(cfg_path)
+    data["groundtruth"] = str(GT_PATH)
+    data["n"] = n
+    data["n_correct"] = ok
+    data["accuracy"] = ok / n if n else None
+    if write:
+        verify_path.parent.mkdir(parents=True, exist_ok=True)
+        verify_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    return data
+
+
+def score_verify_motion_json(
+    verify_path: Path,
+    motion_cfg_path: Path | None = None,
+    *,
+    write: bool = True,
+) -> dict[str, Any]:
+    """GT verify score for exp8/9: app→exp7 gen match; inapp→recommended component vs movement_gt."""
+    if not verify_path.is_file():
+        raise FileNotFoundError(verify_path)
+    data = json.loads(verify_path.read_text(encoding="utf-8"))
+    cfg_path = _resolve_generation_config(
+        motion_cfg_path,
+        data.get("config"),
+        data.get("config_json"),
+        data.get("generation_config"),
+        fallback=motion_cfg_path,
+    )
+    if not cfg_path.is_file():
+        raise FileNotFoundError(f"motion generation config missing for {verify_path}")
+    gt = load_gt_by_cue()
+    cfg_by = {int(r["idx"]): r for r in load_config_list(cfg_path)}
+    ok = n = 0
+    for row in data.get("rows") or data.get("results") or []:
+        cue = str(row.get("cue") or "")
+        cfg_row = cfg_by.get(int(row.get("cue_idx", row.get("idx", 0))))
+        if not cue and cfg_row:
+            cue = str(cfg_row.get("cue") or "")
+        ev = gt.get(cue) or {}
+        movement_gt = ev.get("movement_gt") or {}
+        scored = _score_motion_verify_row(row, cfg_row, movement_gt)
+        if scored is None:
+            row.pop("verify_scoring", None)
+            continue
+        row["verify_scoring"] = scored
+        n += 1
+        if scored["verify_correct"]:
+            ok += 1
+    data["verify_scoring"] = VERIFY_SCORING
+    data["verify_scoring_version"] = VERIFY_SCORING_VERSION
+    data["generation_config"] = str(cfg_path)
+    data["groundtruth"] = str(GT_PATH)
+    data["n"] = n
+    data["n_correct"] = ok
+    data["accuracy"] = ok / n if n else None
+    if write:
+        verify_path.parent.mkdir(parents=True, exist_ok=True)
+        verify_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    return data
+
+
+def score_exp7(config_path: Path, out_path: Path) -> dict[str, Any]:
     gt = load_gt_by_cue()
     rows_out: list[dict[str, Any]] = []
     ok = n = 0
@@ -176,12 +426,8 @@ def score_exp7(config_path: Path, out_path: Path) -> dict[str, Any]:
         raw = (mg.get("annotation_raw") or "").strip()
         if not comp and not mg.get("always_correct") and raw.lower() != "none":
             continue
-        tail = _tail_steps(row.get("movements") or [])
-        if mg.get("always_correct") or (comp and comp.get("kind") == "any"):
-            match = True
-        elif comp:
-            match, _ = _tail_matches_component(tail, comp)
-        else:
+        match = motion_generation_match(row, mg)
+        if match is None:
             continue
         n += 1
         if match:
@@ -209,11 +455,24 @@ def score_exp7(config_path: Path, out_path: Path) -> dict[str, Any]:
     return payload
 
 
-def metrics_from_json(path: Path, spec: dict[str, Any], *, motion_cfg: Path | None = None) -> dict[str, Any]:
+def metrics_from_json(
+    path: Path,
+    spec: dict[str, Any],
+    *,
+    pose_cfg: Path | None = None,
+    motion_cfg: Path | None = None,
+    rescore_json: bool = True,
+) -> dict[str, Any]:
     if not path.is_file():
         return {"status": "missing", "path": str(path)}
 
     kind = spec["kind"]
+    model_tag = str(spec.get("model_tag") or "qwen32b")
+    if pose_cfg is None:
+        pose_cfg = config_for_experiment("1", model_tag)
+    if motion_cfg is None:
+        motion_cfg = config_for_experiment("7", model_tag)
+
     if kind in {"pose_generation_score", "motion_generation_score"}:
         data = json.loads(path.read_text(encoding="utf-8"))
         ok = int(data.get("n_correct", 0))
@@ -230,67 +489,50 @@ def metrics_from_json(path: Path, spec: dict[str, Any], *, motion_cfg: Path | No
         }
 
     if kind in {"pose_verify_vlm", "pose_verify_text"}:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        results = data.get("results") or []
-        gt = load_gt_by_cue()
-        agree_ok = agree_n = 0
-        for r in results:
-            cue = r.get("cue")
-            if not cue or cue not in gt:
-                continue
-            model_ok = r.get("result", {}).get("pose_is_appropriate")
-            if model_ok is None:
-                continue
-            agree_n += 1
-            human_ok = human_gt_pose_ok(gt[cue].get("pose_gt", ""))
-            if bool(model_ok) == human_ok:
-                agree_ok += 1
-        acc = agree_ok / agree_n if agree_n else None
+        try:
+            if rescore_json:
+                data = score_verify_pose_json(path, pose_cfg if pose_cfg.is_file() else None, write=True)
+            else:
+                data = json.loads(path.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        ok = int(data.get("n_correct", 0))
+        n = int(data.get("n", 0))
+        acc = data.get("accuracy")
+        if acc is None and n:
+            acc = ok / n
         return {
             "status": "ok",
             "path": str(path),
-            "ok": agree_ok,
-            "n": agree_n,
+            "ok": ok,
+            "n": n,
             "accuracy": acc,
             "accuracy_pct": None if acc is None else round(100 * acc, 1),
-            "headline": f"human-agree {agree_ok}/{agree_n}"
+            "headline": f"verify-gt {ok}/{n}"
             + (f" = {100 * acc:.1f}%" if acc is not None else ""),
         }
 
     if kind in {"motion_verify_vlm", "motion_verify_text"}:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        from score_pilot40_motion_gt_components import _tail_matches_component, _tail_steps  # noqa: WPS433
-
-        gt = load_gt_by_cue()
-        cfg_path = motion_cfg or Path(spec.get("input_config", ""))
-        cfg_by = {int(r["idx"]): r for r in load_config_list(cfg_path)}
-        det_ok = det_n = 0
-        for vr in data.get("rows") or []:
-            cue = vr.get("cue")
-            row = cfg_by.get(int(vr.get("cue_idx", 0))) or {}
-            if not cue:
-                cue = row.get("cue")
-            ev = gt.get(str(cue or ""), {})
-            comp = (ev.get("movement_gt") or {}).get("component")
-            if not comp or not row:
-                continue
-            gen_tail = _tail_steps(row.get("movements") or [])
-            gen_match, _ = _tail_matches_component(gen_tail, comp)
-            appropriate = vr.get("movement_is_appropriate")
-            if appropriate is None:
-                continue
-            det_n += 1
-            if bool(appropriate) == bool(gen_match):
-                det_ok += 1
-        acc = det_ok / det_n if det_n else None
+        try:
+            if rescore_json:
+                data = score_verify_motion_json(path, motion_cfg if motion_cfg.is_file() else None, write=True)
+            else:
+                data = json.loads(path.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        ok = int(data.get("n_correct", 0))
+        n = int(data.get("n", 0))
+        acc = data.get("accuracy")
+        if acc is None and n:
+            acc = ok / n
         return {
             "status": "ok",
             "path": str(path),
-            "ok": det_ok,
-            "n": det_n,
+            "ok": ok,
+            "n": n,
             "accuracy": acc,
             "accuracy_pct": None if acc is None else round(100 * acc, 1),
-            "headline": f"detection {det_ok}/{det_n}"
+            "headline": f"verify-gt {ok}/{n}"
             + (f" = {100 * acc:.1f}%" if acc is not None else ""),
         }
 
@@ -314,16 +556,23 @@ def _result_json_path(spec: dict[str, Any], model_tag: str) -> Path:
 def print_qwen_series_summary() -> None:
     from qwen_cross_summary import print_qwen_cross_summary  # noqa: WPS433
 
+    def _metrics(path: Path, spec: dict[str, Any], **kw: Any) -> dict[str, Any]:
+        tag = str(kw.get("model_tag") or spec.get("model_tag") or "qwen32b")
+        return metrics_from_json(
+            path,
+            {**spec, "model_tag": tag},
+            pose_cfg=config_for_experiment("1", tag),
+            motion_cfg=config_for_experiment("7", tag),
+            rescore_json=True,
+        )
+
     specs = experiment_specs_all("qwen32b")
     print_qwen_cross_summary(
         suite_label=f"Manipulator pilot-90 ({N_CUES} cues, tasks 1–13)",
         specs=specs,
         result_path_for=_result_json_path,
-        metrics_for=lambda path, spec, **kw: metrics_from_json(
-            path, spec, motion_cfg=kw.get("motion_cfg"),
-        ),
+        metrics_for=_metrics,
         repo=_REPO,
-        metrics_kwargs={"motion_cfg": config_for_experiment("7", "qwen32b")},
     )
 
 

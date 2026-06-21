@@ -45,6 +45,8 @@ from pilot90_experiment_suite import (  # noqa: E402
     print_summary_table,
     score_exp1,
     score_exp7,
+    score_verify_motion_json,
+    score_verify_pose_json,
 )
 from pilot90_paths import (  # noqa: E402
     VERIFY_EXP_DIR,
@@ -383,8 +385,10 @@ def _run_one(spec: dict[str, Any], args: argparse.Namespace) -> Path:
         print(f"[1] scored {out_json}", flush=True)
     elif kind == "pose_verify_vlm":
         _run_pose_verify_vlm(args, out_json, pose_cfg)
+        score_verify_pose_json(out_json, pose_cfg)
     elif kind == "pose_verify_text":
         _run_pose_verify_text(args, out_json, pose_cfg)
+        score_verify_pose_json(out_json, pose_cfg)
     elif kind == "pose_pairwise":
         _run_pose_pairwise(args, out_json)
     elif kind == "multitile":
@@ -416,8 +420,10 @@ def _run_one(spec: dict[str, Any], args: argparse.Namespace) -> Path:
                 f"  • First issue: {failures[0]}"
             )
         _run_motion_verify_vlm(args, out_json, motion_cfg)
+        score_verify_motion_json(out_json, motion_cfg)
     elif kind == "motion_verify_text":
         _run_motion_verify_text(args, out_json, motion_cfg)
+        score_verify_motion_json(out_json, motion_cfg)
     elif kind == "motion_pairwise_mp4":
         if not motion_cfg.is_file():
             raise FileNotFoundError(
@@ -499,6 +505,7 @@ def main(argv: list[str] | None = None) -> None:
         return
 
     motion_cfg = config_for_experiment("7", args.model_tag)
+    pose_cfg = config_for_experiment("1", args.model_tag)
 
     needs_model = any(
         s["kind"]
@@ -524,7 +531,13 @@ def main(argv: list[str] | None = None) -> None:
         t0 = datetime.now().isoformat(timespec="seconds")
         try:
             out_path = _run_one(spec, args)
-            m = metrics_from_json(out_path, spec, motion_cfg=motion_cfg)
+            m = metrics_from_json(
+                out_path,
+                spec,
+                pose_cfg=pose_cfg,
+                motion_cfg=motion_cfg,
+                rescore_json=True,
+            )
         except Exception as e:
             out_path = verify_result_path(spec["id"], args.model_tag)
             m = {"status": "error", "error": str(e), "path": str(out_path)}
