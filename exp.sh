@@ -3,6 +3,7 @@
 #SBATCH --output=logs/exp_%j.log
 #SBATCH --error=logs/exp_%j.log
 #SBATCH --time=24:00:00
+#SBATCH --export=ALL
 #
 # Logs: logs/exp_<JOBID>.log  (stdout+stderr combined — tail this file)
 # Single entry point: interactive, salloc, and sbatch (partition/GPU via your alias).
@@ -13,8 +14,9 @@
 #   ALL_MODELS=1 SUMMARY=1 bash exp.sh
 #   DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all
 #
-# Cluster sbatch (partition/GPU via your sbg/sbg2 alias):
-#   sbg  --export=ALL,MODEL_SIZE=7b,ONLY=8,9,MOTION_PREPARE_MP4=0 exp.sh
+# Cluster sbatch — set env on the submit line, then sbatch (export=ALL is in #SBATCH header):
+#   ONLY=4,5,6,10 MODEL_SIZE=32b sbg exp.sh
+#   sbg --export=ALL,MODEL_SIZE=7b,ONLY=8,9,MOTION_PREPARE_MP4=0 exp.sh
 #   sbg2 --export=ALL,MODEL_SIZE=32b,ONLY=4,5,6,10,MOTION_PREPARE_PAIRWISE=0 exp.sh
 #   sbgd --export=ALL,MODEL_SIZE=3b,ONLY=4,5,6,10 exp.sh
 #
@@ -52,6 +54,7 @@ _log_start() {
   echo "[exp.sh] job=${SLURM_JOB_ID:-interactive} partition=${SLURM_JOB_PARTITION:-?}"
   echo "[exp.sh] submit=${SLURM_SUBMIT_DIR:-$ROOT} cwd=${ROOT}"
   echo "[exp.sh] ONLY=${ONLY:-all} MODEL_SIZE=${MODEL_SIZE:-32b} DOMAIN=${DOMAIN:-robotarm}"
+  echo "[exp.sh] tip: sbatch needs ONLY/MODEL_SIZE exported (exp.sh has #SBATCH --export=ALL)"
   echo "================================================================"
 }
 _is_cluster() {
