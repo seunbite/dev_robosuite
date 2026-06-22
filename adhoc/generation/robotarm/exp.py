@@ -8,7 +8,7 @@ Pilot-90 experiment runner (exp 1–10).
   python adhoc/generation/robotarm/exp.py all
   python adhoc/generation/robotarm/exp.py all --summary   # scores only, no runs
 
-Legacy: bash scripts/run_pilot90_qwen_suite.sh (wraps this module).
+Legacy: bash exp.sh (or python adhoc/generation/robotarm/exp.py).
 """
 from __future__ import annotations
 

@@ -1,29 +1,11 @@
 #!/usr/bin/env bash
-# Pilot-40 (39 cues) × 10 experiments — Qwen2.5-VL-32B (single model load).
+# Pilot-40 (39 cues) × 10 experiments — Qwen2.5-VL (single model load).
+# Full table: README_PILOT.md
 #
-# Usage (GPU node, e.g. salloc):
 #   bash scripts/run_pilot40_qwen_suite.sh
-#   bash scripts/run_pilot40_qwen_suite.sh --only 5,6        # new multitile 6/12 only
-#   RESUME=1 bash scripts/run_pilot40_qwen_suite.sh
-#   SUMMARY_ONLY=1 bash scripts/run_pilot40_qwen_suite.sh          # table only, no GPU
-#   ONLY=8 SUMMARY_ONLY=1 bash scripts/run_pilot40_qwen_suite.sh
-#   SEPARATE_STEPS=1 bash scripts/run_pilot40_qwen_suite.sh   # 10× model reload (slow)
-#
-# Gemini baselines (steps 1–4, 7–10 already done; 5–6 are new):
-#   1  pose gen      → motion_configs_prompt_v19_generation_pose_pilot40.json
-#                      scored: pilot40_pose_eval_consolidated_scored.tsv
-#   2  pose VLM      → pose_tile_verify_pilot{10,20,20_more}_gemini.json
-#   3  pose text     → pose_textonly_verify_pilot{10,20,20_more}_gemini.json
-#   4  pose 2-way    → pilot40_pose_pairwise_12_gemini.json
-#   5  multitile 6   → (no pilot40 Gemini; closest: pilot20_pose_multitile_gt_gemini.json)
-#   6  multitile 12  → (same)
-#   7  motion gen    → motion_configs_prompt_v19_gt_fixed_pose_pilot40.json
-#                      metrics: pilot40_motion_verify_metrics.json
-#   8  motion VLM    → pilot40_motion_component_verify_gemini.json
-#   9  motion text   → pilot40_motion_component_verify_text_gemini.json
-#  10  motion mp4    → samples/motion_gt_neg_pairwise/pairwise_eval_results*.json
-#
-# Qwen outputs: data/results/verify/pilot40_qwen32b/exp{01..10}_*.json
+#   ONLY=5,6 RESUME=1 bash scripts/run_pilot40_qwen_suite.sh
+#   SUMMARY_ONLY=1 bash scripts/run_pilot40_qwen_suite.sh
+#   VLM_MODEL=Qwen/Qwen2.5-VL-7B-Instruct OUT_DIR=data/results/verify/pilot40_qwen7b bash ...
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"

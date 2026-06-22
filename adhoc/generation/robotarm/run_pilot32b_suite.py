@@ -2,7 +2,7 @@
 """
 Run all 7 pilot experiments with one Qwen2.5-VL-32B load (salloc-friendly).
 
-  bash scripts/run_pilot32b_suite.sh
+  python adhoc/generation/robotarm/run_pilot32b_suite.py
 
 Writes per-experiment JSON under data/results/verify/pilot32b_qwen32b/
 and a suite summary JSON + accuracy table on stdout.

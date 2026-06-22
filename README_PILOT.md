@@ -94,27 +94,35 @@ source scripts/cluster_env.sh /data/user_data/$USER/hf_cache
 | **Server (cluster)** | `DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all` — mobile bimanipulator |
 | **Local (Mac)** | `cd ~/Downloads/workspace/dev_robosuite && ONLY=1,2,3,7 bash exp.sh` |
 
-### `exp.sh` — one entry point
+### `exp.sh` — one entry point (interactive + sbatch)
 
-Defaults: **all 10 tasks**, **Qwen 32B**, resume on.  
-`exp.sh` picks repo + Python env automatically:
+`exp.sh` is the only orchestrator for pilot-90 / pilot-40 Google Robot. It works in:
+
+- **interactive**: `bash exp.sh` or `ONLY=2,3 bash exp.sh`
+- **sbatch**: `sbg --export=ALL,MODEL_SIZE=7b,ONLY=8,9 exp.sh` (partition/GPU/mem from your `sbg`/`sbg2` alias)
+
+`#SBATCH` headers at the top of `exp.sh` set log paths (`logs/exp_%j.out`). Override partition/time/gpus when submitting.
 
 | Site | Path | Env |
 |------|------|-----|
-| cluster (auto) | `~/sblee/dev_robosuite` | `conda activate m2m_caption32b` |
+| cluster (auto) | `~/sblee/dev_robosuite` | `y/envs/robosuite-vlm` via `activate_cluster_vlm.sh` |
 | local (auto) | `~/Downloads/workspace/dev_robosuite` | `micromamba activate robosuite` |
 
-Override: `EXP_SITE=local|cluster`, `SKIP_ENV=1` (already activated).
+Override: `SKIP_ENV=1` (already activated), `SKIP_GIT_PULL=1` (no `git pull` on cluster).
 
 ```bash
 bash exp.sh                              # manipulator full suite (32b)
-DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all   # Google Robot pilot-40
-SUMMARY=1 bash exp.sh                    # scores only
+DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all
+SUMMARY=1 bash exp.sh                    # Qwen 32B/7B/3B cross-model tables
 ONLY=1,2,3 bash exp.sh                   # subset
-MODEL_SIZE=gemini bash exp.sh            # Gemini API (source APIKEY.sh)
-MODEL_SIZE=7b bash exp.sh
+MODEL_SIZE=7b ONLY=8,9 bash exp.sh
 GENERATE=0 ONLY=2,3 bash exp.sh          # verify only (needs prior exp1/7 configs)
-ALL_MODELS=1 bash exp.sh                 # 32b → 7b → 3b, then summary
+ALL_MODELS=1 SUMMARY=1 bash exp.sh       # 32b → 7b → 3b, then summary
+
+# sbatch (cluster)
+sbg  --export=ALL,MODEL_SIZE=7b,ONLY=8,9,MOTION_PREPARE_MP4=0 exp.sh
+sbg2 --export=ALL,MODEL_SIZE=32b,ONLY=4,5,6,10,MOTION_PREPARE_PAIRWISE=0 exp.sh
+DOMAIN=google_robot sbg2 --export=ALL,MODEL_SIZE=32b exp.sh
 ```
 
 Motion media (exp8, exp10) — run once before verify if needed:
@@ -123,22 +131,6 @@ Motion media (exp8, exp10) — run once before verify if needed:
 bash scripts/prepare_pilot90_motion_mp4.sh
 bash scripts/prepare_pilot90_motion_pairwise_mp4.sh
 ONLY=8,9,10 bash exp.sh
-```
-
-### Direct Python CLI (optional)
-
-```bash
-python adhoc/generation/robotarm/exp.py all --summary
-python adhoc/generation/robotarm/generate_all.py --backend gemini
-python adhoc/generation/robotarm/generate_only_move.py --backend gemini --resume
-```
-
-### Motion media prep (exp8, exp10)
-
-```bash
-bash scripts/prepare_pilot90_motion_mp4.sh
-bash scripts/prepare_pilot90_motion_pairwise_mp4.sh
-ONLY=8,9,10 bash scripts/run_pilot90_qwen_suite.sh
 ```
 
 ---
