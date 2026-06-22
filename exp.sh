@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=exp
-#SBATCH --output=logs/exp_%j.out
-#SBATCH --error=logs/exp_%j.err
+#SBATCH --output=logs/exp_%j.log
+#SBATCH --error=logs/exp_%j.log
 #SBATCH --time=24:00:00
 #
+# Logs: logs/exp_<JOBID>.log  (stdout+stderr combined — tail this file)
 # Single entry point: interactive, salloc, and sbatch (partition/GPU via your alias).
 #
 #   bash exp.sh all
@@ -12,7 +13,7 @@
 #   ALL_MODELS=1 SUMMARY=1 bash exp.sh
 #   DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all
 #
-# Cluster sbatch (pass partition/mem/gpus on the command line):
+# Cluster sbatch (partition/GPU via your sbg/sbg2 alias):
 #   sbg  --export=ALL,MODEL_SIZE=7b,ONLY=8,9,MOTION_PREPARE_MP4=0 exp.sh
 #   sbg2 --export=ALL,MODEL_SIZE=32b,ONLY=4,5,6,10,MOTION_PREPARE_PAIRWISE=0 exp.sh
 #   sbgd --export=ALL,MODEL_SIZE=3b,ONLY=4,5,6,10 exp.sh
@@ -38,6 +39,21 @@ fi
 cd "${ROOT}"
 mkdir -p logs
 
+_on_err() {
+  local rc=$?
+  echo "[exp.sh] FATAL: exit $rc at line ${BASH_LINENO[0]}: ${BASH_COMMAND}" >&2
+  exit "$rc"
+}
+trap _on_err ERR
+
+_log_start() {
+  echo "================================================================"
+  echo "[exp.sh] start  time=$(date -Iseconds 2>/dev/null || date)"
+  echo "[exp.sh] job=${SLURM_JOB_ID:-interactive} partition=${SLURM_JOB_PARTITION:-?}"
+  echo "[exp.sh] submit=${SLURM_SUBMIT_DIR:-$ROOT} cwd=${ROOT}"
+  echo "[exp.sh] ONLY=${ONLY:-all} MODEL_SIZE=${MODEL_SIZE:-32b} DOMAIN=${DOMAIN:-robotarm}"
+  echo "================================================================"
+}
 _is_cluster() {
   [[ -n "${SLURM_JOB_ID:-}" ]] \
     || [[ -d /data/user_data ]] \
@@ -62,8 +78,12 @@ _setup_env() {
       source "${ROOT}/scripts/cluster_env.sh" "${HF_HOME:-/data/user_data/${USER}/hf_cache}"
     fi
     if [[ -f "${ROOT}/scripts/activate_cluster_vlm.sh" ]]; then
+      echo "[exp.sh] activating VLM env..."
       # shellcheck source=/dev/null
-      source "${ROOT}/scripts/activate_cluster_vlm.sh" "${ROOT}"
+      if ! source "${ROOT}/scripts/activate_cluster_vlm.sh" "${ROOT}"; then
+        echo "[exp.sh] FATAL: VLM env setup failed" >&2
+        exit 1
+      fi
     fi
     return 0
   fi
@@ -184,10 +204,17 @@ _run_once() {
     nvidia-smi || true
   fi
   echo "[exp.sh] ${cmd[*]}"
-  "${cmd[@]}"
+  if "${cmd[@]}"; then
+    echo "[exp.sh] === done OK ==="
+  else
+    local rc=$?
+    echo "[exp.sh] === failed exit $rc ===" >&2
+    exit "$rc"
+  fi
 }
 
 main() {
+  _log_start
   _setup_shell
   _setup_env
   if _is_cluster; then
