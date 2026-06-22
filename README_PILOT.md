@@ -105,7 +105,7 @@ source scripts/cluster_env.sh /data/user_data/$USER/hf_cache
 
 | Site | Path | Env |
 |------|------|-----|
-| cluster (auto) | `~/sblee/dev_robosuite` | `y/envs/robosuite-vlm` via `activate_cluster_vlm.sh` |
+| cluster (auto) | `~/sblee/dev_robosuite` | `robosuite-vlm` or fallback `m2m_caption32b` |
 | local (auto) | `~/Downloads/workspace/dev_robosuite` | `micromamba activate robosuite` |
 
 Override: `SKIP_ENV=1` (already activated), `SKIP_GIT_PULL=1` (no `git pull` on cluster).

@@ -14,8 +14,26 @@ ENV_NAME="${VLM_ENV_NAME:-robosuite-vlm}"
 ENV_BIN="$ROOT/y/envs/$ENV_NAME/bin"
 
 if [[ ! -x "$ENV_BIN/python" ]]; then
+  CONDA_SH="${CONDA_SH:-/data/user_data/${USER}/miniconda3/etc/profile.d/conda.sh}"
+  FALLBACK_ENV="${CONDA_FALLBACK_ENV:-m2m_caption32b}"
+  if [[ -f "$CONDA_SH" ]]; then
+  # shellcheck disable=SC1090
+    source "$CONDA_SH"
+    if conda activate "$FALLBACK_ENV" 2>/dev/null; then
+      echo "[env] robosuite-vlm missing — using conda fallback: $FALLBACK_ENV" >&2
+      echo "[env] python=$(command -v python)"
+      python - <<'PY' || true
+import torch
+print(f"[env] torch={torch.__version__} cuda_available={torch.cuda.is_available()}")
+if torch.cuda.is_available():
+    print(f"[env] gpu={torch.cuda.get_device_name(0)}")
+PY
+      return 0 2>/dev/null || exit 0
+    fi
+  fi
   echo "Missing VLM env: $ENV_BIN/python" >&2
   echo "  Create with: micromamba create -p $ROOT/y/envs/$ENV_NAME python=3.10 -y" >&2
+  echo "  Or use existing conda: CONDA_FALLBACK_ENV=m2m_caption32b bash exp.sh" >&2
   echo "  Then on a GPU node: bash scripts/install_vlm_transformers.sh" >&2
   return 1 2>/dev/null || exit 1
 fi
