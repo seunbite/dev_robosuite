@@ -75,6 +75,7 @@ def experiment_specs(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: str
         if eid in _SKIP_SUITE:
             continue
         kind = {
+            "0": "full_generation",
             "1": "pose_generation_score",
             "2": "pose_verify_vlm",
             "3": "pose_verify_text",
@@ -89,7 +90,7 @@ def experiment_specs(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: str
             "A": "pose_plausibility_groups",
             "B": "pose_representative_pick",
         }[eid]
-        tag = model_tag_gen if eid in {"1", "7", "7_1"} else model_tag_verify
+        tag = model_tag_gen if eid in {"0", "1", "7", "7_1"} else model_tag_verify
         if eid in {"A", "B"}:
             tag = model_tag_gen
         spec: dict[str, Any] = {
@@ -100,7 +101,7 @@ def experiment_specs(model_tag_gen: str = DEFAULT_GEN_TAG, model_tag_verify: str
             "prompt": str(prompt_exp_path(eid).relative_to(_REPO)),
             "html": str(html_result_path(eid, tag).relative_to(_REPO)),
         }
-        if eid in {"1", "7", "7_1"}:
+        if eid in {"0", "1", "7", "7_1"}:
             spec["result_config"] = str(result_config_path(eid, tag).relative_to(_REPO))
             spec["score_json"] = str(score_result_path(eid, tag).relative_to(_REPO))
         elif eid in {"2", "3", "4", "5", "6", "8", "9", "10", "A", "B"}:

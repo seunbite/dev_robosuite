@@ -13,6 +13,8 @@ PROMPT_EXP_DIR = _REPO / "data/seed/prompt" / ROBOT / "exp"
 PROMPT_LEGACY_DIR = _REPO / "data/seed/prompt" / ROBOT
 SHOTS = _REPO / "data/seed/shots" / ROBOT / "shot_configs_pilot40_mobile.json"
 FEWSHOT_SHOTS = _REPO / "data/seed/shots" / ROBOT / "diverse_shots_mobile.json"
+SHOT_CUE_SET = _REPO / "data/seed/shots" / ROBOT / "shot_configs_19_mobile.json"
+CONTEXT_VARIATION_YML = _REPO / "data/seed/yml/context_variation_google_robot.yml"
 CUES_YAML = _REPO / "data/seed/yml/_cues_new.yml"
 MANIFEST_TSV = _REPO / "data/seed/yml/pilot100_manifest.tsv"
 GT_PATH = _REPO / "data/seed/groundtruth" / "gt_google_robot.json"
@@ -29,6 +31,8 @@ TOPK_GRID_DIR = _REPO / "data/results/visualize/google_robot/pose_topk_gemini"
 RESULT_CFG_DIR = _REPO / "data/results/motion_configs" / ROBOT / "exp"
 VERIFY_EXP_DIR = _REPO / "data/results/verify" / ROBOT / "exp"
 HTML_EXP_DIR = _REPO / "data/results/html" / ROBOT
+CONTEXT_VARIATION_OUT = _REPO / "data/results/paper_figures/context_variation_google_robot"
+CONTEXT_VARIATION_INPUT_HTML = HTML_EXP_DIR / "exp12_context_variation_input.html"
 
 # Legacy flat paths (pre-refactor)
 LEGACY_VERIFY_DIR = _REPO / "data/results/verify" / ROBOT
@@ -39,6 +43,7 @@ DEFAULT_GEN_TAG = "mobile-map"
 DEFAULT_VERIFY_TAG = "gemini-2.5-flash"
 
 EXPERIMENT_TITLES: dict[str, str] = {
+    "0": "Full choreography generation (pose + movement, exp0 prompt)",
     "1": "Pose generation vs human GT (mobile map)",
     "2": "Pose verify + regenerate — VLM (PNG)",
     "3": "Pose verify + regenerate — text",
@@ -46,20 +51,27 @@ EXPERIMENT_TITLES: dict[str, str] = {
     "5": "Pose pairwise (VLM) — multitile grid 6",
     "6": "Pose pairwise (VLM) — multitile grid 12",
     "7": "Movement generation vs component GT",
+    "7_1": "Movement generation vs component GT (fixed-pose image + tail)",
     "8": "Movement verify + regenerate — VLM (MP4)",
     "9": "Movement verify + regenerate — text",
     "10": "Movement pairwise (VLM — MP4)",
+    "12": "Context variation (persona + scenario)",
+    "A": "Pose plausibility — per-tile VLM (12 dir×orient groups)",
+    "B": "Representative pose pick — exp1 GT-correct pool tiles",
 }
 
-GENERATION_EXPS = frozenset({"1", "7"})
+GENERATION_EXPS = frozenset({"0", "1", "7", "7_1"})
 CONFIG_INPUT_EXPS: dict[str, str] = {
+    "0": "0",
     "1": "1",
     "2": "1",
     "3": "1",
     "7": "7",
+    "7_1": "7_1",
     "8": "7",
     "9": "7",
     "10": "7",
+    "B": "1",
 }
 
 PROMPT_LEGACY_MAP: dict[str, str] = {
@@ -76,8 +88,16 @@ PROMPT_LEGACY_MAP: dict[str, str] = {
 }
 
 
+FIXED_POSE_PNG_DIR = _REPO / "data/results/render/google_robot/fixed_pose_png"
+
+
 def prompt_exp_path(exp_id: str | int) -> Path:
-    return PROMPT_EXP_DIR / f"prompt_exp{int(exp_id)}.txt"
+    eid = str(exp_id).strip().replace(".", "_")
+    if eid.upper() in {"A", "B"}:
+        return PROMPT_EXP_DIR / f"prompt_exp{eid.upper()}.txt"
+    if eid in {"7_1"} or "_" in eid:
+        return PROMPT_EXP_DIR / f"prompt_exp{eid}.txt"
+    return PROMPT_EXP_DIR / f"prompt_exp{int(eid)}.txt"
 
 
 def model_to_tag(model: str) -> str:
@@ -89,23 +109,36 @@ def model_to_tag(model: str) -> str:
         return m.replace("/", "-")
     if "32b" in low:
         return "qwen32b"
+    if "7b" in low:
+        return "qwen7b"
+    if "3b" in low:
+        return "qwen3b"
     return re.sub(r"[^a-zA-Z0-9._-]+", "_", m)
 
 
 def result_config_path(exp_id: str | int, model_tag: str) -> Path:
-    return RESULT_CFG_DIR / f"result_exp{int(exp_id)}_{model_tag}.json"
+    return RESULT_CFG_DIR / f"result_exp{_exp_slug(exp_id)}_{model_tag}.json"
+
+
+def _exp_slug(exp_id: str | int) -> str:
+    eid = str(exp_id).strip().replace(".", "_")
+    if eid.upper() in {"A", "B"}:
+        return eid.upper()
+    if "_" in eid:
+        return eid
+    return str(int(eid))
 
 
 def verify_result_path(exp_id: str | int, model_tag: str) -> Path:
-    return VERIFY_EXP_DIR / f"result_exp{int(exp_id)}_{model_tag}.json"
+    return VERIFY_EXP_DIR / f"result_exp{_exp_slug(exp_id)}_{model_tag}.json"
 
 
 def score_result_path(exp_id: str | int, model_tag: str) -> Path:
-    return VERIFY_EXP_DIR / f"score_exp{int(exp_id)}_{model_tag}.json"
+    return VERIFY_EXP_DIR / f"score_exp{_exp_slug(exp_id)}_{model_tag}.json"
 
 
 def html_result_path(exp_id: str | int, model_tag: str) -> Path:
-    return HTML_EXP_DIR / f"exp{int(exp_id)}_{model_tag}.html"
+    return HTML_EXP_DIR / f"exp{_exp_slug(exp_id)}_{model_tag}.html"
 
 
 def config_for_experiment(exp_id: str | int, model_tag: str) -> Path:

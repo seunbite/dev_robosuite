@@ -104,7 +104,7 @@ def _gemini_client(model: str) -> Any:
 
 def _maybe_generate(spec: dict[str, Any], args: argparse.Namespace) -> None:
     eid = spec["id"]
-    if eid not in {"1", "7", "7_1"}:
+    if eid not in {"0", "1", "7", "7_1"}:
         return
     if os.getenv("GENERATE", "1") == "0":
         return

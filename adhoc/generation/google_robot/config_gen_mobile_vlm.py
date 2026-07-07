@@ -12,6 +12,7 @@ from typing import Any
 
 import yaml
 
+from adhoc.generation.google_robot.mobile_pose_normalize import normalize_config_row
 from pilot40_paths import (
     CUES_YAML,
     FEWSHOT_SHOTS,
@@ -113,22 +114,38 @@ def _vllm_json_hint(backend: str) -> str:
     )
 
 
-def _llm_generate(prompt: str, *, model: str, backend: str = "gemini", vlm: Any | None = None) -> str:
+def _llm_generate(
+    prompt: str,
+    *,
+    model: str,
+    backend: str = "gemini",
+    vlm: Any | None = None,
+    images: list[Any] | None = None,
+) -> str:
     if vlm is not None:
-        return vlm.generate(prompt)
+        return vlm.generate(prompt, images=images)
     if backend.lower() == "gemini":
+        import io
+
         from google import genai
+        from google.genai import types
 
         key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
         if not key:
             raise RuntimeError("Set GOOGLE_API_KEY or GEMINI_API_KEY")
         client = genai.Client(api_key=key)
-        resp = client.models.generate_content(model=model, contents=prompt)
+        parts: list[Any] = []
+        for img in images or []:
+            buf = io.BytesIO()
+            img.convert("RGB").save(buf, format="PNG")
+            parts.append(types.Part.from_bytes(data=buf.getvalue(), mime_type="image/png"))
+        parts.append(prompt)
+        resp = client.models.generate_content(model=model, contents=parts)
         return (resp.text or "").strip()
     from vlm_client import VLMClient
 
     client = VLMClient(backend=backend, model=model)
-    return client.generate(prompt)
+    return client.generate(prompt, images=images)
 
 
 def _llm_generate_many(
@@ -160,6 +177,14 @@ def _mobile_pose_from_gt_pair(d: str, g: str, ref: dict[str, Any] | None = None)
     }
 
 
+from parse_pose_gt_mobile import mobile_fixed_pose_from_gt_row  # noqa: E402
+
+
+def google_robot_gt_fixed_pose(gt_row: dict[str, Any]) -> dict[str, Any]:
+    """Map gt_google_robot.json mobile pose GT → exp7 fixed start pose."""
+    return mobile_fixed_pose_from_gt_row(gt_row)
+
+
 def _fixed_pose_step(pose_fields: dict[str, Any], *, duration: float = 0.5) -> dict[str, Any]:
     return {
         "type": "pose",
@@ -173,6 +198,18 @@ def _strip_leading_poses(movements: list[dict[str, Any]]) -> list[dict[str, Any]
     while out and out[0].get("type") == "pose":
         out.pop(0)
     return out
+
+
+def _build_exp0_prompt(*, cue: str, backend: str, prompt_path: Path | None = None) -> str:
+    """Full config: exp1 pose rules + exp7 movement/path rules (for correction inner prompt)."""
+    ppath = prompt_path or prompt_exp_path(0)
+    template = ppath.read_text(encoding="utf-8")
+    return (
+        template.replace("{{CUE_CATALOG}}", _cue_catalog(cue=cue, backend=backend))
+        .replace("{{FEW_SHOT_EXAMPLES}}", _fewshot_block(backend=backend))
+        .replace("{{CUE_NAME}}", cue)
+        + _vllm_json_hint(backend)
+    )
 
 
 def _build_exp1_prompt(*, cue: str, backend: str, prompt_path: Path | None = None) -> str:
@@ -206,6 +243,104 @@ def _build_exp7_prompt(
     )
 
 
+def _build_exp7_1_prompt(
+    *,
+    cue: str,
+    description: str,
+    fixed_pose: dict[str, Any],
+    backend: str,
+    prompt_path: Path | None = None,
+) -> str:
+    ppath = prompt_path or prompt_exp_path("7_1")
+    template = ppath.read_text(encoding="utf-8")
+    return (
+        template.replace("{{FEW_SHOT_EXAMPLES}}", _fewshot_block(max_examples=4, backend=backend))
+        .replace("{{FIXED_FIRST_POSE_JSON}}", json.dumps(fixed_pose, ensure_ascii=False, indent=2))
+        .replace("{{FIXED_START_POSE_JSON}}", json.dumps(fixed_pose, ensure_ascii=False, indent=2))
+        .replace("{{CUE_NAME}}", cue)
+        .replace("{{CUE_DESCRIPTION}}", description)
+        + _vllm_json_hint(backend)
+    )
+
+
+def generate_exp0_row(
+    *,
+    cue: str,
+    cue_idx: int,
+    description: str,
+    model: str,
+    backend: str = "gemini",
+    vlm: Any | None = None,
+    out_path: Path | None = None,
+    prompt_path: Path | None = None,
+    raw_override: str | None = None,
+    extra_prompt_suffix: str | None = None,
+) -> dict[str, Any]:
+    """Full choreography generation (pose + movement) via prompt_exp0.txt."""
+    from adhoc.generation.google_robot.legacy.config_gen_single_mobile import (  # noqa: WPS433
+        _extract_reasoning_and_json,
+        _sanitize_model_output,
+        _validate_config,
+        _validate_reasoning,
+    )
+
+    require_reasoning = _require_planning_comments(backend, env_key="EXP0_REQUIRE_REASONING")
+    max_attempts = 3 if _is_local_backend(backend) else 2
+    prompt = _build_exp0_prompt(cue=cue, backend=backend, prompt_path=prompt_path)
+    if extra_prompt_suffix:
+        prompt = prompt.rstrip() + "\n\n" + extra_prompt_suffix.strip() + "\n"
+    validation_errors: list[str] = []
+    reasoning_text = ""
+    parsed: dict[str, Any] | None = None
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    for attempt in range(max_attempts):
+        if raw_override is not None and attempt == 0:
+            raw = _sanitize_model_output(raw_override)
+            raw_override = None
+        else:
+            attempt_prompt = prompt
+            if attempt > 0 and validation_errors:
+                attempt_prompt += "\n\n# Fix these issues:\n" + "\n".join(
+                    f"# - {e}" for e in validation_errors
+                )
+            raw = _sanitize_model_output(_llm_generate(attempt_prompt, model=model, backend=backend, vlm=vlm))
+        try:
+            reasoning_text, parsed = _extract_reasoning_and_json(raw)
+        except (json.JSONDecodeError, ValueError) as e:
+            validation_errors = [f"JSON parse failed: {e}"]
+            if not raw.strip():
+                validation_errors.append("model returned empty output")
+            else:
+                validation_errors.append(f"raw preview: {raw[:240]!r}")
+            continue
+        validation_errors = list(_validate_reasoning(reasoning_text)) if require_reasoning else []
+        validation_errors.extend(_validate_config(parsed))
+        if not validation_errors:
+            break
+
+    if parsed is None:
+        raise ValueError(f"exp0 failed for {cue}: {validation_errors}")
+
+    row = {
+        "idx": cue_idx,
+        "cue": cue,
+        "description": parsed.get("description") or description,
+        "movements": parsed.get("movements") or [],
+        "state": "exp0_full_generation",
+        "model": model,
+        "time": now,
+        "experiment": "exp0",
+        "generation_valid": True,
+    }
+    if reasoning_text:
+        row["reasoning"] = reasoning_text
+    row = normalize_config_row(row)
+    if out_path is not None:
+        upsert_config_row(out_path, row)
+    return row
+
+
 def generate_exp1_row(
     *,
     cue: str,
@@ -217,6 +352,7 @@ def generate_exp1_row(
     out_path: Path | None = None,
     prompt_path: Path | None = None,
     raw_override: str | None = None,
+    extra_prompt_suffix: str | None = None,
 ) -> dict[str, Any]:
     from adhoc.generation.google_robot.legacy.config_gen_single_mobile import (  # noqa: WPS433
         _extract_reasoning_and_json,
@@ -228,6 +364,8 @@ def generate_exp1_row(
     require_reasoning = _require_planning_comments(backend, env_key="EXP1_REQUIRE_REASONING")
     max_attempts = 3 if _is_local_backend(backend) else 2
     prompt = _build_exp1_prompt(cue=cue, backend=backend, prompt_path=prompt_path)
+    if extra_prompt_suffix:
+        prompt = prompt.rstrip() + "\n\n" + extra_prompt_suffix.strip() + "\n"
     validation_errors: list[str] = []
     reasoning_text = ""
     parsed: dict[str, Any] | None = None
@@ -274,6 +412,7 @@ def generate_exp1_row(
     }
     if reasoning_text:
         row["reasoning"] = reasoning_text
+    row = normalize_config_row(row)
     if out_path is not None:
         upsert_config_row(out_path, row)
     return row
@@ -285,6 +424,7 @@ def generate_exp7_row(
     cue_idx: int,
     description: str,
     fixed_pose: dict[str, Any],
+    pose_gt: str = "",
     model: str,
     backend: str = "gemini",
     vlm: Any | None = None,
@@ -339,7 +479,7 @@ def generate_exp7_row(
             "cue": cue,
             "movements": [_fixed_pose_step(fixed_pose)] + tail,
         }
-        validation_errors = list(_validate_reasoning(reasoning_text)) if require_reasoning else []
+        validation_errors = list(_validate_reasoning(reasoning_text, required=("Q1", "Q2", "Q3"))) if require_reasoning else []
         validation_errors.extend(_validate_config(full))
         if not tail:
             validation_errors.append("exp7 produced empty movement tail")
@@ -361,8 +501,125 @@ def generate_exp7_row(
         "generation_valid": True,
         "gt_fixed_first_pose": fixed_pose,
     }
+    if pose_gt:
+        row["pose_gt"] = pose_gt
     if reasoning_text:
         row["reasoning"] = reasoning_text
+    row = normalize_config_row(row)
+    if out_path is not None:
+        upsert_config_row(out_path, row)
+    return row
+
+
+def generate_exp7_1_row(
+    *,
+    cue: str,
+    cue_idx: int,
+    description: str,
+    fixed_pose: dict[str, Any],
+    pose_gt: str = "",
+    model: str,
+    backend: str = "gemini",
+    vlm: Any | None = None,
+    out_path: Path | None = None,
+    prompt_path: Path | None = None,
+    raw_override: str | None = None,
+    render_env: Any | None = None,
+    pose_png_dir: Path | None = None,
+) -> dict[str, Any]:
+    from adhoc.generation.google_robot.legacy.config_gen_single_mobile import (  # noqa: WPS433
+        _extract_reasoning_and_json,
+        _sanitize_model_output,
+        _validate_config,
+        _validate_reasoning,
+    )
+    from fixed_pose_render import ensure_fixed_pose_png  # noqa: WPS433
+    from pilot40_paths import FIXED_POSE_PNG_DIR  # noqa: WPS433
+
+    require_reasoning = _require_planning_comments(backend, env_key="EXP7_REQUIRE_REASONING")
+    max_attempts = 3 if _is_local_backend(backend) else 2
+    prompt = _build_exp7_1_prompt(
+        cue=cue,
+        description=description,
+        fixed_pose=fixed_pose,
+        backend=backend,
+        prompt_path=prompt_path,
+    )
+    png_path, pose_img = ensure_fixed_pose_png(
+        fixed_pose,
+        cue=cue,
+        cue_idx=cue_idx,
+        png_dir=pose_png_dir or FIXED_POSE_PNG_DIR,
+        env=render_env,
+        force=os.getenv("FORCE_POSE_PNG", "0") == "1",
+    )
+    validation_errors: list[str] = []
+    reasoning_text = ""
+    tail: list[dict[str, Any]] = []
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    for attempt in range(max_attempts):
+        if raw_override is not None and attempt == 0:
+            raw = _sanitize_model_output(raw_override)
+            raw_override = None
+        else:
+            attempt_prompt = prompt
+            if attempt > 0 and validation_errors:
+                attempt_prompt += "\n\n# Fix these issues:\n" + "\n".join(
+                    f"# - {e}" for e in validation_errors
+                )
+            raw = _sanitize_model_output(
+                _llm_generate(
+                    attempt_prompt,
+                    model=model,
+                    backend=backend,
+                    vlm=vlm,
+                    images=[pose_img],
+                )
+            )
+        try:
+            reasoning_text, parsed = _extract_reasoning_and_json(raw)
+        except (json.JSONDecodeError, ValueError) as e:
+            validation_errors = [f"JSON parse failed: {e}"]
+            if not raw.strip():
+                validation_errors.append("model returned empty output")
+            else:
+                validation_errors.append(f"raw preview: {raw[:240]!r}")
+            continue
+        tail = parsed.get("movements") or parsed.get("movement_component") or []
+        tail = _strip_leading_poses(tail)
+        full = {
+            "cue": cue,
+            "movements": [_fixed_pose_step(fixed_pose)] + tail,
+        }
+        validation_errors = list(_validate_reasoning(reasoning_text, required=("Q1", "Q2", "Q3"))) if require_reasoning else []
+        validation_errors.extend(_validate_config(full))
+        if not tail:
+            validation_errors.append("exp7_1 produced empty movement tail")
+        if not validation_errors:
+            break
+
+    if validation_errors:
+        raise ValueError(f"exp7_1 failed for {cue}: {validation_errors}")
+
+    row = {
+        "idx": cue_idx,
+        "cue": cue,
+        "description": description,
+        "movements": [_fixed_pose_step(fixed_pose)] + tail,
+        "state": "exp7_1_movement_generation",
+        "model": model,
+        "time": now,
+        "experiment": "exp7_1",
+        "generation_valid": True,
+        "gt_fixed_first_pose": fixed_pose,
+        "fixed_pose_png": str(png_path),
+    }
+    if pose_gt:
+        row["pose_gt"] = pose_gt
+    if reasoning_text:
+        row["reasoning"] = reasoning_text
+    row = normalize_config_row(row)
     if out_path is not None:
         upsert_config_row(out_path, row)
     return row
@@ -440,31 +697,33 @@ def run_exp_generation(
             "description": description,
             "shot_row": shots_by_cue.get(cue, {}),
         }
-        if exp_id == "7":
-            ev = gt_row
-            gt_pairs = _parse_gt_poses(str(ev.get("pose_gt") or ev.get("groundtruth", "")))
-            ref_pose = {}
-            for step in (shots_by_cue.get(cue) or {}).get("movements") or []:
-                if step.get("type") == "pose":
-                    ref_pose = (step.get("parameters") or {}).get("pose") or {}
-                    break
-            if gt_pairs:
-                d, g = gt_pairs[0]
-                fixed = _mobile_pose_from_gt_pair(d, g, ref_pose)
-            else:
-                fixed = ref_pose or {
-                    "torso_height": "mid",
-                    "arm_position": "front",
-                    "gripper_orientation": "horizontal",
-                    "head": "center",
-                }
-            item["fixed_pose"] = fixed
+        if exp_id in {"7", "7_1"}:
+            item["fixed_pose"] = google_robot_gt_fixed_pose(gt_row)
+            item["pose_gt"] = str(gt_row.get("pose_gt") or gt_row.get("groundtruth") or "")
         work.append(item)
+
+    render_env = None
+    if exp_id == "7_1":
+        from adhoc.generation.google_robot.legacy import _make_env  # noqa: WPS433
+
+        render_env = _make_env()
+        print("[gen] exp7_1: shared render env for fixed-pose PNGs", flush=True)
 
     def _run_one(item: dict[str, Any], *, raw_override: str | None = None) -> None:
         cue = item["cue"]
         try:
-            if exp_id == "1":
+            if exp_id == "0":
+                generate_exp0_row(
+                    cue=cue,
+                    cue_idx=item["cue_idx"],
+                    description=item["description"],
+                    model=model,
+                    backend=backend,
+                    vlm=vlm,
+                    out_path=out_path,
+                    raw_override=raw_override,
+                )
+            elif exp_id == "1":
                 generate_exp1_row(
                     cue=cue,
                     cue_idx=item["cue_idx"],
@@ -481,11 +740,26 @@ def run_exp_generation(
                     cue_idx=item["cue_idx"],
                     description=item["description"],
                     fixed_pose=item["fixed_pose"],
+                    pose_gt=item.get("pose_gt", ""),
                     model=model,
                     backend=backend,
                     vlm=vlm,
                     out_path=out_path,
                     raw_override=raw_override,
+                )
+            elif exp_id == "7_1":
+                generate_exp7_1_row(
+                    cue=cue,
+                    cue_idx=item["cue_idx"],
+                    description=item["description"],
+                    fixed_pose=item["fixed_pose"],
+                    pose_gt=item.get("pose_gt", ""),
+                    model=model,
+                    backend=backend,
+                    vlm=vlm,
+                    out_path=out_path,
+                    raw_override=raw_override,
+                    render_env=render_env,
                 )
             else:
                 raise ValueError(f"Unsupported generation exp: {exp_id}")
@@ -493,14 +767,12 @@ def run_exp_generation(
         except Exception as e:
             print(f"[gen] exp{exp_id} FAIL {cue}: {e}", flush=True)
 
-    i = 0
-    while i < len(work):
-        chunk = work[i : i + batch_size]
-        i += len(chunk)
-        if batch_size > 1 and vlm is not None and len(chunk) > 1:
-            if exp_id == "1":
-                prompts = [_build_exp1_prompt(cue=item["cue"], backend=backend) for item in chunk]
-            else:
+    try:
+        i = 0
+        while i < len(work):
+            chunk = work[i : i + batch_size]
+            i += len(chunk)
+            if batch_size > 1 and vlm is not None and len(chunk) > 1 and exp_id == "7":
                 prompts = [
                     _build_exp7_prompt(
                         cue=item["cue"],
@@ -510,13 +782,18 @@ def run_exp_generation(
                     )
                     for item in chunk
                 ]
-            raws = _llm_generate_many(prompts, model=model, backend=backend, vlm=vlm)
-            for item, raw in zip(chunk, raws):
-                _run_one(item, raw_override=raw)
-                if delay > 0:
-                    time.sleep(delay)
-        else:
-            for item in chunk:
-                _run_one(item)
-                if delay > 0:
-                    time.sleep(delay)
+                raws = _llm_generate_many(prompts, model=model, backend=backend, vlm=vlm)
+                for item, raw in zip(chunk, raws):
+                    _run_one(item, raw_override=raw)
+                    if delay > 0:
+                        time.sleep(delay)
+            else:
+                for item in chunk:
+                    _run_one(item)
+                    if delay > 0:
+                        time.sleep(delay)
+    finally:
+        if render_env is not None:
+            closer = getattr(render_env, "close", None)
+            if callable(closer):
+                closer()
