@@ -7,23 +7,19 @@ from typing import Any
 
 _REPO = Path(__file__).resolve().parents[2]
 _ROBOTARM = _REPO / "adhoc/generation/robotarm"
-if str(_ROBOTARM) not in sys.path:
-    sys.path.insert(0, str(_ROBOTARM))
+_GOOGLE = _REPO / "adhoc/generation/google_robot"
+for p in (_ROBOTARM, _GOOGLE):
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
 
-from pilot40_experiment_suite import _parse_gt_poses  # noqa: E402
+from parse_pose_gt_mobile import (  # noqa: E402
+    human_gt_pose_ok,
+    pose_generation_correct_any_mobile,
+)
 from score_pilot40_motion_gt_components import (  # noqa: E402
     _tail_matches_component,
     _tail_steps,
 )
-
-_ARM_TO_DIR = {
-    "front": "front",
-    "back": "back",
-    "in": "right",
-    "out": "left",
-    "up": "up",
-    "down": "down",
-}
 
 _AXIS_TO_CART = {
     "pitch": "x",
@@ -32,32 +28,6 @@ _AXIS_TO_CART = {
     "pan": "y",
     "height": "z",
 }
-
-
-def mobile_pose_to_dir_grip(pose: dict[str, Any]) -> dict[str, str]:
-    arm = str(pose.get("arm_position", "")).strip().lower()
-    return {
-        "dir": _ARM_TO_DIR.get(arm, arm),
-        "gripper_orientation": str(pose.get("gripper_orientation", "")).strip().lower(),
-    }
-
-
-def pose_generation_correct_any_mobile(row: dict[str, Any], groundtruth: str) -> bool | None:
-    """Any pose step in config may match any listed GT (dir, grip) pair."""
-    poses: list[dict[str, str]] = []
-    for step in row.get("movements") or []:
-        if step.get("type") != "pose":
-            continue
-        pose = (step.get("parameters") or {}).get("pose") or {}
-        if pose.get("arm_position") and pose.get("gripper_orientation"):
-            poses.append(mobile_pose_to_dir_grip(pose))
-    if not groundtruth or not poses:
-        return None
-    targets = _parse_gt_poses(groundtruth.strip())
-    if not targets:
-        return None
-    gen_set = {(p["dir"], p["gripper_orientation"]) for p in poses}
-    return any(t in gen_set for t in targets)
 
 
 def _normalize_mobile_step(step: dict[str, Any]) -> dict[str, Any]:
