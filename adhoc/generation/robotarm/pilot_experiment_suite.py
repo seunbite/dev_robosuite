@@ -52,11 +52,11 @@ EXPERIMENT_SPECS: list[dict[str, Any]] = [
         "out_name": "exp5_temporal_multitile.json",
     },
     {
-        "id": "6_google_robot_compare40",
-        "title": "Google Robot pose compare (~40 cues)",
-        "kind": "google_robot",
+        "id": "6_tiago_compare40",
+        "title": "Tiago pose compare (~40 cues)",
+        "kind": "tiago",
         "limit": 40,
-        "out_name": "exp6_google_robot_compare40.json",
+        "out_name": "exp6_tiago_compare40.json",
     },
     {
         "id": "7_multitile_pilot100",
@@ -196,7 +196,7 @@ def metrics_from_json(path: Path, spec: dict[str, Any]) -> dict[str, Any]:
             "headline": headline,
         }
 
-    if kind == "google_robot":
+    if kind == "tiago":
         results = data.get("results") or []
         skipped = sum(1 for r in results if r.get("skipped"))
         scored = [r for r in results if r.get("vlm_winner") is not None]

@@ -1,0 +1,72 @@
+[
+  {
+    "idx": 22,
+    "cue": "circle_temple_crazy",
+    "description": "The robot first points forward in an accusatory gesture, gives a small reinforcing jab, then moves its hand to its temple and makes two clear circles to signify 'crazy'.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 70,
+            "y": -35,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 2.5,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 55,
+            "y": -45,
+            "z": 75,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.8,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "yz",
+          "radius": 0.06,
+          "sweep": 720,
+          "speed": 1.8,
+          "direction": "cw"
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-08T08:45:07",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q1: No, the motion lacks the essential accusatory pointing gesture and the circular motion is too small and fast to be readable as the \"crazy\" sign.",
+    "correction_q2": "Correction Q2: The sequence should be recomposed to first establish a clear, held point towards the viewer, then transition to a pose beside the temple, and finally execute a larger, more moderately paced circular path in the correct plane (yz) to be clearly legible.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: No, the motion lacks the essential accusatory pointing gesture and the circular motion is too small and fast to be readable as the \"crazy\" sign.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The sequence should be recomposed to first establish a clear, held point towards the viewer, then transition to a pose beside the temple, and finally execute a larger, more moderately paced circular path in the correct plane (yz) to be clearly legible.\n\n# Q1: How would a human perform this motion? (One sentence)\n# A human would point at another person to establish the subject ('you'), then bring their index finger to their temple and make one or two small circles.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\n# Q2: candidates=P1) front+vertical at x:70,y:-35,z:60, P2) up+horizontal at x:50,y:-40,z:75; winner=P1 because the 'front' direction is critical for the initial accusatory point, and the 'vertical' orientation mimics an upright pointing finger.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n# Q3: options=M1) pose(point)>movement(jab)>pose(temple)>path(circle), M2) pose(temple)>path(circle); winner=M1 because separating the accusation (point+jab) from the sign (circle at temple) creates a clear narrative sequence essential for this cue's meaning.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n# Q4: options=C1) a sharp forward jab after pointing, C2) a final hold pose after the circle; winner=C1 because the jab emphasizes the \"you\" part of \"you are crazy\", strengthening the context for the circling motion that follows."
+  }
+]

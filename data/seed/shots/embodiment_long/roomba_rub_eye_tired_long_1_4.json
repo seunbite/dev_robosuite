@@ -1,0 +1,478 @@
+{
+  "schema": "long_fewshot.schema.json",
+  "design": {
+    "baseline": "Every level independently starts from the same original core; no level is extended from a previous long level.",
+    "level_mapping": {
+      "long1": "Corrected version of the existing natural contextual long.",
+      "long2": "Original plus 1-2 count-controlled contextual submotions.",
+      "long3": "Original plus 3-4 count-controlled contextual submotions.",
+      "long4": "Original plus 5-6 count-controlled contextual submotions."
+    }
+  },
+  "examples": [
+    {
+      "id": "roomba_rub_eye_tired_long1",
+      "cue": "rub_eye_tired",
+      "platform": "roomba",
+      "level": "long1",
+      "description": "Starting from the unchanged tight repeated-circle core, add two PRE submotions: (1) rotate in place to orient as if attention is fading, then (2) creep forward slowly as a tired approach. The core remains component 3.",
+      "added_submotion_target": {
+        "policy": "corrected_natural_long",
+        "min": 2,
+        "max": 2
+      },
+      "added_submotions": [
+        {
+          "component_index": 1,
+          "position": "before_core",
+          "description": "Rotate 90 degrees in place to establish a sluggish attention shift."
+        },
+        {
+          "component_index": 2,
+          "position": "before_core",
+          "description": "Creep forward 0.05 m to frame the robot as tired before the rubbing proxy."
+        }
+      ],
+      "configs": {
+        "original": {
+          "source_code": "path(base, arc, r=0.05, deg=360, spd=0.4, rep=3)",
+          "movements": [
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.4,
+                  "repetition": 3,
+                  "radius": 0.05,
+                  "degrees": 360.0
+                }
+              }
+            }
+          ]
+        },
+        "result": {
+          "source_code": "path(base, arc, r=0, deg=90, spd=1.5) + path(base, line, x=0.05, spd=0.3) + path(base, arc, r=0.05, deg=360, spd=0.4, rep=3)",
+          "movements": [
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 1.5,
+                  "radius": 0.0,
+                  "degrees": 90.0
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.3,
+                  "x": 0.05
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.4,
+                  "repetition": 3,
+                  "radius": 0.05,
+                  "degrees": 360.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "main_component_range": {
+        "start": 3,
+        "end": 3,
+        "indexing": "1-based-inclusive",
+        "contract": "Components in this range must preserve the original core semantics; context may be inserted only outside this range."
+      }
+    },
+    {
+      "id": "roomba_rub_eye_tired_long2",
+      "cue": "rub_eye_tired",
+      "platform": "roomba",
+      "level": "long2",
+      "description": "Starting from the same original, add exactly two PRE submotions: (1) pause motionless as a fatigue beat and (2) drift forward slowly. The repeated tight-circle core is unchanged at component 3.",
+      "added_submotion_target": {
+        "policy": "count_controlled",
+        "min": 1,
+        "max": 2
+      },
+      "added_submotions": [
+        {
+          "component_index": 1,
+          "position": "before_core",
+          "description": "Pause for 1.2 s to create a readable low-energy beat."
+        },
+        {
+          "component_index": 2,
+          "position": "before_core",
+          "description": "Drift forward 0.06 m slowly before executing the core."
+        }
+      ],
+      "configs": {
+        "original": {
+          "source_code": "path(base, arc, r=0.05, deg=360, spd=0.4, rep=3)",
+          "movements": [
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.4,
+                  "repetition": 3,
+                  "radius": 0.05,
+                  "degrees": 360.0
+                }
+              }
+            }
+          ]
+        },
+        "result": {
+          "source_code": "path(base, line, x=0, spd=0.2, hold=1.2) + path(base, line, x=0.06, spd=0.25) + path(base, arc, r=0.05, deg=360, spd=0.4, rep=3)",
+          "movements": [
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.2,
+                  "x": 0.0,
+                  "hold_time": 1.2
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.25,
+                  "x": 0.06
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.4,
+                  "repetition": 3,
+                  "radius": 0.05,
+                  "degrees": 360.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "main_component_range": {
+        "start": 3,
+        "end": 3,
+        "indexing": "1-based-inclusive",
+        "contract": "Components in this range must preserve the original core semantics; context may be inserted only outside this range."
+      }
+    },
+    {
+      "id": "roomba_rub_eye_tired_long3",
+      "cue": "rub_eye_tired",
+      "platform": "roomba",
+      "level": "long3",
+      "description": "Starting from the same original, add four contextual submotions: PRE (1) a slow 70-degree attention drift, (2) a brief fatigue pause, and (3) a slow forward approach; POST (4) a slow backward retreat. The unchanged repeated-circle core is component 4.",
+      "added_submotion_target": {
+        "policy": "count_controlled",
+        "min": 3,
+        "max": 4
+      },
+      "added_submotions": [
+        {
+          "component_index": 1,
+          "position": "before_core",
+          "description": "Turn 70 degrees slowly as a drowsy attention drift."
+        },
+        {
+          "component_index": 2,
+          "position": "before_core",
+          "description": "Pause for 0.8 s to establish fatigue."
+        },
+        {
+          "component_index": 3,
+          "position": "before_core",
+          "description": "Approach slowly by 0.06 m."
+        },
+        {
+          "component_index": 5,
+          "position": "after_core",
+          "description": "Retreat slowly by 0.05 m as a low-energy recovery."
+        }
+      ],
+      "configs": {
+        "original": {
+          "source_code": "path(base, arc, r=0.05, deg=360, spd=0.4, rep=3)",
+          "movements": [
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.4,
+                  "repetition": 3,
+                  "radius": 0.05,
+                  "degrees": 360.0
+                }
+              }
+            }
+          ]
+        },
+        "result": {
+          "source_code": "path(base, arc, r=0, deg=70, spd=0.35) + path(base, line, x=0, spd=0.2, hold=0.8) + path(base, line, x=0.06, spd=0.25) + path(base, arc, r=0.05, deg=360, spd=0.4, rep=3) + path(base, line, x=-0.05, spd=0.25)",
+          "movements": [
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.35,
+                  "radius": 0.0,
+                  "degrees": 70.0
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.2,
+                  "x": 0.0,
+                  "hold_time": 0.8
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.25,
+                  "x": 0.06
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.4,
+                  "repetition": 3,
+                  "radius": 0.05,
+                  "degrees": 360.0
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.25,
+                  "x": -0.05
+                }
+              }
+            }
+          ]
+        }
+      },
+      "main_component_range": {
+        "start": 4,
+        "end": 4,
+        "indexing": "1-based-inclusive",
+        "contract": "Components in this range must preserve the original core semantics; context may be inserted only outside this range."
+      }
+    },
+    {
+      "id": "roomba_rub_eye_tired_long4",
+      "cue": "rub_eye_tired",
+      "platform": "roomba",
+      "level": "long4",
+      "description": "Starting from the same original, add six contextual submotions: PRE (1) a broad slow attention turn, (2) a long fatigue pause, (3) a slow forward approach, and (4) a small corrective turn; POST (5) a slow retreat and (6) a final long motionless settle. The unchanged repeated-circle core is component 5.",
+      "added_submotion_target": {
+        "policy": "count_controlled",
+        "min": 5,
+        "max": 6
+      },
+      "added_submotions": [
+        {
+          "component_index": 1,
+          "position": "before_core",
+          "description": "Turn 120 degrees slowly as an extended attention-loss setup."
+        },
+        {
+          "component_index": 2,
+          "position": "before_core",
+          "description": "Pause for 1.0 s to emphasize fatigue."
+        },
+        {
+          "component_index": 3,
+          "position": "before_core",
+          "description": "Approach slowly by 0.05 m."
+        },
+        {
+          "component_index": 4,
+          "position": "before_core",
+          "description": "Make a small opposite 40-degree corrective turn."
+        },
+        {
+          "component_index": 6,
+          "position": "after_core",
+          "description": "Retreat slowly by 0.05 m."
+        },
+        {
+          "component_index": 7,
+          "position": "after_core",
+          "description": "Settle motionless for 1.5 s as an extended tired aftermath."
+        }
+      ],
+      "configs": {
+        "original": {
+          "source_code": "path(base, arc, r=0.05, deg=360, spd=0.4, rep=3)",
+          "movements": [
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.4,
+                  "repetition": 3,
+                  "radius": 0.05,
+                  "degrees": 360.0
+                }
+              }
+            }
+          ]
+        },
+        "result": {
+          "source_code": "path(base, arc, r=0, deg=120, spd=0.3) + path(base, line, x=0, spd=0.2, hold=1.0) + path(base, line, x=0.05, spd=0.2) + path(base, arc, r=0, deg=-40, spd=0.3) + path(base, arc, r=0.05, deg=360, spd=0.4, rep=3) + path(base, line, x=-0.05, spd=0.2) + path(base, line, x=0, spd=0.2, hold=1.5)",
+          "movements": [
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.3,
+                  "radius": 0.0,
+                  "degrees": 120.0
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.2,
+                  "x": 0.0,
+                  "hold_time": 1.0
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.2,
+                  "x": 0.05
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.3,
+                  "radius": 0.0,
+                  "degrees": -40.0
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "arc",
+                  "speed": 0.4,
+                  "repetition": 3,
+                  "radius": 0.05,
+                  "degrees": 360.0
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.2,
+                  "x": -0.05
+                }
+              }
+            },
+            {
+              "type": "path",
+              "parameters": {
+                "path": {
+                  "mode": "base",
+                  "shape": "line",
+                  "speed": 0.2,
+                  "x": 0.0,
+                  "hold_time": 1.5
+                }
+              }
+            }
+          ]
+        }
+      },
+      "main_component_range": {
+        "start": 5,
+        "end": 5,
+        "indexing": "1-based-inclusive",
+        "contract": "Components in this range must preserve the original core semantics; context may be inserted only outside this range."
+      }
+    }
+  ]
+}

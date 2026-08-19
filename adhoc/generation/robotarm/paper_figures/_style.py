@@ -10,10 +10,22 @@ import matplotlib.pyplot as plt
 MODEL_ORDER = ("Gm", "Qw32", "Qw7", "Qw3")
 
 MODEL_STYLE: dict[str, dict] = {
-    "Gm": {"marker": "o", "fillstyle": "full", "linestyle": "-", "mfc": "black", "mec": "black"},
-    "Qw32": {"marker": "s", "fillstyle": "none", "linestyle": "-", "mfc": "white", "mec": "black"},
-    "Qw7": {"marker": "^", "fillstyle": "full", "linestyle": "-", "mfc": "black", "mec": "white", "markeredgewidth": 1.2},
-    "Qw3": {"marker": "D", "fillstyle": "none", "linestyle": "--", "mfc": "white", "mec": "black"},
+    "Gm": {
+        "marker": "o", "fillstyle": "full", "linestyle": "-", "mfc": "black", "mec": "black",
+        "bar_color": "0.15", "bar_hatch": "",
+    },
+    "Qw32": {
+        "marker": "s", "fillstyle": "none", "linestyle": "-", "mfc": "white", "mec": "black",
+        "bar_color": "white", "bar_hatch": "////",
+    },
+    "Qw7": {
+        "marker": "^", "fillstyle": "full", "linestyle": "-", "mfc": "black", "mec": "white", "markeredgewidth": 1.2,
+        "bar_color": "white", "bar_hatch": "xxxx",
+    },
+    "Qw3": {
+        "marker": "D", "fillstyle": "none", "linestyle": "--", "mfc": "white", "mec": "black",
+        "bar_color": "0.55", "bar_hatch": "",
+    },
 }
 
 POSE_TASKS = ("1", "2", "3")
@@ -69,6 +81,8 @@ def apply_paper_style() -> None:
 def save_fig(fig: plt.Figure, path, *, caption: str | None = None) -> None:
     path = str(path)
     fig.savefig(path, bbox_inches="tight", pad_inches=0.02)
+    if path.lower().endswith(".pdf"):
+        fig.savefig(path.rsplit(".", 1)[0] + ".png", bbox_inches="tight", pad_inches=0.02)
     if caption:
         cap_path = path.rsplit(".", 1)[0] + "_caption.txt"
         with open(cap_path, "w", encoding="utf-8") as f:

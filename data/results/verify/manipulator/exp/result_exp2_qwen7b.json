@@ -1,0 +1,2664 @@
+{
+  "time": "2026-06-13T02:03:09",
+  "mode": "single_selected_tile",
+  "vlm_backend": "transformers",
+  "model": "Qwen/Qwen2.5-VL-7B-Instruct",
+  "config_json": "/home/hoyeonk/sblee/dev_robosuite/data/results/motion_configs/manipulator/exp/result_exp1_qwen7b.json",
+  "tile_dir": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12",
+  "tile_pick_json": "/home/hoyeonk/sblee/dev_robosuite/data/results/verify/pose_tile_pick_by_group.json",
+  "tile_pick": {
+    "back_horizontal": 4,
+    "back_vertical": 5,
+    "down_horizontal": 6,
+    "down_vertical": 2,
+    "front_horizontal": 5,
+    "front_vertical": 3,
+    "left_horizontal": 2,
+    "left_vertical": 3,
+    "right_horizontal": 5,
+    "right_vertical": 4,
+    "up_horizontal": 6,
+    "up_vertical": 2
+  },
+  "selected_tile_dir": null,
+  "total": 88,
+  "results": [
+    {
+      "idx": 7,
+      "cue": "raise_fists_victory",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the cue's requirement for an upward victory gesture.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is not suitable for a raised-fist victory gesture as it does not start from a neutral upward position.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:30)",
+            "movement(joint=elbow, rep=1, deg=x:15 | x:-15)",
+            "movement(joint=wrist, rep=1, deg=y:30)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 8,
+      "cue": "fist_pump",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the cue. The arm is already extended forward, and the fist pump needs to start from an upward position.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To perform a fist pump, the arm should first move upwards, which requires repositioning the arm from the current front position.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=arm, rep=1, deg=z:90)",
+            "movement(hand, rep=1, deg=z:-90)",
+            "movement(arm, rep=1, deg=z:-90)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 9,
+      "cue": "flex_bicep",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose is not suitable for the cue. The arm should be positioned in a relaxed state before smoothly contracting the bicep. The current pose suggests a direct forward-facing position which does not align with starting in a relaxed posture.",
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "Changing the direction to 'left' allows the robot to start in a more relaxed position, mimicking a natural starting stance for the flex_bicep cue.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-20)",
+            "movement(joint=elbow, rep=1, deg=x:-90)",
+            "path(shape=arc, joint=elbow, axis=xz, speed=2.0)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 10,
+      "cue": "shrug_idk",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current 'up' direction implies a vertical movement which is not suitable for a shrug that emphasizes uncertainty, which should be horizontal or along a front-back axis.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "A shrug typically involves moving the shoulders laterally, which is best represented by setting the direction to 'front' to allow for movement across the horizontal plane.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:8)",
+            "movement(joint=shoulder, rep=1, deg=x:-8)",
+            "path(shape=sine, joint=shoulder, period:0.5)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 11,
+      "cue": "self_scratch_head_confused",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the self-scratch-head-confused cue.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is too vertical and high, making it difficult to convey a sense of confusion. A front-facing pose with horizontal grip would better allow for a more grounded and natural movement sequence.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-20)",
+            "movement(joint=wrist, rep=1, deg=x:-10, y:0, z:10)",
+            "path(shape=arc, joint=wrist, axis=xz, speed=1.6)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 12,
+      "cue": "facepalm",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_down_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the desired cue. The robot should be facing downward to start with a dip, which is missing here.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The robot should start by pointing its gripper downward to match the 'facepalm' cue, which involves a downward dip.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-8)",
+            "path(shape=arc, joint=?, axis=z, speed=1.6)",
+            "movement(joint=wrist, rep=1, deg=z:8)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 13,
+      "cue": "point_self",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current direction (front) does not align with the self-pointing gesture since the arm should point towards the robot's torso.",
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The direction should be set to back to point towards the robot's torso, which is the intended target for a self-pointing gesture.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:45)",
+            "movement(joint=elbow, rep=1, deg=x:45)",
+            "movement(joint=shoulder, rep=1, deg=x:-45)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 14,
+      "cue": "point_you",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose with dir=front and gripper_orientation=vertical is suitable for pointing at a target.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=x:-10)",
+            "movement(joint=elbow, rep=1, deg:y:-30)",
+            "movement(joint=wrist, rep=1, deg=z:20)"
+          ]
+        },
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 15,
+      "cue": "beckon_come_here",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose should indicate a more approachable direction than front and horizontal orientation.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose does not convey an inviting or beckoning gesture. A more open and inviting direction would be more suitable.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "path(shape=arc, joint=shoulder, axis=x, speed=1.0)",
+            "path(shape=arc, joint=? ,axis=x+z, speed=1.2)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 16,
+      "cue": "stop_palm_out",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not match the cue requirements. The cue 'stop_palm_out' requires the robot to begin in an upright position with the palm facing outward and hold that position without further motion.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To align with the cue, the robot should start in a front-facing direction with the palm facing outward. This will allow the robot to maintain the desired posture without additional movements.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:0, z:0)",
+            "movement(joint=arm_01, rep=1, deg=x:0, z:0)",
+            "movement(joint=arm_02, rep=1, deg=x:0, z:0)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 17,
+      "cue": "pat_stomach",
+      "current_dir": "back",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_back_horizontal.png",
+      "tile_index": 4,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose's direction should be 'front' to align with patting the stomach.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The direction needs to be front to match the action of patting the stomach. The current back direction does not align with the intended gesture.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:25,z:-7)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.8)",
+            "movement(joint=elbow, rep=1, deg=z:5)",
+            "movment(joint=elbow, rep=1, deg=z:5)",
+            "movement(joint=shoulder, rep=1, deg=x:-25,z:7)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 18,
+      "cue": "fan_face_hot",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "parse_error": "Expecting value: line 10 column 50 (char 586)",
+        "raw_text": "```json\n{\n  \"pose_is_appropriate\": false,\n  \"direction_orientation_assessment\": \"The current pose lacks the necessary extension and opening of the fingers required to create a fan-like gesture.\",\n  \"if_not_appropriate\": {\n    \"recommended_dir\": \"front\",\n    \"recommended_gripper_orientation\": \"vertical\",\n    \"why_change\": \"The current gripper orientation needs to change to vertical to allow the fingers to open wide, creating the fan effect.\",\n    \"recommended_movement_plan_after_change\": [\n      \"movement(joint=shoulder, rep=1, deg=y:20)\",\n      \"movement(joint=wrist, rep=1, deg=y:180)\", // Open the fingers wide\n      \"path(shape=line, joint=wrist, axis=y, speed=1.5)\",\n      \"movement(joint=wrist, rep=1, deg=y:-180)\", // Close the fingers back to the starting position\n      \"path(shape=circle, joint=wrist, axis=xy, speed=1.2)\"\n    ]\n  },\n  \"confidence\": 0.8\n}\n```"
+      }
+    },
+    {
+      "idx": 19,
+      "cue": "cover_yawn_sleepy",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_down_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=down, gripper_orientation=horizontal) does not align with the cue 'cover_yawn_sleepy'. The arm should be lifted for the action to start.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue 'cover_yawn_sleepy' requires the arm to be lifted towards the viewer for the initial gesture of covering a yawn, which is not possible from a down-facing pose.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:20)",
+            "movement(joint=arm, rep=1, deg=y:10)",
+            "movement(joint=wrist, rep=1, deg=y:-15)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 20,
+      "cue": "rub_eye_tired",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose is not suitable for the 'rub_eye_tired' cue. The direction should be 'left' or 'right' to simulate rubbing an eye, and the gripper orientation should be 'vertical' to align with the motion of rubbing.",
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The robot needs to move towards the eye and use a vertical gripper orientation to align with the rubbing motion.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=y:-90)",
+            "movement(joint=wrist, rep=1, deg=y:90)",
+            "path(shape=arc, joint=fingers, axis=y, speed=2.0)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 21,
+      "cue": "tap_temple_think",
+      "current_dir": "left",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_left_horizontal.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The robot is facing the correct direction (left), but the gripper orientation should be vertical to align with the intended gesture of tapping the temple.",
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The current gripper orientation is horizontal, which does not match the intended gesture of tapping the temple. The vertical orientation will allow the robot to tap the temple correctly.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=wrist, rep=1, deg=y:20)",
+            "path(shape=arc, joint=?, axis=xz, speed=1.0)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 22,
+      "cue": "circle_temple_crazy",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=horizontal) does not align with the intended direction of pointing towards the viewer (front). The arm should be positioned to point towards the viewer to indicate outward intention.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose points upwards, which is not suitable for indicating outward intention. Pointing frontwards (dir=front) will correctly align with the intended direction.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:12)",
+            "movement(joint=wrist, rep=1, deg=z:20 | z:-20)",
+            "path(shape=arc, joint=wrist, axis=xz, speed=1.2)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 23,
+      "cue": "lean_forward_interest",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the intended cue of leaning forward and maintaining eye contact.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The current pose (dir=front, gripper_orientation=horizontal) does not convey a forward-leaning posture. Changing to dir=down will allow the robot to lower its center of gravity and maintain an attentive stance.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-20)",
+            "path(shape=quadratic, joint=shoulder, control_point=[x:0,z:-15], axis=z, speed=1.5)",
+            "movement(joint=elbow, rep=1, deg=y:-10)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 24,
+      "cue": "cover_mouth_gasp",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose is not suitable for the cue because the direction should be 'front' to match the action of covering the mouth.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The arm needs to be directed towards the viewer to cover the mouth effectively, matching the described action.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:45)",
+            "movement(joint=elbow, rep=1, deg=x:90)",
+            "movement(joint=wrist, rep=1, deg=y:90)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 25,
+      "cue": "cheers_toast",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current direction and gripper orientation do not match the desired cue. The cue is a cheers toast, which typically involves an upward motion, not a front-facing pose.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue is a cheers toast, which requires the robot to raise its arm upwards. A front-facing pose does not convey the upward motion necessary for a cheers toast.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=y:30)",
+            "path(shape=arc, joint=shoulder, axis=y, speed=1.5)",
+            "movement(joint=elbow, rep=1, deg=y:20)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 26,
+      "cue": "highfive_invite",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the desired cue. The hand should be extended forward with a relaxed, open grip to invite a high-five.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose has the hand in a more vertical position, which is not conducive to an open, relaxed high-five invitation. The recommended change maintains the horizontal gripper orientation but adjusts the direction to ensure the arm is fully extended and relaxed towards the viewer.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-15)",
+            "movement(joint=elbow, rep=1, deg:x:-90)",
+            "movement(joint=wrist, rep=1, deg:y:-45)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 27,
+      "cue": "highfive_imitation",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the high-five imitation cue.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose does not match the relaxed and fluid motion required for a high-five. The wrist angle and shoulder position should be more aligned with reaching out to another hand at the same height and level.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:10)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.8)",
+            "movement(joint=wrist, rep=1, deg=y:30 | y:-30)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 28,
+      "cue": "fistbump_invite",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the desired direction for a fist bump invite. The arm should be extended forward rather than pointing up.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The robot needs to extend the arm forward to initiate the fist bump invite gesture. The current pose with the arm up does not convey an inviting or forward-reaching motion.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:15)",
+            "movement(joint=elbow, rep=1, deg=x:-90)",
+            "path(shape=line, joint=elbow, axis=x, speed=1.8)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 30,
+      "cue": "pat_self_back",
+      "current_dir": "back",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_back_vertical.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the cue because the arm is extended forward and should be directed back.",
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The robot needs to move its arm back to gather attention, which is the initial step of the pat_self_back cue.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:30)",
+            "movement(joint=wrist, rep=1, deg=z:-20)",
+            "movement(joint=elbow, rep=1, deg=x:-20)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 31,
+      "cue": "draw_circle_repeat",
+      "current_dir": "back",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_back_vertical.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The direction should be changed to front as the robot needs to extend forward and draw a circle.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue requires the robot to extend forward and draw a circle, which is not achievable from the back direction. Rearranging the direction will allow for the proper hand positioning and movement.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=5, deg=x:0, z:90)",
+            "path(shape=arc, joint=shoulder, radius=0.3, deg=360)",
+            "movement(joint=shoulder, rep=5, deg=x:0, z:-90)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 32,
+      "cue": "throat_cut_stop",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose should be changed to ensure a sharp upward cut and then a sudden stop at the throat.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To perform the throat cut, the robot needs to start by pointing down towards the throat, creating a sharp upward cut. Then, the arm can be lowered slightly to emphasize the abrupt halt.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-45)",
+            "movement(joint=wrist, rep=1, deg=z:20)",
+            "movement(joint=elbow, rep=1, deg=down:10)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 33,
+      "cue": "chin_flick_dismiss",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current direction (front) does not match the expected tilt direction for the cue 'chin_flick_dismiss'. The cue requires the head to be tilted forward, which typically indicates a direction towards the floor.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The cue 'chin_flick_dismiss' suggests a forward head tilt, which should be represented by a direction towards the floor (-z). The current pose is pointing forward (+x), which does not align with the required tilt direction.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=head, rep=1, deg=z:-10)",
+            "path(shape=vibro, joint=head, axis=z, duration=0.1)",
+            "movement(joint=head, rep=1, deg=z:10)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 34,
+      "cue": "cover_ears_too_loud",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The robot should start facing forward (dir=front) and have its gripper oriented horizontally.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is set up to be more about raising or lowering the arm rather than moving towards the source of loud noise. The robot needs to face the person they want to communicate with first before performing the ear-covering action.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-30,z:-10)",
+            "path(shape=line, joint=shoulder, axis=x, speed=1.5)",
+            "movement(joint=wrist, rep=1, deg=z:-30)",
+            "movement(joint=shoulder, rep=1, deg=x:45,z:30)",
+            "path(shape=arc, joint=?, axis=xy, speed=1.5)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 35,
+      "cue": "salute",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The gripper's pointing axis should be directed upward to align with the 'salute' gesture.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "For a salute gesture, the EE needs to be pointed upward to address the audience directly.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-8)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.8)",
+            "movement(joint=elbow, rep=1, deg=x:-45,z:45)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 36,
+      "cue": "visor_search",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the 'visor_search' cue. The vertical direction is appropriate, but the horizontal gripping orientation is not suitable for a careful search pattern.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The vertical gripping orientation does not allow for the fine-tuning movement required for a careful search pattern. A horizontal gripping orientation would enable the wrist to make precise adjustments.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:10)",
+            "movement(joint=wrist, rep=1, deg=x:5 | x:-5)",
+            "path(shape=arc, joint=wrist, axis=xz, speed=1.2)"
+          ]
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 37,
+      "cue": "yield_turn",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose is not appropriate because the endpoint orientation does not match the intended gesture.",
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The endpoint orientation needs to be adjusted to align with the intended yield gesture, which should be more directed towards the side rather than front-facing.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-45)",
+            "movement(joint=shoulder, rep=1, deg=y:-75)",
+            "movement(joint=wrist, rep=1, deg=z:-30)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 39,
+      "cue": "request_turn",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the target cue as it lacks a preparatory dip.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is front-facing with the gripper horizontal, which does not imply a preparatory dip or gather attention. To match the cue, the arm should initially point upwards to create a dip before extending forward.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=elbow, rep=1, deg=x:-45, z:45)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.8)",
+            "movement(joint=wrist, rep=1, deg=z:10)"
+          ]
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 40,
+      "cue": "guiding_arm",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose's direction should be adjusted to emphasize the dip and upward path for clarity.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To start the movement from a more grounded position, emphasizing the preparatory dip before extending the arm forward.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-20)",
+            "path(shape=line, joint=shoulder, axis=y, speed=1.6)",
+            "movement(joint=wrist, rep=1, deg=z:20)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 41,
+      "cue": "protective_arm_out",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the protective gesture required by the cue.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The robot is already pointing forward correctly. However, the current movement sequence does not match the protective gesture needed. It should start with an upward arm raise for a protective barrier before lowering the arm in a defined circular motion.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=y:60)",
+            "movement(joint=shoulder, rep=1, deg=z:-60)",
+            "path(shape=circle, joint=shoulder, axis=xz, speed=1.2)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 42,
+      "cue": "escorting_gesture",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose's direction (front) and gripper orientation (horizontal) do not align well with the escorting gesture, which requires a more subtle and directional movement.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The escorting gesture typically involves guiding with a gentle upper body movement. Direct front-facing poses are not suitable for this cue as they lack the necessary subtlety.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:8)",
+            "path(shape=curve, joint=shoulder, radius=10, speed=1.2)",
+            "movement(joint=elbow, rep=1, deg=x:-5)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 44,
+      "cue": "clarification_request_palm_tilt",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current front direction does not align with the need to draw attention forward before directing a palm-down request.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To start drawing attention upward before directing a palm-down request, which aligns with the clarification_request_palm_tilt cue.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:20, z:30)",
+            "movement(joint=elbow, rep=1, deg=x:-20, z:20)",
+            "movement(joint=wrist, rep=1, deg=z:-45)"
+          ],
+          "confidence": 0.8
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 45,
+      "cue": "slow_down_request_palm_down",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current front direction is not suitable for a palm-down gesture as it does not align with the desired downward pointing.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To achieve the slow_down_request_palm_down cue, the robot needs to point its EE downward to emphasize the palm-down gesture.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-8)",
+            "movement(joint=wrist, rep=1, deg=z:-20)",
+            "movement(joint=elbow, rep=1, deg=x:0, y:15, z:-75)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 46,
+      "cue": "speed_up_circular_cue",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose should ideally have the robot facing down to begin the upward dip.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To align with the goal of gathering attention with an upward dip, starting from a downward-facing position would allow the robot to move upwards, creating the necessary upward dip.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "path(shape=arc, joint=shoulder, axis=yz, speed=1.8)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 47,
+      "cue": "wait_for_me_backward_palm",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_down_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The robot arm is directed down, which is suitable for a preparatory swing followed by lowering the arm horizontally with the palm facing backward.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=y:-20)",
+            "path(shape=line, joint=shoulder, axis=y, speed=0.8)",
+            "movement(joint=elbow, rep=1, deg=y:20)",
+            "path(shape=rectilinear, joint=elbow, axis=y, speed=0.8)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 49,
+      "cue": "polite_decline_small_push",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The pose direction and orientation align well with the target cue of a gentle push away.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=x:-10)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.5)",
+            "movement(joint=wrist, rep=1, deg=x:10)"
+          ]
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 50,
+      "cue": "firm_accept_forward_reach",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The robot is correctly positioned to extend a forward-reaching motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=z:10)",
+            "path(shape=line, joint=shoulder, axis=x, speed=1.8)",
+            "movement(joint=wrist, rep=1, deg=z:20)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 51,
+      "cue": "hesitant_accept_half_reach",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the hesitant_accept_half_reach cue. The front direction and horizontal gripper orientation suggest a more assertive or direct gesture rather than a hesitant one.",
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "Changing the direction to 'left' and the gripper orientation to 'vertical' will create a more subtle and hesitant appearance, which better fits the intended gesture of hesitantly accepting something.\n",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-10)",
+            "path(shape=line, joint=elbow, axis=y, speed=1.2)",
+            "movement(joint=wrist, rep=1, deg=y:-10)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 52,
+      "cue": "cancel_previous_offer_retract",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The robot's current hand position is not suitable for retracting the offer as it is directed upwards, which does not align with the movement required to retract an offer.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current hand position should be directed towards the viewer (front) to retract the offer. Retracting an offer typically involves pulling the hand back towards oneself or moving it away from the offering gesture.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-45)",
+            "movement(joint=wrist, rep=1, deg=z:-20)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 53,
+      "cue": "conditional_accept_pause_then_reach",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=up, grip=horizontal) does not align well with the desired movement sequence for the 'conditional_accept_pause_then_reach' cue.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is too elevated and rigid, making it difficult to transition smoothly into the dip, acceptance, and reaching gestures required for the cue.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-5)",
+            "path(shape=curve, joint=shoulder, axis=x, speed=1.0)",
+            "movement(joint=elbow, rep=1, deg=x:-10)",
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "movement(joint=wrist, rep=1, deg=x:20)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 54,
+      "cue": "final_decision_down_press",
+      "current_dir": "down",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_down_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with dir=down and gripper_orientation=vertical does not align well with the cue requirement to emphasize the decision with a sharp drop and vertical freeze.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The original pose is too vertical, which does not convey the sharp drop and vertical freeze needed for the final_decision_down_press cue. A horizontal gripper orientation will help emphasize the sharp descent.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-30) -> path(shape=line, joint=hand, axis=z, speed=2.0)",
+            "movement(joint=hand, rep=1, deg=z:40)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 55,
+      "cue": "resume_speaking_pull",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The robot's direction (front) and gripper orientation (horizontal) are suitable for the 'resume_speaking_pull' cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=z:-5)",
+            "path(shape=quadraticCurveTo, joint=shoulder, controlPoint=[shoulder.currentPosition.x - 5, shoulder.currentPosition.y, shoulder.currentPosition.x - 10, shoulder.currentPosition.y], endPoint=[shoulder.currentPosition.x - 10, shoulder.currentPosition.y])",
+            "movement(joint=wrist, rep=1, deg=z:15)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 56,
+      "cue": "emphasize_point_downbeat",
+      "current_dir": "down",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_down_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The pose currently does not align with the cue's need for an emphasis on a downward dip followed by a sharp upward gesture.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The robot needs to start in a position that allows it to dip downward and then raise sharply upwards, which is not possible with the current pose.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=elbow, rep=1, deg=x:-45, z:45)",
+            "path(shape=line, joint=shoulder, axis=z, speed=2.0)",
+            "movement(joint=wrist, rep=1, deg=z:10)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 57,
+      "cue": "unsure_response_hand_hover_stop",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current dir=up and gripper_orientation=horizontal pose does not align with the intended motion of hovering near the viewer's hand or object.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current dir=up indicates the arm is pointing towards the ceiling, which is not suitable for hovering near the viewer's hand or object. The recommended dir=front would allow the robot to point directly at the viewer's hand or object.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:10)",
+            "movement(joint=elbow, rep=1, deg=z:-10)",
+            "movement(joint=wrist, rep=1, deg=x:10, z:5)"
+          ]
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 58,
+      "cue": "prevent_fall_support_reach",
+      "current_dir": "down",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_down_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The gripper_direction for this cue should be front to extend one hand towards the ground.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose with the gripper pointing downwards and vertically oriented does not align with the cue requirement to extend the hand forward towards the ground to stabilize itself.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "path(shape=line, joint=elbow, axis=y, speed=1.5)",
+            "movement(joint=wrist, rep=1, deg=y:90)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 59,
+      "cue": "nod_yes",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "Current pose is not suitable for the nod_yes cue.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose does not align with the nod.Yes cue. The robot needs to move its shoulder to tilt the head forward, which is not aligned with the current dir=front, gripper_orientation=horizontal pose.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "movement(joint=shoulder, rep=1, deg=-10)",
+            "movement(joint=shoulder, rep=1, deg=x:-10)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 60,
+      "cue": "shake_head_no",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose should have the robot facing away from the viewer to clearly indicate a refusal.",
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To effectively convey a refusal, the robot should be facing away from the viewer, as seen in cues like head shaking to refuse.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-40, y:0)",
+            "movement(joint=elbow, rep=1, deg=x:-20, y:0)",
+            "movement(joint=shoulder, rep=1, deg=x:-5, y:0)",
+            "movement(joint=elbow, rep=1, deg=x:-30, y:0)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 61,
+      "cue": "air_quotes",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose aligns well with the requirement to have the EE point towards the viewer, which is suitable for the air_quotes cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=z:-8)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.5)",
+            "movement(joint=wrist, rep=1, deg=z:15)"
+          ]
+        },
+        "confidence": 1.0,
+        "confidence_reason": "The current pose is correctly oriented to convey the air_quotes gesture by pointing towards the viewer. The proposed movement sequence logically transitions from a preparatory dip to an open palm extending forward, followed by a slight bend in the fingers to complete the air_quote pose."
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 62,
+      "cue": "self_hug",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the cue of a self-hug as the arm is extended and not in a position to form an embrace.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is not suitable for a self-hug as the arm is not positioned to form an embrace. A more suitable direction would be 'front' to align with the goal of a self-hug.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-90)",
+            "movement(joint=elbow, rep=1, deg=x:-90)",
+            "movement(joint=wrist, rep=1, deg=x:45)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 64,
+      "cue": "tilt_head_curious",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with dir=front and gripper_orientation=horizontal does not align well with the cue 'tilt_head_curious'.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue 'tilt_head_curious' requires the robot to raise its head slightly forward and then tilt it to the side. The current pose is too frontal and does not capture the forward tilt.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:5, y:0, z:0)",
+            "movement(joint=shoulder, rep=1, deg=x:0, y:0, z:10)",
+            "path(shape=arc, joint=shoulder, axis=y, speed=1.0)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 65,
+      "cue": "raise_index_one_moment",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The arm is correctly positioned to point forward (dir=front) and the gripper orientation is suitable for a simple raise gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=z:-8)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.8)",
+            "movement(joint=wrist, rep=1, deg=z:8)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 66,
+      "cue": "shh_gesture",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with dir=front and gripper_orientation=horizontal does not align well with the shh_gesture. The arm needs to be closer to the mouth and in a more vertical orientation.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To simulate bringing the arm close to the mouth, changing the direction to down and the gripper orientation to vertical will better represent the desired gesture.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-15)",
+            "movement(joint=elbow, rep=1, deg=y:90)",
+            "path(shape=circle, joint=elbow, radius=0.1, deg=y:-5)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 67,
+      "cue": "rub_arms_cold",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the desired gesture of rubbing arms cold.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The horizontal grip orientation does not convey the intended circular rubbing motion. A vertical grip would better represent the rubbing action.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:20, y:0)",
+            "path(shape=line, joint=?, axis=x, speed=1.8)",
+            "movement(joint=elbow, rep=1, deg=x:45, z:15)",
+            "path(shape=circle, joint=elbow, axis=yz, speed=1.2)"
+          ]
+        },
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 69,
+      "cue": "cross_arms_defensive",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_down_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the defensive posture needed for the 'cross_arms_defensive' cue.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The current pose with 'dir=down' and 'gripper_orientation=horizontal' does not convey a defensive posture. It needs to be adjusted to a more vertical direction and horizontal gripper orientation to ensure the viewer interprets it as a defensive stance.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-25,z:-25)",
+            "path(shape=line, joint=?, axis=x, speed=1.6)",
+            "movement(joint=shoulder, rep=1, deg=x:25,z:25)",
+            "path(shape=line, joint=?, axis=x, speed=1.6)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 72,
+      "cue": "palms_together_thank_you",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the intended gesture of palms together. The gripper orientation being horizontal is also not suitable for creating a respectful lift.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The robot needs to move the arms forward to chest level and create a smooth and respectful lift, which requires a vertical gripper orientation to mimic a prayer-like position.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:0,y:0,z:10) -> movement(joint=elbow, rep=1, deg=x:0,y:0,z:0)",
+            "path(shape=circle, joint=elbow, axis=yz, radius:0.3, speed:0.5, repetitions:1)",
+            "movement(joint=wrist, rep=1, deg=x:0,y:0,z:0)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 74,
+      "cue": "hands_up_surrender",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose is not suitable for the cue 'hands_up_surrender'. The robot should begin in a low posture and raise its arms vertically.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is too close to the ceiling, which does not align with the low starting posture required for the 'hands_up_surrender' cue.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-90)",
+            "movement(joint=elbow, rep=1, deg=z:45)",
+            "movement(joint=wrist, rep=1, deg=y:90)"
+          ]
+        },
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 75,
+      "cue": "arms_open_welcome",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) aligns well with the cue 'arms_open_welcome' as it sets a friendly tone and invites interaction.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=wrist, rep=1, deg=z:20)",
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "path(shape=circle, joint=shoulder, radius=0.2, speed=1.2)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 76,
+      "cue": "stretch_arms_up",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose direction (up) and gripper orientation (horizontal) align well with the stretch_arms_up cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=y:-8)",
+            "movement(joint=shoulder, rep=1, deg=y:18, z:10)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.8)",
+            "movement(joint=shoulder, rep=1, deg=z:8)"
+          ]
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 78,
+      "cue": "disagreement_cross_then_release",
+      "error": "no tile pick for (cross, horizontal)"
+    },
+    {
+      "idx": 82,
+      "cue": "frustration_down_throw",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose should have a front direction but should change to down for better alignment with the cue's description.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue requires the robot to throw the arm upward and outward after extending it forward, which is not represented by the current front direction. Down direction aligns better with the throwing motion.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:15, z:30)",
+            "path(shape=arc, joint=shoulder, axis=xy, speed=2.0)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 84,
+      "cue": "submission_lowered_open_palm",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_down_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose should be adjusted to better convey a formal submission gesture.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose with 'down' direction does not convey a formal submission gesture effectively. A more appropriate direction would be 'front' to align with the typical use case of a formal submission gesture.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-10)",
+            "path(shape=line, joint=shoulder, axis=x, speed=0.5)",
+            "movement(joint=wrist, rep=1, deg=y:-10)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 85,
+      "cue": "dominance_high_open_hold",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose suggests a confident rise from a front-facing base but lacks the firm wrist grip and deliberate shoulder accent required for the cue.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "A vertical grip orientation will better represent a firm wrist grip, which is essential for the cue's emphasis. The current horizontal orientation does not convey the required firmness.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=y:10)",
+            "movement(joint=wrist, rep=1, deg=y:15)",
+            "movement(joint=shoulder, rep=1, deg=y:-15)"
+          ]
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 86,
+      "cue": "apology_forward_lowered_hold",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the required gesture of an apology bow.",
+        "if_not_appropriate": {
+          "recommended_dir": "down",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose has the robot pointing frontward, which does not align with the gesture of apologizing by lowering the arm. A downward-facing pose better represents the movement towards the ground, which is typical in apologies.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:20, z:-70)",
+            "movement(joint=shoulder, rep=1, deg=x:-20, z:-70)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.5)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 90,
+      "cue": "start_action_forward_snap",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The robot is positioned correctly to convey the cue by extending the arm forward, which aligns with the front direction.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=x:45)",
+            "movement(joint=elbow, rep=1, deg=x:-90)",
+            "movement(joint=wrist, rep=1, deg=z:-30)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 92,
+      "cue": "retry_action_reset_circle",
+      "current_dir": "back",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_back_vertical.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The vertical gripper orientation does not align well with a back gesture in terms of conveying frustration or resetting.",
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The current vertical gripper orientation does not match the intended back gesture for expressing frustration. A more suitable horizontal orientation would help in creating the desired motion.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-8)",
+            "path(shape=arc, joint=shoulder, axis=z, speed=1.8)",
+            "movement(joint=wrist, rep=1, deg=z:8)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 94,
+      "cue": "abandon_action_drop_turn",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_down_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "parse_error": "Expecting value: line 9 column 53 (char 775)",
+        "raw_text": "{\n  \"pose_is_appropriate\": false,\n  \"direction_orientation_assessment\": \"The current pose (dir=down, gripper_orientation=horizontal) is not suitable for the 'abandon_action_drop_turn' cue because the EE is pointing down towards the floor, which does not align with dropping an object in front of itself.\",\n  \"if_not_appropriate\": {\n    \"recommended_dir\": \"down\",\n    \"recommended_gripper_orientation\": \"horizontal\",\n    \"why_change\": \"The current pose is not appropriate because the EE is pointing down towards the floor, which does not match the action of dropping an object in front of oneself. Dropping an object would require a downward motion towards the target area.\",\n    \"recommended_movement_plan_after_change\": [\n      \"movement(joint=shoulder, rep=1, deg=z:-10)\", // Drop the object\n      \"movement(joint=shoulder, rep=1, deg=x:30)\", // Turn upper body to the side\n      \"movement(joint=shoulder, rep=1, deg=x:-30)\" // Return focus forward\n    ]\n  },\n  \"confidence\": 0.8\n}"
+      }
+    },
+    {
+      "idx": 95,
+      "cue": "prepare_action_raise_hold",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "current pose does not align with the cue's requirement for gathering attention with a small dip and rising into a brief preparation before adding a crisp peak accent.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose (dir=front, gripper_orientation=horizontal) does not align with the cue's requirement for a preparatory dip followed by a rise and peak. The initial dip should be more prominent and directed towards the observer, which requires a different direction.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-15)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.2, z:-20)",
+            "movement(joint=shoulder, rep=1, deg=z:15)"
+          ]
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 97,
+      "cue": "hesitation_pause_hold",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose is suitable as the arm is already pointing upward (dir=up), which aligns with the cue's requirement for initial hand raising.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=z:5)",
+            "pause(duration=0.5)",
+            "movement(joint=shoulder, rep=1, deg=z:-5)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 104,
+      "cue": "scale_expand",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current front direction does not align with the desired horizontal expansion.",
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue requires horizontal expansion which is better represented by a leftward direction rather than the current front direction.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=y:-20)",
+            "path(shape=line, joint=shoulder, axis=y, speed=1.2)",
+            "movement(joint=wrist, rep=1, deg=y:30)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 106,
+      "cue": "uncertainty_wave",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The robot should aim to move its arm from an upward position to a horizontal position to convey uncertainty and hesitation.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose start position (dir=up) does not align with the requirement to move the arm to a horizontal position to express uncertainty and hesitation. Starting from an upward position would hinder the smooth transition needed for the cue to be interpreted correctly.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=y:10)",
+            "path(shape=arc, joint=shoulder, axis=y, speed=1.0)",
+            "movement(joint=wrist, rep=1, deg=x:20 | x:-20)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 108,
+      "cue": "interrupt_hard",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_horizontal.png",
+      "tile_index": 6,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the intended cue, as the robot needs to initiate with an upward wave and should not start with the arm fully extended upwards.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is too rigid and does not allow for the fluid upward movement needed to convey an interrupt_hard cue. Starting from a more relaxed and ready-to-move position will help achieve the desired gesture.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=y:-5)",
+            "path(shape=curve, joint=shoulder, axis=xy, speed=1.2)",
+            "movement(joint=wrist, rep=1, deg=z:25)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 109,
+      "cue": "interrupt_soft",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_up_vertical.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose is not appropriate as the robot should be facing forward to convey the interruption.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose has the robot facing up, which does not align with the target cue of interrupting softly. The robot needs to be facing forward to make a clear and deliberate movement towards the audience.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "path(shape=line, joint=shoulder, axis=x, speed=1.8)",
+            "movement(joint=wrist, rep=1, deg=y:10 | y:-10)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 114,
+      "cue": "contain_space",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the cue's requirement for a tight pinch followed by spreading out and holding. The direction should be 'front' but the orientation should be 'vertical' to replicate the squeezing action.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "The current horizontal orientation does not match the tight pinch required for the cue 'contain_space'. A vertical orientation will better represent the squeezing action of the fingers.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-10,z:10)",
+            "movement(joint=shoulder, rep=1, deg=x:0,z:0)",
+            "movement(joint=wrist, rep=1, deg=x:20,y:-20)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 115,
+      "cue": "expand_space",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with dir=front and gripper_orientation=horizontal does not align well with the desired expansion gesture.",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To convey the 'expand space' cue effectively, the robot should have an open palm facing upward. This change will help the robot present a broad, welcoming gesture towards the viewer.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=elbow, rep=1, deg=x:90)",
+            "path(shape=parabola, joint=shoulder, axis=y, speed=0.8)",
+            "movement(joint=elbow, rep=1, deg=x:-90)"
+          ]
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 116,
+      "cue": "compress_space",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with gripper_orientation vertical does not align well with the need to compress space around the robot. The robot should start by rising to a neutral position.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The robot needs to start with an upward movement to prepare the space before compressing it, which requires a horizontal gripper orientation to effectively convey the compression action.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:15)",
+            "movement(joint=shoulder, rep=1, deg=x:0,z:-10)",
+            "path(shape=line, joint=shoulder, axis=z, speed=1.5)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 117,
+      "cue": "balance_scale",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_vertical.png",
+      "tile_index": 3,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose with dir=front and gripper_orientation=vertical does not align well with the goal of lifting and arc-like motion needed for the balance scale cue.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is not suitable for the balance scale cue as it lacks the necessary arc-like motion and does not indicate a steady vertical stance.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=z:-12)",
+            "path(shape=arc, joint=? ,axis=xy, speed=1.0)",
+            "movement(joint=wrist, rep=1, deg=z:8)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 118,
+      "cue": "push_pull_dual",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "current pose does not align with the push_pull_dual cue which requires a forward push followed by a backward pull. The current pose is not suitable for starting the push or pulling motions.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To initiate the push, the robot needs to start with a forward movement. The current pose with a horizontal gripper orientation is not conducive to a direct forward push.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "movement(joint=shoulder, rep=1, deg=x:-10)"
+          ]
+        },
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 121,
+      "cue": "weight_shift_forward",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the target cue, as the robot is too upright and lacks the necessary forward lean.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The robot needs to lean forward slightly to prepare for the weight shift, which is currently not captured by the pose.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=hip, rep=1, deg=x:5, y:0)",
+            "path(shape=arc, joint=hip, axis=yz, speed=0.8)",
+            "movement(joint=hip, rep=1, deg=x:10, y:0)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 122,
+      "cue": "weight_shift_backward",
+      "current_dir": "back",
+      "current_gripper_orientation": "vertical",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_back_vertical.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the desired cue, as the robot should initially lean back slightly to prepare for the weight shift.",
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The robot needs to prepare to lean back slightly, which requires a horizontal grip to allow for a smooth weight shift.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-10)",
+            "movement(joint=elbow, rep=1, deg:x:10)",
+            "path(shape=circle, joint=shoulder, radius:0.1, speed=1.2)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 123,
+      "cue": "torso_rotate_away",
+      "current_dir": "left",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_left_horizontal.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current direction (left) does not align with the target cue, which requires the robot to move its torso slightly left but still facing forward.",
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose needs to be adjusted to better represent the cue, as the direction should be front rather than left to maintain engagement and focus.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=hip, rep=1, deg=x:-5)",
+            "path(shape=arc, joint=hip, axis=yz, start_angle=-5, end_angle=0, speed=0.8)",
+            "movement(joint=hip, rep=1, deg=x:5)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 124,
+      "cue": "torso_rotate_toward",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the desired cue\"",
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To achieve the 'torso_rotate_toward' cue, the robot should start with an upward pointing pose to gather attention before rotating.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:20)",
+            "movement(joint=hip, rep=1, deg=x:15)",
+            "path(shape=line, joint=shoulder, axis=x+z, speed=1.2)"
+          ]
+        },
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 125,
+      "cue": "lean_side_doubt",
+      "current_dir": "left",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_left_horizontal.png",
+      "tile_index": 2,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align well with the desired cue as it does not provide a clear leaning or twisting motion.",
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose lacks the necessary leaning and twisting motions needed to convey 'lean_side_doubt'.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:20)",
+            "movement(joint=shoulder, rep=1, deg=x:-20)",
+            "movement(joint=shoulder, rep=1, deg=x:0)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 127,
+      "cue": "expand_chest",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current front direction and horizontal gripper orientation are suitable for the expand_chest cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "movement(joint=shoulder, rep=1, deg=x:12)",
+            "movement(joint=hip, rep=1, deg=y:-5)",
+            "movement(joint=pelvis, rep=1, deg=x:10)",
+            "movement(joint=chest, rep=1, deg=x:10)",
+            "movement(joint=wrist, rep=1, deg=z:8)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 128,
+      "cue": "eye_widen_surprise",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the target cue. The robot should be facing more towards the side to simulate a head turn.",
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose (dir=front, gripper_orientation=horizontal) does not capture the required head shift and eye widening for the surprise cue. Changing the direction to left will better simulate a head turn.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=shoulder, rep=1, deg=x:-20)",
+            "movement(joint=neck, rep=1, deg=y:20)",
+            "movement(joint=eye, rep=1, deg:open:75)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 130,
+      "cue": "gaze_shift_avoid",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "group_tile_image": "/home/hoyeonk/sblee/dev_robosuite/data/results/visualize/pose_groups_12/group_front_horizontal.png",
+      "tile_index": 5,
+      "selected_tile_image": null,
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose does not align with the desired direction for the cue.",
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose is facing the front, which doesn't match the requirement to tilt the head slightly to the side for avoiding eye contact. Changing to the left direction will allow the robot to achieve the intended head tilt.",
+          "recommended_movement_plan_after_change": [
+            "movement(joint=neck, rep=1, deg=x:-10)",
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "path(shape=arc, joint=shoulder, axis=xy, speed=0.8)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    }
+  ],
+  "verify_scoring": "gt_match",
+  "verify_scoring_version": 1,
+  "generation_score_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/verify/manipulator/exp/score_exp1_qwen7b.json",
+  "groundtruth": "/Users/sb/Downloads/workspace/dev_robosuite/data/seed/groundtruth/gt_manipulator.json",
+  "n": 85,
+  "n_correct": 28,
+  "accuracy": 0.32941176470588235
+}

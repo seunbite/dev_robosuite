@@ -1,0 +1,123 @@
+{
+  "id": "humanoid_depict_lion_correction_oneshot",
+  "platform": "humanoid",
+  "platform_note": "This one-shot is a **humanoid** example. Reuse the same critique→config discipline on every robot platform (tiago, roomba, quadruped, single_arm): Recognition / Correction Q1 / Q2 must drive large, iconic parameter changes — not tiny pose polish.",
+  "cue": "depict_lion",
+  "description": "Theatrical lion roar: wide claw hands high and forward, then aggressive shoulder-z beats.",
+  "recognition_q": "A robot crouches down and then stands up.",
+  "correction_q1": "no, The motion lacks any distinct \"lion\" characteristics like claws or a roar; it's just a generic crouch and stand.",
+  "correction_q2": "The entire motion needs to be redesigned to be more theatrical: start in a low crouch with wide, claw-like hands, then have the robot explode upwards, throwing its head back forcefully and thrusting its arms forward to simulate a powerful roar.",
+  "origin": {
+    "label": "prior attempt (failed — generic crouch/stand)",
+    "source_code": "pose(dir=front, grip=vert, torso=low, z=45, x=65, left_arm=mirror) + move(torso, height, high, spd=3.0) + move(head, tilt, -30, spd=3.0, hold=0.8)",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.6,
+        "parameters": {
+          "pose": {
+            "torso_height": "low",
+            "arm_position": "front",
+            "gripper_orientation": "vertical",
+            "head": "center",
+            "left_arm": "mirror",
+            "x": 65,
+            "y": 50,
+            "z": 45
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "torso",
+                "axis": "height",
+                "degrees": ["high"]
+              }
+            ],
+            "repetition": 1,
+            "speed": 3.0,
+            "hold_time": 0
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [0.0, -30.0]
+              }
+            ],
+            "repetition": 1,
+            "speed": 3.0,
+            "hold_time": 0.8
+          }
+        }
+      }
+    ]
+  },
+  "corrected": {
+    "label": "corrected attempt (implements Q2 with bold margins)",
+    "source_code": "pose(dir=front, grip=horiz, x=80, y=30, z=80, left_arm=mirror) + move(shoulder, z, 30, spd=1.5, rep=1) + move(shoulder, z, -60, spd=3.5, rep=1)",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.6,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "front",
+            "gripper_orientation": "horizontal",
+            "head": "center",
+            "left_arm": "mirror",
+            "x": 80,
+            "y": 30,
+            "z": 80
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "shoulder",
+                "axis": "z",
+                "degrees": [0.0, 30.0]
+              }
+            ],
+            "repetition": 1,
+            "speed": 1.5,
+            "hold_time": 0
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "shoulder",
+                "axis": "z",
+                "degrees": [0.0, -60.0]
+              }
+            ],
+            "repetition": 1,
+            "speed": 3.5,
+            "hold_time": 0
+          }
+        }
+      }
+    ]
+  },
+  "lesson": "Q2 said thrust arms forward / theatrical roar — so the rewrite jumps x=65→80, z=45→80, y=50→30 (wide claws) and adds large shoulder-z beats at spd=1.5 then 3.5. +z raises the hands, −z lowers them (world-axis signed). Do not answer Q2 with only ±5 percentile polish."
+}

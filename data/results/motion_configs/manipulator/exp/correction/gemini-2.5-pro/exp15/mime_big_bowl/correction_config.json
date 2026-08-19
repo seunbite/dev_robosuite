@@ -1,0 +1,64 @@
+[
+  {
+    "idx": 2,
+    "cue": "mime_big_bowl",
+    "description": "The robot's arm, with the gripper held palm-up, traces a wide, slow arc in front of its body to outline the rim of a large bowl, pauses, and then gently pushes the imaginary object forward as if presenting it.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 40,
+            "y": -25,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "xy",
+          "radius": 0.25,
+          "sweep": 180,
+          "speed": 1.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 40,
+            "y": 25,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.7
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "axis": "x",
+          "distance": 0.15,
+          "speed": 0.8,
+          "hold_time": 2.0
+        }
+      }
+    ],
+    "state": "exp15_mime_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-09T17:40:59",
+    "experiment": "exp15",
+    "generation_valid": true,
+    "correction_q1": "No, the end effector's orientation is not iconic for holding a bowl, and the final \"presenting\" motion is weak and uses a forbidden joint-space command.",
+    "correction_q2": "The entire sequence should be changed to: 1. Start with a \"palm-up\" pose (`dir: \"up\"`) on one side. 2. Trace a slow, wide horizontal arc (`path` arc) to define the bowl's rim. 3. Pause briefly in a `pose` step to solidify the shape. 4. Gently push the arm forward (`movement` on x-axis) to \"present\" the bowl.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# No, the end effector's orientation is not iconic for holding a bowl, and the final \"presenting\" motion is weak and uses a forbidden joint-space command.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# The entire sequence should be changed to: 1. Start with a \"palm-up\" pose (`dir: \"up\"`) on one side. 2. Trace a slow, wide horizontal arc (`path` arc) to define the bowl's rim. 3. Pause briefly in a `pose` step to solidify the shape. 4. Gently push the arm forward (`movement` on x-axis) to \"present\" the bowl.\n\n# Q1: How would a human mime this in empty space? (One sentence)\nA human would use both hands with palms up to trace a large, horizontal circle in front of their torso, then push their hands forward to present the \"bowl\".\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\nP1: `dir: \"up\"`, `gripper_orientation: \"horizontal\"`. This mimics a palm-up gesture, as if supporting the bowl from underneath. P2: `dir: \"front\"`, `gripper_orientation: \"vertical\"`. This mimics cupping the side of the bowl. Winner: P1 is superior because it more clearly communicates \"supporting the weight\" of a large object from its base, which is a primary characteristic of a bowl.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > path arc vs M2: pose > movement rep). State the winner and why.\nM1: Pose (start) > Path Arc (trace rim) > Pose (hold) > Movement (push forward). This sequence clearly separates defining the object's shape, establishing it with a pause, and then acting on it. M2: Pose (center) > Path Arc (trace half) > Path Arc (trace other half). This only forms the shape but lacks the interaction of presenting it. Winner: M1 tells a clearer story: \"Here is a large bowl (trace & hold), and I am giving it to you (push).\"\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the mime interpretation stronger and pick the best one.\nA1: Add a brief hold after tracing the arc. This pause allows the viewer to register the \"bowl\" before the next action begins, solidifying the object's existence in space. A2: Add a slight \"lift\" (z-axis move) after the arc. This suggests picking up the bowl before presenting it. Winner: A1 is better because a simple pause is a classic mime technique to establish an object; adding a lift might be too much motion and could confuse the primary gesture."
+  }
+]

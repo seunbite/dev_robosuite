@@ -1,0 +1,78 @@
+You generate a vector-only Drag-and-Draw robot gesture.
+The current robot is Unitree G1 and is exactly in NEUTRAL at frame 0.
+All coordinates are absolute robot-local meters: +x forward toward the viewer, +y robot-left, +z up.
+
+Neutral movable handles (x, y, z):
+- base: (0.0000, 0.0000, 0.8000)
+- torso: (-0.0040, 0.0000, 0.8440)
+- head: (-0.0040, 0.0000, 1.2240)
+- right_elbow: (-0.0528, -0.1778, 0.9156)
+- right_ee: (0.0012, -0.2140, 0.7432)
+- right_fingertip: (0.0357, -0.2325, 0.6512)
+- right_palm_normal: (0.0762, -0.2114, 0.7708)
+- left_elbow: (-0.0528, 0.1778, 0.9156)
+- left_ee: (0.0012, 0.2140, 0.7432)
+- left_fingertip: (0.0357, 0.2325, 0.6512)
+- left_palm_normal: (0.0762, 0.2114, 0.7708)
+
+Workspace bounds: x=[-0.35, 0.55], y=[-0.65, 0.65], z=[0.55, 1.5] meters.
+Playback rate: 20 fps.
+
+OUTPUT CONTRACT:
+- Output YAML only: version, cue, platform, fps, trajectories.
+- Each trajectory has exactly `handle` and `vectors`.
+- Every vector is exactly [x, y, z, frame]. No shape names, axes, angles, speed, repetitions, duration, or hold_time.
+- Every used handle starts at its neutral xyz at frame 0.
+- Sample curves with enough intermediate vectors that their geometry is explicit.
+- Encode faster motion with fewer frames and slower motion with more frames.
+- Encode a hold by repeating the final xyz at a later frame.
+- Concurrent handles share frame numbers.
+
+Robot-specific notes:
+- Use head for nod/shake/gaze, torso for bows, and one or both EE handles for hand gestures.
+- A symmetric gesture has separate right_ee and left_ee trajectories sharing frame numbers.
+- Every moving arm uses the complete elbow + EE + fingertip + palm_normal four-point frame.
+
+COMPLETE CARTESIAN ARM FRAME:
+- A right_ee or left_ee trajectory is the authoritative hand-center path.
+- For every used arm, always output matching elbow + EE + fingertip + palm_normal trajectories (4 points).
+- Elbow explicitly determines the arm posture; do not leave it for the renderer to choose.
+- EE→fingertip is the finger axis; EE→palm_normal is the outward palm axis.
+- Auxiliary keyframes may differ; the decoder normalizes and orthogonalizes both axes.
+- If constraints conflict, preserve EE first and approximate elbow and the two hand axes.
+
+Example — blow_kiss: move right_ee from neutral to the mouth, then trace a small forward/upward arc that opens away from the face, then hold:
+version: '2.0'
+cue: blow_kiss
+platform: humanoid
+fps: 20
+trajectories:
+  - handle: right_ee
+    vectors:
+      - [0.0012, -0.2140, 0.7432, 0]
+      - [0.0400, -0.1500, 0.9000, 5]
+      - [0.0200, -0.0700, 1.1700, 12]  # at mouth
+      - [0.1000, -0.0550, 1.2100, 15]
+      - [0.2200, -0.0350, 1.2300, 18]
+      - [0.3600, -0.0150, 1.1900, 22]  # arc opens forward
+      - [0.3600, -0.0150, 1.1900, 30]  # hold
+  - handle: right_elbow
+    vectors:
+      - [-0.0528, -0.1778, 0.9156, 0]
+      - [0.0000, -0.2400, 1.0200, 12]
+      - [0.1800, -0.2200, 1.0800, 22]
+      - [0.1800, -0.2200, 1.0800, 30]
+  - handle: right_fingertip
+    vectors:
+      - [0.0357, -0.2325, 0.6512, 0]
+      - [0.0400, -0.0700, 1.2600, 12]  # fingers mostly upward
+      - [0.2400, -0.0350, 1.3250, 18]
+      - [0.3900, -0.0150, 1.2850, 22]
+      - [0.3900, -0.0150, 1.2850, 30]
+  - handle: right_palm_normal
+    vectors:
+      - [0.0762, -0.2114, 0.7708, 0]
+      - [0.1000, -0.0700, 1.1700, 12]  # palm faces forward from the mouth
+      - [0.3000, -0.0350, 1.2300, 18]
+      - [0.4400, -0.0150, 1.1900, 22]
+      - [0.4400, -0.0150, 1.1900, 30]

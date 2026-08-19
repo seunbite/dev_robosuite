@@ -48,6 +48,13 @@ PAIRWISE_IMG_DIR = _REPO / "data/results/visualize/pose_pairwise_12_pilot90"
 MULTITILE_IMG_DIR = _REPO / "data/results/visualize/pose_multitile_gt_pilot90"
 MOTION_MANIFEST = _REPO / "data/results/render/manipulator/motion_vlm_verify_pilot90/manifest_pilot90.json"
 MOTION_PAIRWISE_DIR = _REPO / "data/results/verify/samples/motion_gt_neg_pairwise_pilot90"
+MOTION_REP_PAIRWISE_DIR = _REPO / "data/results/verify/samples/motion_gt_neg_rep_pairwise_pilot90"
+REP_PAIRWISE_SPECS_NAME = "pairwise_specs_rep_pilot90.json"
+REP_PAIRWISE_INPUT_HTML = MOTION_REP_PAIRWISE_DIR / "pairwise_rep_input_review.html"
+
+CONTEXT_VARIATION_YML = _REPO / "data/seed/yml/context_variation_catalog_20.yml"
+CONTEXT_VARIATION_OUT = _REPO / "data/results/paper_figures/context_variation_20"
+CONTEXT_VARIATION_INPUT_HTML = _REPO / "data/results/html/manipulator/exp12_context_variation_input.html"
 
 N_CUES = 90
 
@@ -70,9 +77,12 @@ EXPERIMENT_TITLES: dict[str, str] = {
     "8": "Movement verify + regenerate — VLM (MP4)",
     "9": "Movement verify + regenerate — text",
     "10": "Movement pairwise (VLM — MP4)",
+    "11": "Movement pairwise (temporal / repetition flip)",
+    "12": "Context variation (persona + scenario)",
+    "13": "Baseline few-shot (xyz / joint trajectories)",
 }
 
-GENERATION_EXPS = frozenset({"1", "7"})
+GENERATION_EXPS = frozenset({"1", "7", "12"})
 CONFIG_INPUT_EXPS: dict[str, str] = {
     "1": "1",
     "2": "1",
@@ -119,6 +129,14 @@ def score_result_path(exp_id: str | int, model_tag: str) -> Path:
 def html_result_path(exp_id: str | int, model_tag: str) -> Path:
     """Per-experiment review HTML, e.g. data/results/html/exp2_qwen32b.html."""
     return HTML_EXP_DIR / f"exp{int(exp_id)}_{model_tag}.html"
+
+
+def exp11_input_html_path() -> Path:
+    return REP_PAIRWISE_INPUT_HTML
+
+
+def exp11_specs_path() -> Path:
+    return MOTION_REP_PAIRWISE_DIR / REP_PAIRWISE_SPECS_NAME
 
 
 def config_for_experiment(exp_id: str | int, model_tag: str) -> Path:

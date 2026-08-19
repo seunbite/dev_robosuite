@@ -1,0 +1,68 @@
+[
+  {
+    "idx": 15,
+    "cue": "beckon_come_here",
+    "description": "The robot extends its arm with the palm up to invite, holding briefly to establish intent, then pulls its forearm inward twice in a clear 'come here' gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 45,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 70,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.5,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -60
+              },
+              "speed": 2.0,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "x": 60
+              },
+              "speed": 1.6,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-08T08:29:33",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q1: No, the rendered motion's beckoning curls are too fast and wrist-only, making the gesture look more like a frantic, jittery spasm than an intentional \"come here\" pull.",
+    "correction_q2": "Correction Q2: The motion should first stage the gesture by extending the arm with a palm-up pose and holding it briefly to create an invitation, then replace the rapid wrist flicks with two slower, more deliberate elbow bends that pull the forearm and hand toward the robot's body.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: No, the rendered motion's beckoning curls are too fast and wrist-only, making the gesture look more like a frantic, jittery spasm than an intentional \"come here\" pull.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The motion should first stage the gesture by extending the arm with a palm-up pose and holding it briefly to create an invitation, then replace the rapid wrist flicks with two slower, more deliberate elbow bends that pull the forearm and hand toward the robot's body.\n\n# Q1: How would a human perform this motion? (One sentence)\n# Q1: A human extends their arm forward with the palm up, then repeatedly curls their forearm and wrist inward toward their own body to \"pull\" the other person closer.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\n# Q2: candidates=P1) up+horizontal+x70,y50,z50, P2) front+vertical+x70,y50,z50; winner=P1 because the palm-up orientation is iconic for a welcoming beckon, whereas a front-facing palm (P2) reads as a \"stop\" gesture.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n# Q3: options=M1 pose(extend)>movement(wrist curls), M2 pose(extend)>movement(elbow pulls); winner=M2 because using the elbow joint creates a larger, more human-like pulling motion that is far more readable and less spastic than a small, rapid wrist-only flick.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n# Q4: options=C1 an immediate beckon from a neutral pose, C2 extending the arm and holding it for a moment before beckoning; winner=C2 because the preparatory hold clearly establishes an \"invitation\" before the pulling action begins, making the entire sequence unambiguous."
+  }
+]

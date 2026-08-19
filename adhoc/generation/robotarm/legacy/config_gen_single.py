@@ -299,7 +299,10 @@ def _coerce_step_parameters(step: Dict[str, Any]) -> Dict[str, Any]:
 
 def _normalize_motion_config(config: Dict[str, Any]) -> Dict[str, Any]:
     """Normalize generated configs (e.g. strip legacy path.joint when EE fields exist)."""
-    from legacy.path_ee_ik import normalize_path_parameters
+    try:
+        from legacy.path_ee_ik import normalize_path_parameters
+    except ImportError:
+        normalize_path_parameters = lambda params: params
 
     out = dict(config)
     raw = config.get("movements") or config.get("sequence") or []

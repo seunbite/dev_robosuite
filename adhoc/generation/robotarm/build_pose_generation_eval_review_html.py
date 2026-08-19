@@ -152,6 +152,7 @@ def build(
     out_html: Path | None = None,
     gif_dir: Path | None = None,
     title: str | None = None,
+    cues: set[str] | None = None,
 ) -> Path:
     spec = dict(SUITES[suite])
     gif_dir = gif_dir or spec["gif_dir"]
@@ -173,6 +174,8 @@ def build(
         from pilot90_paths import load_gt_by_cue, row_generation_done
 
         cfg_rows = [r for r in cfg_rows if row_generation_done(r)]
+        if cues:
+            cfg_rows = [r for r in cfg_rows if str(r.get("cue", "")) in cues]
         cfg_by_cue = {cfg.get("cue", ""): cfg for cfg in cfg_rows}
         gt_by_cue = load_gt_by_cue()
         for cfg in sorted(cfg_rows, key=lambda r: int(r.get("idx", 0))):
@@ -346,14 +349,22 @@ if __name__ == "__main__":
     p.add_argument("--out-html", type=Path, default=None)
     p.add_argument("--gif-dir", type=Path, default=None)
     p.add_argument("--title", type=str, default=None)
+    p.add_argument(
+        "--cues",
+        type=str,
+        default=None,
+        help="Comma-separated cue subset (default: all rows in config)",
+    )
     p.add_argument("--open", action="store_true", help="Open HTML in default browser")
     args = p.parse_args()
+    cue_set = {c.strip() for c in args.cues.split(",") if c.strip()} if args.cues else None
     out = build(
         suite=args.suite,
         config=args.config,
         out_html=args.out_html,
         gif_dir=args.gif_dir,
         title=args.title,
+        cues=cue_set,
     )
     print(f"Wrote {out}")
     if args.open:

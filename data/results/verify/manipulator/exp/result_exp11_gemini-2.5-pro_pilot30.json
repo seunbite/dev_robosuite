@@ -1,0 +1,630 @@
+{
+  "time": "2026-06-17T02:50:10",
+  "mode": "exp11_motion_pairwise_rep_flip",
+  "vlm_backend": "gemini",
+  "model": "gemini-2.5-pro",
+  "pairwise_specs": "data/results/verify/samples/motion_gt_neg_rep_pairwise_pilot90/pairwise_specs_rep_pilot90.json",
+  "spec_version": "v1",
+  "spec_n": 30,
+  "layout": "left_right_plain_mp4_stitched",
+  "pilot_n": 30,
+  "n": 30,
+  "n_scored": 30,
+  "accuracy": 0.6333333333333333,
+  "accuracy_by_bucket": {
+    "non→rep": 0.6818181818181818,
+    "rep→non": 0.5
+  },
+  "bucket_counts": {
+    "non→rep": {
+      "ok": 15,
+      "n": 22
+    },
+    "rep→non": {
+      "ok": 4,
+      "n": 8
+    }
+  },
+  "mp4": [
+    {
+      "idx": 7,
+      "cue": "raise_fists_victory",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "007_raise_fists_victory_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: raise_fists_victory\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is much more appropriate. It performs a single, clean, upward thrust, which is the iconic motion for 'raising a fist in victory'. The right side performs a rapid up-and-down shaking or pumping motion. While this can also be a celebratory gesture, it's not a 'raise'. The left side's motion is a direct and unambiguous representation of the cue.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 8,
+      "cue": "fist_pump",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "008_fist_pump_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: fist_pump\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "Both sides show a similar vertical pumping motion appropriate for a fist pump. However, the motion on the right is slightly better because it is sharper and more emphatic. There is a more distinct stop at the bottom of the downward pump before the arm returns up, which better conveys the triumphant and decisive nature of the gesture.",
+        "confidence": 0.7
+      },
+      "pred": "right",
+      "better_side": "right",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 9,
+      "cue": "flex_bicep",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "009_flex_bicep_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: flex_bicep\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is significantly more appropriate because it isolates the motion to the 'elbow' joint, creating a clear curling motion that is the primary characteristic of flexing a bicep. The right side's motion is a compound movement involving both the 'shoulder' and 'elbow' joints, resulting in the entire arm lifting up. This distracts from the core gesture and makes it less recognizable as a bicep flex.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 10,
+      "cue": "shrug_idk",
+      "gt_side": "right",
+      "left": "neg_rep",
+      "right": "gt",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "010_shrug_idk_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: shrug_idk\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side is much more appropriate. A shrug is typically a single, quick up-and-down movement. The right side performs exactly this, a single vertical lift and drop. The left side repeats the motion, which makes it look less like a natural shrug and more like a mechanical pumping or a repetitive, emphatic gesture. The single repetition on the right is the most common and recognizable way to perform a shrug.",
+        "confidence": 1.0
+      },
+      "pred": "right",
+      "better_side": "right",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 11,
+      "cue": "self_scratch_head_confused",
+      "gt_side": "right",
+      "left": "neg_rep",
+      "right": "gt",
+      "gt_repetition_label": "rep",
+      "neg_rep_override": "non",
+      "pair_mp4": "011_self_scratch_head_confused_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: self_scratch_head_confused\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side better conveys the cue. Its motion has a larger and more distinct vertical trajectory, which is clearly recognizable as a scratching action against the robot's 'head'. The right side's motion is too small and subtle, appearing more like a slight vibration or tap, which is less effective at communicating the gesture of scratching one's head in confusion.",
+        "confidence": 0.9
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 12,
+      "cue": "facepalm",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "012_facepalm_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: facepalm\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side's motion is more appropriate for a 'facepalm'. It moves the end-effector up and forward to a position that would be in front of a face and holds it there, which is the core of the gesture. The right side's motion has a similar trajectory but includes a small, extra forward push at the very end, which makes it look less like a hand meeting a face and more like a slight nudge or reach-past motion.",
+        "confidence": 0.85
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 14,
+      "cue": "point_you",
+      "gt_side": "right",
+      "left": "neg_rep",
+      "right": "gt",
+      "gt_repetition_label": null,
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "014_point_you_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: point_you\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate because it executes a direct, forward-thrusting motion to point. This is the most common and clear trajectory for a 'point at you' gesture. The right side's motion includes a significant upward arc, which is less direct and could be interpreted as pointing upwards and forwards, rather than directly at the viewer.",
+        "confidence": 0.9
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 15,
+      "cue": "beckon_come_here",
+      "gt_side": "right",
+      "left": "neg_rep",
+      "right": "gt",
+      "gt_repetition_label": "rep",
+      "neg_rep_override": "non",
+      "pair_mp4": "015_beckon_come_here_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: beckon_come_here\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is much more appropriate. It performs a distinct pulling motion, moving the end-effector towards the robot's base, which is the core trajectory of a 'come here' or beckoning gesture. The right side's motion moves both towards and away from the base, with the 'pushing away' part being completely contradictory to the cue's meaning.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 16,
+      "cue": "stop_palm_out",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "016_stop_palm_out_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: stop_palm_out\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side's motion is a single, decisive push forward into a held pose, which clearly and authoritatively conveys the 'stop' signal. The right side's motion includes a slight retraction after the forward push, which weakens the gesture's intent and makes it less definitive than a firm stop.",
+        "confidence": 0.9
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 17,
+      "cue": "pat_stomach",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "rep",
+      "neg_rep_override": "non",
+      "pair_mp4": "017_pat_stomach_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: pat_stomach\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is significantly better because it uses a repetitive, circular motion. This is a very common and easily recognizable way to mime the action of rubbing one's stomach. The right side performs only a single, short, downward movement, which is too brief and lacks the repetition necessary to be clearly understood as 'patting the stomach'. The continuous, repeated action on the left is key to conveying the gesture.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 18,
+      "cue": "fan_face_hot",
+      "gt_side": "right",
+      "left": "neg_rep",
+      "right": "gt",
+      "gt_repetition_label": "rep",
+      "neg_rep_override": "non",
+      "pair_mp4": "018_fan_face_hot_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: fan_face_hot\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is much more appropriate. Its motion is a horizontal, side-to-side waving movement, which directly mimics the iconic gesture of fanning one's face when hot. The right side's motion is a forward-and-backward pushing movement, which does not convey the concept of fanning.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 19,
+      "cue": "cover_yawn_sleepy",
+      "gt_side": "right",
+      "left": "neg_rep",
+      "right": "gt",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "019_cover_yawn_sleepy_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: cover_yawn_sleepy\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side's motion is more appropriate for covering a yawn. The robot arm moves its end-effector to a higher position, directly in front of where a 'mouth' or 'face' would be on the central column. The right side's motion ends significantly lower, more at a 'chest' level, which does not effectively convey the act of covering a mouth.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 20,
+      "cue": "rub_eye_tired",
+      "gt_side": "right",
+      "left": "neg_rep",
+      "right": "gt",
+      "gt_repetition_label": "rep",
+      "neg_rep_override": "non",
+      "pair_mp4": "020_rub_eye_tired_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: rub_eye_tired\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate because its motion is more sustained and repetitive. It performs a clear, repeated vertical back-and-forth movement at the 'eye' level, which strongly reads as rubbing. The right side's motion is much shorter and less repetitive, making the 'rubbing' action less clear and almost like a single tap or twitch.",
+        "confidence": 0.9
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 21,
+      "cue": "tap_temple_think",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "rep",
+      "neg_rep_override": "non",
+      "pair_mp4": "021_tap_temple_think_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: tap_temple_think\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate because it performs a repetitive back-and-forth motion. The cue 'tap_temple_think' implies a repeated tapping action, which the left side's multiple movements accurately convey. The right side only performs a single in-and-out motion, which reads more like a single poke rather than the characteristic repetitive gesture for thinking.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 23,
+      "cue": "lean_forward_interest",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "023_lean_forward_interest_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: lean_forward_interest\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate. The cue 'lean_forward_interest' is best represented by a simple, direct forward movement, as if a person is leaning in to see or hear better. The left motion is a pure forward translation, which clearly and effectively conveys this action. The right motion, based on the annotation, includes an upward component, which is not characteristic of this specific gesture and makes the motion less clear.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 24,
+      "cue": "cover_mouth_gasp",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "024_cover_mouth_gasp_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: cover_mouth_gasp\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate. The final pose is more centered and closer to the robot's 'body,' which better simulates the action of a hand covering a mouth. The right side's motion ends with the hand too far forward, making the gesture less clear and less like a natural gasp.",
+        "confidence": 0.85
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 25,
+      "cue": "cheers_toast",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "025_cheers_toast_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: cheers_toast\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side better conveys a toast. It performs a single, clear forward thrust, which is the core motion of extending a glass to clink with another. The right side immediately retracts after moving forward, making the motion look more like a quick jab or poke rather than a deliberate toast, which often has a slight hold at the point of contact.",
+        "confidence": 0.9
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 26,
+      "cue": "highfive_invite",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": null,
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "026_highfive_invite_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: highfive_invite\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate. It raises its 'hand' and holds it in a static, ready position, which is the standard, unambiguous way to invite a high five. This creates a clear and stable target for the other person. The right side's repetitive up-and-down motion is less clear; it feels more like a general beckoning or 'hurry up' gesture and presents an unstable target, which is not suitable for a high five.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 27,
+      "cue": "highfive_imitation",
+      "gt_side": "right",
+      "left": "neg_rep",
+      "right": "gt",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "027_highfive_imitation_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: highfive_imitation\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side's motion is more appropriate because its trajectory follows a more natural, human-like arc when raising the 'hand' for the high-five. This makes the gesture more recognizable and less robotic compared to the slightly more direct and linear path of the right side.",
+        "confidence": 0.7
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 28,
+      "cue": "fistbump_invite",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "028_fistbump_invite_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: fistbump_invite\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "Both motions are virtually identical and equally appropriate for the cue. They both consist of a simple forward extension of the arm, presenting the fist towards the viewer and holding the pose, which clearly reads as an invitation for a fist bump. There is no discernible difference in trajectory, speed, or hold time between the two sides.",
+        "confidence": 0.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 30,
+      "cue": "pat_self_back",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "rep",
+      "neg_rep_override": "non",
+      "pair_mp4": "030_pat_self_back_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: pat_self_back\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate because it performs the patting motion multiple times (twice). The repetition of the pat is characteristic of the gesture and makes the intent much clearer to an observer. The right side only performs a single pat, which is less distinct and could be missed or misinterpreted.",
+        "confidence": 0.9
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 33,
+      "cue": "chin_flick_dismiss",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "033_chin_flick_dismiss_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: chin_flick_dismiss\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side is better because its trajectory is an arc that moves both upwards and forwards. The 'chin flick' gesture is about flicking something away from the body, so this combined up-and-forward motion is crucial. The left side's motion is almost purely vertical, resembling a simple shoulder lift or shrug, which doesn't convey the dismissive 'away' aspect of the cue as effectively.",
+        "confidence": 0.9
+      },
+      "pred": "right",
+      "better_side": "right",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 34,
+      "cue": "cover_ears_too_loud",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "034_cover_ears_too_loud_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: cover_ears_too_loud\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side is more appropriate because the motion includes a subtle shake or vibration. While both motions move the end-effector to the correct position to represent covering an ear, the shaking on the right side better conveys a reaction to a stimulus that is \"too loud,\" suggesting a flinch or discomfort from the sound. The left side's motion is too smooth and neutral to fully capture the meaning of the cue.",
+        "confidence": 0.9
+      },
+      "pred": "right",
+      "better_side": "right",
+      "vlm_correct": false,
+      "correct": false
+    },
+    {
+      "idx": 35,
+      "cue": "salute",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "035_salute_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: salute\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate because it includes a distinct hold at the peak of the motion. A salute is characterized by a crisp movement to the head, a brief, sharp hold, and then a return. The left side captures this 'up-hold-down' rhythm perfectly. The right side moves up and immediately back down without any pause, which makes it look more like a casual wave or a simple touch-and-go motion, rather than a formal salute.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 36,
+      "cue": "visor_search",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "rep",
+      "neg_rep_override": "non",
+      "pair_mp4": "036_visor_search_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: visor_search\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate because it performs a horizontal, side-to-side sweeping motion after establishing the 'visor' pose. This clearly conveys the action of 'searching' or looking around. The right side's motion is a vertical bobbing, which does not match the 'search' component of the cue.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 37,
+      "cue": "yield_turn",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": null,
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "037_yield_turn_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: yield_turn\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate. The cue 'yield_turn' is an offering or 'after you' gesture, which is typically a smooth, sweeping motion. The left arm performs a more natural, curved trajectory, sweeping outward from the body. This more closely resembles a human politely offering a turn. The right side's motion is more linear and direct, which reads less like a gentle yielding and more like a simple 'go' command.",
+        "confidence": 0.9
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 39,
+      "cue": "request_turn",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "039_request_turn_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: request_turn\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate because it performs a single, clear pulling motion towards the robot's body. This is a very standard and recognizable beckoning gesture, often used to indicate 'your turn' or 'come here'. The right side performs a small, repetitive, oscillating motion that is less clear and does not map as well to the conventional human gesture for requesting a turn.",
+        "confidence": 1.0
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 41,
+      "cue": "protective_arm_out",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "041_protective_arm_out_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: protective_arm_out\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is more appropriate. The motion is a direct, horizontal push outward from the shoulder, which is a very clear and iconic representation of a 'protective arm out' or 'stop' gesture. The right side's motion has both a forward and a significant upward component, which makes the gesture feel less like a direct barrier and more like a general 'raising' motion. The directness of the left side's trajectory better embodies the protective intent of the cue.",
+        "confidence": 0.9
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 44,
+      "cue": "clarification_request_palm_tilt",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": "non",
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "044_clarification_request_palm_tilt_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: clarification_request_palm_tilt\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "left",
+        "motion_assessment": "The left side is significantly better because it isolates the motion to a distinct tilt or rotation of the end effector, which perfectly matches the 'palm_tilt' cue for requesting clarification (like a 'what?' or 'huh?' gesture). The right side moves the entire arm in a small shuffling motion from the shoulder, which does not read as a tilt and is a less specific or recognizable gesture for this cue.",
+        "confidence": 0.9
+      },
+      "pred": "left",
+      "better_side": "left",
+      "vlm_correct": true,
+      "correct": true
+    },
+    {
+      "idx": 45,
+      "cue": "slow_down_request_palm_down",
+      "gt_side": "left",
+      "left": "gt",
+      "right": "neg_rep",
+      "gt_repetition_label": null,
+      "neg_rep_override": "osc_repeat3",
+      "pair_mp4": "045_slow_down_request_palm_down_pair_rep.mp4",
+      "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: slow_down_request_palm_down\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+      "parsed": {
+        "better_side": "right",
+        "motion_assessment": "The right side is more appropriate because it includes a small repetition or 'bounce' in the downward motion. The gesture for 'slow down' is typically a repeated, gentle, downward patting motion. The right side's two-part downward movement better captures this rhythmic quality, making it more recognizable than the single, smooth downward press on the left.",
+        "confidence": 0.9
+      },
+      "pred": "right",
+      "better_side": "right",
+      "vlm_correct": false,
+      "correct": false
+    }
+  ]
+}

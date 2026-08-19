@@ -1,0 +1,277 @@
+{
+  "time": "2026-07-08T08:27:10",
+  "domain": "manipulator",
+  "exp_id": "1",
+  "model_tag": "gemini-2.5-pro",
+  "round": 1,
+  "parent_round": 0,
+  "correction_stem": "correction",
+  "cue": "self_scratch_head_confused",
+  "base_config_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/manipulator/exp/result_exp1_gemini-2.5-pro.json",
+  "config_snapshot_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/manipulator/exp/correction/gemini-2.5-pro/exp1/self_scratch_head_confused/correction_config.json",
+  "is_correct": null,
+  "action": "corrected",
+  "correction": {
+    "exp_id": "1",
+    "correction_q1": "Correction Q1: no, the motion lacks a clear \"confused\" head tilt, the movement to the head is too direct, and the final \"scratch\" is an unconvincing lateral shake instead of a scratching motion.",
+    "correction_q2": "Correction Q2: The sequence should be recomposed to first establish confusion with a clear head tilt, then slowly raise a closed gripper to the head to show hesitation, pause thoughtfully, and finally execute a small, repeated up-and-down scratching motion with the wrist.",
+    "is_correct": null,
+    "inner_reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: no, the motion lacks a clear \"confused\" head tilt, the movement to the head is too direct, and the final \"scratch\" is an unconvincing lateral shake instead of a scratching motion.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The sequence should be recomposed to first establish confusion with a clear head tilt, then slowly raise a closed gripper to the head to show hesitation, pause thoughtfully, and finally execute a small, repeated up-and-down scratching motion with the wrist.\n\n# Q1: How would a human perform this motion? (One sentence)\n# A human would first show confusion with a head tilt, then slowly bring their fingers to their temple, pause in thought, and then perform a few light scratches.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\n# Q2: candidates=P1) left+horizontal+x45,y25,z85, P2) back+vertical+x20,y30,z85; winner=P1 because placing the hand at the side of the \"head\" (temple) is more iconic for confused scratching than placing it at the back of the head.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n# Q3: options=M1 pose(start)>movement(head_tilt)>pose(to_head)>movement(scratch), M2 pose(start)>path(to_head)>movement(scratch+tilt); winner=M1 because it cleanly separates the emotional beats: first confusion, then the thoughtful act of raising the hand, then the scratch itself.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n# Q4: options=C1 an initial head tilt, C2 a slow movement to the head, C3 a pause before scratching; winner=C1+C2+C3, as combining the initial confusion tilt, the slow/hesitant approach, and the thoughtful pause before the scratch creates the most convincing and readable performance of confusion.",
+    "config_parsed": {
+      "idx": 0,
+      "cue": "self_scratch_head_confused",
+      "description": "The robot first tilts its 'head' to express confusion, slowly and thoughtfully raises its closed hand to its temple, pauses, and then performs two small, light scratches.",
+      "movements": [
+        {
+          "type": "pose",
+          "parameters": {
+            "pose": {
+              "dir": "down",
+              "x": 40,
+              "y": 35,
+              "z": 40,
+              "gripper_orientation": "vertical",
+              "gripper_open_percent": 10
+            },
+            "speed": 1.0,
+            "hold_time": 0.1
+          }
+        },
+        {
+          "type": "movement",
+          "parameters": {
+            "repetition": 1,
+            "joint": "shoulder",
+            "directions": [
+              {
+                "degrees": {
+                  "y": -15
+                },
+                "speed": 1.0,
+                "hold_time": 0.3
+              }
+            ]
+          }
+        },
+        {
+          "type": "pose",
+          "parameters": {
+            "pose": {
+              "dir": "left",
+              "x": 45,
+              "y": 25,
+              "z": 85,
+              "gripper_orientation": "horizontal",
+              "gripper_open_percent": 10
+            },
+            "speed": 0.7,
+            "hold_time": 0.6
+          }
+        },
+        {
+          "type": "movement",
+          "parameters": {
+            "repetition": 2,
+            "joint": "wrist",
+            "directions": [
+              {
+                "degrees": {
+                  "z": 15
+                },
+                "speed": 1.8,
+                "hold_time": 0.1
+              },
+              {
+                "degrees": {
+                  "z": -15
+                },
+                "speed": 1.8,
+                "hold_time": 0.15
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "parse_error": null,
+    "raw_text": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: no, the motion lacks a clear \"confused\" head tilt, the movement to the head is too direct, and the final \"scratch\" is an unconvincing lateral shake instead of a scratching motion.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The sequence should be recomposed to first establish confusion with a clear head tilt, then slowly raise a closed gripper to the head to show hesitation, pause thoughtfully, and finally execute a small, repeated up-and-down scratching motion with the wrist.\n\n# Q1: How would a human perform this motion? (One sentence)\n# A human would first show confusion with a head tilt, then slowly bring their fingers to their temple, pause in thought, and then perform a few light scratches.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\n# Q2: candidates=P1) left+horizontal+x45,y25,z85, P2) back+vertical+x20,y30,z85; winner=P1 because placing the hand at the side of the \"head\" (temple) is more iconic for confused scratching than placing it at the back of the head.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n# Q3: options=M1 pose(start)>movement(head_tilt)>pose(to_head)>movement(scratch), M2 pose(start)>path(to_head)>movement(scratch+tilt); winner=M1 because it cleanly separates the emotional beats: first confusion, then the thoughtful act of raising the hand, then the scratch itself.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n# Q4: options=C1 an initial head tilt, C2 a slow movement to the head, C3 a pause before scratching; winner=C1+C2+C3, as combining the initial confusion tilt, the slow/hesitant approach, and the thoughtful pause before the scratch creates the most convincing and readable performance of confusion.\n{\n  \"idx\": 0,\n  \"cue\": \"self_scratch_head_confused\",\n  \"description\": \"The robot first tilts its 'head' to express confusion, slowly and thoughtfully raises its closed hand to its temple, pauses, and then performs two small, light scratches.\",\n  \"movements\": [\n    {\n      \"type\": \"pose\",\n      \"parameters\": {\n        \"pose\": {\n          \"dir\": \"down\",\n          \"x\": 40,\n          \"y\": 35,\n          \"z\": 40,\n          \"gripper_orientation\": \"vertical\",\n          \"gripper_open_percent\": 10\n        },\n        \"speed\": 1.0,\n        \"hold_time\": 0.1\n      }\n    },\n    {\n      \"type\": \"movement\",\n      \"parameters\": {\n        \"repetition\": 1,\n        \"joint\": \"shoulder\",\n        \"directions\": [\n          {\n            \"degrees\": {\n              \"y\": -15\n            },\n            \"speed\": 1.0,\n            \"hold_time\": 0.3\n          }\n        ]\n      }\n    },\n    {\n      \"type\": \"pose\",\n      \"parameters\": {\n        \"pose\": {\n          \"dir\": \"left\",\n          \"x\": 45,\n          \"y\": 25,\n          \"z\": 85,\n          \"gripper_orientation\": \"horizontal\",\n          \"gripper_open_percent\": 10\n        },\n        \"speed\": 0.7,\n        \"hold_time\": 0.6\n      }\n    },\n    {\n      \"type\": \"movement\",\n      \"parameters\": {\n        \"repetition\": 2,\n        \"joint\": \"wrist\",\n        \"directions\": [\n          {\n            \"degrees\": {\n              \"z\": 15\n            },\n            \"speed\": 1.8,\n            \"hold_time\": 0.1\n          },\n          {\n            \"degrees\": {\n              \"z\": -15\n            },\n            \"speed\": 1.8,\n            \"hold_time\": 0.15\n          }\n        ]\n      }\n    }\n  ]\n}",
+    "prompt_exp_id": "1",
+    "pipeline_exp_id": "1",
+    "vlm_media": {
+      "kind": "video/mp4",
+      "path": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/manipulator/correction/exp1/gemini-2.5-pro/self_scratch_head_confused/new_render/IIWA/20260708_080251_IIWA_self_scratch_head_confused_p405.mp4"
+    }
+  },
+  "input_row": {
+    "idx": 11,
+    "cue": "self_scratch_head_confused",
+    "description": "The robot first tilts its 'head' to show confusion, slowly brings its hand up to its temple, pauses thoughtfully, and then performs two light scratches.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 35,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -8,
+                "z": -5
+              },
+              "speed": 1.0,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 45,
+            "y": 20,
+            "z": 85,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 0.8,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "y": -10
+              },
+              "speed": 1.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "gemini-2.5-pro",
+    "time": "2026-06-12 18:05:38",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A human would perform a confused head scratch by first tilting their head slightly, slowly raising their hand, pausing thoughtfully, and then lightly scratching a couple of times.\n# Q2: candidates=P1) left+horizontal+x45,y20,z85, P2) up+horizontal+x45,y20,z85; winner=P1 because dir:left correctly orients the gripper's palm-like surface onto the side of the head for a scratch, whereas dir:up would be for a facepalm.\n# Q3: options=M1 pose>movement(scratch), M2 pose>pose(head)>movement(scratch), M3 movement(tilt)>pose(head_slow_hold)>movement(scratch); winner=M3 because the preceding head tilt and slow, held arrival at the head are essential animation beats that establish the context of \"confusion\" rather than a simple mechanical scratch.\n# Q4: options=C1 a preparatory head tilt, C2 a final return pose, C3 a faster scratch motion; winner=C1 because the initial head tilt is a powerful and universally understood sign of confusion that primes the viewer for the scratch gesture that follows.",
+    "generation_valid": true,
+    "generation_attempt": 1
+  },
+  "output_row": {
+    "idx": 11,
+    "cue": "self_scratch_head_confused",
+    "description": "The robot first tilts its 'head' to express confusion, slowly and thoughtfully raises its closed hand to its temple, pauses, and then performs two small, light scratches.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 35,
+            "z": 40,
+            "gripper_orientation": "vertical",
+            "gripper_open_percent": 10
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -15
+              },
+              "speed": 1.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 45,
+            "y": 25,
+            "z": 85,
+            "gripper_orientation": "horizontal",
+            "gripper_open_percent": 10
+          },
+          "speed": 0.7,
+          "hold_time": 0.6
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 15
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": -15
+              },
+              "speed": 1.8,
+              "hold_time": 0.15
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-08T08:26:56",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q1: no, the motion lacks a clear \"confused\" head tilt, the movement to the head is too direct, and the final \"scratch\" is an unconvincing lateral shake instead of a scratching motion.",
+    "correction_q2": "Correction Q2: The sequence should be recomposed to first establish confusion with a clear head tilt, then slowly raise a closed gripper to the head to show hesitation, pause thoughtfully, and finally execute a small, repeated up-and-down scratching motion with the wrist.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: no, the motion lacks a clear \"confused\" head tilt, the movement to the head is too direct, and the final \"scratch\" is an unconvincing lateral shake instead of a scratching motion.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The sequence should be recomposed to first establish confusion with a clear head tilt, then slowly raise a closed gripper to the head to show hesitation, pause thoughtfully, and finally execute a small, repeated up-and-down scratching motion with the wrist.\n\n# Q1: How would a human perform this motion? (One sentence)\n# A human would first show confusion with a head tilt, then slowly bring their fingers to their temple, pause in thought, and then perform a few light scratches.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\n# Q2: candidates=P1) left+horizontal+x45,y25,z85, P2) back+vertical+x20,y30,z85; winner=P1 because placing the hand at the side of the \"head\" (temple) is more iconic for confused scratching than placing it at the back of the head.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n# Q3: options=M1 pose(start)>movement(head_tilt)>pose(to_head)>movement(scratch), M2 pose(start)>path(to_head)>movement(scratch+tilt); winner=M1 because it cleanly separates the emotional beats: first confusion, then the thoughtful act of raising the hand, then the scratch itself.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n# Q4: options=C1 an initial head tilt, C2 a slow movement to the head, C3 a pause before scratching; winner=C1+C2+C3, as combining the initial confusion tilt, the slow/hesitant approach, and the thoughtful pause before the scratch creates the most convincing and readable performance of confusion."
+  },
+  "media": {
+    "gif": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/manipulator/correction/exp1/gemini-2.5-pro/self_scratch_head_confused/correction/IIWA/20260708_082702_IIWA_self_scratch_head_confused_p405.gif",
+    "mp4": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/manipulator/correction/exp1/gemini-2.5-pro/self_scratch_head_confused/correction/self_scratch_head_confused.mp4",
+    "pose_png": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/manipulator/correction/exp1/gemini-2.5-pro/self_scratch_head_confused/correction/self_scratch_head_confused_pose.png",
+    "cumulative_tile_gif": null
+  }
+}

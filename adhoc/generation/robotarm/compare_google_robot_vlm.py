@@ -1,4 +1,4 @@
-"""Google Robot component compare via in-process VLM (GIF inputs)."""
+"""Tiago component compare via in-process VLM (GIF inputs)."""
 from __future__ import annotations
 
 import argparse
@@ -20,7 +20,7 @@ for p in (_REPO, _HERE):
 
 from vlm_client import VLMClient, init_inprocess_engine  # noqa: E402
 
-_PROMPT_DIR = _REPO / "data/seed/prompt/google_robot"
+_PROMPT_DIR = _REPO / "data/seed/prompt/tiago"
 
 
 def _load_json(path: Path) -> Any:
@@ -70,12 +70,12 @@ def run(args: argparse.Namespace, *, vlm: VLMClient | None = None) -> dict[str, 
             "time": datetime.now().isoformat(timespec="seconds"),
             "status": "skipped",
             "note": f"render dirs missing: {args.render_dir_a} / {args.render_dir_b}",
-            "headline": "skipped (no GIF renders in repo — rsync data/results/render/google_robot/)",
+            "headline": "skipped (no GIF renders in repo — rsync data/results/render/tiago/)",
             "results": [],
         }
         args.out_json.parent.mkdir(parents=True, exist_ok=True)
         args.out_json.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"[google_robot] skipped — wrote {args.out_json}", flush=True)
+        print(f"[tiago] skipped — wrote {args.out_json}", flush=True)
         return payload
 
     if vlm is None:
@@ -121,7 +121,7 @@ def run(args: argparse.Namespace, *, vlm: VLMClient | None = None) -> dict[str, 
                 "vlm_winner": winner if winner in {"A", "B", "TIE"} else None,
             }
         )
-        print(f"[google_robot] {cue} -> {winner}", flush=True)
+        print(f"[tiago] {cue} -> {winner}", flush=True)
 
     scored = sum(1 for r in results if r.get("vlm_winner"))
     skipped = sum(1 for r in results if r.get("skipped"))

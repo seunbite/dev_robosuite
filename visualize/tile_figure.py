@@ -8,7 +8,7 @@ from the motion config(s) resolved for this embodiment.
 
 **Default config + GIF roots** match ``see_html.py``: read
 ``data/seed/yml/see_html_sources.yml`` → embodiment block (``manipulator`` |
-``google_robot`` | ``quadruped``) for ``motion_config_json`` (string or list)
+``tiago`` | ``quadruped``) for ``motion_config_json`` (string or list)
 and ``render_dir``. That file is the canonical pointer to “current” bundles —
 not a glob by mtime under ``motion_configs/``.
 
@@ -73,7 +73,7 @@ from adhoc.generation.see_html import (  # noqa: E402
 from adhoc.utils.repo_paths import dev_robosuite_root, results_subdir  # noqa: E402
 from adhoc.vlm_test import testset_utils  # noqa: E402
 
-_EMBODIMENTS = frozenset({"manipulator", "google_robot", "quadruped"})
+_EMBODIMENTS = frozenset({"manipulator", "tiago", "quadruped"})
 
 # Methods that produce a single PNG panel (not raw gif/mp4 paths).
 _PNG_TILE_METHODS = frozenset(
@@ -113,14 +113,14 @@ def _normalize_embodiment(robot: str) -> str:
         "robotarm": "manipulator",
         "arm": "manipulator",
         "iiwa": "manipulator",
-        "bimanual": "google_robot",
-        "google": "google_robot",
-        "tiago": "google_robot",
-        "mobile": "google_robot",
+        "bimanual": "tiago",
+        "google": "tiago",
+        "tiago": "tiago",
+        "mobile": "tiago",
     }
     s = aliases.get(s, s)
     if s not in _EMBODIMENTS:
-        raise SystemExit(f"robot must be one of {sorted(_EMBODIMENTS)} (bimanual → google_robot), got {robot!r}")
+        raise SystemExit(f"robot must be one of {sorted(_EMBODIMENTS)} (bimanual → tiago), got {robot!r}")
     return s
 
 
@@ -130,7 +130,7 @@ def _sim_robot_for_embodiment(slug: str, override: str | None) -> str:
     # Defaults match robosuite MotionGenerator / QuadrupedMotionGenerator names used in render pipelines.
     if slug == "manipulator":
         return "IIWA"
-    if slug == "google_robot":
+    if slug == "tiago":
         return "Tiago"
     if slug == "quadruped":
         return "Go2"
@@ -488,7 +488,7 @@ def main() -> None:
     p = argparse.ArgumentParser(description="Tile cue-wise PNG panels (testset_utils visualization).")
     p.add_argument(
         "robot",
-        help="Embodiment slug: manipulator | google_robot (bimanual alias) | quadruped",
+        help="Embodiment slug: manipulator | tiago (bimanual alias) | quadruped",
     )
     p.add_argument(
         "visualize_method",

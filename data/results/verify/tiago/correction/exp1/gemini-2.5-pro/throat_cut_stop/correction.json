@@ -1,0 +1,213 @@
+{
+  "time": "2026-07-05T03:26:43",
+  "domain": "tiago",
+  "exp_id": "1",
+  "model_tag": "gemini-2.5-pro",
+  "round": 1,
+  "parent_round": 0,
+  "correction_stem": "correction",
+  "cue": "throat_cut_stop",
+  "base_config_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/result_exp1_gemini-2.5-pro.json",
+  "config_snapshot_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/correction/gemini-2.5-pro/exp1/throat_cut_stop/correction_config.json",
+  "is_correct": false,
+  "action": "corrected",
+  "correction": {
+    "exp_id": "1",
+    "correction_q1": "No, the robot's arm is positioned far too high, causing it to slice the air above its head instead of across its throat, which misses the core meaning of the gesture.",
+    "correction_q2": "The initial pose must be corrected to lower the arm (lower 'z' value) so the hand is at the robot's neck/throat level. The subsequent path should be a fast, sharp horizontal slice from that corrected position, and an optional fast head-shake can be added at the end to reinforce the \"stop/no\" meaning.",
+    "is_correct": false,
+    "inner_reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# No, the robot's arm is positioned far too high, causing it to slice the air above its head instead of across its throat, which misses the core meaning of the gesture.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# The initial pose must be corrected to lower the arm (lower 'z' value) so the hand is at the robot's neck/throat level. The subsequent path should be a fast, sharp horizontal slice from that corrected position, and an optional fast head-shake can be added at the end to reinforce the \"stop/no\" meaning.\n\n# Q1: How would a human perform this motion? (One sentence)\nA human would raise a flattened hand to one side of their neck and make a quick, sharp, horizontal slicing motion across their throat.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n- Candidate 1: `arm_position: \"in\"`, `gripper_orientation: \"horizontal\"`, `z: 90`. This places the hand high above the head, missing the throat.\n- Candidate 2: `arm_position: \"in\"`, `gripper_orientation: \"horizontal\"`, `z: 70`, `x: 85`. This correctly positions the hand near the robot's upper torso/neck region, setting up a readable slice.\n- Winner: Candidate 2, because its vertical (`z`) and depth (`x`) placement correctly targets the robot's \"throat\" area, which is essential for this gesture's meaning.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n- M1: pose (hand at throat) -> path (slice across). This is a simple and clear execution of the core gesture.\n- M2: pose (hand at throat) -> path (slice across) -> movement (head shake). This adds a reinforcing beat after the main action, strengthening the \"no\" or \"stop\" message.\n- Winner: M2, as the head shake provides valuable context and finality to the slice, making the cue's intent less ambiguous.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n- Choice A: Path speed of 2.0, head shake speed of 2.0. This would feel somewhat casual and might lack the necessary urgency.\n- Choice B: Path speed of 3.5, followed by a brief hold, then a head shake at speed 3.0. This combination of high speed and a punctuating hold makes the slice feel sharp and decisive, better reflecting the gesture's meaning.\n- Winner: Choice B, because the high speed and hold create a much stronger and more iconic sense of \"cutting\" the action.",
+    "config_parsed": {
+      "cue": "throat_cut_stop",
+      "description": "Slices a flat hand horizontally across the throat to signal 'stop' or 'cut'.",
+      "movements": [
+        {
+          "type": "pose",
+          "duration": 0.5,
+          "parameters": {
+            "pose": {
+              "torso_height": "mid",
+              "arm_position": "in",
+              "gripper_orientation": "horizontal",
+              "head": "center",
+              "x": 85,
+              "y": 60,
+              "z": 70
+            }
+          }
+        },
+        {
+          "type": "path",
+          "duration": 0.6,
+          "parameters": {
+            "path": {
+              "mode": "ee",
+              "shape": "line",
+              "axis": "y",
+              "distance": -0.25,
+              "speed": 3.5,
+              "hold_time": 0.2
+            }
+          }
+        },
+        {
+          "type": "movement",
+          "duration": 0.8,
+          "parameters": {
+            "movement": {
+              "joints": [
+                {
+                  "joint": "head",
+                  "axis": "pan",
+                  "degrees": [
+                    -15,
+                    15
+                  ]
+                }
+              ],
+              "repetition": 2,
+              "speed": 3.0
+            }
+          }
+        }
+      ]
+    },
+    "parse_error": null,
+    "raw_text": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# No, the robot's arm is positioned far too high, causing it to slice the air above its head instead of across its throat, which misses the core meaning of the gesture.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# The initial pose must be corrected to lower the arm (lower 'z' value) so the hand is at the robot's neck/throat level. The subsequent path should be a fast, sharp horizontal slice from that corrected position, and an optional fast head-shake can be added at the end to reinforce the \"stop/no\" meaning.\n\n# Q1: How would a human perform this motion? (One sentence)\nA human would raise a flattened hand to one side of their neck and make a quick, sharp, horizontal slicing motion across their throat.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n- Candidate 1: `arm_position: \"in\"`, `gripper_orientation: \"horizontal\"`, `z: 90`. This places the hand high above the head, missing the throat.\n- Candidate 2: `arm_position: \"in\"`, `gripper_orientation: \"horizontal\"`, `z: 70`, `x: 85`. This correctly positions the hand near the robot's upper torso/neck region, setting up a readable slice.\n- Winner: Candidate 2, because its vertical (`z`) and depth (`x`) placement correctly targets the robot's \"throat\" area, which is essential for this gesture's meaning.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n- M1: pose (hand at throat) -> path (slice across). This is a simple and clear execution of the core gesture.\n- M2: pose (hand at throat) -> path (slice across) -> movement (head shake). This adds a reinforcing beat after the main action, strengthening the \"no\" or \"stop\" message.\n- Winner: M2, as the head shake provides valuable context and finality to the slice, making the cue's intent less ambiguous.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n- Choice A: Path speed of 2.0, head shake speed of 2.0. This would feel somewhat casual and might lack the necessary urgency.\n- Choice B: Path speed of 3.5, followed by a brief hold, then a head shake at speed 3.0. This combination of high speed and a punctuating hold makes the slice feel sharp and decisive, better reflecting the gesture's meaning.\n- Winner: Choice B, because the high speed and hold create a much stronger and more iconic sense of \"cutting\" the action.\n{\n  \"cue\": \"throat_cut_stop\",\n  \"description\": \"Slices a flat hand horizontally across the throat to signal 'stop' or 'cut'.\",\n  \"movements\": [\n    {\n      \"type\": \"pose\",\n      \"duration\": 0.5,\n      \"parameters\": {\n        \"pose\": {\n          \"torso_height\": \"mid\",\n          \"arm_position\": \"in\",\n          \"gripper_orientation\": \"horizontal\",\n          \"head\": \"center\",\n          \"x\": 85,\n          \"y\": 60,\n          \"z\": 70\n        }\n      }\n    },\n    {\n      \"type\": \"path\",\n      \"duration\": 0.6,\n      \"parameters\": {\n        \"path\": {\n          \"mode\": \"ee\",\n          \"shape\": \"line\",\n          \"axis\": \"y\",\n          \"distance\": -0.25,\n          \"speed\": 3.5,\n          \"hold_time\": 0.2\n        }\n      }\n    },\n    {\n      \"type\": \"movement\",\n      \"duration\": 0.8,\n      \"parameters\": {\n        \"movement\": {\n          \"joints\": [\n            {\n              \"joint\": \"head\",\n              \"axis\": \"pan\",\n              \"degrees\": [\n                -15,\n                15\n              ]\n            }\n          ],\n          \"repetition\": 2,\n          \"speed\": 3.0\n        }\n      }\n    }\n  ]\n}",
+    "prompt_exp_id": "0",
+    "pipeline_exp_id": "1",
+    "vlm_media": {
+      "kind": "video/mp4",
+      "path": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/throat_cut_stop/new_render/mm19_g32_throat_cut_stop.mp4"
+    }
+  },
+  "input_row": {
+    "idx": 32,
+    "cue": "throat_cut_stop",
+    "description": "Slices a flat hand horizontally across the throat to signal 'stop' or 'cut'.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.6,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "in",
+            "gripper_orientation": "horizontal",
+            "head": "center",
+            "z": 90,
+            "y": 70
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 0.7,
+        "parameters": {
+          "path": {
+            "mode": "ee",
+            "shape": "line",
+            "axis": "y",
+            "distance": -0.3,
+            "speed": 3.0
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "head",
+                "axis": "pan",
+                "degrees": [
+                  -20,
+                  20
+                ]
+              }
+            ],
+            "repetition": 2,
+            "speed": 3.5
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "gemini-2.5-pro",
+    "time": "2026-06-15 02:16:38",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "reasoning": "# Q1: A human would bring a flat hand to one side of their neck and slice it horizontally across to the other side.\n# Q2: Pose A: `in` + `horizontal` at high `z`. Pose B: `front` + `horizontal` at high `z`. Winner is A (`in`) because it positions the hand across the body, ready for a lateral slice, which is more natural than a forward position.\n# Q3: M1: `pose` > `path` (y-axis line). M2: `pose` > `movement` (shoulder pan). Winner is M1 (`path`) because it ensures a crisp, straight, horizontal slice, which is critical for the gesture's meaning.\n# Q4: Add a sharp head shake after the slice vs. just the slice alone. Winner is adding the head shake because it strongly reinforces the negative \"stop/cut\" command."
+  },
+  "output_row": {
+    "idx": 32,
+    "cue": "throat_cut_stop",
+    "description": "Slices a flat hand horizontally across the throat to signal 'stop' or 'cut'.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "in",
+            "gripper_orientation": "horizontal",
+            "head": "center",
+            "x": 85,
+            "y": 60,
+            "z": 70
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 0.6,
+        "parameters": {
+          "path": {
+            "mode": "ee",
+            "shape": "line",
+            "axis": "y",
+            "distance": -0.25,
+            "speed": 3.5,
+            "hold_time": 0.2
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 0.8,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "head",
+                "axis": "pan",
+                "degrees": [
+                  -15,
+                  15
+                ]
+              }
+            ],
+            "repetition": 2,
+            "speed": 3.0
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-05T03:26:34",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "No, the robot's arm is positioned far too high, causing it to slice the air above its head instead of across its throat, which misses the core meaning of the gesture.",
+    "correction_q2": "The initial pose must be corrected to lower the arm (lower 'z' value) so the hand is at the robot's neck/throat level. The subsequent path should be a fast, sharp horizontal slice from that corrected position, and an optional fast head-shake can be added at the end to reinforce the \"stop/no\" meaning.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# No, the robot's arm is positioned far too high, causing it to slice the air above its head instead of across its throat, which misses the core meaning of the gesture.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# The initial pose must be corrected to lower the arm (lower 'z' value) so the hand is at the robot's neck/throat level. The subsequent path should be a fast, sharp horizontal slice from that corrected position, and an optional fast head-shake can be added at the end to reinforce the \"stop/no\" meaning.\n\n# Q1: How would a human perform this motion? (One sentence)\nA human would raise a flattened hand to one side of their neck and make a quick, sharp, horizontal slicing motion across their throat.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n- Candidate 1: `arm_position: \"in\"`, `gripper_orientation: \"horizontal\"`, `z: 90`. This places the hand high above the head, missing the throat.\n- Candidate 2: `arm_position: \"in\"`, `gripper_orientation: \"horizontal\"`, `z: 70`, `x: 85`. This correctly positions the hand near the robot's upper torso/neck region, setting up a readable slice.\n- Winner: Candidate 2, because its vertical (`z`) and depth (`x`) placement correctly targets the robot's \"throat\" area, which is essential for this gesture's meaning.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n- M1: pose (hand at throat) -> path (slice across). This is a simple and clear execution of the core gesture.\n- M2: pose (hand at throat) -> path (slice across) -> movement (head shake). This adds a reinforcing beat after the main action, strengthening the \"no\" or \"stop\" message.\n- Winner: M2, as the head shake provides valuable context and finality to the slice, making the cue's intent less ambiguous.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n- Choice A: Path speed of 2.0, head shake speed of 2.0. This would feel somewhat casual and might lack the necessary urgency.\n- Choice B: Path speed of 3.5, followed by a brief hold, then a head shake at speed 3.0. This combination of high speed and a punctuating hold makes the slice feel sharp and decisive, better reflecting the gesture's meaning.\n- Winner: Choice B, because the high speed and hold create a much stronger and more iconic sense of \"cutting\" the action."
+  },
+  "media": {
+    "gif": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/throat_cut_stop/correction/mm19_g32_throat_cut_stop.gif",
+    "mp4": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/throat_cut_stop/correction/mm19_g32_throat_cut_stop.mp4",
+    "pose_png": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/throat_cut_stop/correction/mm19_g32_throat_cut_stop_pose.png",
+    "cumulative_tile_gif": null
+  }
+}

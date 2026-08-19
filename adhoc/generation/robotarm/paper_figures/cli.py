@@ -27,6 +27,8 @@ def main() -> None:
     sp = sub.add_parser("qual", help="Qualitative grid (pose or movement)")
     sp.add_argument("--mode", choices=("pose", "movement"), required=True)
     sp.add_argument("--idx", default="all")
+    sp.add_argument("--good-idx", default=None)
+    sp.add_argument("--bad-idx", default=None)
     sp.add_argument("--ncols", type=int, default=3)
     sp.add_argument("--out", default=None)
 
@@ -35,9 +37,24 @@ def main() -> None:
     sp.add_argument("--pose-json", default=None)
     sp.add_argument("--out", default=None)
 
+    sp = sub.add_parser("qual-verify", help="Verification qual grid (task4 pose / task10 motion)")
+    sp.add_argument("--mode", choices=("pose", "motion"), required=True)
+    sp.add_argument("--idx", default="all")
+    sp.add_argument("--good-idx", default=None)
+    sp.add_argument("--bad-idx", default=None)
+    sp.add_argument("--pose-json", default=None)
+    sp.add_argument("--ncols", type=int, default=4)
+    sp.add_argument("--cell-size", type=int, default=None)
+    sp.add_argument("--seed", type=int, default=None)
+    sp.add_argument("--out", default=None)
+
     sp = sub.add_parser("components", help="Pose / movement / path definition figure")
-    sp.add_argument("--pose-idx", type=int, default=16)
-    sp.add_argument("--movement-idx", type=int, default=59)
+    sp.add_argument("--embodiment", choices=("IIWA", "Panda", "Tiago", "Quadruped"), default="IIWA")
+    sp.add_argument("--all-embodiments", action="store_true")
+    sp.add_argument("--pose-idx", type=int, default=None)
+    sp.add_argument("--path-variant", choices=("y", "x-pos"), default="y")
+    sp.add_argument("--all-path-variants", action="store_true")
+    sp.add_argument("--force", action="store_true")
     sp.add_argument("--out", default=None)
 
     sp = sub.add_parser("persona", help="Persona variations (curated cue×persona matrix)")
@@ -57,7 +74,19 @@ def main() -> None:
     sp.add_argument("--ncol", type=int, default=5)
     sp.add_argument("--panel-size", type=int, default=220)
 
-    sp = sub.add_parser("essence10", help="Essence-10 generate + HTML")
+    sp = sub.add_parser("context", help="Exp12 context variation (persona + scenario)")
+    sp.add_argument("--catalog-yml", default=None)
+    sp.add_argument("--model", default="gemini-2.5-pro")
+    sp.add_argument("--dry-run", action="store_true")
+    sp.add_argument("--skip-render", action="store_true")
+    sp.add_argument("--force-render", action="store_true")
+    sp.add_argument("--html-only", action="store_true")
+    sp.add_argument("--out-dir", default=None)
+    sp.add_argument("--open", action="store_true")
+
+    sp = sub.add_parser("exp11-input", help="Exp11 repetition pairwise input HTML")
+    sp.add_argument("--open", action="store_true")
+
     sp.add_argument("--model", default="gemini-2.5-pro")
     sp.add_argument("--cues", default=None, help="Comma-separated essence cue names")
     sp.add_argument("--skip-generate", action="store_true")
@@ -79,15 +108,55 @@ def main() -> None:
     elif args.cmd == "qual":
         from paper_figures.qual_generation import build_grid
 
-        build_grid(mode=args.mode, idx_arg=args.idx, ncols=args.ncols, out_path=Path(args.out) if args.out else None)
+        build_grid(
+            mode=args.mode,
+            idx_arg=args.idx,
+            ncols=args.ncols,
+            out_path=Path(args.out) if args.out else None,
+            good_idxs=[int(x) for x in args.good_idx.split(",")] if args.good_idx else None,
+            bad_idxs=[int(x) for x in args.bad_idx.split(",")] if args.bad_idx else None,
+        )
     elif args.cmd == "pairwise":
         from paper_figures.qual_pairwise import build
 
         build(idx_arg=args.idx, pose_json=args.pose_json, out=args.out)
+    elif args.cmd == "qual-verify":
+        from paper_figures.qual_verification import build_grid
+
+        from paper_figures.qual_generation import VERIFY_CELL_SIZE
+
+        build_grid(
+            mode=args.mode,
+            idx_arg=args.idx,
+            ncols=args.ncols,
+            good_idxs=[int(x) for x in args.good_idx.split(",")] if args.good_idx else None,
+            bad_idxs=[int(x) for x in args.bad_idx.split(",")] if args.bad_idx else None,
+            pose_json=Path(args.pose_json) if args.pose_json else None,
+            out_path=Path(args.out) if args.out else None,
+            cell_size=args.cell_size or VERIFY_CELL_SIZE,
+            seed=args.seed,
+        )
     elif args.cmd == "components":
         from paper_figures.component_def import build
 
-        build(pose_idx=args.pose_idx, movement_idx=args.movement_idx, out=args.out)
+        if args.all_embodiments:
+            from paper_figures.component_def import EMBODIMENTS, build as build_one
+
+            for emb in EMBODIMENTS:
+                build_one(
+                    embodiment=emb,
+                    pose_idx=args.pose_idx,
+                    path_variant=args.path_variant,
+                    force=args.force,
+                )
+        else:
+            build(
+                embodiment=args.embodiment,
+                pose_idx=args.pose_idx,
+                path_variant=args.path_variant,
+                out=args.out,
+                force=args.force,
+            )
     elif args.cmd == "persona":
         from paper_figures.persona_change import run
 
@@ -111,6 +180,46 @@ def main() -> None:
             ncol=args.ncol,
             panel_size=args.panel_size,
         )
+    elif args.cmd == "context":
+        from exp12_context_variation import build_input_html, main as exp12_main
+
+        if args.html_only and not args.force_render:
+            out = build_input_html(
+                catalog_yml=Path(args.catalog_yml) if args.catalog_yml else None,
+            )
+            if args.open:
+                import subprocess
+
+                subprocess.run(["open", str(out)], check=False)
+        else:
+            import sys
+
+            argv = ["exp12_context_variation.py"]
+            if args.catalog_yml:
+                argv += ["--catalog-yml", args.catalog_yml]
+            if args.model:
+                argv += ["--model", args.model]
+            if args.dry_run:
+                argv.append("--dry-run")
+            if args.skip_render:
+                argv.append("--skip-render")
+            if args.force_render:
+                argv.append("--force-render")
+            if args.html_only:
+                argv.append("--html-only")
+            if args.out_dir:
+                argv += ["--out-dir", args.out_dir]
+            if args.open:
+                argv.append("--open")
+            sys.argv = argv
+            exp12_main()
+    elif args.cmd == "exp11-input":
+        from exp11_rep_pairwise import main as exp11_main
+
+        import sys
+
+        sys.argv = ["exp11_rep_pairwise.py"] + (["--open"] if args.open else [])
+        exp11_main()
     elif args.cmd == "essence10":
         from paper_figures.essence10 import run
 

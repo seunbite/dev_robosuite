@@ -11,16 +11,30 @@ from .config import LEG_ORDER
 from .controllers.high_level import HighLevelController
 from .kinematics import QuadrupedKinematics, lerp_vec
 
-_ARC_BASE_WZ = 1.0     # rad/s at speed=1.0
-_ARC_FORWARD_VX = 0.3   # m/s forward per unit speed during arc
+_ARC_BASE_WZ = 1.0     # rad/s at speed=1.0 (in-place yaw)
+_ARC_FORWARD_VX = 0.3   # m/s forward per unit speed during arc (r>0)
 _LINE_BASE_VX = 0.5     # m/s at speed=1.0
+
+
+def _arc_degrees_value(degrees: Any) -> float:
+    """Scalar sweep for a single arc segment (lists must be expanded upstream)."""
+    if isinstance(degrees, (list, tuple)):
+        nums = [float(x) for x in degrees if isinstance(x, (int, float))]
+        if not nums:
+            return 0.0
+        # Prefer the last non-zero signed value if a ± pair slipped through.
+        for v in reversed(nums):
+            if abs(v) > 1e-9:
+                return float(v)
+        return float(nums[-1])
+    return float(degrees)
 
 
 def normalize_step(step: dict[str, Any]) -> dict[str, Any]:
     """Normalize a config step so that ``duration`` is always present.
 
     * ``arc``  path with ``degrees`` + ``speed`` → computes ``duration`` and
-      ``velocity``  (``wz`` from degrees, ``vx`` proportional to speed).
+      ``velocity``  (``wz`` from degrees, ``vx`` forward for r>0 / 0 for spin).
     * ``line`` path with ``distance`` + ``speed`` → computes ``duration`` and
       ``velocity``  (``vx`` from distance).
     * ``pose_to_pose`` and steps that already carry ``duration`` are returned
@@ -34,16 +48,24 @@ def normalize_step(step: dict[str, Any]) -> dict[str, Any]:
     shape = path_p.get("shape", "")
 
     if shape == "arc" and "degrees" in path_p and "duration" not in step:
-        deg = float(path_p["degrees"])
-        spd = float(path_p.get("speed", 1.0))
+        deg = _arc_degrees_value(path_p["degrees"])
+        spd = max(0.2, float(path_p.get("speed", 1.0)))
         rad = deg * math.pi / 180.0
-        wz = math.copysign(spd * _ARC_BASE_WZ, rad)
+        radius = abs(float(path_p.get("radius", 0.0) or 0.0))
+        # Always walk forward on circling arcs; in-place yaw when r≈0.
+        # Positive deg → CCW (+wz), negative → CW (−wz).
+        if radius < 1e-4:
+            vx = 0.0
+            wz = math.copysign(spd * _ARC_BASE_WZ, rad if rad != 0.0 else 1.0)
+        else:
+            vx = abs(spd) * _ARC_FORWARD_VX
+            wz = math.copysign(vx / radius, rad if rad != 0.0 else 1.0)
         # Use 3x theoretical duration as upper bound; the renderer will
         # detect heading completion and break early.
         dur = 3.0 * abs(rad) / max(abs(wz), 1e-6)
-        vx = spd * _ARC_FORWARD_VX
         step["duration"] = round(dur, 3)
         path_p = dict(path_p)
+        path_p["degrees"] = deg
         path_p["velocity"] = {"vx": round(vx, 4), "vy": 0.0, "wz": round(wz, 4)}
         step["parameters"] = {**params, "path": path_p}
 
@@ -73,7 +95,7 @@ def path_step_target(step: dict[str, Any]) -> dict[str, float] | None:
     path_p = step.get("parameters", {}).get("path", {})
     shape = path_p.get("shape", "")
     if shape == "arc" and "degrees" in path_p:
-        return {"heading_rad": abs(float(path_p["degrees"])) * math.pi / 180.0}
+        return {"heading_rad": abs(_arc_degrees_value(path_p["degrees"])) * math.pi / 180.0}
     if shape == "line" and "distance" in path_p:
         return {"distance_m": abs(float(path_p["distance"]))}
     return None
@@ -186,20 +208,38 @@ class LocomotionRetrievalDB:
         nominal = self.kinematics.nominal_stance()
         feet = {leg: nominal[leg] for leg in LEG_ORDER}
 
-        front_shift = _height_to_z_delta(pose.front_height)
-        rear_shift = _height_to_z_delta(pose.rear_height)
-        support_shift = _support_shift_map(pose, front_shift, rear_shift)
+        params = pose_params if isinstance(pose_params, dict) else {}
+        front_level = str(params.get("front_height", pose.front_height))
+        rear_level = str(params.get("back_height", params.get("rear_height", pose.rear_height)))
+        direction = str(params.get("dir", pose.direction))
+        lifted_leg = _lifted_leg_from_pose(direction, bool(params.get("three_legs", False)))
+
+        front_shift = _height_to_z_delta(front_level)
+        rear_shift = _height_to_z_delta(rear_level)
+        # Optional continuous offsets (m) for soft planted pair-leg nods — stacked on
+        # categorical height so stance crouch/bow stay strong while move(forelegs,z)
+        # can bob gently without slamming into play_bow.
+        try:
+            front_shift += float(params.get("front_z_delta", 0.0) or 0.0)
+        except (TypeError, ValueError):
+            pass
+        try:
+            rear_shift += float(params.get("back_z_delta", 0.0) or 0.0)
+        except (TypeError, ValueError):
+            pass
+        support_shift = _support_shift_map(lifted_leg, front_shift, rear_shift)
         for leg in ("FL", "FR", "RL", "RR"):
             x, y, z = feet[leg]
             feet[leg] = (x, y, z + support_shift[leg])
 
-        feet = _apply_direction_bias(feet, pose.direction)
+        feet = _apply_direction_bias(feet, direction)
 
-        if pose.lifted_leg != "none":
+        if lifted_leg != "none":
             three_leg_pose = {}
             if isinstance(pose_params, dict):
                 three_leg_pose = pose_params.get("three_leg_pose", {}) or {}
-            feet = _apply_three_leg_pose(feet, pose.lifted_leg, three_leg_pose)
+            feet = _apply_three_leg_pose(feet, lifted_leg, three_leg_pose)
+            feet = _apply_three_leg_weight_shift(feet, lifted_leg)
         return feet
 
 
@@ -227,10 +267,10 @@ def _lifted_leg_from_pose(direction: str, three_legs: bool) -> str:
         "right": "FR",
         "front": "FR",
         "back": "FR",
-        "neutral": "none",
+        "neutral": "FR",  # schema has no dir; default right-front paw
     }
     if direction not in mapping:
-        raise ValueError(f"Unsupported pose direction for lifted leg selection: {direction}")
+        return "FR"
     return mapping[direction]
 
 
@@ -384,23 +424,55 @@ def _movement_query_from_step(
 
 
 def _height_to_z_delta(height: str) -> float:
-    table = {"low": -0.03, "mid": 0.015, "high": 0.065}
+    # Semantic contract:
+    # - low  => crouched / joints more flexed (play_bow front, crouch, sit rear)
+    # - high => tall / joints more extended (sit front, play_bow rear)
+    # In this body frame, increasing foot z lifts the foot toward the body (more flex),
+    # while decreasing z pushes it farther down (more extension).
+    # mid is 0 so nominal stand actually reaches the ground under hold-base.
+    # Magnitudes are large enough to read under gravity-plant PD (was ±3cm — too subtle).
+    table = {"low": 0.085, "mid": 0.0, "high": -0.055}
     if height not in table:
         raise ValueError(f"Unsupported height level: {height}")
     return table[height]
 
 
-def _support_shift_map(pose: PoseRecord, front_shift: float, rear_shift: float) -> dict[str, float]:
+# Push feet slightly past the kinematic tip so MJCF foot spheres (r≈0.022) plant.
+_FOOT_PLANT_Z = -0.025
+
+
+def _apply_foot_plant(feet: FootTargetMap) -> FootTargetMap:
+    return {leg: (p[0], p[1], p[2] + _FOOT_PLANT_Z) for leg, p in feet.items()}
+
+
+def _support_shift_map(lifted_leg: str, front_shift: float, rear_shift: float) -> dict[str, float]:
     shifts = {"FL": front_shift, "FR": front_shift, "RL": rear_shift, "RR": rear_shift}
-    leg = pose.lifted_leg
+    leg = lifted_leg
     if leg == "none":
         return shifts
     if leg in ("FL", "FR"):
         support_front = "FR" if leg == "FL" else "FL"
-        shifts[support_front] = min(0.0, 0.25 * front_shift)
-        shifts["RL"] = min(shifts["RL"], rear_shift - 0.01)
-        shifts["RR"] = min(shifts["RR"], rear_shift - 0.01)
+        # Keep the remaining front foot more extended (planted) and crouch the
+        # rear pair a bit more so CoM stays inside the three-leg support triangle.
+        shifts[support_front] = min(0.0, 0.15 * front_shift)
+        shifts["RL"] = min(shifts["RL"], rear_shift - 0.02)
+        shifts["RR"] = min(shifts["RR"], rear_shift - 0.02)
     return shifts
+
+
+def _apply_three_leg_weight_shift(feet: FootTargetMap, lifted_leg: str) -> FootTargetMap:
+    """Nudge support feet under the body so CoM stays over the triangle."""
+    updated = dict(feet)
+    if lifted_leg == "FR":
+        # Aggressive left/back shift onto FL+RL+RR before the paw leaves the ground.
+        for leg, dx, dy in (("FL", -0.02, 0.06), ("RL", 0.025, 0.05), ("RR", 0.02, -0.025)):
+            x, y, z = updated[leg]
+            updated[leg] = (x + dx, y + dy, z)
+    elif lifted_leg == "FL":
+        for leg, dx, dy in (("FR", -0.02, -0.06), ("RR", 0.025, -0.05), ("RL", 0.02, 0.025)):
+            x, y, z = updated[leg]
+            updated[leg] = (x + dx, y + dy, z)
+    return updated
 
 
 def _apply_direction_bias(feet: FootTargetMap, direction: str) -> FootTargetMap:
@@ -443,9 +515,20 @@ def _pingpong01(cycle_pos: float) -> float:
     return frac * 2.0 if frac < 0.5 else (1.0 - frac) * 2.0
 
 
+def _smoothstep01(t: float) -> float:
+    t = max(0.0, min(1.0, float(t)))
+    return t * t * (3.0 - 2.0 * t)
+
+
 def _movement_line_progress(phase: float, repetition: int, speed: float) -> float:
+    """Map phase∈[0,1] through ``repetition`` ping-pong cycles.
+
+    ``speed`` only shortens step duration (set by the config converter); it must
+    not multiply cycle count — otherwise ``rep=3, spd=3`` becomes 9 frantic pumps.
+    """
+    del speed  # duration already encodes speed; keep signature for callers
     clamped = min(max(phase, 0.0), 1.0)
-    cycles = max(1, repetition) * max(0.1, speed)
+    cycles = max(1, int(repetition))
     return _pingpong01(clamped * cycles)
 
 
@@ -465,11 +548,12 @@ def _three_leg_base_offsets(hand_position: str) -> tuple[float, float, float]:
     hp = _normalize_hand_position(hand_position)
     # Keep a lifted-foot proxy in current_pose so subsequent movement step can detect the same lifted leg.
     mapping = {
-        "up": (0.0, 0.0, 0.14),
-        "front": (0.10, 0.0, 0.06),
-        "right": (0.0, -0.10, 0.10),
-        "back": (-0.04, 0.0, 0.12),
-        "left": (0.0, 0.10, 0.10),
+        # Keep lifts small enough that PD + weight-shift can brace under gravity.
+        "up": (0.0, 0.0, 0.08),
+        "front": (0.06, 0.0, 0.04),
+        "right": (0.0, -0.06, 0.05),
+        "back": (-0.02, 0.0, 0.06),
+        "left": (0.0, 0.06, 0.05),
     }
     return mapping.get(hp, mapping["back"])
 
@@ -483,12 +567,13 @@ def _three_leg_pose_joint_overrides(
     thigh_j = f"{leg}_thigh_joint"
     calf_j = f"{leg}_calf_joint"
     hp = _normalize_hand_position(hand_position)
+    # Kinematic three-leg path can hold a clearer raise without tipping.
     targets = {
-        "up": (0.000, -1.571, -1.780),
-        "front": (0.000, -1.571, -1.110),
-        "right": (-1.047, 0.960, -0.838),
-        "back": (0.000, 0.960, -2.723),
-        "left": (1.047, 0.960, -0.838),
+        "up": (0.000, -1.20, -1.50),
+        "front": (0.000, -0.90, -1.10),
+        "right": (-0.70, 0.70, -0.90),
+        "back": (0.000, 0.70, -1.80),
+        "left": (0.70, 0.70, -0.90),
     }
     hip, thigh, calf = targets.get(hp, targets["back"])
     return {hip_j: hip, thigh_j: thigh, calf_j: calf}
@@ -688,6 +773,10 @@ class ConfigMotionComposer:
         self.db = db or LocomotionRetrievalDB(kinematics=self.controller.low_level.kinematics)
         self.kinematics = self.controller.low_level.kinematics
         self.nominal = self.kinematics.nominal_stance()
+        self._pose_blend_start: FootTargetMap | None = None
+        # Persist lifted-paw joint locks so empty ``hold`` keeps the silhouette.
+        self._hold_joint_overrides: JointMap = {}
+        self._hold_feet: FootTargetMap | None = None
 
     def feet_for_step(
         self,
@@ -698,20 +787,103 @@ class ConfigMotionComposer:
     ) -> tuple[FootTargetMap, FootTargetMap, JointMap]:
         kind = step["type"]
         if kind == "pose":
-            pose_params = step.get("parameters", {}).get("pose", {})
+            pose_params = step.get("parameters", {}).get("pose", {}) or {}
             pose = self.db.retrieve_pose(_pose_query_from_step(step))
-            feet = self._sanitize_feet(self.db.pose_to_feet(pose, pose_params))
-            overrides: JointMap = {}
+            # Four-foot planted silhouette (no lift) — base for bracing under gravity.
+            planted_params = dict(pose_params)
+            planted_params["three_legs"] = False
+            # Bow + lifted paw is statically unstable under free-base gravity; brace
+            # from a near-stand support polygon, then raise the paw.
             if pose_params.get("three_legs"):
+                fh = str(planted_params.get("front_height", "mid")).lower()
+                bh = str(planted_params.get("back_height", planted_params.get("rear_height", "mid"))).lower()
+                if fh == "low" and bh == "high":
+                    planted_params["front_height"] = "mid"
+                    planted_params["back_height"] = "mid"
+            planted = self._sanitize_feet(self.db.pose_to_feet(pose, planted_params), plant=True)
+
+            overrides_full: JointMap = {}
+            target = dict(planted)
+            if pose_params.get("three_legs"):
+                lifted = pose.lifted_leg if pose.lifted_leg not in (None, "none") else "FR"
+                # Shift support feet first so CoM can settle inside the triangle.
+                planted = _apply_three_leg_weight_shift(planted, lifted)
                 tpl = pose_params.get("three_leg_pose") or {}
                 hand_p = str(tpl.get("hand_position", "back"))
-                overrides = _three_leg_pose_joint_overrides(pose.lifted_leg, hand_p)
-                posed_joint_map = self.kinematics.feet_to_joint_map(feet)
-                posed_joint_map.update(overrides)
-                feet = self.kinematics.joint_map_to_feet(posed_joint_map)
-            return feet, feet, overrides
+                overrides_full = _three_leg_pose_joint_overrides(lifted, hand_p)
+                lifted_feet = _apply_three_leg_pose(dict(planted), lifted, tpl)
+                posed_joint_map = self.kinematics.feet_to_joint_map(lifted_feet)
+                posed_joint_map.update(overrides_full)
+                target = self.kinematics.joint_map_to_feet(posed_joint_map)
+            else:
+                target = planted
+                self._hold_joint_overrides = {}
+                self._hold_feet = None
+
+            # Ease into the silhouette so PD can brace under gravity (no root pin).
+            if local_t <= 1e-9 or self._pose_blend_start is None:
+                self._pose_blend_start = dict(current_pose)
+            alpha = _smoothstep01(min(max(local_t / max(duration, 1e-6), 0.0), 1.0))
+            start = self._pose_blend_start
+
+            overrides: JointMap = {}
+            if pose_params.get("three_legs"):
+                # Phase 1: weight-shift only (4 feet). Phase 2: raise the paw.
+                if alpha < 0.65:
+                    a = _smoothstep01(alpha / 0.65)
+                    feet = {
+                        leg: (
+                            start[leg][0] + (planted[leg][0] - start[leg][0]) * a,
+                            start[leg][1] + (planted[leg][1] - start[leg][1]) * a,
+                            start[leg][2] + (planted[leg][2] - start[leg][2]) * a,
+                        )
+                        for leg in planted
+                    }
+                else:
+                    a = _smoothstep01((alpha - 0.65) / 0.35)
+                    feet = {
+                        leg: (
+                            planted[leg][0] + (target[leg][0] - planted[leg][0]) * a,
+                            planted[leg][1] + (target[leg][1] - planted[leg][1]) * a,
+                            planted[leg][2] + (target[leg][2] - planted[leg][2]) * a,
+                        )
+                        for leg in target
+                    }
+                    start_q = self.kinematics.feet_to_joint_map(planted)
+                    overrides = {
+                        j: float(start_q.get(j, v)) + (float(v) - float(start_q.get(j, v))) * a
+                        for j, v in overrides_full.items()
+                    }
+                    # Persist as soon as the paw lifts so a following empty hold
+                    # keeps the extended silhouette (stop_palm_out / highfive).
+                    self._hold_joint_overrides = dict(overrides_full)
+                    self._hold_feet = dict(target) if a >= 0.95 else dict(feet)
+            else:
+                feet = {
+                    leg: (
+                        start[leg][0] + (target[leg][0] - start[leg][0]) * alpha,
+                        start[leg][1] + (target[leg][1] - start[leg][1]) * alpha,
+                        start[leg][2] + (target[leg][2] - start[leg][2]) * alpha,
+                    )
+                    for leg in target
+                }
+
+            if alpha >= 1.0 - 1e-6:
+                self._pose_blend_start = None
+            return feet, dict(target) if alpha >= 1.0 - 1e-6 else dict(feet), overrides
+
+        self._pose_blend_start = None
 
         if kind == "movement":
+            movement_params = step.get("parameters", {}).get("movement") or {}
+            joints = movement_params.get("joints") or []
+            # Empty-joint hold: freeze last silhouette (keep three-leg joint locks).
+            if not joints:
+                hold_feet = dict(self._hold_feet) if self._hold_feet is not None else dict(current_pose)
+                return hold_feet, hold_feet, dict(self._hold_joint_overrides)
+            # Active leg motion clears the static three-leg hold lock.
+            self._hold_joint_overrides = {}
+            self._hold_feet = None
             movement_query = _movement_query_from_step(step, current_pose, self.nominal)
             leg = movement_query["leg"]
             feet = dict(current_pose)
@@ -726,7 +898,8 @@ class ConfigMotionComposer:
                 feet[leg] = _clamp_lateral_with_fixed_z(leg, (x, y, z), anchor, self.kinematics)
             else:
                 feet[leg] = (x, y, z)
-            feet = self._sanitize_feet(feet)
+            # Radial clamp only — current_pose is already planted from the prior pose step.
+            feet = self._sanitize_feet(feet, plant=False)
             # Base IK must use the same foot targets as `feet` (post-sanitize). Using `current_pose`
             # here desyncs thigh/calf from hip when delta=0, so "rest" frames drift (A-B-C-B-C).
             base_joint_map = self.kinematics.feet_to_joint_map(feet)
@@ -741,6 +914,8 @@ class ConfigMotionComposer:
             return feet, dict(current_pose), joint_overrides
 
         if kind == "path":
+            self._hold_joint_overrides = {}
+            self._hold_feet = None
             path_params = step.get("parameters", {}).get("path")
             shape = step["shape"] if path_params is None else str(path_params["shape"])
             velocity = VelocityCommand(**(step.get("velocity", {}) if path_params is None else path_params.get("velocity", {})))
@@ -750,32 +925,49 @@ class ConfigMotionComposer:
                 if path_params is None:
                     start_params = step["start_pose"]
                     end_params = step["end_pose"]
+                    repetition = int(step.get("repetition", 1))
                 else:
                     start_params = path_params["start_pose"]
                     end_params = path_params["end_pose"]
+                    repetition = int(path_params.get("repetition", step.get("repetition", 1)))
+                repetition = max(1, repetition)
                 start_query = _pose_query_from_pose_params(start_params)
                 end_query = _pose_query_from_pose_params(end_params)
                 start_pose = self.db.pose_to_feet(self.db.retrieve_pose(start_query), start_params)
                 end_pose = self.db.pose_to_feet(self.db.retrieve_pose(end_query), end_params)
-                alpha = min(max(local_t / max(duration, 1e-6), 0.0), 1.0)
+                alpha_total = min(max(local_t / max(duration, 1e-6), 0.0), 1.0)
+                alpha = _pingpong01(alpha_total * float(repetition))
+                # Ease in/out so gravity plant can track without thrashing.
+                alpha = alpha * alpha * (3.0 - 2.0 * alpha)
                 blended_pose = {leg: lerp_vec(start_pose[leg], end_pose[leg], alpha) for leg in LEG_ORDER}
                 walk_feet = self.controller.gait.foot_targets(velocity, local_t)
+                gb_xy = float(path_params.get("gait_blend_xy", 0.92)) if path_params is not None else 0.92
+                gb_z = float(path_params.get("gait_blend_z", 0.55)) if path_params is not None else 0.55
+                gb_xy = max(0.0, min(1.0, gb_xy))
+                gb_z = max(0.0, min(1.0, gb_z))
                 feet = {}
                 for leg in LEG_ORDER:
                     nx, ny, nz = self.nominal[leg]
                     wx, wy, wz = walk_feet[leg]
                     px, py, pz = blended_pose[leg]
                     feet[leg] = (
-                        px + 0.7 * (wx - nx),
-                        py + 0.7 * (wy - ny),
-                        pz + 0.35 * (wz - nz),
+                        px + gb_xy * (wx - nx),
+                        py + gb_xy * (wy - ny),
+                        pz + gb_z * (wz - nz),
                     )
-                return self._sanitize_feet(feet), blended_pose, {}
+                # pose_to_feet is unplanted; plant once after the blend.
+                return self._sanitize_feet(feet, plant=True), blended_pose, {}
             raise ValueError(f"Unsupported path shape: {shape}")
 
         raise ValueError(f"Unsupported step type: {kind}")
 
-    def _sanitize_feet(self, feet: FootTargetMap) -> FootTargetMap:
+    def _sanitize_feet(self, feet: FootTargetMap, *, plant: bool = False) -> FootTargetMap:
+        """Radial reachability clamp; optionally apply one-shot foot plant delta.
+
+        Plant must not be re-applied on movement/hold steps that reuse an already
+        planted ``current_pose`` — that double-dips ``_FOOT_PLANT_Z`` and looks
+        like the robot sinking into the floor for the last few frames.
+        """
         safe: FootTargetMap = {}
         min_radius = self.kinematics.config.hip_offset + 0.01
         for leg, foot in feet.items():
@@ -791,4 +983,4 @@ class ConfigMotionComposer:
                 z_down *= scale
                 lz = -z_down
             safe[leg] = (hip[0] + lx, hip[1] + ly, hip[2] + lz)
-        return safe
+        return _apply_foot_plant(safe) if plant else safe

@@ -1,0 +1,29 @@
+You are an expert robot motion designer for a 7-DOF IIWA arm with a parallel-jaw gripper.
+
+Task: Given few-shot end-effector (EE) xyz trajectories for iconic gesture cues, output a NEW trajectory for a target cue that does NOT appear in the examples.
+
+Coordinate frame (world, meters):
+- +x = forward toward the human viewer
+- +y = robot left
+- +z = up (ceiling)
+
+Output format: return ONE JSON object only (no markdown fences, no prose):
+{
+  "cue": "<target cue name>",
+  "hz": 8,
+  "xyz": [[x, y, z], ...]
+}
+
+Rules:
+- Match hz=8 from the examples.
+- Use roughly 20–35 frames for short gestures; up to 55 for richer motions.
+- Each xyz entry is exactly 3 floats (meters). Stay in a similar numeric range as the examples.
+- Produce a smooth, human-readable iconic motion: brief settle → core gesture → optional return/hold.
+- Do NOT copy an example trajectory; invent motion appropriate for the target cue.
+
+{{FEW_SHOT_EXAMPLES}}
+---
+Target cue (NOT in the examples above):
+cue: {{CUE_NAME}}
+description: {{CUE_DESCRIPTION}}
+---

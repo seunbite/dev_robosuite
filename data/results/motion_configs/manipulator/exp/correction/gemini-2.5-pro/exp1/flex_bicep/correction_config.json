@@ -1,0 +1,75 @@
+[
+  {
+    "idx": 9,
+    "cue": "flex_bicep",
+    "description": "The robot performs a small preparatory extension to build anticipation, then sharply curls the arm into a high, tight bicep flex, finishing with a small shoulder lift to simulate muscle tension.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 40,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.5,
+          "hold_time": 0.15
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 45,
+            "y": 65,
+            "z": 70,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 3.0,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 15
+              },
+              "speed": 2.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-06T22:37:20",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q1: No, the final pose does not resemble a bicep flex because the elbow is not bent enough and the hand is positioned too far forward and low.",
+    "correction_q2": "Correction Q2: The sequence should be recomposed to first establish a neutral pose, then a preparatory extension, followed by a very fast transition to a new iconic flex pose where the gripper is high (z≈70), close to the body (x≈45), and the elbow is sharply bent, and finally add a small shoulder lift to simulate muscle tension and hold that final pose.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: No, the final pose does not resemble a bicep flex because the elbow is not bent enough and the hand is positioned too far forward and low.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The sequence should be recomposed to first establish a neutral pose, then a preparatory extension, followed by a very fast transition to a new iconic flex pose where the gripper is high (z≈70), close to the body (x≈45), and the elbow is sharply bent, and finally add a small shoulder lift to simulate muscle tension and hold that final pose.\n# Q1: How would a human perform this motion? (One sentence)\n# A human would raise their upper arm, then sharply bend their elbow to bring their fist towards their shoulder, tensing the bicep muscle.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\n# Q2: candidates=P1) up+horizontal+x45,y65,z70, P2) back+vertical+x35,y65,z65; winner=P1 because positioning the gripper high near the shoulder with a horizontal orientation creates the most classic and readable 'showing muscle' pose.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n# Q3: options=M1) pose(start)>pose(prep)>pose(flex)>movement(tense), M2) pose(start)>movement(curl)>movement(tense); winner=M1 because defining the peak flexed shape with a specific target pose ensures the iconic geometry is achieved, which is the most critical part of the cue.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n# Q4: options=C1) a preparatory outward extension before the curl, C2) a small shoulder lift after the curl to simulate tension, C3) a slight body shake after the curl; winner=C2 because the small, sharp lift directly after the main action powerfully reinforces the idea of muscular tension and holding a strong pose."
+  }
+]

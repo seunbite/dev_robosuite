@@ -12,8 +12,16 @@ from PIL import Image
 VALID_LINE_AXES = frozenset({"x", "y", "z"})
 VALID_PLANES = frozenset({"xy", "yz", "xz", "zx"})
 AXIS_INDEX = {"x": 0, "y": 1, "z": 2}
-# EE path speed scale: speed=1.0 -> 0.12 m/s along path
-PATH_EE_M_PER_S_AT_UNIT_SPEED = 0.12
+# EE path speed scale: Roomba reference (spd=1 → 0.15 m/s along path).
+import sys
+from pathlib import Path
+
+_ROBOTARM_DIR = str(Path(__file__).resolve().parents[1])
+if _ROBOTARM_DIR not in sys.path:
+    sys.path.insert(0, _ROBOTARM_DIR)
+from motion_speed import V_REF_M_PER_S as PATH_EE_M_PER_S_AT_UNIT_SPEED
+from motion_speed import _frame_scale as _frame_scale
+from motion_speed import clamp_speed as _clamp_speed
 PATH_IK_MAX_ITERS = 80
 PATH_IK_POS_TOL_M = 0.004
 
@@ -32,15 +40,23 @@ def _plane_axis_indices(plane: str) -> tuple[int, int]:
     return 0, 2  # xz
 
 
+def _is_distance_span(distance: Any) -> bool:
+    return (
+        isinstance(distance, (list, tuple))
+        and len(distance) >= 2
+        and all(isinstance(x, (int, float)) for x in distance[:2])
+    )
+
+
 def normalize_path_parameters(params: dict[str, Any]) -> dict[str, Any]:
     """Drop legacy few-shot ``joint`` when EE IK fields are present."""
     out = dict(params)
     if out.get("joint") is None:
         return out
     shape = str(out.get("shape", "line")).lower()
-    if shape == "line" and out.get("axis") in VALID_LINE_AXES and isinstance(
-        out.get("distance"), (int, float)
-    ):
+    dist = out.get("distance")
+    has_line_dist = isinstance(dist, (int, float)) or _is_distance_span(dist)
+    if shape == "line" and out.get("axis") in VALID_LINE_AXES and has_line_dist:
         out.pop("joint", None)
     elif shape in ("arc", "circle") and out.get("plane") is not None and isinstance(
         out.get("radius"), (int, float)
@@ -69,12 +85,18 @@ def validate_path_parameters(params: dict[str, Any]) -> list[str]:
         if axis not in VALID_LINE_AXES:
             errors.append(f"line path axis must be one of {sorted(VALID_LINE_AXES)}, got {axis!r}")
         dist = params.get("distance")
-        if not isinstance(dist, (int, float)):
-            errors.append("line path requires numeric distance (meters)")
-        else:
+        if _is_distance_span(dist):
+            for endpoint in (float(dist[0]), float(dist[-1])):
+                dm = _line_distance_meters(endpoint)
+                if abs(dm) > 1e-9 and not (0.02 <= abs(dm) <= 0.5):
+                    errors.append(f"line distance span endpoint {dm:.3f}m outside recommended [0.02, 0.5] m")
+                    break
+        elif isinstance(dist, (int, float)):
             dm = _line_distance_meters(float(dist))
             if not (0.02 <= abs(dm) <= 0.5):
                 errors.append(f"line distance {dm:.3f}m outside recommended [0.02, 0.5] m")
+        else:
+            errors.append("line path requires numeric distance or [lo, hi] span (meters)")
     elif shape in ("arc", "circle"):
         plane = params.get("plane")
         if normalize_plane(str(plane)) not in {"xy", "yz", "xz"}:
@@ -91,9 +113,7 @@ def validate_path_parameters(params: dict[str, Any]) -> list[str]:
             errors.append("arc path requires numeric sweep (degrees)")
         elif not (15 <= abs(float(sweep)) <= 1080):
             errors.append(f"arc sweep {sweep} outside recommended [15, 1080] degrees")
-        direction = params.get("direction", "ccw")
-        if direction not in ("cw", "ccw"):
-            errors.append(f"arc direction must be cw or ccw, got {direction!r}")
+        # Direction is signed sweep only (+/−); legacy cw/ccw is ignored at runtime.
     elif shape is not None:
         errors.append(f"unknown path shape {shape!r}")
     else:
@@ -115,21 +135,30 @@ def _arc_radius_meters(radius: float) -> float:
 
 
 def path_length_meters(params: dict[str, Any]) -> float:
+    """Path length for one repetition set (round-trip when oscillating)."""
     shape = params.get("shape")
     if shape == "line":
-        return abs(_line_distance_meters(float(params["distance"])))
+        dist = params["distance"]
+        if _is_distance_span(dist):
+            lo = _line_distance_meters(float(dist[0]))
+            hi = _line_distance_meters(float(dist[-1]))
+            # One set = 왔다갔다 through the span (two one-way segments).
+            return max(0.01, 2.0 * abs(hi - lo))
+        one_way = abs(_line_distance_meters(float(dist)))
+        # Scalar + repetition>1: each set is out-and-back.
+        if max(1, int(params.get("repetition", 1))) > 1:
+            return max(0.01, 2.0 * one_way)
+        return max(0.01, one_way)
     sweep = float(params.get("sweep", 360))
     radius = _arc_radius_meters(float(params["radius"]))
-    sweep_rad = math.radians(abs(sweep))
-    if sweep >= 360:
-        return 2.0 * math.pi * radius
-    return radius * sweep_rad
+    return radius * abs(_signed_sweep_rad(sweep))
 
 
 def path_duration_seconds(params: dict[str, Any]) -> float:
-    speed = max(0.5, float(params.get("speed", 1.0)))
+    speed = _clamp_speed(float(params.get("speed", 1.0)))
     length_m = max(0.01, path_length_meters(params))
-    return length_m / (speed * PATH_EE_M_PER_S_AT_UNIT_SPEED)
+    rep = max(1, int(params.get("repetition", 1)))
+    return (length_m * rep) / (speed * PATH_EE_M_PER_S_AT_UNIT_SPEED)
 
 
 def _axis_unit(axis: str) -> np.ndarray:
@@ -149,9 +178,52 @@ def _plane_basis(plane: str) -> tuple[np.ndarray, np.ndarray]:
 
 def line_waypoints(params: dict[str, Any], start_pos: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     axis = str(params["axis"])
-    dist_m = _line_distance_meters(float(params["distance"]))
+    dist = params["distance"]
+    if _is_distance_span(dist):
+        # Endpoints of the oscillation span relative to start.
+        lo = _line_distance_meters(float(dist[0]))
+        hi = _line_distance_meters(float(dist[-1]))
+        u = _axis_unit(axis)
+        return start_pos + u * lo, start_pos + u * hi
+    dist_m = _line_distance_meters(float(dist))
     end_pos = start_pos + _axis_unit(axis) * dist_m
     return start_pos, end_pos
+
+
+def _line_offset_along_axis(params: dict[str, Any], phase: float) -> float:
+    """Axis offset (m) from the path start for oscillation phase ``phase`` (cycles).
+
+    ``phase`` advances by 1.0 per repetition set:
+    - ± / [lo, hi]: one set = lo → hi → lo (full 왔다갔다)
+    - scalar + rep>1: one set = 0 → d → 0 (out and back)
+    - scalar + rep=1: linear 0 → d (one-way), phase in [0, 1]
+    """
+    dist = params["distance"]
+    if _is_distance_span(dist):
+        lo = _line_distance_meters(float(dist[0]))
+        hi = _line_distance_meters(float(dist[-1]))
+        # Start at the midpoint (phase=0 → current EE). Cosine lo→hi→lo used to
+        # jump to ``lo`` on the first path frame (e.g. dist=±0.15 → snap −15cm).
+        mid = 0.5 * (lo + hi)
+        amp = 0.5 * (hi - lo)
+        return mid + amp * math.sin(2.0 * math.pi * phase)
+
+    dist_m = _line_distance_meters(float(dist))
+    rep = max(1, int(params.get("repetition", 1)))
+    if rep <= 1:
+        # One-way: phase 0→1 maps to 0→distance
+        return dist_m * min(max(phase, 0.0), 1.0)
+    # Round-trip set: 0 → dist → 0 each integer phase
+    t = 0.5 - 0.5 * math.cos(2.0 * math.pi * phase)
+    return dist_m * t
+
+
+def _signed_sweep_rad(sweep_deg: float) -> float:
+    """Signed arc angle in radians. +180 and −180 travel opposite ways."""
+    s = float(sweep_deg)
+    if abs(s) >= 360.0:
+        return math.copysign(2.0 * math.pi * (abs(s) / 360.0), s)
+    return math.radians(s)
 
 
 def arc_waypoints(
@@ -162,21 +234,16 @@ def arc_waypoints(
     plane = normalize_plane(str(params["plane"]))
     radius_m = _arc_radius_meters(float(params["radius"]))
     sweep_deg = float(params.get("sweep", 360))
-    direction = str(params.get("direction", "ccw"))
-    sign = -1.0 if direction == "cw" else 1.0
-
+    # Signed sweep only (no cw/ccw). Center along −e1; +θ → +e2, −θ → −e2.
+    # On plane=yz that means +sweep bulges up, −sweep bulges down (bowl ∪).
     e1, e2 = _plane_basis(plane)
     center = start_pos - radius_m * e1
-
-    if sweep_deg >= 360:
-        total_rad = 2.0 * math.pi
-    else:
-        total_rad = math.radians(abs(sweep_deg))
+    total_rad = _signed_sweep_rad(sweep_deg)
 
     points: list[np.ndarray] = []
     for k in range(num_samples):
         t = k / max(1, num_samples - 1) if num_samples > 1 else 1.0
-        theta = sign * t * total_rad
+        theta = t * total_rad
         pos = center + radius_m * (math.cos(theta) * e1 + math.sin(theta) * e2)
         points.append(pos.astype(float))
     return points
@@ -241,26 +308,57 @@ def execute_path_ee_ik(
     start_pos = generator._get_eef_position()
     hold_quat = get_eef_quat_wxyz(mujoco_model, mujoco_data, site_id)
 
-    effective_speed = max(0.5, path_speed * (1.0 - 0.45 * hesitation_strength))
+    effective_speed = _clamp_speed(path_speed * (1.0 - 0.45 * hesitation_strength))
     params_eff = {**parameters, "speed": effective_speed}
     duration = path_duration_seconds(params_eff)
-    # Short arcs/lines need enough samples for visible motion and reliable EE IK
-    num_frames = max(12, int(duration * hz))
+    # Zero-length line (= ``hold(t=…)`` rewrite) must freeze — no filler IK frames.
+    if shape == "line":
+        dist = parameters.get("distance", 0.0)
+        if isinstance(dist, (int, float)) and abs(float(dist)) < 1e-9:
+            num_frames = 0
+        elif (
+            _is_distance_span(dist)
+            and abs(float(dist[0]) - float(dist[-1])) < 1e-9
+            and abs(float(dist[0])) < 1e-9
+        ):
+            num_frames = 0
+        else:
+            num_frames = max(1, int(round(duration * hz * _frame_scale())))
+    else:
+        num_frames = max(1, int(round(duration * hz * _frame_scale())))
+        # Tiny radius + high spd (e.g. r=0.01, spd=1.5 @ FRAME_SCALE=0.5) rounds
+        # to 1–2 frames. For a full circle, endpoints t=0 and t=1 are the *same*
+        # point, so the arc looks completely frozen. Keep ≥1 sample / ~30°.
+        if shape in ("arc", "circle"):
+            sweep_abs = abs(float(parameters.get("sweep", 360.0)))
+            min_arc = max(4, int(math.ceil(sweep_abs / 30.0)))
+            num_frames = max(num_frames, min_arc)
 
     pre_pause = int(hz * 0.12 * hesitation_strength)
     for _ in range(pre_pause):
         frames.append(Image.fromarray(capture_image_fn()))
 
     if shape == "line":
-        _, end_pos = line_waypoints(parameters, start_pos)
+        axis = str(parameters.get("axis"))
+        rep = max(1, int(parameters.get("repetition", 1)))
+        dist = parameters["distance"]
+        if _is_distance_span(dist):
+            lo = _line_distance_meters(float(dist[0]))
+            hi = _line_distance_meters(float(dist[-1]))
+            dist_label = f"[{lo:.3f}, {hi:.3f}]m"
+        else:
+            dist_label = f"{_line_distance_meters(float(dist)):.3f}m"
         print(
             f"\n--- Path (line EE IK) ---\n"
-            f"axis={parameters.get('axis')}, distance={_line_distance_meters(float(parameters['distance'])):.3f}m, "
+            f"axis={axis}, distance={dist_label}, repetition={rep}, "
             f"speed={effective_speed}, frames={num_frames}"
         )
+        u = _axis_unit(axis)
         for k in range(num_frames):
-            t = (k + 1) / num_frames
-            target = start_pos * (1.0 - t) + end_pos * t
+            # phase advances through ``rep`` full 왔다갔다 sets
+            phase = (k / max(num_frames - 1, 1)) * (rep if _is_distance_span(dist) or rep > 1 else 1.0)
+            offset = _line_offset_along_axis(parameters, phase)
+            target = start_pos + u * offset
             ik_move_eef_to(
                 ik_solver=ik,
                 mujoco_model=mujoco_model,
@@ -275,10 +373,14 @@ def execute_path_ee_ik(
         plane = normalize_plane(str(parameters.get("plane", "xy")))
         sweep = float(parameters.get("sweep", 360))
         radius_m = _arc_radius_meters(float(parameters["radius"]))
-        mode = "full circle (EE on circumference)" if sweep >= 360 else "arc end anchored at current EE"
+        mode = (
+            "full circle (EE on circumference)"
+            if abs(sweep) >= 360
+            else "arc end anchored at current EE"
+        )
         print(
             f"\n--- Path (arc EE IK) ---\n"
-            f"plane={plane}, radius={radius_m:.3f}m, sweep={sweep}°, {mode}, "
+            f"plane={plane}, radius={radius_m:.3f}m, sweep={sweep}° (signed), {mode}, "
             f"speed={effective_speed}, frames={num_frames}"
         )
         targets = arc_waypoints(parameters, start_pos, num_frames)

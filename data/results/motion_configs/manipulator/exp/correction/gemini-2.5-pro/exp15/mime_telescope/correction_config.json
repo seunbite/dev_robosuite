@@ -1,0 +1,82 @@
+[
+  {
+    "idx": 10,
+    "cue": "mime_telescope",
+    "description": "The robot brings one hand to its 'eye' to form a telescope, performs a small twist as if focusing, and then executes a slow scan to show it is looking through the instrument.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 15,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "gripper_state": "open",
+          "gripper_value": 0.2,
+          "speed": 1.5,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 0.8,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 0.8,
+              "hold_time": 0.4
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "xy",
+          "radius": 0.12,
+          "sweep": -45,
+          "speed": 0.6,
+          "hold_time": 1.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 45,
+            "y": 15,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "gripper_state": "closed",
+          "speed": 1.2,
+          "hold_time": 0.2
+        }
+      }
+    ],
+    "state": "exp15_mime_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-09T17:46:29",
+    "experiment": "exp15",
+    "generation_valid": true,
+    "correction_q1": "no, The gripper was closed, ruining the illusion of a tube, and the final scanning motion was a downward arc instead of a horizontal sweep.",
+    "correction_q2": "The motion should be recomposed to: 1. Raise a partially open gripper to the 'eye' position. 2. Perform a small wrist rotation for 'focusing'. 3. Execute a slow, horizontal (side-to-side) arc to represent scanning. 4. Lower the arm to conclude.",
+    "reasoning": "# Correction Q1: no, The gripper was closed, ruining the illusion of a tube, and the final scanning motion was a downward arc instead of a horizontal sweep.\n# Correction Q2: The motion should be recomposed to: 1. Raise a partially open gripper to the 'eye' position. 2. Perform a small wrist rotation for 'focusing'. 3. Execute a slow, horizontal (side-to-side) arc to represent scanning. 4. Lower the arm to conclude.\n# Q1: A human would cup their hand into a circle, bring it up to their eye, and slowly scan their head and hand from side to side as if looking at a distant horizon.\n# Q2: P1: front+vertical vs P2: up+horizontal. P1 is the winner because it correctly orients the \"telescope\" forward, as if looking through it toward the horizon.\n# Q3: M1: pose(eye) > movement(focus) > path(scan) vs M2: pose(eye) > path(scan). M1 is the winner as it includes the \"focusing\" detail, making the mime richer and more specific.\n# Q4: A1: A small wrist rotation vs A2: a small forward-backward nudge. A1 is better as the rotation is a more iconic mime for adjusting a lens or focus knob."
+  }
+]

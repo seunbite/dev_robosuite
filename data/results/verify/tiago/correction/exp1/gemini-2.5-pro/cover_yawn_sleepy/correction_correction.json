@@ -1,0 +1,302 @@
+{
+  "time": "2026-07-03T19:49:59",
+  "domain": "tiago",
+  "exp_id": "1",
+  "model_tag": "gemini-2.5-pro",
+  "round": 2,
+  "parent_round": 1,
+  "correction_stem": "correction_correction",
+  "cue": "cover_yawn_sleepy",
+  "base_config_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/result_exp1_gemini-2.5-pro.json",
+  "config_snapshot_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/correction/gemini-2.5-pro/exp1/cover_yawn_sleepy/correction_correction_config.json",
+  "is_correct": null,
+  "action": "corrected",
+  "correction": {
+    "exp_id": "1",
+    "correction_q1": "Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".",
+    "correction_q2": "Q1: How would a human perform this motion? (One sentence)",
+    "is_correct": null,
+    "inner_reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\nNo, the arm instantly snaps to the face in the second render, which looks unnatural and robotic for a gesture that should convey sleepy fluidity.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\nThe structure should be changed to first bring the hand to the mouth area, then tilt the head back for the yawn, and finally execute the tired slump. This reordering makes the arm's \"snap\" to the pose look like a preparatory action rather than a glitchy mid-yawn movement, and the subsequent head tilt and slow slump will better convey the sleepy emotion.\n# Q1: How would a human perform this motion? (One sentence)\nA human would start to feel tired, bring a hand up to cover their mouth, open their mouth while tilting their head back, and then relax or slump forward as the yawn finishes.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n- **Candidate 1 (Winner):** `arm_position: \"in\"`, `gripper_orientation: \"horizontal\"`, `elbow_bended: true`, `z: 90`, `x: 80`. This configuration brings the hand inward and high, with a bent elbow, placing the gripper directly in front of the robot's \"mouth\" area, perfectly mimicking the hand position for covering a yawn.\n- **Candidate 2:** `arm_position: \"front\"`, `gripper_orientation: \"vertical\"`, `elbow_bended: true`, `z: 80`. This pose brings the hand forward, but the vertical gripper and less inward position would look more like pointing at the mouth or holding something to eat, not covering a yawn.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n- **M1 (Winner):** `pose(neutral)` -> `pose(hand_to_mouth)` -> `movement(head_tilt_up)` -> `movement(slump)`. This structure first positions the hand, then performs the yawn (head tilt), and finishes with the slump. It's a clear, sequential story. Reordering the \"snap\" to the beginning makes it feel more intentional.\n- **M2:** `pose(neutral)` -> `movement(head_tilt_up)` -> `pose(hand_to_mouth)` -> `movement(slump)`. This was the structure from the previous attempt. The arm \"snap\" happens after the yawn has already started, which feels disruptive and unnatural.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n- **Winner:** A final slow slump combining a torso drop and head lowering. This strongly reinforces the \"sleepy\" aspect of the cue, showing the exhaustion that follows a yawn.\n- **Alternative:** Just lowering the torso without the head movement. This would be less expressive and wouldn't capture the feeling of a heavy, tired head slumping down.",
+    "config_parsed": {
+      "cue": "cover_yawn_sleepy",
+      "description": "Robot brings a hand to its 'mouth', tilts its head back to yawn, and then slumps down tiredly.",
+      "movements": [
+        {
+          "type": "pose",
+          "duration": 0.4,
+          "parameters": {
+            "pose": {
+              "torso_height": "mid",
+              "arm_position": "down",
+              "gripper_orientation": "vertical",
+              "head": "center",
+              "left_arm": "still"
+            }
+          }
+        },
+        {
+          "type": "pose",
+          "duration": 0.8,
+          "parameters": {
+            "pose": {
+              "torso_height": "mid",
+              "arm_position": "in",
+              "gripper_orientation": "horizontal",
+              "head": "center",
+              "left_arm": "still",
+              "elbow_bended": true,
+              "z": 90,
+              "x": 80
+            }
+          }
+        },
+        {
+          "type": "movement",
+          "duration": 1.0,
+          "parameters": {
+            "movement": {
+              "joints": [
+                {
+                  "joint": "head",
+                  "axis": "tilt",
+                  "degrees": [
+                    0,
+                    30
+                  ]
+                }
+              ],
+              "repetition": 1,
+              "speed": 0.9
+            }
+          }
+        },
+        {
+          "type": "movement",
+          "duration": 1.8,
+          "parameters": {
+            "movement": {
+              "joints": [
+                {
+                  "joint": "torso",
+                  "axis": "height",
+                  "degrees": [
+                    0.18,
+                    0.05
+                  ]
+                },
+                {
+                  "joint": "head",
+                  "axis": "tilt",
+                  "degrees": [
+                    30,
+                    5
+                  ]
+                }
+              ],
+              "repetition": 1,
+              "speed": 0.6
+            }
+          }
+        }
+      ]
+    },
+    "parse_error": null,
+    "raw_text": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\nNo, the arm instantly snaps to the face in the second render, which looks unnatural and robotic for a gesture that should convey sleepy fluidity.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\nThe structure should be changed to first bring the hand to the mouth area, then tilt the head back for the yawn, and finally execute the tired slump. This reordering makes the arm's \"snap\" to the pose look like a preparatory action rather than a glitchy mid-yawn movement, and the subsequent head tilt and slow slump will better convey the sleepy emotion.\n# Q1: How would a human perform this motion? (One sentence)\nA human would start to feel tired, bring a hand up to cover their mouth, open their mouth while tilting their head back, and then relax or slump forward as the yawn finishes.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n- **Candidate 1 (Winner):** `arm_position: \"in\"`, `gripper_orientation: \"horizontal\"`, `elbow_bended: true`, `z: 90`, `x: 80`. This configuration brings the hand inward and high, with a bent elbow, placing the gripper directly in front of the robot's \"mouth\" area, perfectly mimicking the hand position for covering a yawn.\n- **Candidate 2:** `arm_position: \"front\"`, `gripper_orientation: \"vertical\"`, `elbow_bended: true`, `z: 80`. This pose brings the hand forward, but the vertical gripper and less inward position would look more like pointing at the mouth or holding something to eat, not covering a yawn.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n- **M1 (Winner):** `pose(neutral)` -> `pose(hand_to_mouth)` -> `movement(head_tilt_up)` -> `movement(slump)`. This structure first positions the hand, then performs the yawn (head tilt), and finishes with the slump. It's a clear, sequential story. Reordering the \"snap\" to the beginning makes it feel more intentional.\n- **M2:** `pose(neutral)` -> `movement(head_tilt_up)` -> `pose(hand_to_mouth)` -> `movement(slump)`. This was the structure from the previous attempt. The arm \"snap\" happens after the yawn has already started, which feels disruptive and unnatural.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n- **Winner:** A final slow slump combining a torso drop and head lowering. This strongly reinforces the \"sleepy\" aspect of the cue, showing the exhaustion that follows a yawn.\n- **Alternative:** Just lowering the torso without the head movement. This would be less expressive and wouldn't capture the feeling of a heavy, tired head slumping down.\n{\n  \"cue\": \"cover_yawn_sleepy\",\n  \"description\": \"Robot brings a hand to its 'mouth', tilts its head back to yawn, and then slumps down tiredly.\",\n  \"movements\": [\n    {\n      \"type\": \"pose\",\n      \"duration\": 0.4,\n      \"parameters\": {\n        \"pose\": {\n          \"torso_height\": \"mid\",\n          \"arm_position\": \"down\",\n          \"gripper_orientation\": \"vertical\",\n          \"head\": \"center\",\n          \"left_arm\": \"still\"\n        }\n      }\n    },\n    {\n      \"type\": \"pose\",\n      \"duration\": 0.8,\n      \"parameters\": {\n        \"pose\": {\n          \"torso_height\": \"mid\",\n          \"arm_position\": \"in\",\n          \"gripper_orientation\": \"horizontal\",\n          \"head\": \"center\",\n          \"left_arm\": \"still\",\n          \"elbow_bended\": true,\n          \"z\": 90,\n          \"x\": 80\n        }\n      }\n    },\n    {\n      \"type\": \"movement\",\n      \"duration\": 1.0,\n      \"parameters\": {\n        \"movement\": {\n          \"joints\": [\n            {\n              \"joint\": \"head\",\n              \"axis\": \"tilt\",\n              \"degrees\": [\n                0,\n                30\n              ]\n            }\n          ],\n          \"repetition\": 1,\n          \"speed\": 0.9\n        }\n      }\n    },\n    {\n      \"type\": \"movement\",\n      \"duration\": 1.8,\n      \"parameters\": {\n        \"movement\": {\n          \"joints\": [\n            {\n              \"joint\": \"torso\",\n              \"axis\": \"height\",\n              \"degrees\": [\n                0.18,\n                0.05\n              ]\n            },\n            {\n              \"joint\": \"head\",\n              \"axis\": \"tilt\",\n              \"degrees\": [\n                30,\n                5\n              ]\n            }\n          ],\n          \"repetition\": 1,\n          \"speed\": 0.6\n        }\n      }\n    }\n  ]\n}",
+    "prompt_exp_id": "1",
+    "pipeline_exp_id": "1",
+    "vlm_media": {
+      "kind": "image/gif",
+      "path": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/cover_yawn_sleepy/correction_correction/cumulative_2tiles.gif"
+    }
+  },
+  "input_row": {
+    "idx": 19,
+    "cue": "cover_yawn_sleepy",
+    "description": "Robot starts a yawn by tilting its head back, brings a hand up to cover its 'mouth', and then slumps down tiredly.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.4,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "down",
+            "gripper_orientation": "vertical",
+            "head": "center",
+            "left_arm": "still"
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 1.0,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [
+                  0,
+                  30
+                ]
+              }
+            ],
+            "repetition": 1,
+            "speed": 0.9
+          }
+        }
+      },
+      {
+        "type": "pose",
+        "duration": 0.8,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "in",
+            "gripper_orientation": "horizontal",
+            "head": "up",
+            "left_arm": "still",
+            "elbow_bended": true,
+            "z": 90,
+            "x": 80
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 1.8,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "torso",
+                "axis": "height",
+                "degrees": [
+                  0.18,
+                  0.05
+                ]
+              },
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [
+                  30,
+                  5
+                ]
+              }
+            ],
+            "repetition": 1,
+            "speed": 0.6
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-02T22:09:17",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "No, the prior config is not representative. The robot's hand snaps instantly to its face instead of moving there, which is unnatural and misses the key \"covering\" action.",
+    "correction_q2": null,
+    "reasoning": "# Correction Q1: No, the prior config is not representative. The robot's hand snaps instantly to its face instead of moving there, which is unnatural and misses the key \"covering\" action.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Q1: How would a human perform this motion?\nA human tilts their head back, brings a hand up to cover their open mouth for the yawn, and then their body might slump slightly as they feel sleepy.\n# Q2: Pose Candidates Comparison.\nCandidate 1: Start with hand already at the face (`arm_position: \"in\"`, high `z`, `head: \"up\"`). This leads to an abrupt start, as seen in the render.\nCandidate 2: Start with a neutral pose (`arm_position: \"down\"`, `head: \"center\"`). This allows the gesture of raising the hand to be visible and intentional.\nWinner: Candidate 2, because it creates a full, readable gesture from start to finish.\n# Q3: Structure Comparison.\nM1: `pose` (hand at face) -> `movement` (torso slump). This is the flawed original structure with an unnatural snap.\nM2: `pose` (neutral) -> `movement` (head tilt) -> `pose` (move hand to face) -> `movement` (torso slump). This builds the action sequentially: the yawn starts, is covered, and then sleepiness follows.\nWinner: M2, as it provides a clear and natural narrative flow for the gesture.\n# Q4: Context Reinforcement.\nChoice 1: Make all movements uniformly slow. This would convey sleepiness, but might feel sluggish.\nChoice 2: Contrast speeds: a slow head tilt to start the yawn (~1.0), a normal-speed arm movement to cover it (~0.8s duration), and a very slow slump at the end (~0.6 speed).\nWinner: Choice 2, because the varying tempo is more expressive and better mimics the different phases of a real yawn."
+  },
+  "output_row": {
+    "idx": 19,
+    "cue": "cover_yawn_sleepy",
+    "description": "Robot brings a hand to its 'mouth', tilts its head back to yawn, and then slumps down tiredly.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.4,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "down",
+            "gripper_orientation": "vertical",
+            "head": "center",
+            "left_arm": "still"
+          }
+        }
+      },
+      {
+        "type": "pose",
+        "duration": 0.8,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "in",
+            "gripper_orientation": "horizontal",
+            "head": "center",
+            "left_arm": "still",
+            "elbow_bended": true,
+            "z": 90,
+            "x": 80
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 1.0,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [
+                  0,
+                  30
+                ]
+              }
+            ],
+            "repetition": 1,
+            "speed": 0.9
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 1.8,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "torso",
+                "axis": "height",
+                "degrees": [
+                  0.18,
+                  0.05
+                ]
+              },
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [
+                  30,
+                  5
+                ]
+              }
+            ],
+            "repetition": 1,
+            "speed": 0.6
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-03T19:49:44",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".",
+    "correction_q2": "Q1: How would a human perform this motion? (One sentence)",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\nNo, the arm instantly snaps to the face in the second render, which looks unnatural and robotic for a gesture that should convey sleepy fluidity.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\nThe structure should be changed to first bring the hand to the mouth area, then tilt the head back for the yawn, and finally execute the tired slump. This reordering makes the arm's \"snap\" to the pose look like a preparatory action rather than a glitchy mid-yawn movement, and the subsequent head tilt and slow slump will better convey the sleepy emotion.\n# Q1: How would a human perform this motion? (One sentence)\nA human would start to feel tired, bring a hand up to cover their mouth, open their mouth while tilting their head back, and then relax or slump forward as the yawn finishes.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n- **Candidate 1 (Winner):** `arm_position: \"in\"`, `gripper_orientation: \"horizontal\"`, `elbow_bended: true`, `z: 90`, `x: 80`. This configuration brings the hand inward and high, with a bent elbow, placing the gripper directly in front of the robot's \"mouth\" area, perfectly mimicking the hand position for covering a yawn.\n- **Candidate 2:** `arm_position: \"front\"`, `gripper_orientation: \"vertical\"`, `elbow_bended: true`, `z: 80`. This pose brings the hand forward, but the vertical gripper and less inward position would look more like pointing at the mouth or holding something to eat, not covering a yawn.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n- **M1 (Winner):** `pose(neutral)` -> `pose(hand_to_mouth)` -> `movement(head_tilt_up)` -> `movement(slump)`. This structure first positions the hand, then performs the yawn (head tilt), and finishes with the slump. It's a clear, sequential story. Reordering the \"snap\" to the beginning makes it feel more intentional.\n- **M2:** `pose(neutral)` -> `movement(head_tilt_up)` -> `pose(hand_to_mouth)` -> `movement(slump)`. This was the structure from the previous attempt. The arm \"snap\" happens after the yawn has already started, which feels disruptive and unnatural.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n- **Winner:** A final slow slump combining a torso drop and head lowering. This strongly reinforces the \"sleepy\" aspect of the cue, showing the exhaustion that follows a yawn.\n- **Alternative:** Just lowering the torso without the head movement. This would be less expressive and wouldn't capture the feeling of a heavy, tired head slumping down."
+  },
+  "media": {
+    "gif": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/cover_yawn_sleepy/correction_correction/mm19_g19_cover_yawn_sleepy.gif",
+    "mp4": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/cover_yawn_sleepy/correction_correction/mm19_g19_cover_yawn_sleepy.mp4",
+    "pose_png": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/cover_yawn_sleepy/correction_correction/mm19_g19_cover_yawn_sleepy_pose.png",
+    "cumulative_tile_gif": null
+  }
+}

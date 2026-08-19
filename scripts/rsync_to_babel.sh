@@ -14,8 +14,8 @@ PAIRWISE="data/results/verify/samples/motion_gt_neg_pairwise_pilot90"
 echo "=== rsync -> ${REMOTE}:${REMOTE_DIR} ==="
 
 rsync -avz --progress \
-  "$ROOT/adhoc/generation/google_robot/" \
-  "${REMOTE}:${REMOTE_DIR}/adhoc/generation/google_robot/"
+  "$ROOT/adhoc/generation/tiago/" \
+  "${REMOTE}:${REMOTE_DIR}/adhoc/generation/tiago/"
 
 rsync -avz --progress \
   "$ROOT/adhoc/generation/robotarm/" \

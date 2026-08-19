@@ -799,6 +799,9 @@ def get_sim_bundle(
     cam_sf = bool(meta.get("camera_spherical_framing", False))
     ckey = (
         f"{sample.get('sample_id')}|{robot}|{hz}|{os.path.normpath(str(config_path))}|csf={int(cam_sf)}"
+        f"|cps={meta.get('cam_pos_scale', '')}|cf={meta.get('cam_fovy', '')}"
+        f"|csm={meta.get('camera_spherical_m', '')}|cd={meta.get('camera_distance', '')}"
+        f"|caz={meta.get('camera_azimuth_deg', '')}|cel={meta.get('camera_elevation_deg', '')}"
     )
     if not force and ckey in _SIM_BUNDLE_CACHE:
         return _SIM_BUNDLE_CACHE[ckey]
@@ -823,8 +826,12 @@ def get_sim_bundle(
                 pass
 
     arm_pkg = _robotarm_package_dir()
-    if str(arm_pkg) not in sys.path:
-        sys.path.insert(0, str(arm_pkg))
+    arm_root = str(arm_pkg.resolve())
+    try:
+        sys.path.remove(arm_root)
+    except ValueError:
+        pass
+    sys.path.insert(0, arm_root)
 
     temp_output_root = (REPO_ROOT / "adhoc" / "test" / "_traj_tmp").resolve()
     temp_output_root.mkdir(parents=True, exist_ok=True)
@@ -834,13 +841,23 @@ def get_sim_bundle(
         if _is_quadruped_sim_robot(robot):
             from legacy.motion_generation_quadruped import QuadrupedMotionGenerator
 
-            gen = QuadrupedMotionGenerator(
-                robot_name=robot,
-                output_dir=str(temp_output_root),
-                capture_image_width=512,
-                capture_image_height=512,
-                hz=hz,
-            )
+            quad_kw: dict[str, Any] = {
+                "robot_name": robot,
+                "output_dir": str(temp_output_root),
+                "capture_image_width": 512,
+                "capture_image_height": 512,
+                "hz": hz,
+            }
+            for key in (
+                "camera_distance",
+                "camera_spherical_m",
+                "camera_elevation_deg",
+                "camera_azimuth_deg",
+                "camera_lookat_z_offset",
+            ):
+                if key in meta:
+                    quad_kw[key] = meta[key]
+            gen = QuadrupedMotionGenerator(**quad_kw)
             pose_id = sample.get("selected_pose_id") or sample.get("pose_index")
             frames, trajectory, cam_pos, cam_rot, fovy = _simulate_trajectory_quadruped(
                 gen,
@@ -853,23 +870,22 @@ def get_sim_bundle(
         elif _is_tiago_mobile_sim_robot(robot):
             if str(REPO_ROOT) not in sys.path:
                 sys.path.insert(0, str(REPO_ROOT))
-            from adhoc.generation.google_robot.legacy.render_mobile_config import (
+            from adhoc.generation.tiago.legacy.render_mobile_config import (
                 render_config_with_trajectory,
                 tiago_trajectory_track_policy,
             )
 
-            frames, trajectory, cam_pos, cam_rot, fovy = render_config_with_trajectory(cfg)
+            frames, trajectory, cam_pos, cam_rot, fovy = render_config_with_trajectory(
+                cfg,
+                cam_pos_scale=float(meta.get("cam_pos_scale", 1.09)),
+                cam_fovy=float(meta.get("cam_fovy", 58.0)),
+                overlay_progress_bar=bool(meta.get("overlay_progress_bar", True)),
+            )
             trajectory_tracks = tiago_trajectory_track_policy(cfg)
         else:
             # ``legacy.motion_generation_quadruped`` inserts ``adhoc/generation`` at sys.path[0],
             # so a plain ``import motion_generation`` resolves to generation/motion_generation.py
             # (thin CLI shim) instead of robotarm/motion_generation.py and breaks IIWA bundles.
-            arm_root = str(arm_pkg.resolve())
-            try:
-                sys.path.remove(arm_root)
-            except ValueError:
-                pass
-            sys.path.insert(0, arm_root)
             from motion_generation import MotionGenerator, _select_initial_poses
             from legacy.vlm_pose_benchmark import _simulate_trajectory
 

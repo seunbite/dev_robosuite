@@ -1,0 +1,92 @@
+[
+  {
+    "idx": 8,
+    "cue": "mime_hammer",
+    "description": "The robot grips an imaginary hammer, performs two distinct strikes, each composed of a clear wind-up, a forceful down-stroke, and a sharp recoil to simulate impact.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 45,
+            "y": -20,
+            "z": 60,
+            "gripper_orientation": "vertical"
+          },
+          "gripper_state": 70,
+          "speed": 1.5,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "path": {
+            "type": "line",
+            "axis": "x+z",
+            "distance": {
+              "x": -0.1,
+              "z": 0.15
+            }
+          },
+          "speed": 2.5,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "path": {
+            "type": "line",
+            "axis": "x+z",
+            "distance": {
+              "x": 0.12,
+              "z": -0.2
+            }
+          },
+          "speed": 4.0,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "path": {
+            "type": "line",
+            "axis": "x+z",
+            "distance": {
+              "x": -0.1,
+              "z": 0.15
+            }
+          },
+          "speed": 2.5,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "path": {
+            "type": "line",
+            "axis": "x+z",
+            "distance": {
+              "x": 0.12,
+              "z": -0.2
+            }
+          },
+          "speed": 4.0,
+          "hold_time": 0.5
+        }
+      }
+    ],
+    "state": "exp15_mime_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-09T17:45:22",
+    "experiment": "exp15",
+    "generation_valid": true,
+    "correction_q1": "Correction Q1: no, the joint-based motion feels indirect and lacks the sharp, impactful quality of a hammer strike, making the mime feel weak.",
+    "correction_q2": "Correction Q2: The entire sequence should be replaced with IK-based path movements, using a clear wind-up (line path up and back), a very fast strike (line path down and forward), and a sharp stop to mime impact, repeating the action once before holding the final pose.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: no, the joint-based motion feels indirect and lacks the sharp, impactful quality of a hammer strike, making the mime feel weak.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The entire sequence should be replaced with IK-based path movements, using a clear wind-up (line path up and back), a very fast strike (line path down and forward), and a sharp stop to mime impact, repeating the action once before holding the final pose.\n\n# Q1: How would a human mime this in empty space? (One sentence)\nA human would make a fist to grip a handle, draw their arm up and back, then swing it forcefully forward and down in an arc, stopping abruptly with a slight recoil to signify impact.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\nP1: `dir: front`, `gripper_orientation: vertical` (to strike a wall). P2: `dir: down`, `gripper_orientation: horizontal` (to strike a table). Winner: P1, as striking forward presents a clearer and more dynamic side profile of the swinging motion to the viewer.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > path arc vs M2: pose > movement rep). State the winner and why.\nM1: pose (grip) > line (wind-up) > line (fast strike) > repeat. M2: pose (grip) > arc (single combined swing). Winner: M1, because separating the wind-up and strike into distinct phases with different speeds creates a much clearer and more powerful depiction of the action.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the mime interpretation stronger and pick the best one.\nA1: After the final strike, hold the pose briefly to signify the hammer resting on the surface. A2: Begin the whole motion with a gripper `close` action to mime picking up the tool. Winner: A1, as holding the final impact pose is a stronger mime convention that emphasizes the completion of the primary action."
+  }
+]

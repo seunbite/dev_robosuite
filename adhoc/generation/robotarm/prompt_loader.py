@@ -17,6 +17,8 @@ _LEGACY_ALIASES: dict[str, str] = {
     "exp08_motion_verify_vlm.txt": "prompt_exp8.txt",
     "exp09_motion_verify_text.txt": "prompt_exp9.txt",
     "exp10_motion_pairwise_mp4.txt": "prompt_exp10.txt",
+    "exp11_motion_pairwise_rep.txt": "prompt_exp11.txt",
+    "exp12_context_variation.txt": "prompt_exp12.txt",
 }
 
 

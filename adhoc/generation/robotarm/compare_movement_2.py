@@ -234,10 +234,16 @@ def run(args: argparse.Namespace) -> None:
             print(f"[skip] {cue}: no motion config", flush=True)
             continue
         mp4_rel = spec.get("pair_mp4")
-        if not mp4_rel:
+        mp4_path: Path | None = None
+        if mp4_rel:
+            cand = Path(mp4_rel)
+            mp4_path = (_REPO / mp4_rel) if not cand.is_absolute() else cand
+            if not mp4_path.is_file():
+                mp4_path = pairwise_dir / cand.name
+        if not mp4_path or not mp4_path.is_file():
             hits = sorted(pairwise_dir.glob(f"{idx:03d}_{cue}_pair*.mp4"))
-            mp4_rel = str(hits[0].relative_to(_REPO)) if hits else None
-        mp4_path = _REPO / mp4_rel if mp4_rel else None
+            mp4_path = hits[0] if hits else None
+            mp4_rel = str(mp4_path.relative_to(_REPO)) if mp4_path and mp4_path.is_relative_to(_REPO) else mp4_rel
         if not mp4_path or not mp4_path.is_file():
             print(f"[skip] {cue}: missing mp4 {mp4_rel}", flush=True)
             continue

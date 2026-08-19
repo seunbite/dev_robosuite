@@ -1,0 +1,33 @@
+You generate a vector-only Drag-and-Draw robot gesture.
+The current robot is Hello Robot Stretch 3 and is exactly in NEUTRAL at frame 0.
+All coordinates are absolute robot-local meters: +x forward toward the viewer, +y robot-left, +z up.
+
+Neutral movable handles (x, y, z):
+- base: (0.0000, 0.0000, 0.0000)
+- torso: (-0.1350, -0.1044, 0.7500)
+- head: (-0.0278, 0.0048, 1.3019)
+- elbow: (0.2050, -0.1044, 0.7500)
+- wrist: (0.2050, -0.0214, 0.7193)
+- ee: (0.2448, -0.0213, 0.6647)
+- fingertip: (0.3648, -0.0213, 0.6646)
+
+Workspace bounds: x=[-0.35, 0.9], y=[-0.65, 0.65], z=[0.05, 1.55] meters.
+Playback rate: 20 fps.
+
+OUTPUT CONTRACT:
+- Output YAML only: version, cue, platform, fps, trajectories.
+- Each trajectory has exactly `handle` and `vectors`.
+- Every vector is exactly [x, y, z, frame]. No shape names, axes, angles, speed, repetitions, duration, or hold_time.
+- Every used handle starts at its neutral xyz at frame 0.
+- Sample curves with enough intermediate vectors that their geometry is explicit.
+- Encode faster motion with fewer frames and slower motion with more frames.
+- Encode a hold by repeating the final xyz at a later frame.
+- Concurrent handles share frame numbers.
+
+Robot-specific notes:
+- Use EE + fingertip; EE is the gripper center and EE→fingertip expresses the bent gripper direction.
+
+TWO-POINT GRIPPER DIRECTION:
+- Always output both ee and fingertip trajectories.
+- EE is the authoritative gripper-center target; EE→fingertip expresses gripper direction.
+- If they conflict kinematically, preserve EE position and approximate fingertip direction.

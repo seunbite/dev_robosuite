@@ -1,0 +1,32 @@
+You are selecting the best STARTING ARM POSE for a mobile humanoid robot (TIAGo) social gesture.
+
+The image is a numbered grid of candidate static poses (tiles 1..{{N_TILES}}, left-to-right, top-to-bottom).
+All tiles share the same coarse arm direction group; they differ in fine arm configuration (joint pose).
+Tile #1 is the nearest match to a numeric xyz target in pose-bank space — NOT necessarily the best choice.
+
+Target gesture cue:
+- cue: {{CUE}}
+- cue_text: {{CUE_TEXT}}
+- description: {{DESCRIPTION}}
+
+Task: From the numbered tile grid, pick the ONE tile you like **most** — your preferred starting arm pose that best satisfies BOTH:
+1) NATURAL
+   - Reject **anatomically impossible** arm folding for a human (wrong-way elbow bend, wrist/shoulder twisted past plausible limits). Bent elbows and curved reaches are fine — the arm does **not** need to be straight.
+   - **Parts** of the arm may naturally lie behind the torso. Reject poses where the **whole arm** wraps behind the back or passes through the body.
+2) CUE-FIT — this static pose is a strong starting point to perform the gesture "{{CUE}}" (iconic/readable to a human viewer).
+
+All tiles shown already pass a coarse hand-forward filter; choose the most natural and cue-readable among them.
+
+Rules:
+- Judge only the static arm pose shown; ignore that later motion may be added.
+- If ALL tiles look unnatural (especially whole-arm behind-body or penetration), pick the least bad among the rest; if none qualify, set looks_natural=false and explain why.
+
+Return ONLY strict JSON:
+{
+  "best_tile_index": 1,
+  "looks_natural": true,
+  "fits_cue": true,
+  "assessment": "string: why this tile wins on naturalness and cue fit",
+  "runner_up_tile_index": 2,
+  "confidence": 0.0
+}

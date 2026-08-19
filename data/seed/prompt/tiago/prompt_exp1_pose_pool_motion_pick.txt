@@ -1,0 +1,29 @@
+You are comparing {{N_TILES}} robot motion clips for the SAME iconic gesture cue.
+You receive {{N_TILES}} separate animated GIFs in order: tile 1, tile 2, … tile {{N_TILES}}.
+Each GIF shows the full generated motion for this cue, but with a different pose-bank candidate
+pinned at the pool pose step (same arm_position + gripper_orientation class; different fine joint xyz).
+
+Task: Which tile number is the MOST REPRESENTATIVE of this cue — which motion (especially its
+held pose and overall body language) would a human viewer most readily associate with the gesture?
+{{REPRESENTATIVE_MEANS}}
+Do NOT judge based on which pose is easiest to start follow-on motion from.
+
+Definitions:
+Coordinate frame: +x forward (viewer), +y robot left, +z up.
+- arm_position: dominant right-arm reach (front|back|in|out|up|down).
+- gripper_orientation: projected jaw-opening line — horizontal (ㅡ) or vertical (|).
+
+Target cue:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+
+Tile labels (geometry only — do NOT assume any tile is ground truth):
+{{TILE_LABELS}}
+
+Return ONLY strict JSON:
+{
+  "best_tile_index": 1,
+  "direction_orientation_assessment": "string: why this tile is the most iconic/representative for the cue",
+  "runner_up_tile_index": 2,
+  "confidence": 0.0
+}

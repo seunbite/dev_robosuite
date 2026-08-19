@@ -1,0 +1,170 @@
+{
+  "schema": "sophistication_fewshot",
+  "platform": "roomba",
+  "cue": "roomba_y_sway_sophistication_demo",
+  "title": "Roomba sophistication few-shot (sleepy yaw PRE + y-sway core + -x retreat POST)",
+  "design": {
+    "core_composition": "y축으로 작게 3회 왕복 (line ping-pong, spd=2)",
+    "sophistication": {
+      "PRE": "0→-60 hold0.5 → +60 hold0.5 → 0, ×2 (drowsy in-place yaw)",
+      "CORE": "동일 y-sway 3회 (spd=2)",
+      "POST": "x축 음의 방향으로 천천히 후퇴"
+    }
+  },
+  "core": {
+    "source_code": "path(base, line, y=[-0.05, 0.05], spd=2.0, rep=3)",
+    "role": "core",
+    "movements": [
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "line",
+            "speed": 2.0,
+            "repetition": 3,
+            "y": [
+              -0.05,
+              0.05
+            ]
+          }
+        }
+      }
+    ],
+    "parse_ok": true,
+    "notes": []
+  },
+  "sophistication": {
+    "source_code": "path(base, arc, r=0, deg=-60, spd=0.25, hold=0.5) + path(base, arc, r=0, deg=120, spd=0.25, hold=0.5) + path(base, arc, r=0, deg=-60, spd=0.25) + path(base, arc, r=0, deg=-60, spd=0.25, hold=0.5) + path(base, arc, r=0, deg=120, spd=0.25, hold=0.5) + path(base, arc, r=0, deg=-60, spd=0.25) + path(base, line, y=[-0.05, 0.05], spd=2.0, rep=3) + path(base, line, x=-0.18, spd=0.25)",
+    "role": "PRE + CORE + POST",
+    "main_component_range": {
+      "start": 7,
+      "end": 7,
+      "indexing": "1-based-inclusive"
+    },
+    "components": [
+      {
+        "index": "1-6",
+        "position": "PRE",
+        "description": "In-place yaw with hold=0.5 at ±60, ×2 cycles"
+      },
+      {
+        "index": 7,
+        "position": "CORE",
+        "description": "Small y-axis sway ×3"
+      },
+      {
+        "index": 8,
+        "position": "POST",
+        "description": "Slow retreat along -x"
+      }
+    ],
+    "movements": [
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "arc",
+            "speed": 0.25,
+            "hold_time": 0.5,
+            "radius": 0.0,
+            "degrees": -60.0
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "arc",
+            "speed": 0.25,
+            "hold_time": 0.5,
+            "radius": 0.0,
+            "degrees": 120.0
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "arc",
+            "speed": 0.25,
+            "radius": 0.0,
+            "degrees": -60.0
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "arc",
+            "speed": 0.25,
+            "hold_time": 0.5,
+            "radius": 0.0,
+            "degrees": -60.0
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "arc",
+            "speed": 0.25,
+            "hold_time": 0.5,
+            "radius": 0.0,
+            "degrees": 120.0
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "arc",
+            "speed": 0.25,
+            "radius": 0.0,
+            "degrees": -60.0
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "line",
+            "speed": 2.0,
+            "repetition": 3,
+            "y": [
+              -0.05,
+              0.05
+            ]
+          }
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "line",
+            "speed": 0.25,
+            "x": -0.18
+          }
+        }
+      }
+    ],
+    "parse_ok": true,
+    "notes": []
+  },
+  "created": "2026-07-28T06:39:48Z"
+}

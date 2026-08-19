@@ -764,6 +764,7 @@ def _simulate_trajectory(gen, cue_name, cue_idx, config_path, hz=4,
             cue=cue_name, cue_idx=cue_idx,
             pose_index=pose_index,
             config_path=config_path, hz=hz, save_gif=False,
+            overlay_progress_bar=False,
         )
     finally:
         gen._capture_image = orig_capture

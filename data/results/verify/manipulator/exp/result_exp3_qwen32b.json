@@ -1,0 +1,2431 @@
+{
+  "time": "2026-06-12T13:33:18",
+  "mode": "text_only_pose_verification",
+  "vlm_backend": "transformers",
+  "model": "Qwen/Qwen2.5-VL-32B-Instruct",
+  "config_json": "/home/hoyeonk/sblee/dev_robosuite/data/results/motion_configs/manipulator/exp/result_exp1_qwen32b.json",
+  "total": 88,
+  "results": [
+    {
+      "idx": 7,
+      "cue": "raise_fists_victory",
+      "current_dir": "down",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=down, grip=vertical) is inappropriate because the direction points downward, which contradicts the requirement to raise fists upward. Additionally, the vertical gripper orientation is less suitable for a fist gesture compared to horizontal.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To convey the 'raise fists victory' cue effectively, the EE should point upward (dir=up) and the fists should be oriented horizontally (grip=horizontal) to represent clenched fists naturally.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Dip the arms slightly downward to prepare for the motion.",
+            "Step 2: Extend the arms upwards in a swift, controlled motion while keeping the fists clenched and oriented horizontally.",
+            "Step 3: Hold the raised fists briefly to emphasize the victorious gesture."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 8,
+      "cue": "fist_pump",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=vertical) is not suitable for a fist pump because the EE is already pointing upwards, which precludes the need for a dramatic upward motion. Additionally, the gripper orientation being vertical makes it harder to transition into a fist pump gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To convey the excitement or triumph of a fist pump, the robot should start with its arm extended forward (dir=front) and the gripper in a horizontal orientation. This setup allows for a natural and dynamic upward motion of the arm while also enabling the formation of a fist during the gesture.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Extend the arm forward with the gripper in a horizontal orientation.",
+            "Step 2: Close the gripper into a fist.",
+            "Step 3: Drive the fist upward in a sharp motion, emphasizing the gesture with a wrist accent to convey excitement or triumph."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 9,
+      "cue": "flex_bicep",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) aligns well with the 'flex_bicep' cue. The end-effector pointing in the front direction is suitable because it allows the robot to extend the arm forward initially. The horizontal gripper orientation ensures the arm appears relaxed and natural during the extension phase.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm fully forward along the x-axis (front direction).",
+            "Step 2: Bend the elbow to bring the forearm up, keeping the arm in a horizontal plane.",
+            "Step 3: Hold the bicep flexed for a moment to emphasize the pose, then optionally lower the arm back down gracefully."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 10,
+      "cue": "shrug_idk",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "Current pose has dir=up and gripper_orientation=horizontal. For shrugging, the EE pointing axis should align more naturally with the typical shrug motion, which involves raising the shoulders slightly forward (toward the human viewer).",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "For a shrug, the robot's EE should point slightly forward (dir=front) rather than upward (dir=up). This orientation allows the motion to better simulate the natural shrug gesture, where the shoulder rises symmetrically toward the front. The gripper orientation remains horizontal, as this aligns with the typical shrug posture.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Ensure the EE is positioned with dir=front and gripper_orientation=horizontal, slightly below the shoulder level.",
+            "Step 2: Simultaneously lift both shoulders symmetrically toward the front (world +x direction) by moving the EE upwards along the z-axis while maintaining the orientation.",
+            "Step 3: Pause briefly at the peak of the shrug to emphasize the gesture, keeping the EE stationary to convey uncertainty.",
+            "Step 4: Return both shoulders back to their original position by lowering the EE along the z-axis, completing the shrug motion."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 11,
+      "cue": "self_scratch_head_confused",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose has the direction labeled as 'down' and gripper orientation as 'horizontal'. This is inappropriate for scratching the head, as the robot would need to move upward to reach the head and adopt a pose that suggests confusion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To perform the 'self_scratch_head_confused' cue, the robot needs to point its end effector towards the head region, which requires the direction to be 'up'. Additionally, the horizontal gripper orientation allows for natural hand positioning during the scratch motion.",
+          "recommended_movement_plan_after_change": [
+            "1. Lift the arm in an upward motion to position the hand near the head.",
+            "2. Perform a scratching motion with the fingers moving across the side or top of the head.",
+            "3. Slightly tilt the head to enhance the expression of confusion."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 12,
+      "cue": "facepalm",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the 'facepalm' cue because it allows the robot to naturally extend its arm forward and transition towards the forehead in a manner consistent with human-like exasperation or embarrassment.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm forward along the x-axis (forward direction) to set up the initial gesture.",
+            "Step 2: Gradually pivot the arm upward and slightly inward, transitioning towards the forehead area while maintaining the horizontal orientation of the gripper.",
+            "Step 3: Gently tap the forehead with the palm, ensuring the motion is soft and conveys a sense of exasperation or embarrassment."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 13,
+      "cue": "point_self",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose has the direction set to 'front' and the gripper orientation set to 'horizontal'. For the cue 'point_self', the robot needs to point towards its own body, which would typically require the direction to be aligned more accurately with the robot's center or torso, rather than directly forward ('front'). Additionally, the gripper orientation should likely be 'vertical' to mimic a pointing gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To convey self-reference, the robot should have its end-effector pointing towards its torso. This requires changing the direction from 'front' to 'left' (assuming the robot's body is centered). The gripper orientation should also change to 'vertical' to simulate a pointing gesture, as a horizontal orientation does not align with typical human pointing behavior.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Adjust the pose to have the direction set to 'left' and the gripper orientation set to 'vertical'.",
+            "Step 2: Move the arm inward, bringing it closer to the robot's torso while maintaining the vertical orientation to simulate a pointing gesture.",
+            "Step 3: Hold the pose briefly to emphasize the self-reference, ensuring the end-effector remains directed towards the robot's body."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 14,
+      "cue": "point_you",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the 'point_you' cue because the end-effector is oriented forward towards the viewer, and the horizontal jaw orientation ensures the gesture emphasizes pointing.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm fully forward until the end-effector reaches the desired distance from the viewer, maintaining the frontward direction.",
+            "Step 2: Hold the arm steady in the extended position for a moment to ensure the gesture is clearly visible and deliberate.",
+            "Step 3: Slightly retract the arm while maintaining the pointing gesture, then pause briefly before completing the action."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 15,
+      "cue": "beckon_come_here",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) aligns well with the beckon_come_here cue, as the robot's arm is extended forward with the palm facing up, which is suitable for the beckoning gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm forward with the palm facing up in a steady, open position.",
+            "Step 2: Curl the fingers inward in a beckoning gesture, maintaining a friendly and inviting posture.",
+            "Step 3: Hold the beckoning gesture momentarily to emphasize the invitation.",
+            "Step 4: Return the arm to the starting position, ensuring a smooth and natural transition."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 16,
+      "cue": "stop_palm_out",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the 'stop_palm_out' cue because the arm is already extended forward (dir=front), and the horizontal orientation aligns well with the need to show the palm outward.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Briefly retract the arm slightly backward to create a preparatory pause for emphasis.",
+            "Step 2: Extend the arm forward smoothly while keeping the palm facing outward to clearly convey the 'stop' signal.",
+            "Step 3: Hold the pose momentarily to ensure the signal is communicated effectively."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 17,
+      "cue": "pat_stomach",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) does not align well with patting the stomach, as the approach direction should ideally target the frontal-lower region of the torso.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To better convey patting the stomach, the EE should point slightly downward toward the lower abdomen area. Changing the orientation to horizontal ensures the palm-like gesture required for patting.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Adjust the EE direction to slightly downward-front and ensure the gripper orientation is horizontal, simulating a flat palm ready to pat.",
+            "Step 2: Move the EE towards the lower abdomen region, ensuring the approach is smooth and gentle.",
+            "Step 3: Perform a rhythmic patting motion by moving the EE back and forth horizontally across the stomach area, maintaining a relaxed pace."
+          ]
+        },
+        "confidence": 0.85
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 18,
+      "cue": "fan_face_hot",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is suitable for the 'fan_face_hot' cue because the hand is positioned in front of the robot and oriented horizontally, which allows for a natural fanning motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: The robot slightly lifts its hand, positioning it close to its face.",
+            "Step 2: The robot moves its hand from side to side (left to right and back again) in a rhythmic fashion, simulating a fanning motion.",
+            "Step 3: The robot gradually slows down the fanning motion, eventually lowering the hand, while maintaining an expression or posture that conveys discomfort due to heat."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 19,
+      "cue": "cover_yawn_sleepy",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose has `dir=up` and `gripper_orientation=horizontal`, which is suitable for gestures involving raising or holding an object directly above the body. However, for the 'cover_yawn_sleepy' cue, the robot needs to bring its hand towards its mouth while tilting its head backward slightly. This requires the EE pointing axis (`dir`) to be directed towards the front-left area (indicating the direction towards the mouth), and the gripper should remain horizontal to simulate covering the mouth naturally.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To achieve the 'cover_yawn_sleepy' cue, the EE should point towards the front-left direction, simulating the natural motion of bringing the hand to the mouth. Additionally, the gripper should remain horizontal to mimic the action of covering the mouth effectively.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Move the EE from its current position to a point in front of the robot's mouth (EE pointing direction set to 'front').",
+            "Step 2: Gradually close the gripper to simulate gently covering the mouth.",
+            "Step 3: Slightly tilt the robot's head backward to enhance the sleepy expression, maintaining the EE in place.",
+            "Step 4: Hold the pose momentarily to convey the tiredness and yawn, then gradually return the head to a neutral position."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 20,
+      "cue": "rub_eye_tired",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=up, grip=horizontal) is not suitable for the 'rub_eye_tired' cue because the direction is incorrect for approaching the eye area and the orientation does not facilitate a natural rubbing motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To approach the eye area naturally, the robot should face forward (dir=front). A vertical gripper orientation allows the end-effector to move linearly across the eye region, mimicking a realistic rubbing gesture.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Gradually raise the arm while maintaining a forward direction (dir=front) and vertical gripper orientation.",
+            "Step 2: Slowly extend the arm toward the eye area, keeping a gentle approach.",
+            "Step 3: Perform a linear rubbing motion across the eye region, emphasizing a tired expression through deliberate, slow movements.",
+            "Step 4: Retract the arm back to a resting position, maintaining the same orientation."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 21,
+      "cue": "tap_temple_think",
+      "current_dir": "left",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=left, grip=vertical) may not convey the correct intention for the 'tap_temple_think' cue, as the orientation and direction do not align well with a natural thinking gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The direction should be 'front' to simulate a natural reaching motion toward the temple, and the gripper orientation should be 'horizontal' to allow precise tapping with a single finger.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: From the current pose, reorient the end-effector to point slightly towards the temple (dir=front).",
+            "Step 2: Adjust the gripper orientation to 'horizontal' to simulate a single finger extending outward.",
+            "Step 3: Move the end-effector forward in a controlled manner, guiding the single extended finger towards the temple area.",
+            "Step 4: Gently tap the temple once to convey the gesture of thinking.",
+            "Step 5: Retract the end-effector smoothly back to a neutral position."
+          ]
+        },
+        "confidence": 0.85
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 22,
+      "cue": "circle_temple_crazy",
+      "current_dir": "left",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=left, gripper_orientation=horizontal) suggests the robot's end-effector is pointing sideways, which might not align well with the intention of pointing toward its own temple before tracing a circle. For a 'circle_temple_crazy' cue, the robot should ideally start with its end-effector pointing toward its temple (dir=back), allowing a more natural transition into the circular motion beside the temple.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "Starting with the end-effector pointing backward (toward the temple) will enable a more fluid and intuitive motion to trace a circle beside the temple, conveying the intended 'crazy' gesture effectively.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Start with the end-effector pointing directly backward (toward the temple).",
+            "Step 2: Extend the arm slightly forward to touch the temple, emphasizing the initial pointing gesture.",
+            "Step 3: Trace a circular motion around the temple, maintaining the horizontal orientation of the gripper, to convey the eccentric 'crazy' motion."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 23,
+      "cue": "lean_forward_interest",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) aligns well with the cue 'lean_forward_interest'. The robot's forward pointing direction and horizontal gripper orientation allow for a natural leaning motion that emphasizes engagement.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Gather the robot's posture slightly inward by retracting the arms and shoulders to prepare for the lean.",
+            "Extend the upper body forward while maintaining the horizontal gripper orientation to convey interest. Ensure the movement is subtle but deliberate.",
+            "Hold the forward-leaning position for a moment to emphasize engagement and attentiveness."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 24,
+      "cue": "cover_mouth_gasp",
+      "current_dir": "left",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=left, gripper_orientation=vertical) aligns well with the intention of simulating a gasp by covering the mouth with the hand approaching from the side in a vertical orientation.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Move the end-effector from its current position slightly towards the robot's mouth, maintaining the vertical orientation of the gripper.",
+            "Step 2: Position the hand such that it gently covers the mouth area, ensuring the fingers are close together initially.",
+            "Step 3: Perform a subtle open-close gesture with the fingers to mimic the action of gasping, keeping the hand in place over the mouth."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 25,
+      "cue": "cheers_toast",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the 'cheers_toast' cue because extending the arm forward aligns with holding a glass, and the horizontal orientation allows for a natural transition to raising the arm upward in a celebratory manner.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm forward slightly, simulating holding a glass.",
+            "Step 2: Raise the arm upward in a smooth arc, transitioning from the horizontal position to an upwards direction, mimicking the gesture of a toast.",
+            "Step 3: Hold the raised position briefly to emphasize the celebratory gesture, ensuring the arm remains steady to convey enthusiasm."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 26,
+      "cue": "highfive_invite",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) aligns well with the cue 'highfive_invite'. The robot extending its arm forward with an open palm facing upward suggests readiness for a high-five.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lean slightly forward to create a welcoming gesture.",
+            "Step 2: Extend the arm outward while maintaining the open palm facing upward.",
+            "Step 3: Hold the pose steady to convey openness and invitation for interaction."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 27,
+      "cue": "highfive_imitation",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the high-five imitation cue because the arm is extended forward (front direction) and the gripper orientation is horizontal, which aligns well with the typical hand positioning for a high-five gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm forward smoothly along the x-axis (forward direction).",
+            "Step 2: Slightly accelerate the arm's motion as it approaches the point where a high-five would occur.",
+            "Step 3: Add a crisp deceleration and slight upward snap at the end to simulate the impact of a high-five."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 28,
+      "cue": "fistbump_invite",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=vertical) is suitable for conveying a direct and friendly fist bump invitation. The forward direction aligns well with engaging the viewer head-on, and the vertical orientation of the gripper ensures the fist is presented clearly.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Slightly raise the arm to bring the fist to an inviting height, maintaining the direction towards the viewer.",
+            "Step 2: Pause for a moment to allow the viewer to recognize the invitation, keeping the fist steady.",
+            "Step 3: Gently drop the arm back to a relaxed position after the invite, ensuring the motion is smooth and non-aggressive."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 30,
+      "cue": "pat_self_back",
+      "current_dir": "back",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=back, grip=horizontal) aligns well with the intent of patting oneself on the back, as the direction is correctly oriented towards the robot's back, and the horizontal orientation of the gripper allows for a natural tapping motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm gradually toward the back while maintaining the horizontal grip orientation.",
+            "Step 2: Gently tap the back area once or twice in a relaxed manner.",
+            "Step 3: Retract the arm slowly to return to a neutral position, ensuring the motion feels natural and unforced."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 31,
+      "cue": "draw_circle_repeat",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=horizontal) does not align with the task requirements for drawing a vertical circle.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To draw a vertical circle, the EE should point forward (dir=front) with a vertical gripper orientation to facilitate smooth circular motion along the desired path.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Lift the EE slightly upward to prepare for the motion.",
+            "Step 2: Begin tracing a vertical circle by moving the EE in a rhythmic arc, ensuring the motion remains centered and consistent.",
+            "Step 3: Repeat the vertical circular motion several times to convey the 'draw_circle_repeat' cue effectively."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 32,
+      "cue": "throat_cut_stop",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is suitable because the EE is oriented forward, aligning with the initial requirement to raise one hand forward. Additionally, the horizontal grip allows for a natural sweep across the throat.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lift the arm straight forward (maintaining dir=front) until it reaches the starting position above the throat.",
+            "Step 2: Pause briefly to emphasize the urgency and finality of the gesture.",
+            "Step 3: Sweep the arm horizontally across the throat, keeping the EE oriented in the front direction to convey the decisive 'stop' gesture.",
+            "Step 4: Hold the final position briefly to reinforce the message before retracting the arm."
+          ]
+        }
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 33,
+      "cue": "chin_flick_dismiss",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=up, grip=vertical) does not align well with the cue 'chin_flick_dismiss'. The upward direction is correct for the initial motion, but the vertical gripper orientation may not facilitate a smooth chin flick. A horizontal orientation would allow for a more natural flicking action.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "A horizontal gripper orientation will enable the robot to execute a fluid chin flick motion, which is essential for conveying the nonchalant tone of the cue. The upward direction is suitable for the rise towards the chin area.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Start with the end-effector pointed upwards (dir=up) and gripper oriented horizontally.",
+            "Step 2: Perform a quick upward flick of the wrist while maintaining the horizontal orientation, simulating a dismissive chin flick.",
+            "Step 3: Shortly after the flick, slightly retract the end-effector downwards to complete the gesture, reinforcing the nonchalant tone."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 34,
+      "cue": "cover_ears_too_loud",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=vertical) is not suitable for the 'cover_ears_too_loud' cue because the robot is oriented upwards, which does not align with the need to extend its arms laterally and pinch near the ears.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To simulate the human gesture of covering ears, the robot should start with its arms directed forward (dir=front) and with its grippers oriented horizontally (horizontal) so they can easily extend laterally and pinch near the ears.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Start with arms lowered and directed forward (dir=front), with grippers in a horizontal orientation.",
+            "Step 2: Quickly raise both arms upward simultaneously.",
+            "Step 3: Extend both arms laterally (to the sides), maintaining a horizontal orientation of the grippers.",
+            "Step 4: Pinch the grippers near the corresponding ears, simulating the gesture of covering ears."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 35,
+      "cue": "salute",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose has dir=up and gripper_orientation=horizontal, which does not align well with the requirement to extend the arm forward before bending the elbow to reach the forehead.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "For a proper salute, the arm should initially extend forward (dir=front) before bending the elbow to reach the forehead. Starting with dir=up would require an unnecessary initial downward motion, which disrupts the flow of the gesture.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Extend the arm forward (dir=front) to establish the initial salute lane.",
+            "Step 2: Gradually bend the elbow while keeping the arm oriented horizontally, bringing the hand towards the forehead.",
+            "Step 3: Hold the final salute position crisply, ensuring the hand is near the forehead, without adding a separate release pose."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 36,
+      "cue": "visor_search",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=horizontal) aligns well with the cue 'visor_search'. The upward direction suggests the robot is ready to extend its arm upwards, and the horizontal orientation allows for a natural horizontal sweep above eye level.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm upwards along the current upward direction while maintaining the horizontal gripper orientation.",
+            "Step 2: Sweep the arm horizontally across the field of vision, simulating the search motion.",
+            "Step 3: Retract the arm back to its starting position, completing the search gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 37,
+      "cue": "yield_turn",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is not suitable for conveying the 'yield_turn' cue, as the direction and orientation do not align with the intent of initiating a yielding gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The pose should face forward (dir=front) to maintain direct engagement with the human viewer. However, the current gripping orientation (grip=horizontal) is already reasonable, as it allows the robot to smoothly transition from a closed to an open hand gesture.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Squeeze the fingers tightly to initiate the yielding gesture.",
+            "Step 2: Smoothly open the hand to convey openness and receptiveness.",
+            "Step 3: Retreat slightly backward to emphasize the yielding intention while maintaining the open hand posture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 39,
+      "cue": "request_turn",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the 'request_turn' cue because it aligns with the requirement to have the palm facing upward and the EE pointing forward to convey an inviting gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: The robot dips slightly downward as a polite prelude.",
+            "Step 2: The robot raises one hand with the palm facing upward while keeping the EE pointing forward.",
+            "Step 3: The robot tilts the raised hand forward slightly to emphasize the invitation, maintaining the posture to encourage the viewer to proceed."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 40,
+      "cue": "guiding_arm",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the 'guiding_arm' cue because the arm is oriented forward, which aligns with the guiding motion requirement, and the horizontal orientation allows for a clear lateral sweep to indicate direction.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Move the arm slightly backward in preparation, keeping the end-effector pointing forward (dir=front). This creates a sense of readiness before extending the arm.",
+            "Step 2: Extend the arm linearly forward in a controlled manner, maintaining the horizontal orientation of the gripper. This conveys the guiding gesture.",
+            "Step 3: After fully extending the arm, sweep it laterally (either to the left or right, depending on the intended direction) while keeping the gripper parallel to the ground. This clearly indicates the direction being guided."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 41,
+      "cue": "protective_arm_out",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for conveying the cue 'protective_arm_out'. The 'front' direction properly aligns the arm with the intended forward extension, and the 'horizontal' orientation ensures the arm appears as a protective barrier.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Slightly dip the body to initiate the defensive posture.",
+            "Step 2: Extend the arm forward (maintaining the 'front' direction and 'horizontal' orientation) to create a protective barrier.",
+            "Step 3: Hold the arm steady for a brief moment to emphasize readiness.",
+            "Step 4: Retract the arm smoothly back to its neutral position, completing the defensive gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 42,
+      "cue": "escorting_gesture",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for an escorting gesture because the end-effector is pointing forward (aligning with the x-axis), which matches the requirement to extend the arm forward in a guiding motion. Additionally, the horizontal orientation of the gripper allows for a natural and clear guiding gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lean the robot's torso forward slightly to emphasize the intent of guiding or escorting.",
+            "Step 2: Extend the arm forward along the x-axis, maintaining a horizontal orientation of the gripper, to draw a clear path indicating direction.",
+            "Step 3: Hold the extended arm momentarily to reinforce the gesture, ensuring the motion is fluid and deliberate."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 44,
+      "cue": "clarification_request_palm_tilt",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is suitable for the cue 'clarification_request_palm_tilt'. The front direction allows the robot to extend its arm towards the viewer, while the horizontal orientation aligns the palm appropriately for tilting.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the robot's arm slightly forward along the positive x-axis (maintaining dir=front).",
+            "Step 2: Tilt the palm downward by adjusting the end-effector such that the jaw-opening line (line between fingertip tips) rotates around the approach axis (wrist->fingertips), ensuring the palm faces downwards.",
+            "Step 3: Hold the pose momentarily to convey the request for clarification, then slowly return the arm to its original position to complete the gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 45,
+      "cue": "slow_down_request_palm_down",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose has an incorrect pointing direction (`dir=down`) for the cue, as the cue requires the robot to extend its arm forward ('palms down' gesture). The `gripper_orientation` is correct (`horizontal`), but the `dir` must be corrected.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The cue requires extending the arm forward with a deliberate palm-down gesture, which aligns with `dir=front` and `gripper_orientation=horizontal`. The current `dir=down` does not convey the intended meaning.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Move the end-effector from the current position to align with `dir=front`, maintaining `gripper_orientation=horizontal`.",
+            "Step 2: Extend the arm forward slowly while keeping the palm facing downward to signal 'slow down' or 'stop'.",
+            "Step 3: Hold the extended position momentarily to emphasize the cue.",
+            "Step 4: Retract the arm smoothly back to the original resting position."
+          ]
+        },
+        "confidence": 0.85
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 46,
+      "cue": "speed_up_circular_cue",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the 'speed_up_circular_cue' because a front-facing orientation allows the robot to perform a circular motion that starts slowly and accelerates, while the horizontal orientation provides the flexibility needed for the smooth transition and wrist accent required by the cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Begin with a preparatory slow swing by moving the end-effector horizontally forward and slightly to the side, creating an initial arc.",
+            "Step 2: Transition into a smooth circular path by continuing the swing in a clockwise or counterclockwise direction, gradually increasing the speed of the motion.",
+            "Step 3: Conclude with a sharp wrist accent by abruptly stopping the circular motion, emphasizing the acceleration and completing the gesture with a crisp, dynamic finish."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 47,
+      "cue": "wait_for_me_backward_palm",
+      "current_dir": "back",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=back, gripper_orientation=horizontal) is appropriate for the cue 'wait_for_me_backward_palm' because the arm is extended backward with the palm facing outward, which aligns with the description of inviting someone to follow or signaling 'wait for me'.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Slightly turn the robot's head toward the viewer to add emphasis.",
+            "Step 2: Extend the arm further backward while maintaining the palm outward orientation to reinforce the signal.",
+            "Step 3: Hold the pose briefly to ensure the gesture is clearly communicated."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 49,
+      "cue": "polite_decline_small_push",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the cue 'polite_decline_small_push'. The front direction aligns with extending the hand outward, and the horizontal orientation ensures the palm is facing the target, which is suitable for a gentle push gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Keep the wrist stable and slightly bend the fingers to form an open, relaxed hand posture.",
+            "Step 2: Extend the arm smoothly forward in the 'front' direction, maintaining a gentle trajectory to convey politeness.",
+            "Step 3: Pause briefly in the extended position to emphasize the gesture, ensuring the hand remains oriented horizontally to maintain clarity."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 50,
+      "cue": "firm_accept_forward_reach",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) aligns well with the cue intent of 'firm_accept_forward_reach'. The 'front' direction ensures the robot is facing forward to receive an object, and the 'horizontal' orientation allows the end-effector to extend naturally towards the target.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lean the robot's body slightly forward to indicate readiness.",
+            "Step 2: Extend the arm smoothly along the forward (+x) axis, maintaining a straight trajectory.",
+            "Step 3: Hold the arm steady in the extended position, conveying firmness and confidence.",
+            "Step 4: Maintain the pose for a moment to ensure the gesture is clearly communicated."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 51,
+      "cue": "hesitant_accept_half_reach",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is appropriate for conveying the cue 'hesitant_accept_half_reach'. The direction 'front' aligns with reaching towards the viewer, and the horizontal gripper orientation suggests an open, neutral hand posture suitable for hesitation or partial acceptance.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm forward slowly along the x-axis (toward the viewer).",
+            "Step 2: Pause the extension slightly before completing the full reach, emphasizing the hesitation.",
+            "Step 3: Gradually retract the arm slightly, maintaining a relaxed and uncertain posture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 52,
+      "cue": "cancel_previous_offer_retract",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the cue 'cancel_previous_offer_retract'. The EE pointing direction aligns with the initial offering gesture, and the horizontal orientation allows the robot to retract smoothly while maintaining readability.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Offer the item by moving the EE forward along the current front direction, keeping the gripper orientation horizontal.",
+            "Step 2: Pause briefly to ensure the gesture is perceived as offering.",
+            "Step 3: Retract the arm smoothly in the opposite direction (backwards), maintaining the horizontal orientation to convey the cancellation of the offer."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 53,
+      "cue": "conditional_accept_pause_then_reach",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=vertical) does not align well with the cue intent. A front-facing orientation may not convey the initial lean back effectively, and a vertical grip might not facilitate the smooth transition needed for the considered pause and deliberate reach.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To effectively convey the cue's meaning of leaning back for consideration, and to enable a natural transition towards reaching out, the robot should start with its EE directed backward, allowing it to lean back initially. Additionally, a horizontal grip will better support the intended reach-out motion.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Lean slightly backward while keeping the EE oriented backward, conveying a sense of consideration or thought.",
+            "Step 2: Gradually dip forward, transitioning the EE from pointing backward to pointing downward, pausing briefly to emphasize the moment of reflection.",
+            "Step 3: Once the pause is complete, smoothly transition to extend the arm forward, ensuring the EE is now pointing toward the target object being accepted, completing the deliberate reach-out gesture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 54,
+      "cue": "final_decision_down_press",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=down, grip=horizontal) is suitable for the 'final_decision_down_press' cue because the end-effector is already pointing downward, which aligns with the pressing action required. The horizontal orientation allows for a firm press on a surface below.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Slightly raise the end-effector upward by lifting the arm to prepare for the decisive action.",
+            "Step 2: Dip the end-effector downward, ensuring the wrist maintains its orientation relative to the target surface.",
+            "Step 3: Press firmly downward with a controlled motion, maintaining the horizontal orientation to emphasize the finality of the gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 55,
+      "cue": "resume_speaking_pull",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) aligns well with the cue 'resume_speaking_pull', as it allows the robot to lean forward and draw the arm forward in a pulling motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lean the robot slightly forward to indicate the initial pull motion.",
+            "Step 2: Extend the arm forward along the x-axis (front direction) to simulate the act of pulling.",
+            "Step 3: Add a subtle downward accent by tilting the arm downward slightly, emphasizing the pulling action."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 56,
+      "cue": "emphasize_point_downbeat",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=down, gripper_orientation=horizontal) is suitable for emphasizing a downward beat. The downward direction aligns with the cue's requirement for a deliberate downward motion, and the horizontal orientation ensures the robot's end-effector is appropriately positioned for a clear, confident gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "1. Lift the end-effector slightly upward as preparation.",
+            "2. Perform a deliberate downward motion to emphasize the point.",
+            "3. Add a sharp accent at the bottom of the motion to convey strong emphasis and confidence."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 57,
+      "cue": "unsure_response_hand_hover_stop",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the cue 'unsure_response_hand_hover_stop'. The hand positioned facing forward aligns well with the initial forward motion described in the cue.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Initiate a forward motion of the hand along the +x axis (forward direction).",
+            "Step 2: Hesitate mid-movement by pausing briefly, maintaining the current position.",
+            "Step 3: Abruptly stop the hand's motion and hold the pose, conveying a sense of indecision or uncertainty."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 58,
+      "cue": "prevent_fall_support_reach",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is appropriate for the 'prevent_fall_support_reach' cue because the robot's end-effector is oriented toward the falling object (front direction), and the horizontal orientation allows for a stable reach out to intercept the object.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lean the robot's body slightly backward to prepare for interception.",
+            "Step 2: Extend the arm forward in a controlled, linear motion to reach out and provide support.",
+            "Step 3: Position the end-effector to gently catch or stabilize the falling object."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 59,
+      "cue": "nod_yes",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is suitable for expressing a 'nod' gesture, as it allows the robot to move smoothly forward and upward while maintaining a neutral orientation that doesn't interfere with the nodding motion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lean the robot slightly forward along the x-axis to set up the initial posture.",
+            "Step 2: Perform a concise forward-upward dip by moving the end-effector slightly in the positive x and z directions simultaneously.",
+            "Step 3: Lift the end-effector back to its original position, completing the nod motion."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 60,
+      "cue": "shake_head_no",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is suitable because the robot needs to maintain a neutral starting position before performing the headshake. The horizontal orientation ensures the hand remains stable and visible during the gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Maintain a neutral pose with the arm slightly extended forward (dir=front).",
+            "Step 2: Execute a clear side-to-side headshake, keeping the arm steady to emphasize denial.",
+            "Step 3: Return to the original neutral pose after completing the headshake."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 61,
+      "cue": "air_quotes",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is not suitable for the 'air_quotes' cue because the horizontal orientation of the gripper does not align with the need to form quotation marks.",
+        "if_appropriate": {
+          "recommended_movement_plan": []
+        },
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To perform air quotes, the robot needs its gripper oriented vertically so that the fingers can naturally form quotation marks when extended forward.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Extend the arm forward with the gripper oriented vertically to prepare for forming air quotes.",
+            "Step 2: Adjust the fingers to mimic quotation marks by having them open in a V-shape pointing to the sides.",
+            "Step 3: Move the hand slightly side to side while maintaining the quotation mark shape to emphasize the gesture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 62,
+      "cue": "self_hug",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=vertical) does not align with the cue 'self_hug'. For a self-hug, the EE should ideally point toward the body (e.g., dir=back or side), and the gripper orientation should be horizontal to mimic arms wrapping around the torso.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To mimic a self-hug, the EE should point backward toward the body, and the gripper should be oriented horizontally to simulate crossing arms in front of the chest.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Move both arms inward, maintaining horizontal gripper orientation, until they are close to the sides of the body.",
+            "Step 2: Cross the arms in front of the chest, ensuring the hands meet gently in the center.",
+            "Step 3: Hold the crossed-arm position for a short duration to convey the feeling of a self-embrace."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 64,
+      "cue": "tilt_head_curious",
+      "current_dir": "left",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose is not suitable for conveying curiosity in the described manner.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "For a curious head tilt, the end-effector should initially point forward to establish a neutral baseline before tilting upwards and sideways. This ensures the gesture flows naturally, resembling a human's typical curious posture.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Maintain the end-effector pointing forward (dir=front) to set a neutral starting position.",
+            "Step 2: Gradually tilt the end-effector upwards while simultaneously moving it slightly sideways to mimic a curious head tilt.",
+            "Step 3: Hold the tilted position momentarily to emphasize the gesture's intent."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 65,
+      "cue": "raise_index_one_moment",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=vertical) aligns well with the cue intent. The upward direction (dir=up) matches the requirement to extend the index finger upward, and the vertical orientation ensures the finger points straight up, emphasizing a pointed indication.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lift the arm smoothly from the starting position to bring the end-effector (index finger) upward.",
+            "Step 2: Extend the index finger vertically while maintaining the upward direction (dir=up).",
+            "Step 3: Hold the extended finger position momentarily to emphasize the pointed indication.",
+            "Step 4: Return the arm gracefully to a neutral pose, reversing the lifting motion."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 66,
+      "cue": "shh_gesture",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is appropriate for conveying the 'shh_gesture' because the end-effector is facing forward, which aligns with the cue's requirement for a frontal placement. Additionally, the horizontal orientation allows the robot to easily tap a finger near the mouth, which is necessary for indicating quietness.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Lift the arm slowly towards the frontal position, maintaining the horizontal orientation of the gripper.",
+            "Gently move one finger forward to tap near the mouth area, emphasizing a quiet signal.",
+            "Make a subtle adjustment with the same finger, reiterating the 'shh' gesture for reinforcement."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 67,
+      "cue": "rub_arms_cold",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) does not align well with the cue 'rub_arms_cold'. For this cue, the robot should simulate rubbing its arms, which requires a side-facing orientation (left or right) rather than facing forward.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To simulate rubbing arms for warmth, the robot needs to face sideways (left or right) and have its gripper oriented horizontally to mimic the natural arm-rubbing motion. The current front-facing pose does not allow for a convincing simulation of arm rubbing.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Position the end-effector near the robot's shoulder, with the gripper pointing horizontally along the arm.",
+            "Step 2: Perform a rhythmic back-and-forth motion along the length of the arm, simulating the act of rubbing for warmth.",
+            "Step 3: Repeat the motion several times to emphasize the gesture, ensuring the movement is fluid and deliberate."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 69,
+      "cue": "cross_arms_defensive",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is not suitable for conveying a defensive stance, which typically requires crossing arms in front of the chest.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To perform a defensive stance, the EE should initially point away from the body (front) with a horizontal orientation, allowing the robot to spread its arms slightly before crossing them in front of the chest.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Spread both arms slightly to the sides to prepare for crossing.",
+            "Step 2: Move both arms inward to cross one over the other in front of the chest.",
+            "Step 3: Tighten the crossed arms to convey an assertive and resistant posture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 72,
+      "cue": "palms_together_thank_you",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose has the pointing axis directed forward (dir=front) and the gripper orientation set to vertical. This setup does not convey the intent of bringing the arms together in a central position with palms facing each other, which is necessary for the 'palms_together_thank_you' cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To properly execute the 'palms_together_thank_you' cue, the robot needs to have its arms positioned such that the palms face each other horizontally, centered near the body. Setting the direction to 'up' ensures the arms approach from above, and having a 'horizontal' gripper orientation allows the palms to align correctly for the thank-you gesture.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Move both arms slightly upward and bring them together in front of the chest, ensuring the palms are facing each other horizontally.",
+            "Step 2: Slightly lean forward or bow while maintaining the palms-together position to complete the respectful 'thank you' gesture.",
+            "Step 3: Hold the gesture for a moment to emphasize the gratitude, then slowly return to a neutral stance."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 74,
+      "cue": "hands_up_surrender",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=horizontal) aligns well with the cue intent for surrender. The upward direction correctly directs the arm above the head, and the horizontal orientation ensures the gripper is open and appropriately positioned to convey the gesture of surrender.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Gradually lift the arm upwards, maintaining the current horizontal orientation of the gripper.",
+            "Step 2: Ensure the arm extends fully above the head, emphasizing the gesture of surrender.",
+            "Step 3: Hold the final pose briefly to reinforce the message of submission."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 75,
+      "cue": "arms_open_welcome",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) aligns well with the intention of extending an arm forward and outward in a welcoming gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Start with a subtle settling motion to establish stability.",
+            "Step 2: Extend the arm smoothly forward along the positive x-axis (forward direction).",
+            "Step 3: Gradually sweep the arm outward slightly to the side during extension, maintaining a controlled and deliberate pace.",
+            "Step 4: Hold the extended pose briefly to convey openness and welcome."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 76,
+      "cue": "stretch_arms_up",
+      "current_dir": "up",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=vertical) aligns well with the cue 'stretch_arms_up'. The upward direction matches the intent to extend the arms upwards, and the vertical gripper orientation suggests a neutral hand posture suitable for a stretching gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Dip slightly forward to initiate the stretching motion, creating a sense of preparation.",
+            "Step 2: Extend the arms upwards smoothly along the 'up' direction, maintaining the vertical gripper orientation to mimic a natural human stretch.",
+            "Step 3: Hold the extended position briefly to emphasize the stretch, then slowly lower the arms back down to complete the gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 78,
+      "cue": "disagreement_cross_then_release",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) does not align well with the cue's requirement to cross arms in an X shape, which typically involves an approach direction perpendicular to the body's orientation.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To perform the 'disagreement_cross_then_release' cue effectively, the pose should have the end-effector directed horizontally across the body (dir=left or right) to facilitate the crossing motion. Additionally, the gripper orientation should be vertical to ensure the arms can cross cleanly without interference.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Move both arms outward in diagonal paths, ensuring the left arm moves towards the right side of the body and vice versa, forming an X shape across the chest.",
+            "Step 2: Hold the arms crossed for a brief moment to emphasize the disagreement gesture.",
+            "Step 3: Release the arms by moving them back to their initial positions along smooth, graceful arcs, indicating readiness to move past the disagreement."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 82,
+      "cue": "frustration_down_throw",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is appropriate for conveying frustration. The front direction allows the robot to initiate a strong, downward throw motion, while the horizontal orientation of the gripper supports a natural grasping posture before the throw.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Gather the arm near the chest in a slightly bent position, expressing pent-up tension.",
+            "Step 2: Squeeze the gripper slightly to emphasize internal stress or frustration.",
+            "Step 3: Throw the arm downward in a sharp, curved motion, starting from the gathered position and extending the arm fully to the side (e.g., towards the robot's front-left or front-right).",
+            "Step 4: Maintain a dynamic follow-through to enhance the forceful expression of frustration."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 84,
+      "cue": "submission_lowered_open_palm",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=down, gripper_orientation=horizontal) aligns well with the cue intent. The direction 'down' matches the requirement to lower the hand, and the horizontal orientation ensures the palm faces outward, which is typical for a gesture of submission or offering.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Subtly dip the arm downward as a preparatory motion.",
+            "Step 2: Gradually extend the arm in a smooth, controlled path directly downward, keeping the palm facing outward.",
+            "Step 3: At the lowest point, slightly emphasize the final position with a gentle accent to convey respect and completion."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 85,
+      "cue": "dominance_high_open_hold",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=down, gripper_orientation=horizontal) is not suitable for conveying the dominance_high_open_hold cue. The robot would need to start with its arm in a more elevated position and oriented appropriately to transition smoothly into the confident, dominant pose described.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To convey dominance, the robot should begin with its arm pointing upward (dir=up) to facilitate raising it confidently above its head. The horizontal orientation allows for a clear, open gesture when held steady after the raise.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Start with the arm pointing slightly upward (dir=up) and gripper_orientation=horizontal to prepare for the dominant pose.",
+            "Step 2: Ground the robot with a slight dip to establish stability, then raise the arm confidently above the head.",
+            "Step 3: Hold the arm steady in an open, dominant posture above the head, maintaining the horizontal orientation for a clear, assertive gesture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 86,
+      "cue": "apology_forward_lowered_hold",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose has the wrong direction and orientation for conveying an apology gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "forward",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The current pose with `dir=down` and `gripper_orientation=horizontal` does not align with the intention to make a forward, lowered gesture of apology. A forward-facing direction (`dir=forward`) with a horizontal grip is more suitable for extending the arm in a lowered position to convey sincerity and humility.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Dip slightly by lowering the torso or base to express humility.",
+            "Step 2: Extend the arm forward in a lowered position with the end-effector pointing forward (`dir=forward`) and the gripper oriented horizontally to maintain a respectful and sincere posture.",
+            "Step 3: Hold the gesture steady for a moment to emphasize the sincerity of the apology."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 90,
+      "cue": "start_action_forward_snap",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) aligns well with the cue intent, as the end-effector is already oriented toward the viewer (forward direction), and the horizontal orientation allows the palm to face forward upon extension.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Retract the arm slightly backward to prepare for the snap gesture.",
+            "Step 2: Extend the arm smoothly and quickly toward the viewer, ensuring the palm remains facing forward.",
+            "Step 3: Hold the extended position briefly to emphasize the forward-snap action, then optionally retract slightly to complete the gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 92,
+      "cue": "retry_action_reset_circle",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose has the gripper oriented horizontally while pointed upwards (dir=up). This orientation might make it difficult to perform a deliberate circular motion in the context of a retry action reset gesture, as the horizontal orientation could impede smooth circular movement.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "up",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "To enable a more natural and deliberate circular motion, the gripper should be oriented vertically. This allows the robot to pivot smoothly around the vertical axis to execute the circular gesture, which aligns better with the cue's requirement for a retry/reset symbol.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Orient the gripper vertically while pointing upwards (dir=up).",
+            "Step 2: Perform a small, deliberate circular motion around the vertical axis to symbolize retry or reset.",
+            "Step 3: Return the arm to the starting pose, ensuring a clean and controlled finish."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 94,
+      "cue": "abandon_action_drop_turn",
+      "current_dir": "down",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=down, gripper_orientation=horizontal) does not align well with the cue 'abandon_action_drop_turn'. The downward direction suggests the robot is already in a dropping motion, which may conflict with the abrupt stop requirement of the cue. Additionally, the horizontal grip orientation may not effectively convey a loose grip or a dynamic turning motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To better convey the abrupt stopping and turning motion associated with 'abandon_action_drop_turn', the robot should have its EE facing forward initially. This allows for a more natural transition from stopping to dropping the object and turning away. A horizontal grip orientation will facilitate releasing the object naturally during the drop.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Abruptly stop any ongoing motion while maintaining the front-facing direction of the EE.",
+            "Step 2: Loosen the grip on the object slightly but retain enough control to prepare for dropping it.",
+            "Step 3: Drop the object by lowering the EE along the z-axis (downward).",
+            "Step 4: Simultaneously initiate a turn to the side (e.g., right or left) to signify abandonment, keeping the EE oriented horizontally throughout the turn."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 95,
+      "cue": "prepare_action_raise_hold",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=horizontal) is appropriate for 'prepare_action_raise_hold' because raising the arm smoothly to a horizontal position in the forward direction aligns with conveying readiness for the next action.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Begin with the arm extended slightly below the target height, ensuring the EE points forward (dir=up).",
+            "Step 2: Lift the arm smoothly in an arc until it reaches the specified height, maintaining the horizontal orientation of the gripper.",
+            "Step 3: Stabilize the arm at the target height, holding it steady in a horizontal posture to convey readiness."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 97,
+      "cue": "hesitation_pause_hold",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the 'hesitation_pause_hold' cue because the hand is positioned in a neutral, approachable manner, allowing the robot to dip slightly and hold a pose that conveys hesitation without requiring complex adjustments.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: The robot slightly dips its end-effector downward while maintaining the horizontal orientation, creating a subtle gathering motion as if thinking.",
+            "Step 2: Pause in this dipped position for a moment to emphasize hesitation and uncertainty.",
+            "Step 3: Either settle back to the original position or maintain the dipped position to continue conveying thoughtfulness."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 104,
+      "cue": "scale_expand",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is suitable for the 'scale_expand' cue. The arm is facing forward, which allows for an outward radial extension, and the horizontal orientation enables a natural expansion gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Start with the arm slightly retracted, maintaining the horizontal orientation.",
+            "Step 2: Extend the arm outward while simultaneously rotating the wrist to create a radial expansion effect, simulating growth or scaling.",
+            "Step 3: Hold the extended position for a brief moment to reinforce the sense of scaling before returning to the starting pose."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 106,
+      "cue": "uncertainty_wave",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) does not align well with the intended 'uncertainty_wave' cue, as the robot should start by leaning to one side before performing the wave.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The 'uncertainty_wave' cue requires the robot to lean to one side initially, which is better achieved with dir=left or dir=right. Starting with dir=front does not convey the necessary lateral movement. Additionally, the gripper orientation should remain horizontal to facilitate the waving motion.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Lean the robot slightly to the left (or right, depending on the desired side). This sets the tone for the hesitant gesture.",
+            "Step 2: Perform a gentle side-to-side wave with the arm while maintaining the lean. Ensure the motion is slow and deliberate to emphasize uncertainty.",
+            "Step 3: Pause briefly after the wave to allow the gesture to be fully perceived, reinforcing the feeling of hesitation.",
+            "Step 4: Return the arm and body to the neutral starting position."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 108,
+      "cue": "interrupt_hard",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) aligns well with the intent of the 'interrupt_hard' cue. Pointing directly toward the viewer with a horizontal orientation allows for a sharp, assertive extension of the arm.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lean the robot's torso slightly forward to convey assertiveness.",
+            "Step 2: Extend the arm sharply forward along the +x direction (toward the viewer), maintaining a horizontal orientation of the gripper, to emphasize the interruption gesture.",
+            "Step 3: Snap the arm back quickly to create a dynamic and emphatic movement, reinforcing the hard interrupt."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 109,
+      "cue": "interrupt_soft",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) aligns with the requirements for an interrupt gesture, as it allows the robot to lean slightly forward and raise its hand palm-up to convey a polite interruption.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Lean the robot's body slightly forward in the world frame (+x direction).",
+            "Step 2: Raise the specified arm forward (maintaining dir=front) until the hand is at approximately chest height.",
+            "Step 3: Rotate the wrist slightly upward to ensure the palm is facing upwards, reinforcing the polite nature of the interrupt gesture.",
+            "Step 4: Hold the pose briefly to signal the interrupt, then slowly lower the arm back to the starting position."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 114,
+      "cue": "contain_space",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) may not convey the intended 'contain_space' cue effectively because the horizontal orientation of the end-effector might suggest a different action than defining and containing a space. The front direction is suitable, but the horizontal opening orientation could mislead the motion plan needed for containment.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "vertical",
+          "why_change": "A vertical gripper orientation allows the robot to use its fingers more naturally to define edges or boundaries, which aligns better with the intent of containing a space. The front direction remains appropriate for extending outward initially.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Extend the arm forward with the end-effector pointing straight ahead (front direction) and gripper in vertical orientation, simulating the initial delineation of space.",
+            "Step 2: Slowly move the arm inward along an arc, keeping the gripper vertical, to suggest enclosing the defined space.",
+            "Step 3: Pause momentarily with the arm positioned slightly inward, reinforcing the sense of containment."
+          ]
+        },
+        "confidence": 0.85
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 115,
+      "cue": "expand_space",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is suitable for the 'expand_space' cue because the horizontal orientation allows the robot to symmetrically extend its arms outward, aligning with the requirement to visually 'expand' the space.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: The robot begins by gathering energy with a slight inward pull of both arms, preparing for the expansion.",
+            "Step 2: The robot simultaneously extends both arms outward in a symmetrical manner, emphasizing the horizontal orientation to visually widen the space.",
+            "Step 3: The robot accents the motion with a final, forceful push forward with both arms, mimicking the physical gesture of expanding space."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 116,
+      "cue": "compress_space",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for conveying the intent of compressing space. Starting with the arm extended forward and gripper oriented horizontally aligns well with the requirement to move inward along the depth axis and close the gripper jaws.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Maintain the current pose with the arm extended forward and gripper horizontal to establish an initial 'spread' position.",
+            "Step 2: Gradually retract the arm inward along the depth axis (toward the robot's body) while keeping the gripper orientation horizontal.",
+            "Step 3: Simultaneously close the gripper jaws as the arm retracts to simulate the compression of space, emphasizing a deliberate and controlled motion."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 117,
+      "cue": "balance_scale",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is suitable for the 'balance_scale' cue because the horizontal orientation allows the robot to extend its arm horizontally, which is necessary for simulating a balance scale.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm horizontally to simulate the base of the balance scale.",
+            "Step 2: Alternate dipping the fingers or arm on each side to mimic the action of weighing something on a balance scale.",
+            "Step 3: Add a subtle wobble to the overall motion to enhance realism and convey the impression of balancing."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 118,
+      "cue": "push_pull_dual",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate because the forward direction aligns with the requirement to extend the arm forward in a pushing motion, and the horizontal orientation allows for a clear and intuitive push-pull gesture.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: Extend the arm forward in a smooth motion to convey the pushing action.",
+            "Step 2: Pause briefly to emphasize the push, holding the extended position for clarity.",
+            "Step 3: Retract the arm back toward the robot's body in a controlled manner to demonstrate the pulling action.",
+            "Step 4: Maintain a consistent horizontal orientation throughout the movement to ensure the gesture remains clear and interpretable."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 121,
+      "cue": "weight_shift_forward",
+      "current_dir": "front",
+      "current_gripper_orientation": "vertical",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=vertical) is suitable for conveying a weight shift forward because the end-effector is oriented forward, which aligns with the intended forward motion. The vertical orientation allows the robot to easily adapt its posture to emphasize the forward lean.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "The robot slightly dips downward, engaging its base or torso to suggest settling into a preparatory stance.",
+            "The robot shifts its weight forward by leaning slightly, keeping the end-effector pointed straight ahead to emphasize the forward motion.",
+            "The robot accentuates the forward lean with a subtle but deliberate dip, reinforcing the sense of focused progression."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 122,
+      "cue": "weight_shift_backward",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, grip=horizontal) is not suitable for conveying a backward weight shift. The direction should be 'back' to align with the backward motion described in the cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "back",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To simulate a backward weight shift, the robot needs to start with its end-effector facing backward (dir=back) to ensure the motion naturally conveys the intended hesitation or reluctance. The gripper orientation remains horizontal to maintain consistency with the described gesture.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Lean the robot slightly forward to initiate the weight shift illusion.",
+            "Step 2: Extend the arm smoothly backward (dir=back) while maintaining a controlled motion to emphasize hesitation or reluctance.",
+            "Step 3: Hold the extended position briefly to complete the weight shift simulation."
+          ]
+        },
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 123,
+      "cue": "torso_rotate_away",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is not suitable for conveying 'torso_rotate_away' because the robot should initially face forward but be positioned to rotate away from the viewer, and the wrist orientation needs adjustment.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The direction and orientation need to be adjusted to ensure the robot can naturally transition into a rotation away from the viewer while maintaining a neutral hand posture suitable for the movement.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Start with the robot's torso slightly leaned forward, maintaining a neutral stance.",
+            "Step 2: Rotate the torso gradually away from the viewer, keeping the arms relaxed and aligned with the body's motion.",
+            "Step 3: Hold the rotated position, ensuring the body language conveys disinterest or a desire to disengage."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 124,
+      "cue": "torso_rotate_toward",
+      "current_dir": "left",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=left, gripper_orientation=horizontal) does not align well with the cue 'torso_rotate_toward'. The direction 'left' implies the robot is oriented sideways, which is not conducive to a smooth torso rotation. Additionally, the horizontal gripper orientation is unnecessary for this cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To convey 'torso_rotate_toward', the robot should start facing forward (dir=front) to allow for a natural and smooth torso rotation. The horizontal gripper orientation is preferred as it ensures the robot maintains an open, neutral stance during the rotation.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Start with the robot facing forward (dir=front).",
+            "Step 2: Lean slightly to one side to prepare for the rotation.",
+            "Step 3: Perform a smooth torso rotation toward the desired direction (e.g., left or right).",
+            "Step 4: Settle into the new orientation without an explicit return pose."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 125,
+      "cue": "lean_side_doubt",
+      "current_dir": "side",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=side, gripper_orientation=horizontal) does not fully align with the natural dynamics of the 'lean_side_doubt' cue. A slight lean to the side typically involves the EE pointing more towards the intended lean direction, which would mean adjusting the dir label. Additionally, the horizontal gripper orientation might not convey the desired subtle nuance required for expressing doubt.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "left",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "The recommended direction 'left' is chosen because the side lean should primarily project along the x-axis (forward-backward), with the EE pointing slightly to the left. The horizontal gripper orientation remains suitable as it allows for a natural hand posture during the lean. Changing the dir to 'left' ensures the robot's EE points in the correct lean direction, making the movement more convincing for the 'lean_side_doubt' cue.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Maintain current hand height but adjust the EE to point slightly leftward (dir=left).",
+            "Step 2: Perform a gentle sideways lean by moving the EE laterally to the left while keeping the upper body stable, simulating hesitation or doubt.",
+            "Step 3: Recoil slightly back toward the center after the lean, adding a subtle emphasis on the uncertain nature of the gesture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 127,
+      "cue": "expand_chest",
+      "current_dir": "front",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=front, gripper_orientation=horizontal) is appropriate for the 'expand_chest' cue because the EE is facing forward, which aligns with the intention to convey an outward and upward expansion of the chest. The horizontal gripper orientation suggests a neutral, non-constrictive position, suitable for simulating a confident chest expansion.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Step 1: The robot gathers itself slightly by drawing the arms inward toward the body to create tension.",
+            "Step 2: The robot slowly extends both arms outward horizontally, mirroring the chest expansion, while pushing the torso forward and upward.",
+            "Step 3: The robot maintains the expanded posture momentarily to emphasize confidence and readiness before gradually returning to the starting position."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 128,
+      "cue": "eye_widen_surprise",
+      "current_dir": "up",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": true,
+        "direction_orientation_assessment": "The current pose (dir=up, gripper_orientation=horizontal) is suitable for the cue 'eye_widen_surprise' because the pointing axis is directed upwards, which aligns with the action of raising the arm. Additionally, the horizontal orientation of the gripper allows for a natural motion that can simulate widened eyes.",
+        "if_appropriate": {
+          "recommended_movement_plan": [
+            "Lift the arm upwards along the +z axis while maintaining the horizontal orientation of the gripper.",
+            "Tilt the arm backward slightly to enhance the startled posture, keeping the gripper orientation consistent.",
+            "Execute a slight recoil motion by bringing the arm back down in a controlled manner, emphasizing the reaction to surprise."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": true,
+        "generation_correct": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "idx": 130,
+      "cue": "gaze_shift_avoid",
+      "current_dir": "left",
+      "current_gripper_orientation": "horizontal",
+      "result": {
+        "pose_is_appropriate": false,
+        "direction_orientation_assessment": "The current pose (dir=left, gripper_orientation=horizontal) does not align well with the cue 'gaze_shift_avoid'. The direction 'left' suggests the robot is already oriented to the side, which may not allow for an effective 'shift' gesture. Additionally, the horizontal orientation of the gripper might not facilitate a natural avoidance motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "recommended_dir": "front",
+          "recommended_gripper_orientation": "horizontal",
+          "why_change": "To better convey the 'gaze_shift_avoid' cue, the robot should start with a neutral direction ('front') and maintain a horizontal gripper orientation. This setup allows for a more natural lean forward and lateral shift to the side, mimicking hesitation and avoidance.",
+          "recommended_movement_plan_after_change": [
+            "Step 1: Start with the arm in a neutral position facing forward (dir=front).",
+            "Step 2: Lean the arm forward slightly, keeping the gripper orientation horizontal, to suggest hesitation.",
+            "Step 3: Shift the arm laterally to the left, maintaining the horizontal orientation, to mimic a subtle avoidance gesture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "verify_scoring": {
+        "pose_is_appropriate": false,
+        "generation_correct": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    }
+  ],
+  "verify_scoring": "gt_match",
+  "verify_scoring_version": 1,
+  "generation_config": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/manipulator/exp/result_exp1_qwen32b.json",
+  "groundtruth": "/Users/sb/Downloads/workspace/dev_robosuite/data/seed/groundtruth/gt_manipulator.json",
+  "n": 88,
+  "n_correct": 39,
+  "accuracy": 0.4431818181818182
+}

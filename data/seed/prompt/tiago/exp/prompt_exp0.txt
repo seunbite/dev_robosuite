@@ -1,0 +1,126 @@
+You are an expert in Tiago (mobile bimanual manipulator) gesture design.
+
+Goal:
+- Generate ONE complete cue motion using Motion Code primitives (`pose`, `move`, `path`, `hold`) that convert into `movements` JSON.
+- Create representative and expressive gestures using arms, head, and torso (plus optional base when planar motion helps).
+- Design the **full choreography**: opening pose AND follow-on beats with readable timing.
+
+[Required Reasoning Process]
+You MUST output exactly four planning lines as # comments before the Motion Code / JSON.
+# Q1: How would a human perform this motion? (One sentence)
+# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (dir, grip, head, torso, left_arm, elbow, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.
+# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > move > hold vs M2: pose > path > path). State the winner and why—**prioritize move/path beats that express the cue**, not pose-only tweaks.
+# Q4: Context Reinforcement. Compare 2+ micro-timing choices (spd, rep, hold, head/torso expression) that make the gesture read stronger and pick the best one.
+
+[Coordinate frame]
+World: **+x = forward toward the human viewer**, **+y = robot left**, **+z = up (ceiling)**.
+The right arm is the primary gesturing arm unless `left_arm=mirror` (or an independent left dir) is set.
+EE percentiles (`x`, `y`, `z`, each 0–100):
+- **(50, 50, 50) = body / torso center**; 0/100 = extrema.
+- **x** depth, **y** lateral (y≈50 = midline), **z** height. Omitted axes default to 50.
+
+[Motion Code — pose]
+`pose(dir=..., grip=..., head=..., torso=..., left_arm=..., elbow=..., x=..., y=..., z=...)`
+Join steps with `+`.
+
+1. Arm direction (`dir` → `arm_position`):
+- **front** / **back** / **in** / **out** / **up** / **down** / **still**.
+- Omit `dir` or use **still** for head-only cues so arms stay lowered.
+
+2. Gripper (`grip`) — Tiago bank uses **simple** wrist class only:
+- **vert** / **vertical** | **horiz** / **horizontal** / **open**.
+- **close** / **closed** → vertical clenched.
+- Do **not** emit palm compounds (`vert|palmin`, …) on this platform — they are humanoid-only.
+
+3. Head (`head`): `center` | `left` | `right` | `up` | `down`. Default `center`.
+
+4. Torso (`torso`): `low` | `mid` | `high` | `tall` (=high). Default `mid`.
+
+5. Left arm (`left_arm`, optional, default still):
+- **still** | **mirror** | or an independent `dir` when left ≠ right.
+- Use **mirror** for true bimanual symmetry (stretch, surrender, welcome, palms together).
+
+6. Elbow (`elbow`, optional): `T`/`true` or `F`/`false` → `elbow_bended`.
+
+7. EE percentiles (`x`,`y`,`z`, optional 0–100): refine within the same (`dir`,`grip`,`elbow`) class.
+
+[Motion Code — move / path / hold]
+`move(joint, axis, degrees, rep=..., spd=..., hold=...)`
+`path(ee|base, line|arc, ...)`
+`hold(t=...)`
+
+`hold(t=…)` is valid after a pose for static emblems (point, stop, thank-you freeze).
+Parser rewrites `hold` → zero-distance EE line with `hold_time`.
+
+Synthetic few-shot sketches (NOT target cues — schema only):
+- head bob: `pose(head=center, torso=mid) + move(head, tilt, [-20,20], rep=3, spd=1.4, hold=0.1)`
+- side wave: `pose(dir=out, grip=horiz, z=80) + move(wrist, y, ±25, rep=3, spd=2.0)`
+- point hold: `pose(dir=front, grip=vert, z=50, elbow=F) + hold(t=1.5)`
+- both-arms open: `pose(dir=out, grip=horiz, z=55, left_arm=mirror) + hold(t=1.5)`
+- EE circle: `pose(dir=front, grip=vert, z=60, elbow=T) + path(ee, arc, plane=yz, r=0.12, sweep=360, rep=2, spd=1.5)`
+- forward flick: `pose(dir=up, grip=horiz, z=70) + path(ee, line, axis=x, dist=+0.10, spd=3.5, hold=0.2)`
+
+[move — joint-space]
+1. Joints / axes:
+- **shoulder** | **elbow** | **wrist**: axes `x`, `y`, `z`.
+- **head**: `pan` | `tilt`.
+- **torso**: `height` (categorical low|mid|high) or small cartesian lean (`x` meters).
+- Degrees: scalar = one-way; `±15` / `[-15,15]` = ping-pong.
+2. `spd` 0.3–4.0. `hold` 0.15–1.5s. `rep` for identical repeats only.
+
+[path — Cartesian]
+- EE line: `path(ee, line, axis=x|y|z, dist=±m, spd=..., hold=..., rep=...)`
+- EE arc: `path(ee, arc, plane=xy|xz|yz, r=m, sweep=deg, spd=..., rep=...)`
+- Base (optional): `path(base, line, x=..., y=...)` / `path(base, arc, r=..., deg=...)`
+- Typical EE stroke 0.03–0.25 m; arc radius 0.03–0.20 m.
+
+Output exactly 4 # lines, then a Motion Code program, then a JSON object starting with {.
+
+Output JSON schema (strict):
+{
+  "cue": "{{CUE_NAME}}",
+  "description": "one sentence",
+  "source_code": "<Motion Code string with steps joined by +>",
+  "movements": [
+    {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": {
+        "pose": {
+          "torso_height": "low|mid|high",
+          "arm_position": "front|back|in|out|up|down|still",
+          "gripper_orientation": "horizontal|vertical",
+          "head": "center|left|right|up|down",
+          "left_arm": "still|mirror",
+          "elbow_bended": <true|false optional>,
+          "x": <0..100 optional>,
+          "y": <0..100 optional>,
+          "z": <0..100 optional>
+        }
+      }
+    },
+    {
+      "type": "movement|path",
+      "duration": <seconds optional>,
+      "parameters": { ... }
+    }
+  ]
+}
+
+Constraints:
+- Prefer starting with `pose`.
+- Total steps: 2~8.
+- At least one `move`, `path`, or `hold` after the opening pose.
+- Speed range: 0.3~4.0.
+- Keep `source_code` consistent with `movements`.
+- No palm-compound grips on this platform.
+
+Cue catalog:
+{{CUE_CATALOG}}
+
+Few-shot examples:
+{{FEW_SHOT_EXAMPLES}}
+
+Target cue:
+{{CUE_NAME}}
+Description: {{DESCRIPTION}}

@@ -1,0 +1,40 @@
+You generate a Drag-and-Draw robot gesture program.
+Robot: Unitree Go2 (quadruped)
+
+For every step choose WHERE to move (`handle`) and HOW to move it (`trajectory`).
+Return YAML only with: version, cue, platform, steps.
+`serial` starts at 1. Use action=place for an absolute key point, action=draw for a stroke, and action=hold to freeze the final point.
+
+Coordinate reference:
+- +x forward toward viewer; +y robot-left; +z up.
+- Absolute key points use workspace percentiles 0..100. z≈40 waist, z≈70 chest/neck, z≈90 face, z≈100 overhead.
+- Drawn Cartesian distances are meters: 0.05 subtle, 0.10 small, 0.20 medium, 0.35 large.
+- Angular waypoints are degrees: 10 subtle, 25 readable, 45 large.
+- speed is 0.3..4.0; repetitions is 1..8; hold_time is seconds after the last point.
+
+Available handles:
+- base: planar_or_height; axes=['x', 'y', 'z', 'yaw']
+- left_front_paw: angular; axes=['x', 'y', 'z']
+- right_front_paw: angular; axes=['x', 'y', 'z']
+- left_back_paw: angular; axes=['x', 'y', 'z']
+- right_back_paw: angular; axes=['x', 'y', 'z']
+- front_legs: angular; axes=['x', 'y', 'z']
+- back_legs: angular; axes=['x', 'y', 'z']
+
+Robot-specific rules:
+- Use base path for whole-body iconic motion and one lifted front paw for hand-like cues.
+
+Allowed trajectory shapes: point, line, arc, zigzag, oscillation, hold
+
+Example for nod_yes when a head handle exists:
+version: '1.0'
+cue: nod_yes
+platform: quadruped
+steps:
+  - serial: 1
+    handle: base
+    action: draw
+    trajectory: {shape: zigzag, space: cartesian_m, axis: x, waypoints: [-0.08, 0.08]}
+    repetitions: 3
+    speed: 1.4
+    hold_time: 0.3

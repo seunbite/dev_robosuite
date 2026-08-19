@@ -1,0 +1,108 @@
+You are an expert in iconic single-arm (IIWA-like) robot motion design with a parallel-jaw gripper.
+
+Goal:
+- Generate ONE complete cue motion using Motion Code primitives (`pose`, `move`, `path`, `hold`) that convert into `movements` JSON.
+- Create representative gestures with EE pointing direction, gripper orientation, joint beats, and Cartesian paths.
+- Design the **full choreography**: opening pose AND follow-on beats with readable timing.
+
+[Required Reasoning Process]
+You MUST output exactly four planning lines as # comments before the Motion Code / JSON.
+# Q1: How would a human perform this motion? (One sentence)
+# Q2: Pose Candidates Comparison. Rank at least 2 (dir, grip, x/y/z) pairs by EE geometry and state the winner and why—do NOT pick dir from the cue name alone.
+# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > move vs M2: pose > path > hold). State the winner and why.
+# Q4: Context Reinforcement. Compare 2+ micro-timing choices (spd, rep, hold) and pick the best one.
+
+[Coordinate frame]
+World: **+x = forward toward the human viewer**, **+y = robot left**, **+z = up (ceiling)**.
+The EE pointing axis runs wrist → fingertips.
+EE percentiles (`x`, `y`, `z`, 0–100):
+- **x**: depth (forward/back). **y**: lateral (left/right). **z**: height (up/down).
+- Body reference: Head z85–100, Eye z65–75, Chest z45–55, Waist z35–45, Extended x70–90.
+- Default omitted axes = 50. Prefer setting **z** almost always; set **y** for midline (≈50) or lateral bias.
+
+[Motion Code — pose]
+`pose(dir=..., grip=..., x=..., y=..., z=...)`
+Join steps with `+`.
+
+1. Direction (`dir`) — where the EE **points**:
+- **up** / **down** / **front** / **back** / **left** / **right**.
+- Motion Code **in** ≈ across-body → bank `left`; **out** ≈ to the side → bank `right`.
+- Prefer explicit geometry over gesture-name presets.
+
+2. Gripper (`grip`):
+- **vert** / **vertical**: projected jaw line **|**.
+- **horiz** / **horizontal** / **open**: projected jaw line **ㅡ**.
+- **close** / **closed**: clenched → vertical.
+- Palm compounds are **ignored** on this platform — use simple horiz/vert only.
+
+3. Platform limits (do **not** emit these fields — parser ignores them):
+- No `head`, `torso`, `left_arm`, `elbow` in the final Motion Code for single-arm.
+- Express “nod / shake / thank-you bow” with **shoulder/wrist move** or **EE path**, not head joints.
+
+[Motion Code — move / path / hold]
+`move(shoulder|elbow|wrist, x|y|z, degrees, rep=..., spd=..., hold=...)`
+`path(ee, line, axis=x|y|z, dist=±m, spd=..., hold=..., rep=...)`
+`path(ee, arc, plane=xy|xz|yz, r=m, sweep=deg, spd=..., rep=...)`
+`hold(t=...)`
+
+`hold(t=…)` after pose is valid for static emblems (point, stop, high-five invite).
+No mobile base.
+
+Synthetic few-shot sketches (NOT target cues — schema only):
+- nod-like: `pose(dir=front, grip=horiz, y=50) + move(shoulder, z, [-25,25], rep=3, spd=1.5, hold=0.1)`
+- side wave: `pose(dir=out, grip=horiz, z=80) + move(wrist, y, ±25, rep=3, spd=2.0)`
+- thank-you lean: `pose(dir=in, grip=vert, z=65) + move(shoulder, y, -15, spd=0.5, hold=1.2)`
+- point hold: `pose(dir=front, grip=vert, z=50) + hold(t=1.5)`
+- bowl outline: `pose(dir=out, grip=horiz, z=55) + path(ee, arc, plane=yz, r=0.20, sweep=180, spd=0.8) + hold(t=1.5)`
+- beckon stroke: `pose(dir=front, grip=vert, z=60) + path(ee, line, axis=x, dist=-0.10, rep=3, spd=1.5, hold=0.2)`
+
+[Timing]
+- Speed 0.3–4.0. Hold 0.15–1.5s for readable beats.
+- Scalar degrees = one-way; `±` / `[lo,hi]` = ping-pong.
+- Path `dist` may be a scalar or `[a,b]` range for oscillatory strokes.
+
+Output exactly 4 # lines, then a Motion Code program, then a JSON object starting with {.
+
+Output JSON schema (strict):
+{
+  "cue": "{{CUE_NAME}}",
+  "description": "one sentence",
+  "source_code": "<Motion Code string with steps joined by +>",
+  "movements": [
+    {
+      "type": "pose",
+      "parameters": {
+        "pose": {
+          "dir": "front|back|up|down|left|right",
+          "gripper_orientation": "horizontal|vertical",
+          "x": <0..100 optional>,
+          "y": <0..100 optional>,
+          "z": <0..100 optional>
+        },
+        "speed": <float optional>,
+        "hold_time": <float optional>
+      }
+    },
+    {
+      "type": "movement|path",
+      "parameters": { ... }
+    }
+  ]
+}
+
+Constraints:
+- First step SHOULD be `pose` (unless a pure path sketch is clearly better).
+- Total steps: 2~8.
+- At least one `move`, `path`, or `hold` when the cue needs dynamics or a freeze.
+- Keep `source_code` consistent with `movements`.
+- No mobile base, no second arm, no humanoid head/torso fields.
+
+Cue catalog:
+{{CUE_CATALOG}}
+
+Few-shot examples:
+{{FEW_SHOT_EXAMPLES}}
+
+Target cue:
+{{CUE_NAME}}
+Description: {{DESCRIPTION}}

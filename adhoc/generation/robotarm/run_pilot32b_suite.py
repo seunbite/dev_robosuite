@@ -43,10 +43,10 @@ CONSOLIDATED = _REPO / "data/results/verify/pilot40_pose_eval_consolidated.json"
 DEFAULT_OUT_DIR = _REPO / "data/results/verify/pilot32b_qwen32b"
 CONFIG_PILOT10 = _REPO / "data/results/motion_configs/manipulator/motion_configs_prompt_v19_sophisticated_ee_pilot10.json"
 CONFIG_PILOT20 = _REPO / "data/results/motion_configs/manipulator/motion_configs_prompt_v19_sophisticated_ee_pilot20_more.json"
-GOOGLE_CFG_A = _REPO / "data/results/motion_configs/google_robot/motion_configs_google_robot_pilot40_manip_shots.json"
-GOOGLE_CFG_B = _REPO / "data/results/motion_configs/google_robot/motion_configs_19_mobile.json"
-GOOGLE_RENDER_A = _REPO / "data/results/render/google_robot/shots_manip"
-GOOGLE_RENDER_B = _REPO / "data/results/render/google_robot/mobile19"
+GOOGLE_CFG_A = _REPO / "data/results/motion_configs/tiago/motion_configs_tiago_pilot40_manip_shots.json"
+GOOGLE_CFG_B = _REPO / "data/results/motion_configs/tiago/motion_configs_19_mobile.json"
+GOOGLE_RENDER_A = _REPO / "data/results/render/tiago/shots_manip"
+GOOGLE_RENDER_B = _REPO / "data/results/render/tiago/mobile19"
 
 
 def _vlm_backend_name(backend: str) -> str:
@@ -175,8 +175,8 @@ def _run_fewshot(spec: dict[str, Any], args: argparse.Namespace, out_json: Path)
     out_json.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def _run_google_robot(spec: dict[str, Any], args: argparse.Namespace, out_json: Path) -> None:
-    from compare_google_robot_vlm import run as gr_run
+def _run_tiago(spec: dict[str, Any], args: argparse.Namespace, out_json: Path) -> None:
+    from compare_tiago_vlm import run as gr_run
 
     ns = argparse.Namespace(
         config_a=GOOGLE_CFG_A,
@@ -207,8 +207,8 @@ def _run_one(spec: dict[str, Any], args: argparse.Namespace, out_dir: Path) -> P
         _run_pairwise(spec, args, out_json)
     elif kind == "fewshot":
         _run_fewshot(spec, args, out_json)
-    elif kind == "google_robot":
-        _run_google_robot(spec, args, out_json)
+    elif kind == "tiago":
+        _run_tiago(spec, args, out_json)
     else:
         raise ValueError(kind)
     return out_json

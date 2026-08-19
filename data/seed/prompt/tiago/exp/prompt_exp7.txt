@@ -1,0 +1,90 @@
+You are an expert in TIAGo-like mobile manipulator gesture design. Create one highly readable motion cue.
+
+The **first pose is FIXED** (human ground truth). You must NOT change its pose fields or output a leading `pose` step.
+**Read that fixed pose first** — how the arm extends and how the gripper reads — then design **1–4 follow-on steps** that only make sense from that configuration.
+
+Example (beckon): fixed start `front` + `vertical`. Prefer small **path** ee line on **y**, `repetition` 3–4 — not a large shoulder reposition.
+Example (yes nod): fixed start arms `down` + head `center`. **movement** on `head` / `tilt`, `repetition` 3 — torso and arms stay still.
+Example (blow_kiss): fixed start `up` + `horizontal`. One **path** ee line **+x** (forward puff), `repetition` 1.
+Example (facepalm): fixed start `in` + `vertical` near the face. **path** ee line **−x** with `hold_time` ≥ 0.15s.
+
+[Required Reasoning Process]
+Output exactly three planning lines as # comments before the JSON.
+# Q1: Given the fixed start pose, what small joint/path motion reads the cue? (One sentence)
+# Q2: Structure Comparison. Compare 2+ tail sequences (e.g., movement vs path vs pose_to_pose). State winner= and why for THIS fixed pose.
+# Q3: Context Reinforcement. Compare 2+ micro-actions (speed, repetition, hold_time). State winner= and why.
+
+[Fixed Start Pose — DO NOT EDIT]
+{{FIXED_FIRST_POSE_JSON}}
+
+[Movement / Path Rules]
+Coordinate frame: +x forward (viewer), +y robot left, +z up.
+- movement `joints[]`: shoulder, elbow, wrist, head, torso, right_arm, left_arm.
+- movement `joints[].degrees`: [lo, hi] per joint entry; `repetition` ≥2 ping-pongs between lo and hi.
+- path: always set `path.mode` (`ee` or `base`); `shape` line or arc as in examples.
+
+[Movement steps — joint-space beats]
+Use `type: "movement"` for discrete beats (arm / head / torso).
+
+3. Joint and axis mapping:
+- **shoulder** | **elbow** | **wrist**: axes `x`, `y`, `z`.
+- **head**: axes `pan` (left/right), `tilt` (up/down), degrees relative to the fixed pose.
+- **torso**: axis `height` only — `degrees` [lo, hi] in **meters** (low≈0.05, mid≈0.18, high≈0.34).
+- x: Depth (forward/backward), y: Lateral (side-to-side / wave), z: Height (up/down / nod).
+
+4. Speed (per movement step):
+- Range: 0.3 (slow) – 4.0 (sharp). Default: 0.8–2.0.
+- Vary: setup 0.6–1.2, core 1.5–3.5, settle 0.5–1.0. Avoid all beats at 3–4 unless one sharp strike.
+
+5. Pause / hold (`hold_time` seconds, per movement step):
+- Use 0.15–0.8s so the viewer sees move → hold → move.
+- Multi-beat cues (beckon, shh, rub): at least one hold ≥ 0.25s between beats.
+
+6. Repetition (`repetition` on movement):
+- Same joint/axis/range repeated identically (head tilt nod 3×, path y ping-pong 4×).
+- Asymmetric rhythms (move–pause–move–move): use separate steps — not `repetition` 4 at speed 4.0 with hold 0.
+
+7. Angle / range (`degrees` per joint entry):
+- shoulder/elbow/wrist rotational axes: typical ±5–45° (wrist ±5–20; shoulder/elbow ±15–50). Hard limit ±50°.
+- head pan/tilt: typical ±8–30° per beat.
+- right_arm/left_arm on x/y/z: |value| > 1 → degrees; |value| ≤ 1 → meters.
+
+[Path steps — EE IK or base Cartesian draw]
+Use `type: "path"` to draw a **straight line or arc in world space**.
+**Never include arm `joint` on path.** Set `path.mode` explicitly.
+
+8. EE line path (`path.mode: "ee"`, `shape: "line"`):
+- Translate EE parallel to one world axis.
+- Fields: `axis` ∈ {x, y, z}, `distance` (meters, signed), `speed`, optional `hold_time`, optional `repetition`.
+- Typical `distance`: 0.03–0.25 m (local stroke 0.03–0.08 m; reach/slash up to ~0.25 m).
+
+9. EE arc path (`path.mode: "ee"`, `shape: "arc"`):
+- Draw an arc in plane `xy`, `yz`, or `xz`.
+- Fields: `plane`, `radius` (meters), `sweep` or `degrees`, optional `direction` cw|ccw, `speed`, optional `hold_time`, optional `repetition`.
+- Typical: `radius` 0.03–0.20 m, `sweep` 45–720° for scratches, circles, wiping.
+- Optional `side`: right | left | both for bilateral paths.
+
+10. Base path (`path.mode: "base"`):
+- Line: `shape: "line"`, set `x` and/or `y` (meters, signed forward/left).
+- Arc: `shape: "arc"`, `radius` (m), `degrees` (turn amount).
+
+[Hard Constraints]
+- [ ] Do NOT output a first pose step. The executor will prepend the fixed pose.
+- [ ] Output **1–4 steps** in `movements` (movement and/or path and/or pose_to_pose after the fixed start).
+- [ ] At least one `movement` or `path` step is required.
+- [ ] Speed: 0.3–4.0. Default 0.8–2.0.
+- [ ] If step.type is `path`, set `path.mode` explicitly (`ee` or `base`).
+- [ ] No markdown code blocks. No prose after JSON.
+
+Output exactly 3 # lines, then JSON:
+{
+  "description": "one sentence describing the full motion including the fixed start",
+  "movements": [ ... steps AFTER the fixed pose only ... ]
+}
+
+{{FEW_SHOT_EXAMPLES}}
+---
+Target Cue:
+Cue Name: {{CUE_NAME}}
+Description: {{CUE_DESCRIPTION}}
+---

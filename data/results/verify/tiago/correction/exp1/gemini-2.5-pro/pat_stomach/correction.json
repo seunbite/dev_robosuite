@@ -1,0 +1,159 @@
+{
+  "time": "2026-07-03T21:03:44",
+  "domain": "tiago",
+  "exp_id": "1",
+  "model_tag": "gemini-2.5-pro",
+  "round": 1,
+  "parent_round": 0,
+  "correction_stem": "correction",
+  "cue": "pat_stomach",
+  "base_config_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/result_exp1_gemini-2.5-pro.json",
+  "config_snapshot_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/correction/gemini-2.5-pro/exp1/pat_stomach/correction_config.json",
+  "is_correct": null,
+  "action": "corrected",
+  "correction": {
+    "exp_id": "1",
+    "correction_q1": "Correction Q1: Yes, the robot clearly brings its hand to its stomach and performs a smooth circular rubbing motion, which is an iconic and easily understandable gesture for being hungry or full.",
+    "correction_q2": "Correction Q2: n/a",
+    "is_correct": null,
+    "inner_reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: Yes, the robot clearly brings its hand to its stomach and performs a smooth circular rubbing motion, which is an iconic and easily understandable gesture for being hungry or full.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: n/a\n# Q1: How would a human perform this motion? (One sentence)\n# A human would place one hand flat on their stomach and rub it in a small circular motion.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n# 1. Pose: arm_position \"back\", gripper_orientation \"horizontal\", torso_height \"low\", head \"down\". This places the hand flat against the lower torso, mimicking a hand on the stomach, and the downward head gaze reinforces the action. 2. Pose: arm_position \"in\", gripper_orientation \"vertical\". This would bring the hand across the body, but the vertical gripper is less natural for a flat rubbing motion. Winner is #1 for its natural hand placement and reinforcing head movement.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n# M1: pose > path. First, establish the pose with the hand on the stomach, then use an EE arc path to create a smooth circular rubbing motion. M2: pose > movement. Use joint-space movements (e.g., shoulder/elbow) to approximate a circle. M1 is the winner because an EE path creates a much smoother and more precise circular motion than trying to orchestrate it with individual joint movements.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n# 1. A continuous, two-circle rub (sweep: 720) at a moderate speed (2.0). This creates a single fluid and clear gesture. 2. A series of short \"patting\" motions using a path with a small distance on the x-axis and repetition. While also valid, the circular rub is a more common and expressive gesture for \"hungry\" or \"satisfied.\" Winner is #1 for better iconicity.",
+    "config_parsed": {
+      "cue": "pat_stomach",
+      "description": "Places one hand on the stomach and rubs it in a circular motion to indicate hunger or satisfaction.",
+      "movements": [
+        {
+          "type": "pose",
+          "duration": 0.8,
+          "parameters": {
+            "pose": {
+              "torso_height": "low",
+              "arm_position": "back",
+              "gripper_orientation": "horizontal",
+              "head": "down",
+              "left_arm": "still",
+              "elbow_bended": true,
+              "z": 30
+            }
+          }
+        },
+        {
+          "type": "path",
+          "duration": 1.5,
+          "parameters": {
+            "path": {
+              "mode": "ee",
+              "shape": "arc",
+              "plane": "yz",
+              "radius": 0.05,
+              "sweep": 720,
+              "speed": 2.0,
+              "side": "right"
+            }
+          }
+        }
+      ]
+    },
+    "parse_error": null,
+    "raw_text": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: Yes, the robot clearly brings its hand to its stomach and performs a smooth circular rubbing motion, which is an iconic and easily understandable gesture for being hungry or full.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: n/a\n# Q1: How would a human perform this motion? (One sentence)\n# A human would place one hand flat on their stomach and rub it in a small circular motion.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n# 1. Pose: arm_position \"back\", gripper_orientation \"horizontal\", torso_height \"low\", head \"down\". This places the hand flat against the lower torso, mimicking a hand on the stomach, and the downward head gaze reinforces the action. 2. Pose: arm_position \"in\", gripper_orientation \"vertical\". This would bring the hand across the body, but the vertical gripper is less natural for a flat rubbing motion. Winner is #1 for its natural hand placement and reinforcing head movement.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n# M1: pose > path. First, establish the pose with the hand on the stomach, then use an EE arc path to create a smooth circular rubbing motion. M2: pose > movement. Use joint-space movements (e.g., shoulder/elbow) to approximate a circle. M1 is the winner because an EE path creates a much smoother and more precise circular motion than trying to orchestrate it with individual joint movements.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n# 1. A continuous, two-circle rub (sweep: 720) at a moderate speed (2.0). This creates a single fluid and clear gesture. 2. A series of short \"patting\" motions using a path with a small distance on the x-axis and repetition. While also valid, the circular rub is a more common and expressive gesture for \"hungry\" or \"satisfied.\" Winner is #1 for better iconicity.\n{\n  \"cue\": \"pat_stomach\",\n  \"description\": \"Places one hand on the stomach and rubs it in a circular motion to indicate hunger or satisfaction.\",\n  \"movements\": [\n    {\n      \"type\": \"pose\",\n      \"duration\": 0.8,\n      \"parameters\": {\n        \"pose\": {\n          \"torso_height\": \"low\",\n          \"arm_position\": \"back\",\n          \"gripper_orientation\": \"horizontal\",\n          \"head\": \"down\",\n          \"left_arm\": \"still\",\n          \"elbow_bended\": true,\n          \"z\": 30\n        }\n      }\n    },\n    {\n      \"type\": \"path\",\n      \"duration\": 1.5,\n      \"parameters\": {\n        \"path\": {\n          \"mode\": \"ee\",\n          \"shape\": \"arc\",\n          \"plane\": \"yz\",\n          \"radius\": 0.05,\n          \"sweep\": 720,\n          \"speed\": 2.0,\n          \"side\": \"right\"\n        }\n      }\n    }\n  ]\n}",
+    "prompt_exp_id": "0",
+    "pipeline_exp_id": "1",
+    "vlm_media": {
+      "kind": "video/mp4",
+      "path": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/pat_stomach/new_render/mm19_g17_pat_stomach.mp4"
+    }
+  },
+  "input_row": {
+    "idx": 17,
+    "cue": "pat_stomach",
+    "description": "Places one hand on the stomach and rubs it in a circular motion to indicate hunger or satisfaction.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.8,
+        "parameters": {
+          "pose": {
+            "torso_height": "low",
+            "arm_position": "back",
+            "gripper_orientation": "horizontal",
+            "head": "down",
+            "left_arm": "still",
+            "elbow_bended": true,
+            "z": 30
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 1.5,
+        "parameters": {
+          "path": {
+            "mode": "ee",
+            "shape": "arc",
+            "plane": "yz",
+            "radius": 0.05,
+            "sweep": 720,
+            "speed": 2.0,
+            "side": "right"
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "gemini-2.5-pro",
+    "time": "2026-06-15 02:12:03",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "reasoning": "# Q1: A human would place a hand on their stomach and make a gentle circular rubbing motion to indicate hunger or fullness.\n# Q2: Pose 1: `arm_position: back`, `gripper: horizontal`, `z: 30` (low). Pose 2: `arm_position: front`, `gripper: horizontal`. Winner is Pose 1 because `back` brings the arm directly to the torso, which is the most natural starting point for a self-touching gesture like patting the stomach.\n# Q3: Structure 1: `pose > path(arc)`. Structure 2: `pose > movement(elbow)`. Winner is Structure 1 because a circular `path` better emulates a gentle rubbing motion, which is more expressive and common for this cue than a simple up/down pat.\n# Q4: Reinforcement 1: Lower torso and tilt head down. Reinforcement 2: Neutral torso and head. Winner is Reinforcement 1 because having the robot look down at its own stomach while slightly hunched over strongly reinforces the idea of self-focus related to hunger or satisfaction."
+  },
+  "output_row": {
+    "idx": 17,
+    "cue": "pat_stomach",
+    "description": "Places one hand on the stomach and rubs it in a circular motion to indicate hunger or satisfaction.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.8,
+        "parameters": {
+          "pose": {
+            "torso_height": "low",
+            "arm_position": "back",
+            "gripper_orientation": "horizontal",
+            "head": "down",
+            "left_arm": "still",
+            "elbow_bended": true,
+            "z": 30
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 1.5,
+        "parameters": {
+          "path": {
+            "mode": "ee",
+            "shape": "arc",
+            "plane": "yz",
+            "radius": 0.05,
+            "sweep": 720,
+            "speed": 2.0,
+            "side": "right"
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-03T21:03:36",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q1: Yes, the robot clearly brings its hand to its stomach and performs a smooth circular rubbing motion, which is an iconic and easily understandable gesture for being hungry or full.",
+    "correction_q2": "Correction Q2: n/a",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: Yes, the robot clearly brings its hand to its stomach and performs a smooth circular rubbing motion, which is an iconic and easily understandable gesture for being hungry or full.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: n/a\n# Q1: How would a human perform this motion? (One sentence)\n# A human would place one hand flat on their stomach and rub it in a small circular motion.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n# 1. Pose: arm_position \"back\", gripper_orientation \"horizontal\", torso_height \"low\", head \"down\". This places the hand flat against the lower torso, mimicking a hand on the stomach, and the downward head gaze reinforces the action. 2. Pose: arm_position \"in\", gripper_orientation \"vertical\". This would bring the hand across the body, but the vertical gripper is less natural for a flat rubbing motion. Winner is #1 for its natural hand placement and reinforcing head movement.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n# M1: pose > path. First, establish the pose with the hand on the stomach, then use an EE arc path to create a smooth circular rubbing motion. M2: pose > movement. Use joint-space movements (e.g., shoulder/elbow) to approximate a circle. M1 is the winner because an EE path creates a much smoother and more precise circular motion than trying to orchestrate it with individual joint movements.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n# 1. A continuous, two-circle rub (sweep: 720) at a moderate speed (2.0). This creates a single fluid and clear gesture. 2. A series of short \"patting\" motions using a path with a small distance on the x-axis and repetition. While also valid, the circular rub is a more common and expressive gesture for \"hungry\" or \"satisfied.\" Winner is #1 for better iconicity."
+  },
+  "media": {
+    "gif": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/pat_stomach/correction/mm19_g17_pat_stomach.gif",
+    "mp4": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/pat_stomach/correction/mm19_g17_pat_stomach.mp4",
+    "pose_png": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/pat_stomach/correction/mm19_g17_pat_stomach_pose.png",
+    "cumulative_tile_gif": null
+  }
+}

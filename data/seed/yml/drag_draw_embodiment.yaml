@@ -1,0 +1,118 @@
+# Drag-and-Draw Vector schema.
+# The LLM emits no shape / speed / repetition / hold attributes.
+# Every motion is one or more handle trajectories of [x, y, z, frame].
+
+meta:
+  version: "2.0"
+  coordinate_frame:
+    name: robot_local_metric
+    unit: meters
+    axes:
+      x: "+forward toward the viewer"
+      y: "+robot-left"
+      z: "+up"
+  vector_format: [x, y, z, frame]
+  rules:
+    - The robot is exactly in the listed neutral state before frame 0.
+    - Every trajectory starts with that handle's neutral xyz at frame 0.
+    - Coordinates are absolute robot-local meters, never deltas or percentiles.
+    - Frames are non-negative integers and strictly increase within a trajectory.
+    - Velocity is encoded only by spatial displacement divided by frame difference.
+    - A hold is encoded only by repeating the same xyz at a later frame.
+    - Lines, arcs, circles and zigzags are encoded as sampled xyz vectors; never name a shape.
+    - Each Humanoid arm uses elbow + EE + fingertip + palm-normal (4 points).
+    - Each Tiago arm and the single arm use elbow + EE + fingertip (3 points).
+    - EE/hand center is authoritative. Auxiliary handles are softer direction or posture constraints.
+
+humanoid:
+  robot: Unitree G1
+  fps: 20
+  neutral_handles:
+    base: [0.0000, 0.0000, 0.8000]
+    torso: [-0.0040, 0.0000, 0.8440]
+    head: [-0.0040, 0.0000, 1.2240]
+    right_elbow: [-0.0528, -0.1778, 0.9156]
+    right_ee: [0.0012, -0.2140, 0.7432]
+    right_fingertip: [0.0357, -0.2325, 0.6512]
+    right_palm_normal: [0.0762, -0.2114, 0.7708]
+    left_elbow: [-0.0528, 0.1778, 0.9156]
+    left_ee: [0.0012, 0.2140, 0.7432]
+    left_fingertip: [0.0357, 0.2325, 0.6512]
+    left_palm_normal: [0.0762, 0.2114, 0.7708]
+  workspace_bounds:
+    x: [-0.35, 0.55]
+    y: [-0.65, 0.65]
+    z: [0.55, 1.50]
+  notes:
+    - Use head for nod/shake/gaze, torso for bows, and one or both EE handles for hand gestures.
+    - A symmetric gesture has separate right_ee and left_ee trajectories sharing frame numbers.
+    - Every moving arm uses the complete elbow + EE + fingertip + palm_normal four-point frame.
+
+tiago:
+  robot: PAL Tiago dual-arm
+  fps: 20
+  neutral_handles:
+    base: [0.0000, 0.0000, 0.0985]
+    torso: [-0.0620, 0.0000, 0.4715]
+    head: [0.1250, 0.0000, 1.1665]
+    right_elbow: [-0.0574, -0.3151, 0.7770]
+    right_ee: [-0.0574, -0.4234, 0.2033]
+    right_fingertip: [-0.0574, -0.4530, 0.1078]
+    left_elbow: [-0.0544, 0.3151, 0.7770]
+    left_ee: [-0.0544, 0.4234, 0.2033]
+    left_fingertip: [-0.0544, 0.4530, 0.1078]
+  workspace_bounds:
+    x: [-0.35, 0.85]
+    y: [-0.75, 0.75]
+    z: [0.05, 1.55]
+  notes:
+    - Prefer arm/head/torso trajectories for gestures; move base only when locomotion itself communicates the cue.
+    - Every moving arm uses the complete elbow + EE + fingertip three-point frame. Tiago has no palm-normal point.
+
+single_arm:
+  robot: KUKA IIWA
+  fps: 20
+  neutral_handles:
+    elbow: [0.2453, 0.0011, 1.5680]
+    ee: [0.4655, -0.0059, 0.9028]
+    fingertip: [0.4648, -0.0081, 0.7828]
+  workspace_bounds:
+    x: [-0.25, 0.95]
+    y: [-0.75, 0.75]
+    z: [0.65, 2.30]
+  notes:
+    - "Use exactly three trajectories: elbow + EE + fingertip."
+    - EE is authoritative; elbow resolves arm posture and EE-to-fingertip defines hand direction.
+
+stretch:
+  robot: Hello Robot Stretch 3
+  fps: 20
+  neutral_handles:
+    base: [0.0000, 0.0000, 0.0000]
+    torso: [-0.1350, -0.1044, 0.7500]
+    head: [-0.0278, 0.0048, 1.3019]
+    elbow: [0.2050, -0.1044, 0.7500]
+    wrist: [0.2050, -0.0214, 0.7193]
+    ee: [0.2448, -0.0213, 0.6647]
+    fingertip: [0.3648, -0.0213, 0.6646]
+  workspace_bounds:
+    x: [-0.35, 0.90]
+    y: [-0.65, 0.65]
+    z: [0.05, 1.55]
+  notes:
+    - Use EE + fingertip; EE is the gripper center and EE→fingertip expresses the bent gripper direction.
+
+roomba:
+  robot: Roomba-style planar base
+  fps: 20
+  neutral_handles:
+    base: [0.0000, 0.0000, 0.0900]
+    base_front: [0.1500, 0.0000, 0.0900]
+  workspace_bounds:
+    x: [-0.60, 0.60]
+    y: [-0.60, 0.60]
+    z: [0.09, 0.09]
+  notes:
+    - base is the body center; base_front is a derived point 0.15 m in front of it.
+    - Always output base and base_front together, even when one point stays fixed.
+    - Translate both points together. To rotate in place, keep base fixed and rotate base_front around it.

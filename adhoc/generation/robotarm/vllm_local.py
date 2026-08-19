@@ -41,6 +41,10 @@ class VLLMLocalEngine:
             "true",
             "yes",
         }
+        # 32B on 40–48GB cards needs eager + conservative KV unless overridden.
+        if "32B" in self.model or "32b" in self.model:
+            if os.getenv("VLLM_ENFORCE_EAGER") is None:
+                self.enforce_eager = True
         self.max_num_seqs = int(os.getenv("VLLM_MAX_NUM_SEQS", "10"))
 
         from hf_cache_setup import hub_model_cache_dir, resolve_model_load_path, setup_hf_cache
@@ -54,7 +58,8 @@ class VLLMLocalEngine:
         print(
             f"[vllm-local] loading {self.model} "
             f"tp={self.tensor_parallel_size} max_len={self.max_model_len} "
-            f"eager={self.enforce_eager} max_num_seqs={self.max_num_seqs}",
+            f"eager={self.enforce_eager} max_num_seqs={self.max_num_seqs} "
+            f"gpu_mem={self.gpu_memory_utilization}",
             flush=True,
         )
         print(f"[vllm-local] hf_cache={cache_root} hub_cache={hub_cache}", flush=True)
@@ -70,12 +75,23 @@ class VLLMLocalEngine:
             gpu_memory_utilization=self.gpu_memory_utilization,
             enforce_eager=self.enforce_eager,
             max_num_seqs=self.max_num_seqs,
-            limit_mm_per_prompt={"image": 4},
+            limit_mm_per_prompt={"image": 4, "video": 1},
             trust_remote_code=True,
+            disable_custom_all_reduce=True,
         )
-        from vlm_sampling import vllm_sampling_params
+        try:
+            from vlm_sampling import vllm_sampling_params
 
-        self._sampling_factory = vllm_sampling_params
+            self._sampling_factory = vllm_sampling_params
+        except ImportError:
+            # Eval-safe fallback if helper module is missing on the cluster.
+            def _fallback_sampling():
+                return SamplingParams(
+                    temperature=float(os.getenv("VLM_TEMPERATURE", "0.0")),
+                    max_tokens=int(os.getenv("VLM_MAX_NEW_TOKENS", "32")),
+                )
+
+            self._sampling_factory = _fallback_sampling
         print("[vllm-local] ready", flush=True)
 
     def _prepare_request(
@@ -98,7 +114,14 @@ class VLLMLocalEngine:
             tmp_paths.append(path)
             content.append({"type": "image", "image": path})
         for vpath in videos:
-            content.append({"type": "video", "video": vpath})
+            nframes = int(os.getenv("VLM_VIDEO_NFRAMES", "8"))
+            content.append(
+                {
+                    "type": "video",
+                    "video": vpath,
+                    "nframes": nframes,
+                }
+            )
         content.append({"type": "text", "text": prompt})
 
         messages = [{"role": "user", "content": content}]

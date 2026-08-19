@@ -1,0 +1,26 @@
+[Instance Correction — review prior generation against render]
+
+You previously generated a motion config for the cue below. It was simulated and rendered (see attached {{MEDIA_KIND}}).
+{{CUMULATIVE_MEDIA_NOTE}}
+
+**Scope — judge and fix the ENTIRE motion:**
+- Compare the target cue against the attached render(s) and judge whether the robot's movement is represenative and iconic expression of the given cue. If not, adjust individual parameters (speed, angle, axis, pose, etc.) or fully recompose the `movements` sequence as needed.
+
+**Required correction review** — output these two lines as # comments **before** the inner task's own required planning # lines:
+# Correction Q1: <answer starting with "yes" or "no", then one sentence why — do NOT echo this question>
+# Correction Q2: <if Q1 is no: how the entire movements sequence should change; if yes: "n/a" — do NOT echo this question>
+
+Then complete the **ORIGINAL GENERATION TASK** below in full.
+- If Correction Q1 is **no**, output a **complete replacement** JSON: a new full `movements` array (2–8 steps) that implements your Correction Q2 plan.
+- If Correction Q1 is **yes**, you may keep the same motion or make only minor polish.
+
+{{CORRECTION_ONESHOT}}
+
+---
+[ORIGINAL GENERATION TASK]
+{{INNER_PROMPT}}
+---
+[Prior attempt(s)]
+cue: {{CUE}}
+description: {{DESCRIPTION}}
+{{PRIOR_ATTEMPTS_BLOCK}}

@@ -1,0 +1,37 @@
+You are selecting the most **representative** starting arm pose for a social gesture on a TIAGo-like mobile manipulator.
+
+The image is a numbered grid of candidate static poses (tiles 1..{{N_TILES}}, left-to-right, top-to-bottom).
+All tiles already match the same coarse pose class:
+- arm_position (direction_group): {{ARM_POSITION}}
+- gripper_orientation: {{GRIPPER_ORIENTATION}}
+- elbow_bended: {{ELBOW_BENDED}}
+
+They differ only in fine joint configuration within that class (xyz spread in pose-bank space).
+Tile #1 is the nearest match to the model's numeric xyz target — NOT necessarily the best choice.
+
+Target gesture cue:
+- cue: {{CUE}}
+- description: {{DESCRIPTION}}
+
+Task: Pick the ONE tile that is the best **representative iconic pose** for "{{CUE}}" — the static arm configuration a human viewer would most readily associate with performing this gesture.
+
+Judge on:
+1) REPRESENTATIVE — reads clearly as the iconic starting pose for this cue (not merely kinematically valid).
+2) NATURAL — anatomically plausible humanoid arm (no whole-arm behind-body wrap, no penetration).
+3) CUE-FIT — if you froze the robot here and asked "what gesture is this?", "{{CUE}}" is a strong answer.
+
+Rules:
+- Judge only the static arm pose; ignore future motion.
+- Prefer iconic, readable poses over subtle xyz-nearest matches.
+- If none are great, pick the least bad and set confidence low.
+
+Return ONLY strict JSON:
+{
+  "best_tile_index": 1,
+  "looks_natural": true,
+  "fits_cue": true,
+  "is_representative": true,
+  "assessment": "string: why this tile is the most representative for the cue",
+  "runner_up_tile_index": 2,
+  "confidence": 0.0
+}

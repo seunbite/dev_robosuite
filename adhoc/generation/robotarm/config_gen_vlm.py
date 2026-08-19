@@ -220,6 +220,7 @@ def generate_exp1_row(
     max_attempts: int | None = None,
     out_path: Path | None = None,
     prompt_path: Path | None = None,
+    extra_prompt_suffix: str | None = None,
 ) -> dict[str, Any]:
     (
         _extract_reasoning_and_json,
@@ -239,6 +240,8 @@ def generate_exp1_row(
     prompt_template = ppath.read_text(encoding="utf-8")
     examples = _fewshot_block(ppath, SHOTS)
     prompt = prompt_template.replace("{{FEW_SHOT_EXAMPLES}}", examples).replace("{{CUE_NAME}}", cue)
+    if extra_prompt_suffix:
+        prompt = prompt.rstrip() + "\n\n" + extra_prompt_suffix.strip() + "\n"
 
     validation_errors: list[str] = []
     reasoning_text = ""

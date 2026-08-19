@@ -1,0 +1,36 @@
+# Persona × cue matrix (~20 configs). Cues: pilot90 pose-generation GT hits only.
+#
+# Run: python adhoc/generation/robotarm/paper_figures/cli.py persona --matrix v20 --force-render
+
+personas:
+  grandmotherly: >
+    Warm, gentle, slightly slow; small amplitudes, soft deceleration, longer caring holds —
+    like a kind grandmother offering or acknowledging something.
+  buzz_lightyear: >
+    Toy-hero theatrical: crisp poses, confident extensions, mission-briefing pauses,
+    stiff then decisive motion — Buzz Lightyear energy (not literal quotes).
+  high_extraversion: >
+    Outgoing, big, open, socially eager; larger reach, faster approach, extra flourish beats.
+  low_extraversion: >
+    Reserved, contained, minimal gesture; smaller range, shorter visible motion, inward finish.
+  high_neuroticism: >
+    Nervous, self-conscious; micro-pauses, speed jitter, incomplete commits, second-guessing beats.
+  low_neuroticism: >
+    Unflappable, steady; even timing, clean arcs, no hesitation, consistent amplitude.
+  playful_child: >
+    Bouncy, imprecise-but-eager; slightly overshooting, quick recoveries, light repetition.
+  calm_steady: >
+    Smooth, unrushed, balanced; moderate speed, clean holds, no drama (distinct from low neuroticism).
+  aggressive: >
+    Sharp, fast, emphatic; short holds, large angles, decisive single beats.
+  sad_subdued: >
+    Low energy, drooping finish; slow speed, long holds, reduced peak height.
+
+# Set 3 — all pose-gen GT✓, visually/socially diverse:
+#   c23 lean_forward, c40 guiding_arm, c59 nod_yes, c64 tilt_head_curious, c125 lean_side_doubt
+runs:
+  - {idx: 23, cue: lean_forward_interest, personas: [high_extraversion, playful_child, calm_steady, low_extraversion]}
+  - {idx: 40, cue: guiding_arm, personas: [grandmotherly, buzz_lightyear, aggressive, sad_subdued]}
+  - {idx: 59, cue: nod_yes, personas: [buzz_lightyear, grandmotherly, high_extraversion, sad_subdued]}
+  - {idx: 64, cue: tilt_head_curious, personas: [playful_child, high_neuroticism, calm_steady, low_extraversion]}
+  - {idx: 125, cue: lean_side_doubt, personas: [high_neuroticism, low_neuroticism, calm_steady, aggressive]}

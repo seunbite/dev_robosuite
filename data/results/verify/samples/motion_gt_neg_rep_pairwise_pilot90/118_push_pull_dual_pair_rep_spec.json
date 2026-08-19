@@ -1,0 +1,31 @@
+{
+  "idx": 118,
+  "cue": "push_pull_dual",
+  "description": "The robot recoils slightly as if preparing, pushes forward sharply, adds a quick transitional beat, and then pulls back as if against resistance.",
+  "start_pose_source": "human_gt_tile_pick",
+  "start_pose_dir": "front",
+  "start_pose_gripper": "vertical",
+  "start_pose_id": 106,
+  "gt_side": "left",
+  "left": "gt",
+  "right": "neg_rep",
+  "left_tail_summary": "pose(front,vertical) → movement shoulder (z+22,z-22)",
+  "right_tail_summary": "pose(front,vertical) → movement shoulder (z+22,z-22)",
+  "pair_mp4": "data/results/verify/samples/motion_gt_neg_rep_pairwise_pilot90/118_push_pull_dual_pair_rep.mp4",
+  "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\nBoth sides use the identical fixed start pose; only the tail movement differs (especially repetition count).\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing, **repetition rhythm**) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n- This task contrasts **repetition**: one side matches human GT repetition; the other deliberately flips it (GT `rep` → single cycle; GT `non` → triple repeat).\n\nTarget cue:\n- cue: push_pull_dual\n- description: The robot recoils slightly as if preparing, pushes forward sharply, adds a quick transitional beat, and then pulls back as if against resistance.\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+  "gt_repetition_label": "non",
+  "gt_rep_override": "non",
+  "neg_rep_override": "repeat3",
+  "gt_movement_repetition_param": 1,
+  "neg_movement_repetition_param": 3,
+  "component": {
+    "kind": "movement",
+    "axes": {
+      "z": "+-"
+    },
+    "joint": null,
+    "repetition": "non",
+    "hold": null,
+    "raw": ""
+  }
+}

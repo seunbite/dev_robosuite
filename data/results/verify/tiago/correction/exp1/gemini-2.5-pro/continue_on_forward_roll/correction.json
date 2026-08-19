@@ -1,0 +1,206 @@
+{
+  "time": "2026-07-05T13:50:19",
+  "domain": "tiago",
+  "exp_id": "1",
+  "model_tag": "gemini-2.5-pro",
+  "round": 1,
+  "parent_round": 0,
+  "correction_stem": "correction",
+  "cue": "continue_on_forward_roll",
+  "base_config_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/result_exp1_gemini-2.5-pro.json",
+  "config_snapshot_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/correction/gemini-2.5-pro/exp1/continue_on_forward_roll/correction_config.json",
+  "is_correct": null,
+  "action": "corrected",
+  "correction": {
+    "exp_id": "1",
+    "correction_q1": "Correction Q1: No, the \"roll\" motion is a small, static arc in the coronal (xz) plane, which lacks the forward sweeping direction implied by \"continue on\".",
+    "correction_q2": "Correction Q2: The structure should be changed to a pose followed by two path steps: first, a repeated circular arc in the sagittal (yz) plane to create a \"rolling wheel\" effect, and second, a linear path forward along the x-axis to create the \"continue on\" push.",
+    "is_correct": null,
+    "inner_reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: No, the \"roll\" motion is a small, static arc in the coronal (xz) plane, which lacks the forward sweeping direction implied by \"continue on\".\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The structure should be changed to a pose followed by two path steps: first, a repeated circular arc in the sagittal (yz) plane to create a \"rolling wheel\" effect, and second, a linear path forward along the x-axis to create the \"continue on\" push.\n\n# Q1: How would a human perform this motion? (One sentence)\n# A human would make a circular, rolling motion with their hand and forearm, often while sweeping the entire arm forward to encourage progression.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n# Pose 1: `arm_position: front`, `gripper_orientation: horizontal`. This palm-down pose is good for a generic \"keep turning\" motion. Pose 2: `arm_position: front`, `gripper_orientation: vertical`. This \"knife-hand\" pose is better for a circular motion in the sagittal plane that looks like a wheel rolling forward. Winner: Pose 2, as it better aligns with the forward, directional nature of the cue.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n# M1: `pose` > `path (arc in xz)`. This was the prior attempt; the arc is in the wrong plane and feels static. M2: `pose` > `path (arc in yz, repetition 2)` > `path (line in +x)`. This structure explicitly separates the \"roll\" (the circular yz path) from the \"continue forward\" (the linear x path), making the intent much clearer. Winner: M2, because it creates a more iconic and understandable gesture by combining a roll and a directional push.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n# T1: One fast, large roll. This might be too aggressive. T2: Two smaller, moderately-paced rolls (`speed: 2.0`) followed by a slightly faster forward push (`speed: 2.2`). This rhythm feels more like a gentle and clear encouragement to \"keep it rolling... forward.\" Winner: T2, for its encouraging and clear rhythm.",
+    "config_parsed": {
+      "cue": "continue_on_forward_roll",
+      "description": "Encourages continuation with a forward rolling hand motion and a final forward push.",
+      "movements": [
+        {
+          "type": "pose",
+          "duration": 0.5,
+          "parameters": {
+            "pose": {
+              "torso_height": "mid",
+              "arm_position": "front",
+              "gripper_orientation": "vertical",
+              "head": "center",
+              "elbow_bended": true,
+              "z": 70
+            }
+          }
+        },
+        {
+          "type": "path",
+          "duration": 2.0,
+          "parameters": {
+            "path": {
+              "mode": "ee",
+              "shape": "arc",
+              "plane": "yz",
+              "radius": 0.08,
+              "sweep": 360,
+              "direction": "cw",
+              "repetition": 2,
+              "speed": 2.0
+            }
+          }
+        },
+        {
+          "type": "path",
+          "duration": 0.8,
+          "parameters": {
+            "path": {
+              "mode": "ee",
+              "shape": "line",
+              "axis": "x",
+              "distance": 0.1,
+              "speed": 2.2,
+              "hold_time": 0.3
+            }
+          }
+        }
+      ]
+    },
+    "parse_error": null,
+    "raw_text": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: No, the \"roll\" motion is a small, static arc in the coronal (xz) plane, which lacks the forward sweeping direction implied by \"continue on\".\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The structure should be changed to a pose followed by two path steps: first, a repeated circular arc in the sagittal (yz) plane to create a \"rolling wheel\" effect, and second, a linear path forward along the x-axis to create the \"continue on\" push.\n\n# Q1: How would a human perform this motion? (One sentence)\n# A human would make a circular, rolling motion with their hand and forearm, often while sweeping the entire arm forward to encourage progression.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n# Pose 1: `arm_position: front`, `gripper_orientation: horizontal`. This palm-down pose is good for a generic \"keep turning\" motion. Pose 2: `arm_position: front`, `gripper_orientation: vertical`. This \"knife-hand\" pose is better for a circular motion in the sagittal plane that looks like a wheel rolling forward. Winner: Pose 2, as it better aligns with the forward, directional nature of the cue.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n# M1: `pose` > `path (arc in xz)`. This was the prior attempt; the arc is in the wrong plane and feels static. M2: `pose` > `path (arc in yz, repetition 2)` > `path (line in +x)`. This structure explicitly separates the \"roll\" (the circular yz path) from the \"continue forward\" (the linear x path), making the intent much clearer. Winner: M2, because it creates a more iconic and understandable gesture by combining a roll and a directional push.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n# T1: One fast, large roll. This might be too aggressive. T2: Two smaller, moderately-paced rolls (`speed: 2.0`) followed by a slightly faster forward push (`speed: 2.2`). This rhythm feels more like a gentle and clear encouragement to \"keep it rolling... forward.\" Winner: T2, for its encouraging and clear rhythm.\n{\n  \"cue\": \"continue_on_forward_roll\",\n  \"description\": \"Encourages continuation with a forward rolling hand motion and a final forward push.\",\n  \"movements\": [\n    {\n      \"type\": \"pose\",\n      \"duration\": 0.5,\n      \"parameters\": {\n        \"pose\": {\n          \"torso_height\": \"mid\",\n          \"arm_position\": \"front\",\n          \"gripper_orientation\": \"vertical\",\n          \"head\": \"center\",\n          \"elbow_bended\": true,\n          \"z\": 70\n        }\n      }\n    },\n    {\n      \"type\": \"path\",\n      \"duration\": 2.0,\n      \"parameters\": {\n        \"path\": {\n          \"mode\": \"ee\",\n          \"shape\": \"arc\",\n          \"plane\": \"yz\",\n          \"radius\": 0.08,\n          \"sweep\": 360,\n          \"direction\": \"cw\",\n          \"repetition\": 2,\n          \"speed\": 2.0\n        }\n      }\n    },\n    {\n      \"type\": \"path\",\n      \"duration\": 0.8,\n      \"parameters\": {\n        \"path\": {\n          \"mode\": \"ee\",\n          \"shape\": \"line\",\n          \"axis\": \"x\",\n          \"distance\": 0.1,\n          \"speed\": 2.2,\n          \"hold_time\": 0.3\n        }\n      }\n    }\n  ]\n}",
+    "prompt_exp_id": "0",
+    "pipeline_exp_id": "1",
+    "vlm_media": {
+      "kind": "video/mp4",
+      "path": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/continue_on_forward_roll/new_render/mm19_g48_continue_on_forward_roll.mp4"
+    }
+  },
+  "input_row": {
+    "idx": 48,
+    "cue": "continue_on_forward_roll",
+    "description": "Encourages continuation with a forward rolling hand motion, followed by a slight nod.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "front",
+            "gripper_orientation": "horizontal",
+            "head": "center",
+            "elbow_bended": true,
+            "z": 75
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 1.5,
+        "parameters": {
+          "path": {
+            "mode": "ee",
+            "shape": "arc",
+            "plane": "xz",
+            "radius": 0.08,
+            "sweep": 180,
+            "repetition": 2,
+            "speed": 1.8
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 0.5,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [
+                  0,
+                  -15
+                ]
+              }
+            ],
+            "repetition": 1,
+            "speed": 2.0
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "gemini-2.5-pro",
+    "time": "2026-06-15 03:56:47",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "reasoning": "# Q1: A human would perform this by making a gentle forward rolling motion with their hand to encourage someone to proceed.\n# Q2: Pose Candidate A: `arm_position: front`, `gripper_orientation: horizontal`, `torso_height: mid`, `elbow_bended: true`. Pose Candidate B: `arm_position: out`, `gripper_orientation: horizontal`. The winner is Pose A because the forward arm position is more direct and suitable for encouraging forward progression, whereas an outward position is for guiding sideways.\n# Q3: Structure M1: A single repeated Cartesian arc path (`path`, `shape: arc`, `plane: xz`) to create a smooth roll. Structure M2: A joint-space motion (`movement`) coordinating the elbow and wrist. The winner is M1 because a Cartesian arc directly and reliably creates the desired smooth, circular end-effector trajectory for the \"roll\".\n# Q4: Context A: Add a slight affirmative head nod after the roll. Context B: Have the robot's base inch forward slightly. The winner is A because a nod is a common, subtle, and clear affirmation that pairs naturally with the \"continue\" gesture without repositioning the entire robot."
+  },
+  "output_row": {
+    "idx": 48,
+    "cue": "continue_on_forward_roll",
+    "description": "Encourages continuation with a forward rolling hand motion and a final forward push.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "front",
+            "gripper_orientation": "vertical",
+            "head": "center",
+            "elbow_bended": true,
+            "z": 70
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 2.0,
+        "parameters": {
+          "path": {
+            "mode": "ee",
+            "shape": "arc",
+            "plane": "yz",
+            "radius": 0.08,
+            "sweep": 360,
+            "direction": "cw",
+            "repetition": 2,
+            "speed": 2.0
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 0.8,
+        "parameters": {
+          "path": {
+            "mode": "ee",
+            "shape": "line",
+            "axis": "x",
+            "distance": 0.1,
+            "speed": 2.2,
+            "hold_time": 0.3
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-05T13:50:10",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q1: No, the \"roll\" motion is a small, static arc in the coronal (xz) plane, which lacks the forward sweeping direction implied by \"continue on\".",
+    "correction_q2": "Correction Q2: The structure should be changed to a pose followed by two path steps: first, a repeated circular arc in the sagittal (yz) plane to create a \"rolling wheel\" effect, and second, a linear path forward along the x-axis to create the \"continue on\" push.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: No, the \"roll\" motion is a small, static arc in the coronal (xz) plane, which lacks the forward sweeping direction implied by \"continue on\".\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The structure should be changed to a pose followed by two path steps: first, a repeated circular arc in the sagittal (yz) plane to create a \"rolling wheel\" effect, and second, a linear path forward along the x-axis to create the \"continue on\" push.\n\n# Q1: How would a human perform this motion? (One sentence)\n# A human would make a circular, rolling motion with their hand and forearm, often while sweeping the entire arm forward to encourage progression.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n# Pose 1: `arm_position: front`, `gripper_orientation: horizontal`. This palm-down pose is good for a generic \"keep turning\" motion. Pose 2: `arm_position: front`, `gripper_orientation: vertical`. This \"knife-hand\" pose is better for a circular motion in the sagittal plane that looks like a wheel rolling forward. Winner: Pose 2, as it better aligns with the forward, directional nature of the cue.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n# M1: `pose` > `path (arc in xz)`. This was the prior attempt; the arc is in the wrong plane and feels static. M2: `pose` > `path (arc in yz, repetition 2)` > `path (line in +x)`. This structure explicitly separates the \"roll\" (the circular yz path) from the \"continue forward\" (the linear x path), making the intent much clearer. Winner: M2, because it creates a more iconic and understandable gesture by combining a roll and a directional push.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n# T1: One fast, large roll. This might be too aggressive. T2: Two smaller, moderately-paced rolls (`speed: 2.0`) followed by a slightly faster forward push (`speed: 2.2`). This rhythm feels more like a gentle and clear encouragement to \"keep it rolling... forward.\" Winner: T2, for its encouraging and clear rhythm."
+  },
+  "media": {
+    "gif": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/continue_on_forward_roll/correction/mm19_g48_continue_on_forward_roll.gif",
+    "mp4": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/continue_on_forward_roll/correction/mm19_g48_continue_on_forward_roll.mp4",
+    "pose_png": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/continue_on_forward_roll/correction/mm19_g48_continue_on_forward_roll_pose.png",
+    "cumulative_tile_gif": null
+  }
+}

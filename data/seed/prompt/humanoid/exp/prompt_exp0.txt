@@ -1,0 +1,140 @@
+You are an expert in Unitree G1 humanoid gesture design.
+
+Goal:
+- Generate ONE complete cue motion using Motion Code primitives (`pose`, `move`, `path`, `hold`) that convert into `movements` JSON.
+- Create representative and expressive gestures using both arms, head, and torso.
+- Design the **full choreography**: opening pose AND follow-on beats with readable timing.
+
+[Required Reasoning Process]
+You MUST output exactly four planning lines as # comments before the Motion Code / JSON.
+# Q1: How would a human perform this motion? (One sentence)
+# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (dir, grip, head, torso, left_arm, elbow, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.
+# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > move > hold vs M2: pose > path > path). State the winner and why—**prioritize move/path beats that express the cue**, not pose-only tweaks.
+# Q4: Context Reinforcement. Compare 2+ micro-timing choices (spd, rep, hold, head/torso expression) that make the gesture read stronger and pick the best one.
+
+[Coordinate frame]
+World frame: **+x = forward toward the human viewer**, **+y = robot left**, **+z = up (ceiling)**.
+The right arm is the primary gesturing arm unless `left_arm=mirror` (or an independent left dir) is set.
+EE percentiles (`x`, `y`, `z`, each 0–100) refine the right-hand fingertip in the workspace:
+- **(50, 50, 50) = body center** (chest / midline baseline for the chosen `dir`).
+- **0 / 100 = extrema** on that axis (most back/right/low vs forward/left/high). Spans 0–50 and 50–100 may be asymmetric in meters.
+- **x**: depth — forward / back (higher ≈ farther toward viewer).
+- **y**: lateral — left / right (higher ≈ more toward robot left / +y). For **midline / palms-together / chest-center**, use **y≈50** (not x).
+- **z**: height — up / down (higher ≈ face/head height; lower ≈ waist). Default omitted axes = 50.
+
+[Motion Code — pose]
+`pose(dir=..., grip=..., head=..., torso=..., left_arm=..., elbow=..., x=..., y=..., z=..., t=...)`
+Join steps with `+`.
+
+1. Arm direction (`dir` → `arm_position`) — dominant reach of the right arm:
+- **front**: reach toward the viewer (+x). Example: offer, point forward, handshake.
+- **back**: reach toward own torso (−x). Example: hand on chest, retract.
+- **in**: reach inward across / toward midline (+y from the right arm). Example: beckon, palms together, rub chest.
+- **out**: reach outward to the side (−y). Example: side wave, open branch.
+- **up**: reach toward the ceiling (+z). Example: stretch, surrender.
+- **down** / **still**: lowered / rest. **Omit `dir` or set `still` for head-only cues** (nod, shake, tilt) so arms do not invent a raised pose.
+
+2. Gripper / hand (`grip`) — wrist class and optional palm normal:
+- Wrist class: **vert** / **vertical** (jaw line **|**) or **horiz** / **horizontal** / **open** (jaw line **ㅡ**).
+- Palm compounds (humanoid bank): combine with `|` — `vert|palmin`, `horiz|palmdown`, `horiz|palmup`, `horiz|palmfront`, `horiz|palmback`.
+  - **palmin**: palm toward midline / body. **palmfront**: palm toward viewer (stop / high-five).
+  - **palmup** / **palmdown**: open-hand invite / press-down. **palmback**: fist back toward self.
+- **close** / **closed** / **pinch**: maps to vertical clenched (fist cues).
+- Prefer a compound when palm facing is semantically load-bearing (stop, shrug, welcome, fist).
+
+3. Head (`head`): `center` | `left` | `right` | `up` | `down` — preset gaze. Default `center`.
+
+4. Torso (`torso`): `low` | `mid` | `high` | `tall` (=high). Default `mid`.
+
+5. Left arm (`left_arm`, optional, default still):
+- **still**: left arm stays at rest.
+- **mirror**: left copies the right arm direction (symmetric: stretch, surrender, palms together, hug). **Use mirror when both arms share the same direction** — do not set left to the same categorical value as right.
+- Or an independent `dir` value when left differs from right.
+
+6. Elbow (`elbow`, optional): `T` / `true` / `F` / `false` → `elbow_bended`. Use `T` for flexed salutes / raised-index / draw-circle; `F` for straight point / reach.
+
+7. EE percentiles (`x`, `y`, `z`, optional 0–100): see coordinate frame above. For hands meeting at chest centerline use `dir=in`, `left_arm=mirror`, and **y≈50**; **do not** treat `x=50` as left–right center.
+
+[Motion Code — move / path / hold]
+`move(joint, axis, degrees, rep=..., spd=..., hold=...)`
+`path(ee|base, line|arc, ...)`
+`hold(t=...)`
+
+**Read the opening pose first**, then design **1–7 follow-on steps**.
+`hold(t=…)` is a first-class beat (pose + hold is valid for static emblems: point, stop, welcome).
+Parser rewrites `hold` to a zero-distance EE line with `hold_time`.
+
+Synthetic few-shot sketches (NOT target cues — schema only):
+- head bob: `pose(head=center, torso=mid) + move(head, tilt, [-20,20], rep=3, spd=1.4, hold=0.1)`
+- side wave: `pose(dir=out, grip=horiz|palmfront, z=80) + move(wrist, y, ±25, rep=3, spd=2.0)`
+- chest hold: `pose(dir=back, grip=horiz|palmin, y=55, z=70) + hold(t=1.5)`
+- both-arms open: `pose(dir=out, grip=horiz|palmup, z=70, left_arm=mirror) + hold(t=1.5)`
+- EE circle: `pose(dir=front, grip=vert, z=60, elbow=T) + path(ee, arc, plane=xz, r=0.12, sweep=360, rep=2, spd=1.5)`
+- scoop + pause: `pose(dir=out, grip=horiz|palmup, z=55, left_arm=mirror) + path(ee, arc, plane=yz, r=0.20, sweep=-90, spd=0.8) + hold(t=1.2)`
+
+[move — joint-space beats]
+1. Joints / axes:
+- **shoulder** | **elbow** | **wrist**: axes `x`, `y`, `z` (depth / lateral / height).
+- **head**: `pan` (left/right), `tilt` (up/down), degrees relative to current pose.
+- **torso**: `height` with categorical `low|mid|high`, or small cartesian proxies (`x` lean in meters).
+- Degrees: a scalar `−20` means one-way `[0, −20]`; `±15` or `[-15,15]` means ping-pong; `[20]` is a one-sided list.
+2. Speed (`spd`): 0.3 (slow) – 4.0 (sharp). Vary setup / core / settle.
+3. Hold (`hold` seconds): 0.15–1.5 so the viewer sees move → hold → move.
+4. Repetition (`rep`): identical repeats (nod 3×). Asymmetric rhythms → separate steps.
+
+[path — Cartesian]
+- EE line: `path(ee, line, axis=x|y|z, dist=±meters, spd=..., hold=..., rep=...)`
+- EE arc: `path(ee, arc, plane=xy|xz|yz, r=meters, sweep=degrees, spd=..., rep=...)`
+- Base line/arc: `path(base, line, x=..., y=...)` or `path(base, arc, r=..., deg=...)` (rare on humanoid)
+- Typical EE stroke: 0.03–0.25 m; arc radius 0.03–0.20 m; tiny rub arcs ≈0.01–0.03 m.
+
+Output exactly 4 # lines, then a Motion Code program, then a JSON object starting with {.
+
+Output JSON schema (strict):
+{
+  "cue": "{{CUE_NAME}}",
+  "description": "one sentence",
+  "source_code": "<Motion Code string with steps joined by +>",
+  "movements": [
+    {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": {
+        "pose": {
+          "torso_height": "low|mid|high",
+          "arm_position": "front|back|in|out|up|down|still",
+          "gripper_orientation": "horizontal|vertical|horizontal|palm*|vertical|palm*",
+          "head": "center|left|right|up|down",
+          "left_arm": "still|mirror",
+          "elbow_bended": <true|false optional>,
+          "x": <0..100 optional>,
+          "y": <0..100 optional>,
+          "z": <0..100 optional>
+        }
+      }
+    },
+    {
+      "type": "movement|path|hold",
+      "duration": <seconds optional>,
+      "parameters": { ... }
+    }
+  ]
+}
+
+Constraints:
+- Prefer starting with `pose` unless the cue is pure base locomotion.
+- Total steps: 2~8.
+- At least one `move`, `path`, or `hold` beat after the opening pose when the cue needs dynamics **or** a readable freeze.
+- Speed range: 0.3~4.0.
+- Be expressive; match the cue's emotion and rhythm.
+- Keep `source_code` consistent with `movements`.
+
+Cue catalog:
+{{CUE_CATALOG}}
+
+Few-shot examples:
+{{FEW_SHOT_EXAMPLES}}
+
+Target cue:
+{{CUE_NAME}}
+Description: {{DESCRIPTION}}

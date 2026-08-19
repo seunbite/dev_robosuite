@@ -1,0 +1,77 @@
+[
+  {
+    "idx": 23,
+    "cue": "lean_forward_interest",
+    "description": "The robot first recoils slightly in an anticipation beat, then leans deliberately forward and upward to express engagement, and ends with a subtle head-like tilt to signify sustained focus.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -15
+              },
+              "speed": 1.8,
+              "hold_time": 0.05
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 75,
+            "y": 50,
+            "z": 68,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "y": 10
+              },
+              "speed": 1.2,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-08T08:45:49",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q1: No, the rendered motion is too small and subtle, failing to clearly express \"interest\" and instead looking like a minor, generic forward shift.",
+    "correction_q2": "Correction Q2: The entire sequence should be recomposed to create a more pronounced and deliberate lean by significantly increasing the forward (x) and upward (z) travel to an \"eye-level\" pose, slowing the main lean-in motion for intentionality, and adding a more distinct final head-like tilt with a longer hold to signify sustained focus.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: No, the rendered motion is too small and subtle, failing to clearly express \"interest\" and instead looking like a minor, generic forward shift.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The entire sequence should be recomposed to create a more pronounced and deliberate lean by significantly increasing the forward (x) and upward (z) travel to an \"eye-level\" pose, slowing the main lean-in motion for intentionality, and adding a more distinct final head-like tilt with a longer hold to signify sustained focus.\n\n# Q1: How would a human perform this motion? (One sentence)\n# A human would first pull back slightly in an anticipation beat, then lean their upper body and head forward and slightly upward towards the point of interest, holding the position to show focus.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\n# Q2: candidates=P1) front+horizontal+x75,y50,z68, P2) down+vertical+x70,y50,z55; winner=P1 because its forward direction and higher, eye-level z-coordinate better represent leaning in to see or listen with engagement, whereas P2 suggests looking down at something.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n# Q3: options=M1 pose(start)>movement(recoil)>pose(lean)>movement(focus), M2 pose(start)>path(arc); winner=M1 because breaking the action into distinct beats for anticipation (recoil), the main lean, and the final focus makes the internal state of \"interest\" much more expressive and readable than a single smooth motion.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n# Q4: options=C1 a quick recoil before leaning forward, C2 a final head-like tilt and hold; winner=C1 because the preparatory recoil creates anticipation and makes the subsequent forward lean feel like a deliberate reaction to a stimulus, which is the essence of showing interest."
+  }
+]

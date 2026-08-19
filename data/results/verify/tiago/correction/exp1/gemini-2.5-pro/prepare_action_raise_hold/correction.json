@@ -1,0 +1,229 @@
+{
+  "time": "2026-07-05T22:58:45",
+  "domain": "tiago",
+  "exp_id": "1",
+  "model_tag": "gemini-2.5-pro",
+  "round": 1,
+  "parent_round": 0,
+  "correction_stem": "correction",
+  "cue": "prepare_action_raise_hold",
+  "base_config_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/result_exp1_gemini-2.5-pro.json",
+  "config_snapshot_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/correction/gemini-2.5-pro/exp1/prepare_action_raise_hold/correction_config.json",
+  "is_correct": null,
+  "action": "corrected",
+  "correction": {
+    "exp_id": "1",
+    "correction_q1": "Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".",
+    "correction_q2": "Q1: How would a human perform this motion? (One sentence)",
+    "is_correct": null,
+    "inner_reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Q1: How would a human perform this motion? (One sentence)\nA human would take a slight \"intake of breath\" posture, raising their chest and lifting one or both hands slightly into a ready position, then holding steady.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n- **Candidate 1:** Start pose: `torso_height: \"low\"`, `arm_position: \"still\"`. The robot is in a settled, neutral state before the preparatory motion begins, allowing for a more noticeable \"raise\".\n- **Candidate 2:** Start pose: `torso_height: \"mid\"`, `arm_position: \"still\"`. This is a more standard neutral pose, but provides less dynamic range for the \"raise\" part of the cue.\n- **Winner:** Candidate 1. Starting from a lower torso height makes the subsequent \"raise\" motion more deliberate and expressive, reinforcing the idea of preparing or gathering energy.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n- **M1:** `pose` (start) -> `movement` (combined torso and arm lift) with `hold_time`. This structure packages the entire \"raise and hold\" action into a single, coordinated, and expressive beat.\n- **M2:** `pose` (start) -> `movement` (torso lift) -> `path` (arm lift). This separates the body and arm movements, making the action feel disjointed and less like a single, unified preparatory \"inhale\".\n- **Winner:** M1. A single, coordinated movement is crucial for conveying a unified sense of preparation. Combining the torso and arm lift into one step creates a much stronger and more readable gesture.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n- **Choice 1:** A slow, smooth lift (`speed: 1.0`) followed by a long hold. This would feel deliberate but might lack the energy and sense of anticipation required for a \"prepare\" cue.\n- **Choice 2:** A crisp, faster lift (`speed: 2.2`) followed by a firm hold (`hold_time: 1.5`). The sharper speed communicates anticipatory tension, like a quick intake of breath, and the long hold clearly establishes the \"ready\" state.\n- **Winner:** Choice 2. The faster speed is essential for conveying the \"preparatory\" nature of the action, making it feel like a transition into another action rather than a gesture in itself.",
+    "config_parsed": {
+      "cue": "prepare_action_raise_hold",
+      "description": "The robot raises its torso and one hand in a crisp, preparatory motion, then holds, signaling readiness to act.",
+      "movements": [
+        {
+          "type": "pose",
+          "duration": 0.4,
+          "parameters": {
+            "pose": {
+              "torso_height": "low",
+              "arm_position": "still",
+              "gripper_orientation": "vertical",
+              "head": "center"
+            }
+          }
+        },
+        {
+          "type": "movement",
+          "duration": 2.0,
+          "parameters": {
+            "movement": {
+              "joints": [
+                {
+                  "joint": "torso",
+                  "axis": "height",
+                  "degrees": [
+                    0.05,
+                    0.18
+                  ]
+                },
+                {
+                  "joint": "shoulder",
+                  "axis": "y",
+                  "degrees": [
+                    0,
+                    -35
+                  ]
+                },
+                {
+                  "joint": "elbow",
+                  "axis": "y",
+                  "degrees": [
+                    0,
+                    -60
+                  ]
+                }
+              ],
+              "repetition": 1,
+              "speed": 2.2,
+              "hold_time": 1.5
+            }
+          }
+        }
+      ]
+    },
+    "parse_error": null,
+    "raw_text": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Q1: How would a human perform this motion? (One sentence)\nA human would take a slight \"intake of breath\" posture, raising their chest and lifting one or both hands slightly into a ready position, then holding steady.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n- **Candidate 1:** Start pose: `torso_height: \"low\"`, `arm_position: \"still\"`. The robot is in a settled, neutral state before the preparatory motion begins, allowing for a more noticeable \"raise\".\n- **Candidate 2:** Start pose: `torso_height: \"mid\"`, `arm_position: \"still\"`. This is a more standard neutral pose, but provides less dynamic range for the \"raise\" part of the cue.\n- **Winner:** Candidate 1. Starting from a lower torso height makes the subsequent \"raise\" motion more deliberate and expressive, reinforcing the idea of preparing or gathering energy.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n- **M1:** `pose` (start) -> `movement` (combined torso and arm lift) with `hold_time`. This structure packages the entire \"raise and hold\" action into a single, coordinated, and expressive beat.\n- **M2:** `pose` (start) -> `movement` (torso lift) -> `path` (arm lift). This separates the body and arm movements, making the action feel disjointed and less like a single, unified preparatory \"inhale\".\n- **Winner:** M1. A single, coordinated movement is crucial for conveying a unified sense of preparation. Combining the torso and arm lift into one step creates a much stronger and more readable gesture.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n- **Choice 1:** A slow, smooth lift (`speed: 1.0`) followed by a long hold. This would feel deliberate but might lack the energy and sense of anticipation required for a \"prepare\" cue.\n- **Choice 2:** A crisp, faster lift (`speed: 2.2`) followed by a firm hold (`hold_time: 1.5`). The sharper speed communicates anticipatory tension, like a quick intake of breath, and the long hold clearly establishes the \"ready\" state.\n- **Winner:** Choice 2. The faster speed is essential for conveying the \"preparatory\" nature of the action, making it feel like a transition into another action rather than a gesture in itself.\n{\n  \"cue\": \"prepare_action_raise_hold\",\n  \"description\": \"The robot raises its torso and one hand in a crisp, preparatory motion, then holds, signaling readiness to act.\",\n  \"movements\": [\n    {\n      \"type\": \"pose\",\n      \"duration\": 0.4,\n      \"parameters\": {\n        \"pose\": {\n          \"torso_height\": \"low\",\n          \"arm_position\": \"still\",\n          \"gripper_orientation\": \"vertical\",\n          \"head\": \"center\"\n        }\n      }\n    },\n    {\n      \"type\": \"movement\",\n      \"duration\": 2.0,\n      \"parameters\": {\n        \"movement\": {\n          \"joints\": [\n            {\n              \"joint\": \"torso\",\n              \"axis\": \"height\",\n              \"degrees\": [\n                0.05,\n                0.18\n              ]\n            },\n            {\n              \"joint\": \"shoulder\",\n              \"axis\": \"y\",\n              \"degrees\": [\n                0,\n                -35\n              ]\n            },\n            {\n              \"joint\": \"elbow\",\n              \"axis\": \"y\",\n              \"degrees\": [\n                0,\n                -60\n              ]\n            }\n          ],\n          \"repetition\": 1,\n          \"speed\": 2.2,\n          \"hold_time\": 1.5\n        }\n      }\n    }\n  ]\n}",
+    "prompt_exp_id": "0",
+    "pipeline_exp_id": "1",
+    "vlm_media": {
+      "kind": "video/mp4",
+      "path": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/prepare_action_raise_hold/new_render/mm19_g95_prepare_action_raise_hold.mp4"
+    }
+  },
+  "input_row": {
+    "idx": 95,
+    "cue": "prepare_action_raise_hold",
+    "description": "The robot raises its torso and hand slightly in a preparatory hold, signaling readiness to act.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.4,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "still",
+            "gripper_orientation": "vertical",
+            "head": "center"
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 1.0,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "torso",
+                "axis": "height",
+                "degrees": [
+                  0.18,
+                  0.34
+                ]
+              },
+              {
+                "joint": "shoulder",
+                "axis": "pitch",
+                "degrees": [
+                  0,
+                  -25
+                ]
+              },
+              {
+                "joint": "elbow",
+                "axis": "pitch",
+                "degrees": [
+                  0,
+                  -40
+                ]
+              }
+            ],
+            "repetition": 1,
+            "speed": 1.2
+          }
+        }
+      },
+      {
+        "type": "pose",
+        "duration": 1.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "high",
+            "arm_position": "front",
+            "gripper_orientation": "horizontal",
+            "head": "center",
+            "elbow_bended": true,
+            "z": 65
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "gemini-2.5-pro",
+    "time": "2026-06-15 02:25:22",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "reasoning": "# Q1: A human would slightly raise their torso and a hand while looking forward expectantly, like taking a preparatory breath before acting.\n# Q2: Pose 1: `torso_height: mid`, `arm_position: still` (neutral waiting). Pose 2: `torso_height: high`, `arm_position: front`, `elbow_bended: true` (active ready). Winner is Pose 2 because the elevated and forward posture is more expressive of \"preparation\" and imminent action.\n# Q3: Structure 1: `pose` (start) > `movement` (raise torso & arm) > `pose` (hold). Structure 2: `pose` (snap to ready) > `pose` (hold). Winner is Structure 1 because the dynamic transition of raising the body is the core of the \"prepare\" gesture, not just being in the final state.\n# Q4: Surrounding action 1: Hold the final pose for a sustained period. Surrounding action 2: Add a small head nod after reaching the pose. The best option is the sustained hold, as it creates a clear moment of anticipation without adding the potentially confusing meaning of a \"yes\" nod."
+  },
+  "output_row": {
+    "idx": 95,
+    "cue": "prepare_action_raise_hold",
+    "description": "The robot raises its torso and one hand in a crisp, preparatory motion, then holds, signaling readiness to act.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.4,
+        "parameters": {
+          "pose": {
+            "torso_height": "low",
+            "arm_position": "still",
+            "gripper_orientation": "vertical",
+            "head": "center"
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 2.0,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "torso",
+                "axis": "height",
+                "degrees": [
+                  0.05,
+                  0.18
+                ]
+              },
+              {
+                "joint": "shoulder",
+                "axis": "y",
+                "degrees": [
+                  0,
+                  -35
+                ]
+              },
+              {
+                "joint": "elbow",
+                "axis": "y",
+                "degrees": [
+                  0,
+                  -60
+                ]
+              }
+            ],
+            "repetition": 1,
+            "speed": 2.2,
+            "hold_time": 1.5
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-05T22:58:37",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".",
+    "correction_q2": "Q1: How would a human perform this motion? (One sentence)",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Q1: How would a human perform this motion? (One sentence)\nA human would take a slight \"intake of breath\" posture, raising their chest and lifting one or both hands slightly into a ready position, then holding steady.\n# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (torso_height, arm_position, gripper_orientation, head, left_arm, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.\n- **Candidate 1:** Start pose: `torso_height: \"low\"`, `arm_position: \"still\"`. The robot is in a settled, neutral state before the preparatory motion begins, allowing for a more noticeable \"raise\".\n- **Candidate 2:** Start pose: `torso_height: \"mid\"`, `arm_position: \"still\"`. This is a more standard neutral pose, but provides less dynamic range for the \"raise\" part of the cue.\n- **Winner:** Candidate 1. Starting from a lower torso height makes the subsequent \"raise\" motion more deliberate and expressive, reinforcing the idea of preparing or gathering energy.\n# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > movement > pose vs M2: pose > path > path). State the winner and why—**prioritize movement/path beats that express the cue**, not pose-only tweaks.\n- **M1:** `pose` (start) -> `movement` (combined torso and arm lift) with `hold_time`. This structure packages the entire \"raise and hold\" action into a single, coordinated, and expressive beat.\n- **M2:** `pose` (start) -> `movement` (torso lift) -> `path` (arm lift). This separates the body and arm movements, making the action feel disjointed and less like a single, unified preparatory \"inhale\".\n- **Winner:** M1. A single, coordinated movement is crucial for conveying a unified sense of preparation. Combining the torso and arm lift into one step creates a much stronger and more readable gesture.\n# Q4: Context Reinforcement. Compare 2+ micro-timing choices (speed, repetition, hold_time, torso/head expression) that make the gesture read stronger and pick the best one.\n- **Choice 1:** A slow, smooth lift (`speed: 1.0`) followed by a long hold. This would feel deliberate but might lack the energy and sense of anticipation required for a \"prepare\" cue.\n- **Choice 2:** A crisp, faster lift (`speed: 2.2`) followed by a firm hold (`hold_time: 1.5`). The sharper speed communicates anticipatory tension, like a quick intake of breath, and the long hold clearly establishes the \"ready\" state.\n- **Winner:** Choice 2. The faster speed is essential for conveying the \"preparatory\" nature of the action, making it feel like a transition into another action rather than a gesture in itself."
+  },
+  "media": {
+    "gif": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/prepare_action_raise_hold/correction/mm19_g95_prepare_action_raise_hold.gif",
+    "mp4": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/prepare_action_raise_hold/correction/mm19_g95_prepare_action_raise_hold.mp4",
+    "pose_png": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/prepare_action_raise_hold/correction/mm19_g95_prepare_action_raise_hold_pose.png",
+    "cumulative_tile_gif": null
+  }
+}

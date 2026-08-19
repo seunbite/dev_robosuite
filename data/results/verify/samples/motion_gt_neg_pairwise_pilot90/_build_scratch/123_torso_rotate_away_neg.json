@@ -1,0 +1,51 @@
+[
+  {
+    "idx": 123,
+    "cue": "torso_rotate_away",
+    "description": "The robot shows a subtle backward recoil to signal intent, then turns its 'body' away in a smooth arc, and finishes with a slight sag to reinforce the disengagement.",
+    "groundtruth": "",
+    "gt_fixed_first_pose": {
+      "dir": "front",
+      "x": 55,
+      "y": 50,
+      "z": 50,
+      "gripper_orientation": "horizontal"
+    },
+    "start_pose_source": "generation",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "xy",
+          "radius": 0.04,
+          "sweep": 360.0,
+          "direction": "ccw",
+          "speed": 2.0,
+          "hold_time": 0.2
+        }
+      }
+    ],
+    "state": "pair_gt_neg_axis",
+    "generation_mode": "pair_gt_positive",
+    "neg_axis_meta": {
+      "true_plane": "xy",
+      "neg_plane": "xy",
+      "avoid_axis": "z"
+    }
+  }
+]

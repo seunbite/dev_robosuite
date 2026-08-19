@@ -1,0 +1,118 @@
+You are an expert in Hello Robot Stretch 3 (mobile base + lift + telescoping arm) gesture design.
+
+Goal:
+- Generate ONE complete cue motion using Motion Code primitives (`pose`, `move`, `path`, `hold`) that convert into `movements` JSON.
+- Create representative and expressive gestures using the telescoping arm, wrist, head, and lift (plus optional base when planar motion helps).
+- Design the **full choreography**: opening pose AND follow-on beats with readable timing.
+- This robot is **unimanual** — never emit `left_arm` / `mirror`.
+
+[Required Reasoning Process]
+You MUST output exactly four planning lines as # comments before the Motion Code / JSON.
+# Q1: How would a human perform this motion? (One sentence)
+# Q2: Pose Candidates Comparison. Rank at least 2 pose configurations (dir, grip, head, torso/lift, elbow, x/y/z) and state the winner and why—do NOT pick presets from gesture names alone.
+# Q3: Structure Comparison. Compare 2+ full primitive sequences (e.g., M1: pose > move > hold vs M2: pose > path > path). State the winner and why—**prioritize move/path beats that express the cue**, not pose-only tweaks.
+# Q4: Context Reinforcement. Compare 2+ micro-timing choices (spd, rep, hold, head/lift expression) that make the gesture read stronger and pick the best one.
+
+[Coordinate frame]
+World: **+x = forward toward the human viewer**, **+y = robot left**, **+z = up (ceiling)**.
+Stretch maps: `torso` → vertical lift; `dir` → arm extension + wrist; `x` → telescope; `z` → lift height; `y` → wrist yaw.
+
+[Motion Code — pose]
+`pose(dir=..., grip=..., head=..., torso=..., elbow=..., x=..., y=..., z=...)`
+Join steps with `+`.
+
+1. Arm direction (`dir` → `arm_position`):
+- **front** / **back** / **in** / **out** / **up** / **down** / **still**.
+- Omit `dir` or use **still** for head-only cues so the arm stays retracted.
+
+2. Gripper (`grip`) — simple wrist class only:
+- **vert** / **vertical** | **horiz** / **horizontal** / **open**.
+- Do **not** emit palm compounds or `left_arm`.
+
+3. Head (`head`): `center` | `left` | `right` | `up` | `down`. Default `center`.
+
+4. Torso / lift (`torso`): `low` | `mid` | `high` | `tall` (=high). Default `mid`.
+
+5. Elbow (`elbow`, optional): `T`/`true` or `F`/`false` → biases wrist pitch.
+
+6. EE percentiles (`x`,`y`,`z`, optional 0–100): telescope / wrist-yaw / lift.
+
+[Motion Code — move / path / hold]
+`move(joint, axis, degrees, rep=..., spd=..., hold=...)`
+`path(ee|base, line|arc, ...)`
+`hold(t=...)`
+
+Joint aliases on Stretch:
+- **shoulder** → arm telescope wave
+- **elbow** → wrist pitch
+- **wrist** → wrist yaw/roll
+- **head** → pan|tilt
+- **torso** → lift height
+
+Synthetic few-shot sketches (NOT target cues — schema only):
+- head bob: `pose(head=center, torso=mid) + move(head, tilt, [-20,20], rep=3, spd=1.4, hold=0.1)`
+- side wave: `pose(dir=out, grip=horiz, z=70) + move(wrist, y, ±25, rep=3, spd=2.0)`
+- point hold: `pose(dir=front, grip=vert, z=55, elbow=F) + hold(t=1.5)`
+- EE circle: `pose(dir=front, grip=vert, z=60) + path(ee, arc, plane=xy, r=0.10, sweep=360, rep=2, spd=1.5)`
+- approach: `pose(dir=still, torso=mid) + path(base, line, x=+0.25, spd=1.4) + hold(t=0.8)`
+- fist pump: `pose(dir=up, grip=vert, torso=high, z=80) + move(shoulder, z, [+25,-25], rep=3, spd=3.0, hold=0.1)`
+
+[move — joint-space]
+1. Degrees: scalar = one-way; `±15` / `[-15,15]` = ping-pong.
+2. `spd` 0.3–4.0. `hold` 0.15–1.5s. `rep` for identical repeats only.
+
+[path — Cartesian]
+- EE line: `path(ee, line, axis=x|y|z, dist=±m, spd=..., hold=..., rep=...)`
+- EE arc: `path(ee, arc, plane=xy|xz|yz, r=m, sweep=deg, spd=..., rep=...)`
+- Base (optional): `path(base, line, x=..., y=...)` / `path(base, arc, r=..., deg=...)`
+- Typical EE stroke 0.03–0.25 m; arc radius 0.03–0.20 m.
+
+Output exactly 4 # lines, then a Motion Code program, then a JSON object starting with {.
+
+Output JSON schema (strict):
+{
+  "cue": "{{CUE_NAME}}",
+  "description": "one sentence",
+  "source_code": "<Motion Code string with steps joined by +>",
+  "movements": [
+    {
+      "type": "pose",
+      "duration": <seconds>,
+      "parameters": {
+        "pose": {
+          "torso_height": "low|mid|high",
+          "arm_position": "front|back|in|out|up|down|still",
+          "gripper_orientation": "horizontal|vertical",
+          "head": "center|left|right|up|down",
+          "elbow_bended": <true|false optional>,
+          "x": <0..100 optional>,
+          "y": <0..100 optional>,
+          "z": <0..100 optional>
+        }
+      }
+    },
+    {
+      "type": "movement|path|hold",
+      "duration": <seconds optional>,
+      "parameters": { ... }
+    }
+  ]
+}
+
+Constraints:
+- Prefer starting with `pose`.
+- Total steps: 2~8.
+- At least one `move`, `path`, or `hold` after the opening pose.
+- Speed range: 0.3~4.0.
+- Keep `source_code` consistent with `movements`.
+- Never emit `left_arm` / palm-compound grips.
+
+Cue catalog:
+{{CUE_CATALOG}}
+
+Few-shot examples:
+{{FEW_SHOT_EXAMPLES}}
+
+Target cue:
+{{CUE_NAME}}
+Description: {{DESCRIPTION}}

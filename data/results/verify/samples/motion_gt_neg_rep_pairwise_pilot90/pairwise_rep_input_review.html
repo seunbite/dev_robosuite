@@ -1,0 +1,2956 @@
+<!doctype html>
+<html><head><meta charset="utf-8"/>
+<title>Exp11 repetition pairwise — pilot-90 preview</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:1200px;margin:20px auto;padding:0 16px 48px;background:#fafafa}
+h1{font-size:22px} h2{font-size:19px;margin-top:40px;padding-bottom:6px;border-bottom:2px solid #ccc}
+h3{font-size:16px;margin:24px 0 8px}
+.summary{background:#fff;border:1px solid #ccc;border-radius:10px;padding:14px;margin:16px 0}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.stat{flex:1;min-width:140px;border-radius:10px;padding:12px 14px;font-size:14px}
+.stat b{display:block;font-size:22px;margin-bottom:4px}
+.stat-ok{background:#e8f5e9;border:1px solid #81c784}
+.stat-miss{background:#ffebee;border:1px solid #e57373}
+.stat-all{background:#e3f2fd;border:1px solid #64b5f6}
+.topnav{margin:16px 0;font-size:14px}
+.topnav a{margin-right:14px;font-weight:600}
+.group-ok h2{color:#2e7d32;border-color:#81c784}
+.group-miss h2{color:#c62828;border-color:#e57373}
+.group-pending h2{color:#666;border-color:#bbb}
+.cue-card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:14px 16px 18px;margin:18px 0}
+.group-ok .cue-card{border-left:4px solid #43a047}
+.group-miss .cue-card{border-left:4px solid #e53935}
+.answer{background:#e8f5e9;border:1px solid #81c784;border-radius:8px;padding:8px 12px;font-weight:600;margin:8px 0}
+.vlm-out{border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px}
+.vlm-ok{background:#e8f5e9;border:1px solid #81c784}
+.vlm-miss{background:#ffebee;border:1px solid #e57373}
+.vlm-pending{background:#fff8e1;border:1px solid #ffb74d}
+.vlm-missing{background:#f5f5f5;border:1px dashed #bbb;color:#666}
+.vlm-verdict{margin:0 0 6px}
+.vlm-assess{margin:0;color:#333;line-height:1.45}
+.badge{font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.media{width:100%;border:1px solid #ccc;border-radius:8px;background:#000;min-height:160px}
+.missing{background:#eee;color:#666;padding:40px;text-align:center;font-size:13px}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0}
+th,td{border:1px solid #ddd;padding:6px 8px;text-align:left;vertical-align:top}
+pre{background:#f0f0f2;padding:12px;border-radius:8px;font-size:11px;white-space:pre-wrap;max-height:360px;overflow:auto}
+.jump a{margin-right:8px;font-size:12px}
+.dim{color:#888}
+</style></head><body>
+<h1>Exp11 — Movement pairwise (repetition flip)</h1>
+<div class="summary">
+  <p>n=76 specs · GT rep=16 · GT non=60 · skipped=14 (of pilot-90)</p>
+  <p><b>Layout:</b> one stitched left|right plain MP4 per cue (no <code>alpha_frame_trajectory</code> overlay).</p>
+  <p><b>Neg rule:</b> human GT <code>rep</code> → single cycle (repetition=1); human GT <code>non</code> with lone <code>+</code>/<code>−</code> axis → <code>+-</code> oscillation ×3; other <code>non</code> → same direction ×3.</p>
+  <p>Prompt: <code>data/seed/prompt/manipulator/exp/prompt_exp11.txt</code> · Specs: <code>pairwise_specs_rep_pilot90.json</code></p>
+  <p><b>VLM:</b> gemini-2.5-pro · scored 37 cues · accuracy <b>45.9%</b></p>
+  <div class="stats">
+    <div class="stat stat-ok"><b>17</b>correct</div>
+    <div class="stat stat-miss"><b>20</b>wrong</div>
+    <div class="stat stat-all"><b>39</b>not scored</div>
+  </div>
+  <nav class="topnav">
+    <a href="#group-correct">✓ Correct (17)</a>
+    <a href="#group-wrong">✗ Wrong (20)</a>
+    <a href="#group-unscored">— Unscored (39)</a>
+  </nav>
+</div>
+<section class="group group-ok" id="group-correct">
+  <h2>✓ Correct — VLM picked GT side (17/37)</h2>
+  <nav class="jump"><b>Jump:</b> <a href="#c9">9</a> <a href="#c10">10</a> <a href="#c14">14</a> <a href="#c20">20</a> <a href="#c21">21</a> <a href="#c23">23</a> <a href="#c24">24</a> <a href="#c28">28</a> <a href="#c36">36</a> <a href="#c37">37</a> <a href="#c39">39</a> <a href="#c41">41</a> <a href="#c44">44</a> <a href="#c59">59</a> <a href="#c61">61</a> <a href="#c64">64</a> <a href="#c66">66</a></nav>
+  
+<section id="c9" class="cue-card">
+  <h3>9. flex_bicep</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is much more appropriate. It clearly articulates at the &#x27;elbow&#x27; joint, bringing the &#x27;forearm&#x27; up towards the &#x27;upper arm&#x27;, which is the iconic motion of flexing a bicep. The right side simply lifts the entire arm from the &#x27;shoulder&#x27; without the characteristic elbow bend, which does not convey the cue.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+&#x27;} joint=shoulder</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(left,horizontal) → movement shoulder (z+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(left,horizontal) → movement shoulder (z+22,z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="009_flex_bicep_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: flex_bicep
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c10" class="cue-card">
+  <h3>10. shrug_idk</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side shows a single, smooth upward and downward motion of the shoulder joint, which is a very clear and direct representation of a shrug. The right side performs a double-pump or jittery motion, which is less natural and not as iconic for the &#x27;I don&#x27;t know&#x27; gesture. The simplicity and clear vertical trajectory of the left side make it a much better match for the cue.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=shoulder</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(up,vertical) → movement shoulder (z-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(up,vertical) → movement shoulder (z-22,z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="010_shrug_idk_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: shrug_idk
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c14" class="cue-card">
+  <h3>14. point_you</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = None</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is better because it includes a distinct hold at the peak of the forward motion. This pause is crucial for a pointing gesture to be clearly understood, as it allows the viewer to register that they are the target. The right side performs a quicker &#x27;jab&#x27; forward and immediately retracts, which feels less deliberate and less communicative.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,vertical) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,vertical) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="014_point_you_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: point_you
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c20" class="cue-card">
+  <h3>20. rub_eye_tired</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is more appropriate. The cue &#x27;rub_eye_tired&#x27; implies a small, repetitive, back-and-forth motion localized to the area of an eye. The left motion has a smaller horizontal trajectory that accurately represents this localized rubbing action. The right side&#x27;s motion is a much wider horizontal sweep, which is too large and broad to be interpreted as rubbing a small area like an eye; it looks more like wiping a forehead or waving.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(left,vertical) → movement shoulder (y+15,y-15,y+15,y-15)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(left,vertical) → movement shoulder (y+22,y-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="020_rub_eye_tired_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: rub_eye_tired
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c21" class="cue-card">
+  <h3>21. tap_temple_think</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is much more appropriate. Its motion is a repeated horizontal poke directed towards where the temple would be, which clearly mimics the action of tapping one&#x27;s temple to indicate thinking. The right side&#x27;s motion is a vertical up-and-down movement in the same general area, which does not read as a &#x27;tap&#x27; at all and fails to convey the meaning of the cue.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(left,horizontal) → movement shoulder (y+15,y-15,y+15,y-15)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(left,horizontal) → movement shoulder (y+22,y-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="021_tap_temple_think_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: tap_temple_think
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c23" class="cue-card">
+  <h3>23. lean_forward_interest</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is more appropriate. The combination of forward and downward movement (a diagonal lean) much more accurately captures the physical act of a person leaning forward to show interest. The purely horizontal forward motion on the right side looks too robotic and lacks the natural downward arc of a lean, making it less expressive.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="023_lean_forward_interest_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: lean_forward_interest
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c24" class="cue-card">
+  <h3>24. cover_mouth_gasp</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=0.90</p>
+  <p class="vlm-assess">The left motion is more appropriate because its trajectory includes a significant horizontal component, moving the end-effector both up and across the body towards the centerline. This better mimics the human action of bringing a hand to cover the mouth in a gasp. The right side&#x27;s motion is too vertical and lacks this crucial &#x27;covering&#x27; aspect, reading more like a simple &#x27;raise hand&#x27; gesture.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(up,horizontal) → movement shoulder (x-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(up,horizontal) → movement shoulder (x-22,x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="024_cover_mouth_gasp_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: cover_mouth_gasp
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c28" class="cue-card">
+  <h3>28. fistbump_invite</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>RIGHT</b> · GT=RIGHT · <span class="badge">✓ GT match</span> · conf=0.90</p>
+  <p class="vlm-assess">The RIGHT side is better because the motion is a direct, straight-forward extension. This trajectory is more iconic and less ambiguous for inviting a fist bump. The LEFT side includes a sideways component in its movement, making it seem more like the robot is reaching for an object to its side rather than presenting its fist to someone directly in front of it.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,horizontal) → movement shoulder (x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="028_fistbump_invite_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: fistbump_invite
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c36" class="cue-card">
+  <h3>36. visor_search</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is significantly better because it includes a distinct side-to-side scanning motion after the arm is raised. This horizontal sweep is crucial for conveying the &#x27;search&#x27; part of the cue. The right side&#x27;s motion is much more static, consisting of only a very slight turn, which fails to clearly communicate the act of searching.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(left,vertical) → movement shoulder (y+15,y-15,y+15,y-15)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(left,vertical) → movement shoulder (y+22,y-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="036_visor_search_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: visor_search
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c37" class="cue-card">
+  <h3>37. yield_turn</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = None</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left motion is much more appropriate for &#x27;yield_turn&#x27;. This gesture involves offering the conversational floor to another person, which is typically represented by an open, outward motion away from the speaker&#x27;s body. The left side&#x27;s trajectory moves the arm forward and outwards, correctly conveying this offering or presenting action. The right side&#x27;s motion moves the arm forward but inwards across the robot&#x27;s centerline, which reads as a self-referential or closed-off gesture, the opposite of yielding.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (x-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (x-22,x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="037_yield_turn_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: yield_turn
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c39" class="cue-card">
+  <h3>39. request_turn</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=0.50</p>
+  <p class="vlm-assess">Both motions are nearly identical and show an appropriate beckoning gesture for &#x27;request turn&#x27;. However, the trajectory on the left appears to be a slightly cleaner and more direct arc. This simplicity makes the gesture marginally clearer and more iconic. The motion on the right, while very similar, seems to have a slightly less direct path, which adds no communicative value and makes it fractionally less distinct.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(up,horizontal) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(up,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="039_request_turn_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: request_turn
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c41" class="cue-card">
+  <h3>41. protective_arm_out</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side&#x27;s motion is more appropriate. It moves the arm forward and outward in a horizontal plane, which directly represents the action of putting an arm &#x27;out&#x27; to create a protective barrier. The right side&#x27;s motion is too vertical; it moves the arm mostly upwards, which does not convey the sense of creating a shield in front as effectively.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(up,horizontal) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(up,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="041_protective_arm_out_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: protective_arm_out
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c44" class="cue-card">
+  <h3>44. clarification_request_palm_tilt</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=0.90</p>
+  <p class="vlm-assess">The left side is significantly better because it isolates the motion to a distinct tilt or rotation of the end effector, which perfectly matches the &#x27;palm_tilt&#x27; cue for requesting clarification (like a &#x27;what?&#x27; or &#x27;huh?&#x27; gesture). The right side moves the entire arm in a small shuffling motion from the shoulder, which does not read as a tilt and is a less specific or recognizable gesture for this cue.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;, &#x27;y&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (x+22,y+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (x+22,x-22,y+22,y-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="044_clarification_request_palm_tilt_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: clarification_request_palm_tilt
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c59" class="cue-card">
+  <h3>59. nod_yes</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is more appropriate because it performs a repeated nodding motion. A &#x27;yes&#x27; nod is typically a repetitive gesture, and the multiple up-and-down movements on the left make the cue much clearer and more recognizable than the single, larger nod on the right.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (z+15,z-15,z+15,z-15)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (z+22,z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="059_nod_yes_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: nod_yes
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c61" class="cue-card">
+  <h3>61. air_quotes</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=0.80</p>
+  <p class="vlm-assess">Both sides correctly use a small, repetitive yaw rotation of the end-effector to simulate the finger-flexing motion of air quotes. However, the motion on the left has a slightly larger amplitude. This makes the individual &quot;quotes&quot; more distinct and deliberate, which better matches the typical human execution of the gesture. The motion on the right is a bit smaller and faster, which can read as more of a general, less defined wiggle.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (z+15,z-15,z+15,z-15)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (z+22,z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="061_air_quotes_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: air_quotes
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c64" class="cue-card">
+  <h3>64. tilt_head_curious</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is significantly more appropriate because it performs a true tilting motion (a roll) of the end-effector, which is exactly what a &#x27;head tilt&#x27; is. This motion directly conveys curiosity or questioning. The right side performs a turning motion (a yaw), which looks like the robot is looking to the side, not tilting its head.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (z-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (z-22,z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="064_tilt_head_curious_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: tilt_head_curious
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c66" class="cue-card">
+  <h3>66. shh_gesture</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-ok">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=LEFT · <span class="badge">✓ GT match</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is more appropriate. The &#x27;shh&#x27; gesture involves bringing a vertical index finger to the lips. The left motion&#x27;s trajectory and final hold position are centrally located where a mouth would be, making the gesture clear and recognizable. The right side&#x27;s final position is slightly off-center, which weakens the iconic connection to the mouth and makes the gesture less specific.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(up,vertical) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(up,vertical) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="066_shh_gesture_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: shh_gesture
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+</section><section class="group group-miss" id="group-wrong">
+  <h2>✗ Wrong — VLM missed GT side (20/37)</h2>
+  <nav class="jump"><b>Jump:</b> <a href="#c7">7</a> <a href="#c8">8</a> <a href="#c11">11</a> <a href="#c12">12</a> <a href="#c15">15</a> <a href="#c16">16</a> <a href="#c17">17</a> <a href="#c18">18</a> <a href="#c19">19</a> <a href="#c25">25</a> <a href="#c26">26</a> <a href="#c27">27</a> <a href="#c30">30</a> <a href="#c33">33</a> <a href="#c34">34</a> <a href="#c35">35</a> <a href="#c45">45</a> <a href="#c50">50</a> <a href="#c60">60</a> <a href="#c74">74</a></nav>
+  
+<section id="c7" class="cue-card">
+  <h3>7. raise_fists_victory</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is more appropriate because it performs a single, direct, upward thrust, which is the iconic motion for raising a fist in victory. The right side&#x27;s motion has a slight up-and-down oscillation, which makes it look more like a pumping action and less like a decisive, triumphant gesture.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,vertical) → movement shoulder (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,vertical) → movement shoulder (z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="007_raise_fists_victory_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: raise_fists_victory
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c8" class="cue-card">
+  <h3>8. fist_pump</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is more appropriate. A fist pump is an iconic gesture characterized by a strong, vertical movement, typically pulling the fist down or pushing it up. The motion on the left is a clean, vertical pump. The motion on the right has a significant forward-and-backward component, creating an arc that is less recognizable as the intended gesture.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,horizontal) → movement shoulder (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,horizontal) → movement shoulder (z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="008_fist_pump_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: fist_pump
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c11" class="cue-card">
+  <h3>11. self_scratch_head_confused</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=0.90</p>
+  <p class="vlm-assess">The left side is more appropriate because the scratching motion has a larger vertical amplitude. This larger, more deliberate movement makes the action of &#x27;scratching the head&#x27; clearer and more recognizable as a sign of confusion or contemplation. The motion on the right is too small and subtle, appearing more like a slight jitter than an intentional scratch.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+-&#x27;} joint=wrist</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(left,vertical) → movement wrist (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(left,vertical) → movement wrist (z+15,z-15,z+15,z-15)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="011_self_scratch_head_confused_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: self_scratch_head_confused
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c12" class="cue-card">
+  <h3>12. facepalm</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is more appropriate because its trajectory is a clear forward-and-upward motion, bringing the &#x27;hand&#x27; directly to where a face would be. This accurately conveys the &#x27;palm to face&#x27; action. The right side&#x27;s motion is too vertical; it looks more like the robot is just raising its hand rather than performing the specific facepalm gesture.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,horizontal) → movement shoulder (x-22,x+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,horizontal) → movement shoulder (x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="012_facepalm_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: facepalm
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c15" class="cue-card">
+  <h3>15. beckon_come_here</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=0.90</p>
+  <p class="vlm-assess">The left side is more appropriate. It performs a simple, direct horizontal pulling motion towards the robot&#x27;s body. This is a very clear and universally understood representation of the &#x27;come here&#x27; beckoning gesture. The right side&#x27;s motion is a diagonal pull, moving inwards and upwards. While this is also a valid human variation, the simpler, more direct trajectory on the left is more iconic and less ambiguous.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=wrist</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,horizontal) → movement wrist (z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,horizontal) → movement wrist (z-15,z+15,z-15,z+15)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="015_beckon_come_here_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: beckon_come_here
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c16" class="cue-card">
+  <h3>16. stop_palm_out</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>RIGHT</b> · GT=LEFT · <span class="badge">✗ picked RIGHT, GT=LEFT</span> · conf=0.90</p>
+  <p class="vlm-assess">The right side is more appropriate. The cue &quot;stop_palm_out&quot; is typically a direct, forward presentation of the palm, as if creating a barrier. The right side&#x27;s motion is a clean, horizontal thrust forward, which perfectly captures this meaning. In contrast, the left side&#x27;s motion has a noticeable downward component, which weakens the gesture and makes it less recognizable as a &#x27;stop&#x27; signal. The direct, assertive movement on the right is more iconic.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(up,horizontal) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(up,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="016_stop_palm_out_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: stop_palm_out
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c17" class="cue-card">
+  <h3>17. pat_stomach</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>RIGHT</b> · GT=LEFT · <span class="badge">✗ picked RIGHT, GT=LEFT</span> · conf=1.00</p>
+  <p class="vlm-assess">The right side is significantly better. It performs a repetitive, side-to-side arcing motion in front of the robot&#x27;s &#x27;torso&#x27;, which clearly mimics the gesture of patting or rubbing a stomach. The left side performs a single, large, vertical up-and-down motion, which does not resemble the cue at all.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=wrist</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(left,vertical) → movement wrist (x-15,x+15,x-15,x+15)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(left,vertical) → movement wrist (x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="017_pat_stomach_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: pat_stomach
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c18" class="cue-card">
+  <h3>18. fan_face_hot</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=0.95</p>
+  <p class="vlm-assess">The left side is significantly more appropriate because it repeats the fanning motion. The act of fanning oneself when hot is inherently a repetitive, back-and-forth action. The left side performs two clear cycles of this movement, making the gesture instantly recognizable. The right side performs only a single, larger back-and-forth motion, which is far less clear and could be mistaken for a simple wave or a push/pull action rather than fanning.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+-&#x27;} joint=wrist</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(left,horizontal) → movement wrist (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(left,horizontal) → movement wrist (z+15,z-15,z+15,z-15)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="018_fan_face_hot_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: fan_face_hot
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c19" class="cue-card">
+  <h3>19. cover_yawn_sleepy</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side&#x27;s motion is more appropriate for covering a yawn. It brings the end-effector across the body to a central position, which correctly mimics the action of bringing a hand to the mouth. The right side&#x27;s motion is a more generic upward and outward gesture that doesn&#x27;t land in a plausible &#x27;cover mouth&#x27; position.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,horizontal) → movement shoulder (x-22,x+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,horizontal) → movement shoulder (x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="019_cover_yawn_sleepy_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: cover_yawn_sleepy
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c25" class="cue-card">
+  <h3>25. cheers_toast</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=0.90</p>
+  <p class="vlm-assess">The left side better conveys a toast. It performs a single, clear, forward-and-upward motion, simulating the action of raising a glass to clink with another. The right side&#x27;s motion is similar but has a slight retraction or bounce at the end, which complicates the gesture and makes it less direct and recognizable as a simple toast.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,horizontal) → movement shoulder (x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="025_cheers_toast_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: cheers_toast
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c26" class="cue-card">
+  <h3>26. highfive_invite</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = None</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is more appropriate because its motion is both upward and forward, presenting the end-effector towards a partner in a clear invitation. This trajectory and the resulting pose are much more characteristic of a high-five gesture. The right side&#x27;s motion is a simple, stiff vertical lift, which lacks the crucial forward, inviting component.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,horizontal) → movement shoulder (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,horizontal) → movement shoulder (z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="026_highfive_invite_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: highfive_invite
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c27" class="cue-card">
+  <h3>27. highfive_imitation</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=0.75</p>
+  <p class="vlm-assess">Both motions are very similar, but the trajectory on the left is slightly better. It has a more pronounced upward arc, bringing the end-effector up and forward into the classic high-five position. The motion on the right is a bit more of a direct, linear push forward. The upward component on the left makes it a more recognizable and appropriate gesture for the cue.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,horizontal) → movement shoulder (x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="027_highfive_imitation_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: highfive_imitation
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c30" class="cue-card">
+  <h3>30. pat_self_back</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is significantly better because it includes the repetitive tapping motion essential to the act of &#x27;patting&#x27;. The right side only performs a single, smooth movement towards the back, which looks more like a &#x27;touch&#x27; than a &#x27;pat&#x27;. The repetition on the left clearly conveys the intended action.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(back,horizontal) → movement shoulder (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(back,horizontal) → movement shoulder (z+15,z-15,z+15,z-15)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="030_pat_self_back_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: pat_self_back
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c33" class="cue-card">
+  <h3>33. chin_flick_dismiss</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>RIGHT</b> · GT=LEFT · <span class="badge">✗ picked RIGHT, GT=LEFT</span> · conf=0.90</p>
+  <p class="vlm-assess">The right side is better because its trajectory is an arc that moves both upwards and forwards. The &#x27;chin flick&#x27; gesture is about flicking something away from the body, so this combined up-and-forward motion is crucial. The left side&#x27;s motion is almost purely vertical, resembling a simple shoulder lift or shrug, which doesn&#x27;t convey the dismissive &#x27;away&#x27; aspect of the cue as effectively.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(back,horizontal) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(back,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="033_chin_flick_dismiss_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: chin_flick_dismiss
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c34" class="cue-card">
+  <h3>34. cover_ears_too_loud</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>RIGHT</b> · GT=LEFT · <span class="badge">✗ picked RIGHT, GT=LEFT</span> · conf=0.90</p>
+  <p class="vlm-assess">The right side is more appropriate because the motion includes a subtle shake or vibration. While both motions move the end-effector to the correct position to represent covering an ear, the shaking on the right side better conveys a reaction to a stimulus that is &quot;too loud,&quot; suggesting a flinch or discomfort from the sound. The left side&#x27;s motion is too smooth and neutral to fully capture the meaning of the cue.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(left,vertical) → movement shoulder (y-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(left,vertical) → movement shoulder (y-22,y+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="034_cover_ears_too_loud_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: cover_ears_too_loud
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c35" class="cue-card">
+  <h3>35. salute</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=0.90</p>
+  <p class="vlm-assess">The left side better conveys a salute because it executes a complete, two-part motion: the arm moves up to a &#x27;salute&#x27; position and then crisply returns down. A salute is defined by both the raising of the hand and its return to the starting position. The right side&#x27;s motion is primarily just the upward movement, which only represents half of the recognizable gesture.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,horizontal) → movement shoulder (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,horizontal) → movement shoulder (z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="035_salute_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: salute
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c45" class="cue-card">
+  <h3>45. slow_down_request_palm_down</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = None</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is more appropriate because it executes a clear, vertical up-and-down &#x27;patting&#x27; motion. This trajectory is iconic for the &#x27;slow down&#x27; or &#x27;calm down&#x27; gesture. The right side&#x27;s motion has a significant forward-and-back component in addition to the vertical movement, which makes the gesture less clear and less recognizable as a simple patting action.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,horizontal) → movement shoulder (z-22,z+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,horizontal) → movement shoulder (z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="045_slow_down_request_palm_down_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: slow_down_request_palm_down
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c50" class="cue-card">
+  <h3>50. firm_accept_forward_reach</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>RIGHT</b> · GT=LEFT · <span class="badge">✗ picked RIGHT, GT=LEFT</span> · conf=0.80</p>
+  <p class="vlm-assess">Both motions depict a forward reach. However, the right side&#x27;s motion comes to a more abrupt and decisive stop at the end of the trajectory. This quality of movement better conveys the &quot;firm&quot; aspect of the cue, whereas the left side&#x27;s motion is smoother and decelerates more gently, which reads as a less emphatic action.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="050_firm_accept_forward_reach_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: firm_accept_forward_reach
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c60" class="cue-card">
+  <h3>60. shake_head_no</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=1.00</p>
+  <p class="vlm-assess">The left side is significantly better because it performs a clean, horizontal side-to-side motion, which is the canonical movement for shaking a head &#x27;no&#x27;. The right side&#x27;s motion includes a significant vertical component, resulting in a looping or bobbing trajectory that is not characteristic of the gesture and is less clear in its intent.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,horizontal) → movement shoulder (y+22,y-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,horizontal) → movement shoulder (y+15,y-15,y+15,y-15)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="060_shake_head_no_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: shake_head_no
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c74" class="cue-card">
+  <h3>74. hands_up_surrender</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-miss">
+  <p class="vlm-verdict"><b>VLM (Gemini)</b> · chose <b>LEFT</b> · GT=RIGHT · <span class="badge">✗ picked LEFT, GT=RIGHT</span> · conf=0.90</p>
+  <p class="vlm-assess">The left side is more appropriate. The motion not only raises the arm but also moves it outwards, resulting in a wider, more open final pose. This wider stance is more characteristic of a surrender gesture, conveying vulnerability and openness more effectively than the more compact, purely vertical motion on the right.</p>
+  
+</div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,horizontal) → movement shoulder (x-22,x+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,horizontal) → movement shoulder (x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="074_hands_up_surrender_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: hands_up_surrender
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+</section><section class="group group-pending" id="group-unscored">
+  <h2>— Not scored yet (39)</h2>
+  <nav class="jump"><b>Jump:</b> <a href="#c47">47</a> <a href="#c49">49</a> <a href="#c51">51</a> <a href="#c52">52</a> <a href="#c53">53</a> <a href="#c54">54</a> <a href="#c55">55</a> <a href="#c56">56</a> <a href="#c57">57</a> <a href="#c58">58</a> <a href="#c62">62</a> <a href="#c65">65</a> <a href="#c67">67</a> <a href="#c69">69</a> <a href="#c72">72</a> <a href="#c75">75</a> <a href="#c76">76</a> <a href="#c78">78</a> <a href="#c82">82</a> <a href="#c84">84</a> <a href="#c86">86</a> <a href="#c90">90</a> <a href="#c94">94</a> <a href="#c95">95</a> <a href="#c97">97</a> <a href="#c106">106</a> <a href="#c107">107</a> <a href="#c108">108</a> <a href="#c109">109</a> <a href="#c115">115</a> <a href="#c116">116</a> <a href="#c117">117</a> <a href="#c118">118</a> <a href="#c121">121</a> <a href="#c122">122</a> <a href="#c125">125</a> <a href="#c127">127</a> <a href="#c128">128</a> <a href="#c130">130</a></nav>
+  
+<section id="c47" class="cue-card">
+  <h3>47. wait_for_me_backward_palm</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,vertical) → movement shoulder (x-22,x+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,vertical) → movement shoulder (x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="047_wait_for_me_backward_palm_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: wait_for_me_backward_palm
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c49" class="cue-card">
+  <h3>49. polite_decline_small_push</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,vertical) → movement shoulder (x+22,x-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,vertical) → movement shoulder (x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="049_polite_decline_small_push_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: polite_decline_small_push
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c51" class="cue-card">
+  <h3>51. hesitant_accept_half_reach</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (x+15,x-15,x+15,x-15)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="051_hesitant_accept_half_reach_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: hesitant_accept_half_reach
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c52" class="cue-card">
+  <h3>52. cancel_previous_offer_retract</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,horizontal) → movement shoulder (x-22,x+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,horizontal) → movement shoulder (x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="052_cancel_previous_offer_retract_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: cancel_previous_offer_retract
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c53" class="cue-card">
+  <h3>53. conditional_accept_pause_then_reach</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = None</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,vertical) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,vertical) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="053_conditional_accept_pause_then_reach_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: conditional_accept_pause_then_reach
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c54" class="cue-card">
+  <h3>54. final_decision_down_press</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(down,horizontal) → movement shoulder (z-22,z+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(down,horizontal) → movement shoulder (z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="054_final_decision_down_press_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: final_decision_down_press
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c55" class="cue-card">
+  <h3>55. resume_speaking_pull</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (x-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (x-22,x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="055_resume_speaking_pull_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: resume_speaking_pull
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c56" class="cue-card">
+  <h3>56. emphasize_point_downbeat</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,vertical) → movement shoulder (z-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,vertical) → movement shoulder (z-22,z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="056_emphasize_point_downbeat_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: emphasize_point_downbeat
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c57" class="cue-card">
+  <h3>57. unsure_response_hand_hover_stop</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (y+15,y-15,y+15,y-15)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (y+22,y-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="057_unsure_response_hand_hover_stop_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: unsure_response_hand_hover_stop
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c58" class="cue-card">
+  <h3>58. prevent_fall_support_reach</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,horizontal) → movement shoulder (x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="058_prevent_fall_support_reach_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: prevent_fall_support_reach
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c62" class="cue-card">
+  <h3>62. self_hug</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(back,vertical) → movement shoulder (x-22,x+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(back,vertical) → movement shoulder (x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="062_self_hug_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: self_hug
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c65" class="cue-card">
+  <h3>65. raise_index_one_moment</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,vertical) → movement shoulder (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,vertical) → movement shoulder (z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="065_raise_index_one_moment_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: raise_index_one_moment
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c67" class="cue-card">
+  <h3>67. rub_arms_cold</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(left,vertical) → movement shoulder (y+22,y-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(left,vertical) → movement shoulder (y+15,y-15,y+15,y-15)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="067_rub_arms_cold_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: rub_arms_cold
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c69" class="cue-card">
+  <h3>69. cross_arms_defensive</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(left,horizontal) → movement shoulder (x-22,x+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(left,horizontal) → movement shoulder (x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="069_cross_arms_defensive_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: cross_arms_defensive
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c72" class="cue-card">
+  <h3>72. palms_together_thank_you</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(up,vertical) → movement shoulder (z-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(up,vertical) → movement shoulder (z-22,z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="072_palms_together_thank_you_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: palms_together_thank_you
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c75" class="cue-card">
+  <h3>75. arms_open_welcome</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(up,horizontal) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(up,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="075_arms_open_welcome_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: arms_open_welcome
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c76" class="cue-card">
+  <h3>76. stretch_arms_up</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(up,vertical) → movement shoulder (z+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(up,vertical) → movement shoulder (z+22,z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="076_stretch_arms_up_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: stretch_arms_up
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c78" class="cue-card">
+  <h3>78. disagreement_cross_then_release</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,vertical) → movement shoulder (z+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,vertical) → movement shoulder (z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="078_disagreement_cross_then_release_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: disagreement_cross_then_release
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c82" class="cue-card">
+  <h3>82. frustration_down_throw</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,vertical) → movement shoulder (z-22,z+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,vertical) → movement shoulder (z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="082_frustration_down_throw_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: frustration_down_throw
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c84" class="cue-card">
+  <h3>84. submission_lowered_open_palm</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,vertical) → movement shoulder (z-22,z+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,vertical) → movement shoulder (z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="084_submission_lowered_open_palm_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: submission_lowered_open_palm
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c86" class="cue-card">
+  <h3>86. apology_forward_lowered_hold</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(left,horizontal) → movement shoulder (z-22,z+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(left,horizontal) → movement shoulder (z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="086_apology_forward_lowered_hold_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: apology_forward_lowered_hold
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c90" class="cue-card">
+  <h3>90. start_action_forward_snap</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,vertical) → movement shoulder (z-22,z+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,vertical) → movement shoulder (z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="090_start_action_forward_snap_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: start_action_forward_snap
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c94" class="cue-card">
+  <h3>94. abandon_action_drop_turn</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (z-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (z-22,z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="094_abandon_action_drop_turn_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: abandon_action_drop_turn
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c95" class="cue-card">
+  <h3>95. prepare_action_raise_hold</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,horizontal) → movement shoulder (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,horizontal) → movement shoulder (z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="095_prepare_action_raise_hold_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: prepare_action_raise_hold
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c97" class="cue-card">
+  <h3>97. hesitation_pause_hold</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,vertical) → movement shoulder (x+22,x-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,vertical) → movement shoulder (x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="097_hesitation_pause_hold_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: hesitation_pause_hold
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c106" class="cue-card">
+  <h3>106. uncertainty_wave</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(up,horizontal) → movement shoulder (y+22,y-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(up,horizontal) → movement shoulder (y+15,y-15,y+15,y-15)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="106_uncertainty_wave_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: uncertainty_wave
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c107" class="cue-card">
+  <h3>107. exploration_reach</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = None</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="107_exploration_reach_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: exploration_reach
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c108" class="cue-card">
+  <h3>108. interrupt_hard</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,vertical) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,vertical) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="108_interrupt_hard_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: interrupt_hard
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c109" class="cue-card">
+  <h3>109. interrupt_soft</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,vertical) → movement shoulder (x+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,vertical) → movement shoulder (x+22,x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="109_interrupt_soft_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: interrupt_soft
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c115" class="cue-card">
+  <h3>115. expand_space</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(left,vertical) → movement shoulder (y+22,y-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(left,vertical) → movement shoulder (y+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="115_expand_space_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: expand_space
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c116" class="cue-card">
+  <h3>116. compress_space</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (z-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (z-22,z+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="116_compress_space_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: compress_space
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c117" class="cue-card">
+  <h3>117. balance_scale</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = rep</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=rep · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (y+15,y-15,y+15,y-15)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (y+22,y-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="117_balance_scale_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: balance_scale
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c118" class="cue-card">
+  <h3>118. push_pull_dual</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,vertical) → movement shoulder (z+22,z-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,vertical) → movement shoulder (z+22,z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="118_push_pull_dual_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: push_pull_dual
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c121" class="cue-card">
+  <h3>121. weight_shift_forward</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,horizontal) → movement shoulder (x+22,x-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,horizontal) → movement shoulder (x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="121_weight_shift_forward_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: weight_shift_forward
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c122" class="cue-card">
+  <h3>122. weight_shift_backward</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(front,horizontal) → movement shoulder (x-22,x+22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(front,horizontal) → movement shoulder (x-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="122_weight_shift_backward_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: weight_shift_backward
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c125" class="cue-card">
+  <h3>125. lean_side_doubt</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (y-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (y-22,y+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="125_lean_side_doubt_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: lean_side_doubt
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c127" class="cue-card">
+  <h3>127. expand_chest</h3>
+  <p class="answer">GT side = RIGHT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;x&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (neg)</th><td>pose(left,vertical) → movement shoulder (x+22,x-22)</td></tr>
+    <tr><th>RIGHT (gt)</th><td>pose(left,vertical) → movement shoulder (x+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="127_expand_chest_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: expand_chest
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c128" class="cue-card">
+  <h3>128. eye_widen_surprise</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;z&#x27;: &#x27;+&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (z+22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (z+22,z-22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="128_eye_widen_surprise_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: eye_widen_surprise
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+<section id="c130" class="cue-card">
+  <h3>130. gaze_shift_avoid</h3>
+  <p class="answer">GT side = LEFT · human GT rep label = non</p>
+  <div class="vlm-out vlm-missing"><p><b>VLM</b> — no scored run for this cue</p></div>
+  <table>
+    <tr><th>GT tail</th><td>override=non · repetition param=1</td></tr>
+    <tr><th>NEG tail</th><td>override=osc_repeat3 · repetition param=3</td></tr>
+    <tr><th>component</th><td colspan="1">movement axes={&#x27;y&#x27;: &#x27;-&#x27;} joint=None</td></tr>
+    <tr><th>LEFT (gt)</th><td>pose(front,horizontal) → movement shoulder (y-22)</td></tr>
+    <tr><th>RIGHT (neg)</th><td>pose(front,horizontal) → movement shoulder (y-22,y+22)</td></tr>
+  </table>
+  <div class="grid2">
+    <div><video class="media" src="130_gaze_shift_avoid_pair_rep.mp4" controls loop muted playsinline></video></div>
+    <div><details open><summary>prompt_exp11.txt</summary><pre>You are comparing two robot-arm motions for the SAME iconic gesture cue.
+
+You are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.
+
+Task: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture&#x27;s meaning?
+   &quot;More appropriate&quot; means: which side&#x27;s motion best matches what a viewer would recognize as embodying this cue&#x27;s meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.
+
+Rules:
+- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.
+- Ignore minor rendering differences; focus on whether the motion reads as the cue.
+
+Target cue:
+- cue: gaze_shift_avoid
+
+Return ONLY strict JSON:
+{
+  &quot;better_side&quot;: &quot;left&quot; or &quot;right&quot;,
+  &quot;motion_assessment&quot;: &quot;string: which side better conveys the cue and why (trajectory, axis, repetition, hold)&quot;,
+  &quot;confidence&quot;: 0.0
+}
+</pre></details></div>
+  </div>
+</section>
+</section>
+</body></html>

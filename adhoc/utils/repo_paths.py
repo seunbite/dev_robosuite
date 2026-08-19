@@ -3,7 +3,7 @@
 Seed layout (``data/seed``)::
 
   yml/                  — ``cues.yml``, ``cues_new.yml``, …
-  prompt/<robot>/       — ``manipulator`` | ``google_robot`` | ``quadruped``
+  prompt/<robot>/       — ``manipulator`` | ``tiago`` | ``quadruped``
   shots/<robot>/        — canonical ``shots.json`` (list of shot configs); legacy ``shot_*.json`` ok
   prompt/<robot>/       — canonical ``prompt.txt``; legacy ``prompt_*.txt`` ok
 
@@ -15,7 +15,7 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-_ROBOTS = frozenset({"manipulator", "google_robot", "quadruped"})
+_ROBOTS = frozenset({"manipulator", "tiago", "quadruped"})
 
 
 def dev_robosuite_root() -> Path:
@@ -94,7 +94,7 @@ def resolve_seed_prompt_txt(robot: str) -> Path:
 
 
 def infer_robot_from_prompt_path(prompt_file: str | Path) -> str | None:
-    """Return ``manipulator`` / ``google_robot`` / ``quadruped`` if path contains ``.../prompt/<slug>/``."""
+    """Return ``manipulator`` / ``tiago`` / ``quadruped`` if path contains ``.../prompt/<slug>/``."""
     parts = Path(prompt_file).parts
     for i, p in enumerate(parts):
         if p == "prompt" and i + 1 < len(parts) and parts[i + 1] in _ROBOTS:

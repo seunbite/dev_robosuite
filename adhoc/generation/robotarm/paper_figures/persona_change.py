@@ -306,14 +306,7 @@ def build_html(items: list[tuple[dict, Path | None]], out_html: Path) -> None:
             persona = html.escape(str(cfg.get("persona", "?")))
             rel = os.path.relpath(gif, out_html.parent) if gif and gif.is_file() else ""
             media = f'<img src="{rel}" loading="lazy">' if rel else "<div class='missing'>No render</div>"
-            raw = html.escape(json.dumps(cfg, indent=2, ensure_ascii=False))
-            pdesc = html.escape(str(cfg.get("persona_desc", ""))[:120])
-            desc_html = f'<p class="pdesc">{pdesc}…</p>' if pdesc else ""
-            cards.append(
-                f"<article><h4>{persona}</h4>{desc_html}{media}"
-                f"{_summary_block(cfg)}"
-                f"<details><summary>raw JSON</summary><pre>{raw}</pre></details></article>"
-            )
+            cards.append(f"<article><h4>{persona}</h4>{media}</article>")
         sections.append(
             f"<section class='cue-group'><h2>c{idx} {html.escape(cue)}</h2>"
             f"<table class='compare'><thead>{thead}</thead><tbody>{''.join(trows)}</tbody></table>"
@@ -331,19 +324,12 @@ def build_html(items: list[tuple[dict, Path | None]], out_html: Path) -> None:
         "td.seq{font-size:11px;color:#444}"
         ".grid{display:flex;flex-wrap:wrap;gap:10px}"
         "article{border:1px solid #ddd;padding:8px;width:240px;vertical-align:top}"
-        "article h4{margin:0 0 4px}"
-        ".pdesc{font-size:10px;color:#555;margin:0 0 6px;line-height:1.3}"
+        "article h4{margin:0 0 6px}"
         "img{max-width:220px;height:auto;display:block}"
-        ".summary{background:#f8f9fc;border:1px solid #e0e4ef;border-radius:4px;padding:6px;margin:6px 0;font-size:11px}"
-        ".kv{display:flex;gap:6px;margin:2px 0}"
-        ".k{color:#555;min-width:52px;font-weight:600}"
-        ".v{color:#111;flex:1}"
-        ".steps{margin-top:6px;padding-top:4px;border-top:1px dashed #ccd;color:#333;line-height:1.35}"
-        "details pre{font-size:9px;max-height:160px;overflow:auto;background:#f5f5f5;margin:4px 0}"
         ".missing{color:#999;font-size:12px}"
         "</style></head><body>"
         f"<h1>Persona variations ({len(items)} configs)</h1>"
-        f"<p>Grouped by cue — compare <b>speed / hold / amplitude</b> in table + summary blocks.</p>"
+        f"<p>Grouped by cue — compare <b>speed / hold / amplitude</b> in table.</p>"
         f"{''.join(sections)}</body></html>"
     )
     out_html.parent.mkdir(parents=True, exist_ok=True)

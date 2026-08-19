@@ -30,7 +30,7 @@ MOBILE_ROBOT_CONFIGS = {
         'arm_group': 'right',
         'head_indices': [0, 1] # Head Pan, Head Tilt in robot._joint_positions
     },
-    'GoogleRobot': { # Proxy using Tiago
+    'Tiago': { # Proxy using Tiago
         'torso_idx': 3,
         'torso_range': [0.05, 0.35],
         'yaw_idx': 2,

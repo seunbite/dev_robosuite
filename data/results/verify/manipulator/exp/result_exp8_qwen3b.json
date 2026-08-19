@@ -1,0 +1,4180 @@
+{
+  "time": "2026-06-13T14:30:52",
+  "vlm_backend": "local",
+  "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+  "mode": "motion_component_verify_mp4",
+  "config": "/home/hoyeonk/sblee/dev_robosuite/data/results/motion_configs/manipulator/exp/result_exp7_qwen3b.json",
+  "n": 86,
+  "rows": [
+    {
+      "cue_idx": 7,
+      "cue": "raise_fists_victory",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/007_raise_fists_victory.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the desired cue effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movements do not align with the required gestures for raising hands and transitioning into a victorious gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "Shoulder",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:90)",
+            "movement(joint=elbow, rep=1, deg=y:0)",
+            "path(shape=arc, joint=elbow, axis=yz, speed=1.5)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 8,
+      "cue": "fist_pump",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/008_fist_pump.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the fist pump cue effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement sequence lacks the forward force, quick closing of the fist, and the final high raise of the fist.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "non|rep",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:8) -> movement(joint=elbow, rep=1, deg:x:28,z:-18) -> movement(joint=fist, rep=1, deg:x:16,y:12,z:-14)",
+            "path(shape=arc, joint=elbow, axis=xy, speed=1.5)"
+          ]
+        }
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "non|rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 9,
+      "cue": "flex_bicep",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/009_flex_bicep.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the flex_bicep cue. The shoulder and elbow movements are too abrupt and do not mimic the natural flexing motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movements are too fast and lack the smoothness required to show effort in a task. A more gradual and controlled motion is needed.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "elbow",
+            "repetition": "non",
+            "hold": false,
+            "plane": "yz",
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "movememt(joint=elbow, rep=1, deg=y:+10)",
+            "movememt(joint=elbow, rep=1, deg=y:-10)",
+            "move_to_target(shoulder, elbrow)"
+          ]
+        },
+        "confidence": 0.6
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "elbow",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 10,
+      "cue": "shrug_idk",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/010_shrug_idk.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended shrug_idk cue effectively. It suggests indecision or uncertainty but lacks the emphasis and final steady stance required.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement is too simple and does not capture the nuances of a shrug. It lacks the subtle back-and-forth motion typical of an indecisive gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=3, deg=x:10)",
+            "movement(joint=shoulder, rep=1, deg=y:-10)",
+            "movement(joint=shoulder, rep=1, deg=z:-2)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 11,
+      "cue": "self_scratch_head_confused",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/011_self_scratch_head_confused.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the self_scratch_head_confused cue effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement does not include a sequence that matches the described actions of tapping the forehead and rubbing the cheeks before slapping the palm.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-+",
+              "z": "-+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "path(shape=line, joint=wrist, axis=y, speed=1.0)",
+            "movement(joint=shoulder, rep=1, deg=x:-10)",
+            "path(shape=line, joint=wrist, axis=y, speed=1.0)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 12,
+      "cue": "facepalm",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/012_facepalm.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the facepalm cue. It lacks the necessary arc and orientation changes to create the desired expressive motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement currently follows a linear pattern along the shoulder joint, which does not capture the required arc and orientation changes needed for the facepalm cue.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+-"
+            },
+            "joint": "shoulder",
+            "repetition": "non|rep|any",
+            "hold": true,
+            "plane": "yz",
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "Arcuate the shoulder joint movement to create an arc shape around the shoulder joint.",
+            "Use a repetition of the rotation to maintain the arc and create a more dynamic movement.",
+            "Ensure the wrist joints move to create the desired downward arc and upward flick of the arm."
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "yz"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 13,
+      "cue": "point_self",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/013_point_self.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement does not effectively convey the 'point_self' cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not properly align the robot's hand direction with the intended gesture of pointing itself outward.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder|elbow",
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Use a shoulder rotation to move the arm backward.",
+            "Move the elbow down slightly while maintaining the shoulder rotation.",
+            "Ensure the wrist moves forward to align with the desired direction."
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder|elbow",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 14,
+      "cue": "point_you",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/014_point_you.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement does not convey the intended cue properly. It ends abruptly without a clear follow-up or completion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement ends abruptly without completing the cue, making it unclear and incomplete.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:-8) -> path(shape=line, joint=shoulder, axis=z, speed=1.8) -> movement(joint=wrist, rep=1, deg=z:8)",
+            "movement(joint=shoulder, rep=1, deg=z:-8) -> path(shape=line, joint=shoulder, axis=z, speed=1.8) -> movement(joint=elbow, rep=1, deg:x:-45) -> path(shape=arc, joint=elbow, axis=xz, speed=1.2)"
+          ]
+        }
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 15,
+      "cue": "beckon_come_here",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/015_beckon_come_here.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended beckoning gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the subtle forward wrist beat and slight shoulder extension typical of the beckoning gesture, and does not include a slight pause.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "-"
+            },
+            "joint": "shoulder|wrist|elbow",
+            "repetition": "non|rep|any",
+            "hold": true,
+            "plane": null,
+            "axis": "x|y|z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "movement(joint=wrist, rep=1, deg=z:15)",
+            "movement(joint=elbow, rep=1, deg:x:-20)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "-"
+        },
+        "joint": "shoulder|wrist|elbow",
+        "repetition": "non|rep|any",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 16,
+      "cue": "stop_palm_out",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/016_stop_palm_out.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the appropriate cue well. The robot's current movement focuses on a small elevation of the shoulder and wrist, which does not clearly indicate a stopping gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary components to effectively signal a stop or disengagement. It does not clearly show a lowering of the shoulder and wrist to indicate a withdrawal.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "move shoulder down",
+            "lower wrist",
+            "terminate with a slight pause"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder|wrist",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 17,
+      "cue": "pat_stomach",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/017_pat_stomach.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the desired social gesture cue 'pat_stomach'. It appears to be more focused on adjusting the orientation of the upper arm rather than the intended sweeping motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movements currently described do not achieve the sweeping arc that is typical for the 'pat_stomach' gesture. Instead, the movements are more static and do not transition smoothly from a vertical grip to a horizontal patting motion.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {
+              "x": "+",
+              "y": "-+",
+              "z": "+"
+            },
+            "joint": "wrist",
+            "repetition": "non",
+            "hold": false,
+            "plane": "yz",
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "Use a path that simulates a sweeping motion along the body axis.",
+            "Ensure the wrist joint is involved in the arc movement."
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "yz"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 18,
+      "cue": "fan_face_hot",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/018_fan_face_hot.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey thefan_face_hot cue, as it lacks the dynamic back-and-forth oscillation typical of the fan face motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement lacks the necessary back-and-forth oscillation, which is crucial for conveying the fan face hot cue effectively.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "elbow",
+            "repetition": "any",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "Move the elbow back and forth in a controlled manner.",
+            "Ensure proper synchronization between the shoulder and elbow movements."
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "elbow",
+        "repetition": "any"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 19,
+      "cue": "cover_yawn_sleepy",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/019_cover_yawn_sleepy.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey a clear or appropriate yawning gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement does not provide the necessary extension and transition typical of a yawning gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+",
+              "z": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:-10)",
+            "path(shape=line, joint=shoulder, axis=z, speed=0.5)"
+          ],
+          "confidence": 0.7
+        }
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+",
+          "z": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 20,
+      "cue": "rub_eye_tired",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/020_rub_eye_tired.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the intended 'rub_eye_tired' cue.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary repetitive nature and arc-like motion to effectively simulate the action of rubbing an eye tiredly. It also does not provide the required descent or fatigue effect.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "wrist",
+            "repetition": "non|rep|any",
+            "hold": true,
+            "plane": null,
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:6)",
+            "movement(joint=wrist, rep=3, deg:y:10 | y:-10)",
+            "path(shape=arc, joint=shoulder, axis=y, speed=0.8)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "wrist",
+        "repetition": "non|rep|any",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 21,
+      "cue": "tap_temple_think",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/021_tap_temple_think.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the cue \"tap_temple_think\" given the fixed start pose.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement lacks a clear pause or reflection and does not emphasize the deep thought or contemplation aspect required by the cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+",
+              "z": "-"
+            },
+            "joint": "elbow",
+            "repetition": "non",
+            "hold": true,
+            "plane": "xy",
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=elbow, rep=1, deg=y:-1)",
+            "hold(joint=elbow)",
+            "movement(joint=elbow, rep=1, deg=y:1)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+",
+          "z": "-"
+        },
+        "joint": "elbow",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 22,
+      "cue": "circle_temple_crazy",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/022_circle_temple_crazy.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "Current tail movement does not convey the intended 'circle_temple_crazy' cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement sequence does not form an arc around the temple, which is essential for the 'circle_temple_crazy' cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:6) ->",
+            "path(shape=arc, joint=wrist, axis=xz, speed=1.4) ->",
+            "movement(joint=wrist, rep=1, deg=z:15 | z:-15)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 23,
+      "cue": "lean_forward_interest",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/023_lean_forward_interest.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended cue of leaning forward to maintain engagement.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not achieve the desired forward-leaning motion. Instead, it moves the robot upwards.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+",
+              "z": "+"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "non",
+            "hold": null,
+            "plane": null,
+            "axis": "x|y|z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:+10)",
+            "movement(joint=elbow, rep=1, deg=x:+45)",
+            "movement(joint=wrist, rep=1, deg=z:+15)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+",
+          "z": "+"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 24,
+      "cue": "cover_mouth_gasp",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/024_cover_mouth_gasp.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "Current tail movement does not effectively convey the 'cover_mouth_gasp' cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement sequence does not achieve the desired effect of quickly extending the arm to cover the mouth and closing the gripper tightly.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:15)",
+            "movement(joint=wrist, rep=1, deg=z:-10)",
+            "path(shape=line, joint=wrist, axis=z, speed=1.5)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 25,
+      "cue": "cheers_toast",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/025_cheers_toast.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the desired 'cheers_toast' cue effectively. The motion appears to be primarily aimed at rotation around the shoulder and wrist joints rather than the intended vertical toast action.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary vertical ascent to reach the high toast position and slow descent to emphasize the toast.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": "x:+, y:+, z:+-",
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": true,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg:x:15)",
+            "path(shape=arc, joint=shoulder, axis=xz, speed=1.5)",
+            "movement(joint=wrist, rep=1, deg:y:-50)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "joint": "shoulder",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 26,
+      "cue": "highfive_invite",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/026_highfive_invite.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not sufficiently convey the highfive invite cue. It appears to be more of a static gesture rather than an exaggerated motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement does not add any dynamic elements that would suggest a highfive invite. Instead, it seems more like a static acknowledgment.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "z - repeat shoulder",
+            "z + repeat wrist"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder|wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 27,
+      "cue": "highfive_imitation",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/027_highfive_imitation.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement pattern does not effectively convey the highfive_imitation cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not align with the target cue. It involves simple arc movements and should be adjusted to include more dynamic motions that mimic the gesture of a high five.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+",
+              "z": "+"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg:x:9)",
+            "movement(joint=elbow, rep=2, deg:x:-30 | x:30)",
+            "movement(joint=wrist, rep=2, deg:y:10 | y:-10)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+",
+          "z": "+"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 28,
+      "cue": "fistbump_invite",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/028_fistbump_invite.mp4",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement conveys the intended cue by smoothly transitioning from a raised arm orientation to a closed hand gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "movement(joint=shoulder, rep=1, deg=x:8)",
+            "movement(joint=elbow, rep=1, deg:x:-5)",
+            "movement(joint=wrist, rep=1, deg:y:0)"
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement does not clearly convey the expected gesture. The arm should maintain an upward angle while the hand moves smoothly into a closed position.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+-"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg:x:8)",
+            "movement(joint=elbow, rep=1, deg:x:-5)",
+            "movement(joint=wrist, rep=1, deg:y:0)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 30,
+      "cue": "pat_self_back",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/030_pat_self_back.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the desired social gesture cue of patting oneself on the back.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not clearly demonstrate the intended gesture of patting oneself on the back. The shoulder and wrist movements do not align with the intended direction and force needed for such a motion.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:+8)",
+            "movement(joint=elbow, rep=1, deg=x:-30, z:30)",
+            "movement(joint=wrist, rep=1, deg=z:10)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 31,
+      "cue": "draw_circle_repeat",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/031_draw_circle_repeat.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended action effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement is too simplistic and lacks the complexity needed to clearly convey the drawing of a circle. Currently, it appears as a random zigzagging motion rather than a smooth arc.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": "xy",
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "move gradually towards the center of the circle",
+            "maintain a consistent angle and direction",
+            "repeat the arc multiple times"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "xy"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 32,
+      "cue": "throat_cut_stop",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/032_throat_cut_stop.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended cue of a throat-cut stop gesture effectively. It appears to be a lateral movement without any specific emphasis on the direction or intensity needed.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The movement does not align with the description of a throat-cut stop gesture. It lacks the necessary directional focus and intensity typical of such a cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder|elbow",
+            "repetition": "non",
+            "hold": true,
+            "plane": "xy",
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "Use a more pronounced shoulder movement to emphasize the direction towards the throat.",
+            "Incorporate a slight elbow movement to add more dynamicity to the gesture.",
+            "Ensure the repetition is sufficient to maintain the duration of the throat-cut stop."
+          ]
+        },
+        "confidence": 0.3
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder|elbow",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 33,
+      "cue": "chin_flick_dismiss",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/033_chin_flick_dismiss.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the dismissive action or rejection cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement only involves a single rotation at the wrist which does not capture the dynamic and abrupt nature of a chin flick dismissal.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:-15)",
+            "movement(joint=wrist, rep=1, deg=z:10)",
+            "movement(joint=wrist, rep=1, deg=z:-10)"
+          ]
+        },
+        "confidence": 0.75
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 34,
+      "cue": "cover_ears_too_loud",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/034_cover_ears_too_loud.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the 'cover_ears_too_loud' gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement is not designed to turn away smoothly and protect hearing, which is crucial for the intended cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=2, deg=z:15)",
+            "path(shape=arc, joint=shoulder, axis=yz, speed=1.5)",
+            "movement(joint=shoulder, rep=1, deg=z:-15)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 35,
+      "cue": "salute",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/035_salute.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended saluting gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement lacks the necessary sequence where the elbow is positioned towards the forehead and held steadily, which is essential to convey the salute cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "elbow",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=elbow, rep=1, deg=x:45, z:45)",
+            "path(shape=line, joint=elbow, axis=z, speed=1.2)",
+            "movement(joint=elbow, rep=1, deg=x:-45, z:-45)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "elbow",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 36,
+      "cue": "visor_search",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/036_visor_search.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the visor_search cue due to the lack of smooth circular rotations around the head.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement sequence does not include circular rotations around the head, which is essential for the visor_search cue. Instead, there is a repetitive shoulder and wrist movement that does not mimic the fluidity required.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": "yz",
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Use a path_arc around the head to simulate looking through a visor.",
+            "Ensure the movements are smooth and continuous to maintain the fluidity of the visor_search cue."
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "yz"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 37,
+      "cue": "yield_turn",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/037_yield_turn.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended 'yield turn' gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement is not smooth and fails to emphasize the yielding gesture effectively.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=y:0)",
+            "movement(joint=shoulder, rep=1, deg=y:10)",
+            "movement(joint=shoulder, rep=1, deg=y:-10)"
+          ]
+        },
+        "confidence": 0.6
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 39,
+      "cue": "request_turn",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/039_request_turn.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "Current tail movement does not convey the correct cue. Instead of extending the arm forward, it should pivot around the shoulder joint.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement should pivot around the shoulder joint to extend the arm forward, instead of using a combination of shoulder and wrist movements.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+)",
+            "movement(joint=wrist, rep=1, deg=x:0)"
+          ]
+        },
+        "confidence": 0.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 40,
+      "cue": "guiding_arm",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/040_guiding_arm.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the target cue 'guiding_arm' starting from the fixed start pose. The movement sequence does not include the necessary rotation and guidance elements.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not include the required shoulder and wrist rotations along with the correct axis movements to guide the viewer smoothly.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-+",
+              "z": "+-"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "x|z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "movement(joint=wrist, rep=1, deg=z:10)",
+            "movement(joint=shoulder, rep=1, deg=x:10)",
+            "movement(joint=wrist, rep=1, deg=z:10)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "z": "+-"
+        },
+        "joint": "shoulder|wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 41,
+      "cue": "protective_arm_out",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/041_protective_arm_out.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not appropriately convey the protective_arm_out cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement primarily focuses on shoulder extension and wrist flexion, which do not align with the intended protective posture. The cue emphasizes readiness and care, which requires a more gradual retraction.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "any",
+            "hold": false,
+            "plane": "xz",
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Movement from shoulder to elbow should transition smoothly.",
+            "Progressively reduce the shoulder extension as the elbow bends.",
+            "Ensure the wrist remains slightly flexed to maintain a protective posture."
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "any"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 42,
+      "cue": "escorting_gesture",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/042_escorting_gesture.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the escorting gesture cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary direction and intensity to properly execute an escorting gesture. It appears to be more focused on a simple arm extension and slight adjustment rather than the intended relaxed and engaging motion.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {
+              "x": "-",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "non",
+            "hold": false,
+            "plane": "xz",
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "start with shoulder extension",
+            "use wrist arc to moderate the movement",
+            "maintain the relaxed grip"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "xz"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 44,
+      "cue": "clarification_request_palm_tilt",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/044_clarification_request_palm_tilt.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "Current tail movement does not effectively convey the 'clarification_request_palm_tilt' cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement lacks the necessary elements to effectively establish a welcoming gesture and establish a clear request for clarification.",
+          "recommended_component": {
+            "kind": "path_line",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "elbow",
+            "repetition": "non|rep|any",
+            "hold": true,
+            "plane": "xz",
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "Movement should include a slight rotation around the shoulder to create a more welcoming gesture.",
+            "Utilize a path_line along the elbow joint axis (y) to mimic the tipping action.",
+            "Ensure the elbow remains bent throughout the movement to maintain a friendly posture."
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_line",
+        "axis": "y"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 45,
+      "cue": "slow_down_request_palm_down",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/045_slow_down_request_palm_down.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not align well with the desired cue. The robot needs to perform a more deliberate gesture to convey the slow-down request effectively.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks a clear purpose and does not effectively convey the slow-down request. The robot should prepare with a gentle lift and then use a slow wrist movement to symbolize the request.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "rep",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Prepare the arm gently and slowly",
+            "Move the wrist in a slow, controlled arc towards the palm",
+            "Hold the position for emphasis"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 46,
+      "cue": "speed_up_circular_cue",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/046_speed_up_circular_cue.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "Current tail movement is not appropriate for conveying the speed-up circular cue given the fixed start pose.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not include a circular arc or a consistent speed increase to maintain the interest required for the speed-up circular cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "m.move(shoulder, rep=3, deg:x:-30,z:30 | x:30,z:-30)",
+            "m.move(elbow, rep=2, deg:y:10,z:-10 | y:-10,z:10)",
+            "m.move(wrist, rep=1, deg:y:15,z:-15)"
+          ]
+        },
+        "confidence": 0.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 47,
+      "cue": "wait_for_me_backward_palm",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/047_wait_for_me_backward_palm.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the cue meaning effectively. It appears to be a simple upward motion that does not match the required graceful backward lift.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement is too simple and does not achieve the desired cue of preparing to move and signal readiness. A more complex and deliberate movement would be necessary to convey the intended cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-+",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:-8)",
+            "path(shape=line, joint=shoulder, axis=z, speed=0.8)",
+            "movement(joint=elbow, rep=1, deg:x:-45)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 49,
+      "cue": "polite_decline_small_push",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/049_polite_decline_small_push.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the appropriate meaning for the polite_decline_small_push cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement sequence does not represent a gentle, polite decline with a slight downward motion of the hand, which is required by the cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": null,
+            "repetition": "any",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:-5)",
+            "movement(joint=wrist, rep=1, deg=z:-5)"
+          ]
+        },
+        "confidence": 0.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "repetition": "any"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 50,
+      "cue": "firm_accept_forward_reach",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/050_firm_accept_forward_reach.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended cue effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not clearly extend the arm forward confidently while gripping firmly, which is required for the firm_accept_forward_reach cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "非",
+            "hold": true,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "step 1: Ensure the robot extends its arm forward confidently.",
+            "step 2: Maintain a firm grip on the object.",
+            "step 3: Add a final confident gesture to reinforce the agreement."
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "非",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 51,
+      "cue": "hesitant_accept_half_reach",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/051_hesitant_accept_half_reach.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current sequence of movements does not effectively convey the hesitation and slow raise to a semi-reach position required for the 'hesitant_accept_half_reach' cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The sequence of movements, which includes a shoulder dip and a wrist movement to raise the hand, does not provide the necessary hesitation and slow raise to a semi-reach position.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:10) -> path(shape=arc, joint=shoulder, axis=zy, speed=1.8)",
+            "movement(joint=wrist, rep=1, deg=z:-10) -> path(shape=line, joint=wrist, axis=z, speed=1)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 52,
+      "cue": "cancel_previous_offer_retract",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/052_cancel_previous_offer_retract.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the cue 'cancel_previous_offer_retract'. The robot should acknowledge the offer by pointing forward and then gently retract its hand.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not show the robot retracting its hand post-acknowledgment, which is necessary to convey the cue properly.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:0)",
+            "path(shape=arc, joint=shoulder, axis=zx, speed=1.0)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 53,
+      "cue": "conditional_accept_pause_then_reach",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/053_conditional_accept_pause_then_reach.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the desired cue. The robot appears to be reaching upwards abruptly, which may not align with the intended acceptance gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement suggests an upward reach, which may conflict with the target cue of accepting something. This abrupt movement might not achieve the smooth and controlled transition seen in the example descriptions.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-",
+              "y": "-+",
+              "z": "+"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "non",
+            "hold": false,
+            "plane": "xy|yz|xz",
+            "axis": "x|y|z"
+          },
+          "recommended_tail_guidance": [
+            "Move the shoulder back and down to prepare for the final approach.",
+            "Allow the elbow to slowly extend downwards."
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-",
+          "z": "+"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 54,
+      "cue": "final_decision_down_press",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/054_final_decision_down_press.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the final decision-down press cue. The movements appear to be too varied and do not follow a clear path.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movements are too varied and do not follow a clear path. The robot should move smoothly to convey the final decision-down press cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "wrist",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "move the arm straight down",
+            "hold the position for emphasis",
+            "press firmly to complete the motion"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "wrist",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 55,
+      "cue": "resume_speaking_pull",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/055_resume_speaking_pull.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not align well with the target cue. The robot's action seems to be more about lowering its arm rather than pulling back to begin speaking.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement sequence appears to be more focused on reducing distance rather than transitioning smoothly into a speaking action. It lacks the essential components needed to achieve the desired cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": ""
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "step 1: move shoulder backward",
+            "step 2: move肩部向后移动，然后慢慢拉回。",
+            "step 3: 在拉回过程中缓慢降低手臂，保持稳定。"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 56,
+      "cue": "emphasize_point_downbeat",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/056_emphasize_point_downbeat.mp4",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appears to convey the intended cue by starting with a slight upward shoulder movement followed by a wrist movement, which is consistent with emphasizing a downward beat.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current tail movement does not clearly convey the emphasizing point-downbeat cue. It appears to focus more on the shoulder elevation and wrist movement rather than the descending emphasis.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "+",
+              "z": "-+"
+            },
+            "joint": "shoulder",
+            "repetition": "any",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:-8)",
+            "movement(joint=shoulder, rep=1, deg=z:8)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 57,
+      "cue": "unsure_response_hand_hover_stop",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/057_unsure_response_hand_hover_stop.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the desired cue. It does not produce a clear and coherent gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current tail movement lacks the necessary dynamic elements to convey the cue appropriately. It does not suggest uncertainty or contemplation in a manner consistent with the target description.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": true,
+            "plane": null,
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=y:10)",
+            "path(shape=line, joint=shoulder, axis=y, speed=0.5)"
+          ]
+        },
+        "confidence": 0.3
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 58,
+      "cue": "prevent_fall_support_reach",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/058_prevent_fall_support_reach.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended social gesture cue efficiently.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks a clear and effective direction that would help the robot achieve the desired social gesture. This might hinder its ability to support someone in a fall in a timely and appropriate manner.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+-"
+            },
+            "joint": "elbow",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "elbow towards the forward direction",
+            "move slowly and carefully",
+            "avoid sudden movements"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+-"
+        },
+        "joint": "elbow",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 59,
+      "cue": "nod_yes",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/059_nod_yes.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The provided movement does not transition smoothly from the fixed start pose to the required cue ('nod yes'). It initiates with a shoulder dip and transitions to a wrist accent, but this approach does not convey the intended 'nod' motion effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement lacks the necessary smoothness and transition to effectively convey the 'nod yes' cue. Instead, it results in an uneven and jerky motion.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "+",
+              "z": "+"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": "xy",
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Start with a gentle shoulder dip",
+            "Transition smoothly into the wrist accent",
+            "Ensure the motion flows seamlessly to maintain the 'nod' effect"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+",
+          "z": "+"
+        },
+        "joint": "shoulder|wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 60,
+      "cue": "shake_head_no",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/060_shake_head_no.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended meaning of the 'shake head no' cue well.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement does not clearly indicate a negative response or uncertainty, which is necessary for the 'shake head no' cue.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {
+              "x": "-",
+              "y": "+",
+              "z": "-"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "non",
+            "hold": false,
+            "plane": "xz",
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "arc(xz, joint=shoulder, deg=x:-30)",
+            "arc(xz, joint=wrist, deg=z:-20)",
+            "arc(xz, joint=shoulder, deg=x:15)",
+            "arc(xz, joint=shoulder, deg=x:-15)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "xz"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 61,
+      "cue": "air_quotes",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/061_air_quotes.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the air quotes cue. It appears to be a simple zigzag pattern which may not be enough to capture the rhythm.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement is too simplistic and does not create the desired rhythmic effect typical of air quotes. It lacks the necessary complexity and precision.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-",
+              "y": "-"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Add additional joint rotations (e.g., rotation around shoulder, elbow)",
+            "Use more complex paths such as arc or line",
+            "Introduce a slight change in speed or amplitude"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-",
+          "y": "-"
+        },
+        "joint": "wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 62,
+      "cue": "self_hug",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/062_self_hug.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the self-hug cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement sequence does not accurately represent the intended self-hug gesture. It lacks the smooth lowering and subsequent lifting of the arm, which is crucial for conveying comfort and warmth.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:-6)",
+            "path(shape=arc, joint=shoulder, axis=xz, speed=0.8)",
+            "movement(joint=shoulder, rep=1, deg=z:6)"
+          ]
+        }
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 64,
+      "cue": "tilt_head_curious",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/064_tilt_head_curious.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended 'tilt_head_curious' cue effectively. The movement seems to be more focused on arm positioning rather than tilting the head.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "why_not": "The movement primarily focuses on the arm positioning which is not aligned with the desired tilt of the head. This could make it difficult for the robot to convey the thoughtful and curious aspect intended by the cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "wrist",
+            "repetition": "non|rep",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Move the wrist to tilt the head to one side.",
+            "Ensure the wrist movement creates a slight tilt when combined with any other arm movements."
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "wrist",
+        "repetition": "non|rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 65,
+      "cue": "raise_index_one_moment",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/065_raise_index_one_moment.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not appropriately convey the raise_index_one_moment cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement sequence does not maintain a relaxed posture and does not clearly indicate a single, gentle raise of the index finger.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-+",
+              "z": "+-"
+            },
+            "joint": "wrist",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Movement towards the index finger with a gentle arc and slow repetition",
+            "Ensure a relaxed posture throughout the raising action",
+            "Hold the index finger briefly at the raised position"
+          ]
+        },
+        "confidence": 0.6
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "z": "+-"
+        },
+        "joint": "wrist",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 66,
+      "cue": "shh_gesture",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/066_shh_gesture.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement is not appropriate for conveying the 'shhh_gesture' cue. The robot starts by moving the shoulder to the left, which does not align with the intended gesture of moving the hand away from the ear.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement starts with a shoulder movement to the left rather than a wrist movement towards the ear, which is necessary for the 'shhh_gesture'. Additionally, there should be a smooth transition back to the starting position smoothly without a pause or sharp stop.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "-+",
+              "z": "-+"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "move wrist to the side of the ear",
+            "smoothly transition back to the starting position",
+            "avoid sharp stops or pauses"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "joint": "wrist",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 67,
+      "cue": "rub_arms_cold",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/067_rub_arms_cold.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended cue clearly.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The robot's current movement does not match the required cue. Instead of a slow wrist motion, the robot should perform a deliberate and controlled descent of the arms followed by a gentle, relaxed finish.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "non",
+            "hold": false
+          },
+          "recommended_tail_guidance": [
+            "move shoulder down",
+            "move elbow down",
+            "maintain grip orientation"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder|wrist",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 69,
+      "cue": "cross_arms_defensive",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/069_cross_arms_defensive.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the intended 'cross_arms_defensive' cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement does not follow the required sequence and style for the 'cross_arms_defensive' cue. It fails to achieve a defensive lock-like posture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "+-",
+              "z": "+-"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "x|y|z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=2, deg:x:-15 | x:15) -> path(shape=arc, joint=shoulder, axis=xz, speed=1.2)",
+            "movement(joint=elbow, rep=2, deg:y:-15 | y:15) -> path(shape=arc, joint=elbow, axis=yz, speed=1.2)",
+            "movement(joint=wrist, rep=2, deg:z:-10 | z:10) -> path(shape=arc, joint=wrist, axis=z, speed=1.2)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-",
+          "z": "+-"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 72,
+      "cue": "palms_together_thank_you",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/072_palms_together_thank_you.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the meaning of the cue `palm_together_thank_you` effectively. The robot should rise from the fixed start pose and add a crisp peak accent instead of simply lifting and freezing.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not include a significant ascent or upward motion that would convey the meaning of the cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+",
+              "z": "+"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "x|y|z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg:x:10 | y:10 | z:10)",
+            "path(shape=arc, joint=shoulder, axis=yz, speed=1.5)",
+            "movement(joint=elbow, rep=1, deg:x:5 | y:5 | z:5)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+",
+          "z": "+"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 74,
+      "cue": "hands_up_surrender",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/074_hands_up_surrender.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the meaning of the 'hands_up_surrender' cue correctly.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not align with the intended gesture. It should have the robot raise its arms upwards and then lower them in a surrendered manner.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": true,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=y:-90)",
+            "movement(joint=shoulder, rep=1, deg=y:90)",
+            "movement(joint=shoulder, rep=1, deg=y:-180)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 75,
+      "cue": "arms_open_welcome",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/075_arms_open_welcome.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "Current movement does not convey the arms-open-welcome cue effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary gestures and positioning to appropriately express an arms-open-welcome motion.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder|elbow",
+            "repetition": "non|rep",
+            "hold": true,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=2, deg:x:6)",
+            "movement(joint=elbow, rep=2, deg:y:-80)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder|elbow",
+        "repetition": "non|rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 76,
+      "cue": "stretch_arms_up",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/076_stretch_arms_up.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "Current tail movement does not effectively convey the desired stretch_arms_up cue. The robot should move its arms smoothly upward while maintaining a consistent posture.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "why_not": "The current movement does not ensure smooth upward motion and consistent posture. It lacks the necessary guidance to achieve the desired stretch_arms_up cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+",
+              "z": "+"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "any",
+            "hold": false,
+            "plane": null,
+            "axis": "x|y|z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg:x:0,z:90)",
+            "movement(joint=elbow, rep=1, deg:x:0,z:90)",
+            "movement(joint=forearm, rep=1, deg:x:0,z:90)",
+            "movement(joint=upper_arm, rep=1, deg:x:0,z:90)",
+            "movement(joint=lower_arm, rep=1, deg:x:0,z:90)"
+          ]
+        },
+        "confidence": 0.0
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+",
+          "z": "+"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "any"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 78,
+      "cue": "disagreement_cross_then_release",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/078_disagreement_cross_then_release.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement does not effectively convey a gesture of disagreement through crossing fingers and releasing them.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement does not include a clear gesture of crossing fingers or releasing hands, which are key elements for conveying disagreement.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "wrist",
+            "repetition": "non|rep|any",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "wrist->cross fingers",
+            "wrist->release hands"
+          ]
+        }
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "wrist",
+        "repetition": "non|rep|any"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 82,
+      "cue": "frustration_down_throw",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/082_frustration_down_throw.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended frustration-down-throw cue effectively. The robot appears to be reaching upward but not pulling forward and downward sharply.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the sharp downward pull and forward motion required to convey frustration. The robot's motion seems to be more of an upward reach rather than a frustrated throw.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "-+"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "none",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Shoulder movement to pull forward",
+            "Rapid downward motion to simulate a throw",
+            "Hold the throw in place"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "none",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 84,
+      "cue": "submission_lowered_open_palm",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/084_submission_lowered_open_palm.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the cue. It lacks a clear gesture and does not provide the necessary emphasis.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement does not create a clear and meaningful gesture. It lacks the necessary emphasis and context to convey the cue effectively.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": "x",
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=y:-10) -> movement(joint=elbow, rep=1, deg=x:10) -> movement(joint=hand, rep=1, deg=y:10)"
+          ],
+          "confidence": 0.7
+        }
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 85,
+      "cue": "dominance_high_open_hold",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/085_dominance_high_open_hold.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the 'dominance_high_open_hold' cue. It appears to be focusing on repetitive joint rotations around the shoulder and wrist, which may not align with the intended strong and confident grip action.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement lacks the necessary precision and emphasis to convey the desired dominance high open hold. The repetitive joint rotations do not capture the dynamic and assertive nature of the gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "-+",
+              "z": "-+"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "non|rep|any",
+            "hold": true,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=3, deg=z:-8)",
+            "movement(joint=wrist, rep=3, deg=z:8)",
+            "movement(joint=shoulder, rep=1, deg=z:-8)",
+            "movement(joint=wrist, rep=3, deg=z:8)"
+          ]
+        },
+        "confidence": 0.75
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "joint": "shoulder|wrist",
+        "repetition": "non|rep|any",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 86,
+      "cue": "apology_forward_lowered_hold",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/086_apology_forward_lowered_hold.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey a clear and sincere apology gesture when starting from the fixed start pose.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary elements to create a clear apology gesture. It primarily focuses on a forward motion of the hand and does not include a return to the starting position.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "+",
+              "z": "+"
+            },
+            "joint": "wrist",
+            "repetition": "any",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Use a slight backward movement of the hand as if retracting it."
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+",
+          "z": "+"
+        },
+        "joint": "wrist",
+        "repetition": "any",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 90,
+      "cue": "start_action_forward_snap",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/090_start_action_forward_snap.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended cue effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement sequence does not align well with the desired cue of starting action forward snap. The initial shoulder movement is too gradual and lacks the sudden upward lift required to establish a powerful and dynamic tone.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:+10)",
+            "path(shape=line, joint=shoulder, axis=z, speed=2.0)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 92,
+      "cue": "retry_action_reset_circle",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/092_retry_action_reset_circle.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the desired 'retry_action_reset_circle' cue. It appears to be incomplete and lacks the necessary details to create a coherent motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement sequence is not clearly defined to achieve the desired action, particularly regarding the proper rotation and positioning required for the retry action.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "-+"
+            },
+            "joint": "wrist",
+            "repetition": "non",
+            "hold": null,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=wrist, rep=1, deg=z:-8)",
+            "path(shape=arcs, joint=wrist, axis=xz, speed=1.2)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "wrist",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 94,
+      "cue": "abandon_action_drop_turn",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/094_abandon_action_drop_turn.mp4",
+      "verify_result": {
+        "parse_error": "Expecting value: line 9 column 31 (char 566)",
+        "raw_text": "```json\n{\n  \"movement_is_appropriate\": false,\n  \"movement_assessment\": \"The current tail movement does not effectively convey the 'abandon_action_drop_turn' cue. It lacks the necessary elements to create the intended abrupt departure.\",\n  \"if_appropriate\": {},\n  \"if_not_appropriate\": {\n    \"why_not\": \"The sequence of movements does not provide the required directionality and intensity to express an abrupt abandonment and turn away. It needs to incorporate a more dynamic endpoint.\",\n    \"recommended_component\": {\n      \"kind\": \"movement\",\n      \"axes\": {\"x\": \"+\", \"y\": +\"-\", \"z\": \"+\"},\n      \"joint\": \"shoulder\",\n      \"repetition\": \"rep\",\n      \"hold\": false,\n      \"plane\": null,\n      \"axis\": \"z\"\n    },\n    \"recommended_tail_guidance\": [\n      \"movements\",\n      \"path(shape=arc, joint=shoulder, axis=xz, speed=1.2)\",\n      \"movements\"\n    ]\n  },\n  \"confidence\": 0.7\n}\n```"
+      },
+      "movement_is_appropriate": null,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 95,
+      "cue": "prepare_action_raise_hold",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/095_prepare_action_raise_hold.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not appropriately convey the cue when starting from the provided fixed start pose.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not follow the required cues to properly raise the arm to the desired height and then hold it.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "elbow",
+            "repetition": "rep",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "raise_arm_to_height",
+            "hold_arm_crisply"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "elbow",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 97,
+      "cue": "hesitation_pause_hold",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/097_hesitation_pause_hold.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the desired cue \"hesitation_pause_hold\" properly.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement is currently static and lacks the necessary dynamic elements to convey the intended pause and hold gesture effectively.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "wrist",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=wrist, rep=1, deg=z:-10)",
+            "movement(joint=wrist, rep=1, deg=z:10)",
+            "path(shape=arc, joint=wrist, axis=zx, speed=0.8)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-",
+          "z": "+"
+        },
+        "joint": "wrist",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 104,
+      "cue": "scale_expand",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot40/mp4/104_scale_expand.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the scale expand cue starting from the fixed start pose.",
+        "if_appropriate": null,
+        "if_not_appropriate": {
+          "why_not": "The movement does not smoothly transition from a vertical grip to a horizontal expansion, and the base dipping motion is inconsistent with the target direction.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:90)",
+            "movement(joint=shoulder, rep=1, deg=y:0)",
+            "path(shape=arc, joint=shoulder, axis=xz, speed=1.2)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 106,
+      "cue": "uncertainty_wave",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/106_uncertainty_wave.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended cue of uncertainty_wave effectively. The pattern suggests hesitation but lacks the zigzag repetition and upward extension required.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary zigzag repetition and upward extension that are essential for conveying the uncertainty_wave cue. It appears to be a repetitive wrist beat that does not mimic the intended motion.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "-"
+            },
+            "joint": "wrist",
+            "repetition": "any",
+            "hold": false,
+            "plane": "xz",
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "move the wrist up and down in a zigzag pattern",
+            "extend the arm upwards",
+            "repeat the zigzag pattern in the air"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "-"
+        },
+        "joint": "wrist",
+        "repetition": "any"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 108,
+      "cue": "interrupt_hard",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/108_interrupt_hard.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the interrupt_hard cue effectively. It appears to be a static gesture rather than a dynamic interruption.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement does not show the dynamic and forceful nature of an interrupt_hard, which is characterized by a sudden and impactful gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+",
+              "z": "+"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "x|y|z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+)",
+            "movement(joint=elbow, rep=1, deg:x:+)",
+            "movement(joint=wrist, rep=1, deg=z:+)"
+          ],
+          "confidence": 0.7
+        }
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+",
+          "z": "+"
+        },
+        "joint": "shoulder|elbow|wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 109,
+      "cue": "interrupt_soft",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/109_interrupt_soft.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended interrupt soft gesture effectively. The robot's initial shoulder movement and arc motion do not follow the required smoothness and timing necessary for an interrupt soft action.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "movement(shoulder, joint=shoulder, rep=any, deg=x:-10 | x:5)",
+            "movement(wrist, joint=wrist, rep=any, deg=y:5)"
+          ]
+        },
+        "if_not_appropriate": {
+          "why_not": "The initial shoulder movement and arc motion lack the smoothness and timing required for an interrupt soft gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non|rep",
+            "hold": true
+          },
+          "recommended_tail_guidance": [
+            "shoulder (joint=shoulder, rep=any, deg=-10)",
+            "wrist (joint=wrist, rep=any, deg=5)"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non|rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 114,
+      "cue": "contain_space",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/114_contain_space.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement is not appropriate for conveying the 'contain_space' cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not achieve the required containment effect. It appears to move the arm in a way that does not effectively center the object within the gripper.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+"
+            },
+            "joint": null,
+            "repetition": "rep",
+            "hold": false,
+            "plane": null,
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:0,y:30)",
+            "path(shape=arc, joint=shoulder, axis=xz, speed=1.0)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+"
+        },
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 115,
+      "cue": "expand_space",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/115_expand_space.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement does not effectively convey the sense of expanding space or separating from the person being addressed.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The movement primarily focuses on the shoulder and wrist joints without adequately emphasizing horizontal pulling or separation.",
+          "recommended_component": {
+            "kind": "path_line",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+-"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "step 1: Use a path_line with the axis x to pull the hand horizontally",
+            "step 2: Maintain a slight pause or hold during the horizontal pull",
+            "step 3: Ensure the entire movement emphasizes the separation and distance from the person being addressed."
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_line",
+        "axis": "x"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 116,
+      "cue": "compress_space",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/116_compress_space.mp4",
+      "verify_result": {
+        "parse_error": "Expecting ',' delimiter: line 20 column 7 (char 904)",
+        "raw_text": "```json\n{\n  \"movement_is_appropriate\": true,\n  \"movement_assessment\": \"The initial tail movement of moving the robot's hand along a straight path from the front to the side is suitable for the 'compress space' cue.\",\n  \"if_appropriate\": {\n    \"optional_refinements\": []\n  },\n  \"if_not_appropriate\": {\n    \"why_not\": \"The proposed movement does not effectively convey the sense of immediacy and urgency required for the 'compress space' cue. It lacks a dynamic interaction with the environment or the target that would emphasize the sense of closeness and urgency.\",\n    \"recommended_component\": {\n      \"kind\": \"movement\",\n      \"axes\": {\"x\": \"+\", \"y\": \"-\"},\n      \"joint\": \"shoulder, shoulder_2\",\n      \"repetition\": \"non\",\n      \"hold\": false,\n      \"plane\": null,\n      \"axis\": \"z\"\n    },\n    \"recommended_tail_guidance\": [\n      \"step 1: Begin with a slight downward movement from the shoulder joint.\"\n      \"step 2: Gradually increase the speed and amplitude of the movement.\"\n      \"step 3: Ensure the movement ends with a quick, sharp return to the starting position.\"\n    ]\n  },\n  \"confidence\": 0.8\n}\n```"
+      },
+      "movement_is_appropriate": null,
+      "recommended_component": null
+    },
+    {
+      "cue_idx": 117,
+      "cue": "balance_scale",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/117_balance_scale.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the intended balance scale cue. The robot's initial upward movement might suggest an unintentional attempt to raise the arm, which deviates from the stable and controlled nature required for a balance scale.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement introduces an unintended upward motion, which disrupts the intended calm and controlled movement required for the balance scale cue. It also lacks the smoothness and precision needed to maintain equilibrium over time.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Use a smooth downward motion to initiate the balance scale cue.",
+            "Maintain a gentle and steady arm movement to support the balance.",
+            "Ensure that the movement is held to create a stable position."
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "y": "+-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 118,
+      "cue": "push_pull_dual",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/118_push_pull_dual.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement does not effectively convey the push-pull dual action cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not properly initiate or maintain the pushing and pulling motion required for the push-pull dual action.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Use a horizontal shoulder movement to start the pull action.",
+            "Maintain the pull action by controlling the shoulder joint with a negative rotation.",
+            "Add a small wrist extension (z+) to ensure precision and control."
+          ]
+        },
+        "confidence": 0.4
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 121,
+      "cue": "weight_shift_forward",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/121_weight_shift_forward.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The provided movement does not convey the intended weight shift forward cue. It focuses on a slight forward shoulder rotation which does not align with the need to distribute the grip load forward.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement described does not effectively transition the robot's grip load forward as required by the weight shift forward cue. Instead, it appears to be a minor adjustment in the shoulder position which does not capture the intended action.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "any",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "Ensure the movement includes a more significant forward shoulder rotation to align with the desire to shift the grip load forward."
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "any"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 122,
+      "cue": "weight_shift_backward",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/122_weight_shift_backward.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the intended weight shift backward cue.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The movement does not clearly show a shift towards the back, and the shoulder movements do not follow a consistent pattern that suggests a forward-to-backward transition.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non|rep|any",
+            "hold": false,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "Use a combination of shoulder rotations and body sway to achieve a smooth transition from front to back.",
+            "Incorporate subtle arm movements to guide the weight shift towards the back."
+          ]
+        },
+        "confidence": 0.3
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non|rep|any"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 123,
+      "cue": "torso_rotate_away",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/123_torso_rotate_away.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement does not effectively convey the desired cue of a relaxed departure from the scene, as it does not align with the described rotation towards the viewer.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement does not rotate the torso away from the viewer but instead moves it closer towards the viewer, which contradicts the intended gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "Use a movement to rotate the torso away from the viewer.",
+            "Ensure the movement axis is along the z-axis."
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 124,
+      "cue": "torso_rotate_toward",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/124_torso_rotate_toward.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended cue effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary rotational component to align with the 'torso_rotate_toward' cue.",
+          "recommended_component": {
+            "kind": "movement|path_arc|path_line",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder|elbow|wrist",
+            "repetition": "non|rep|any",
+            "hold": true,
+            "plane": null,
+            "axis": "x|y|z"
+          },
+          "recommended_tail_guidance": [
+            "rotation_y_joints",
+            "arc_xz_joints"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 125,
+      "cue": "lean_side_doubt",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/125_lean_side_doubt.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the desired social gesture cue (lean side doubt). It appears to be a simple shoulder rotation and wrist movement without the necessary nuanced rotation towards the side.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the subtle lean to one side and the gentle rotation of the wrist that would be required to convey the lean side doubt cue effectively.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder|wrist",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "x|y|z"
+          },
+          "recommended_tail_guidance": [
+            "Shoulder rotate slightly to the side",
+            "Wrist rotate gently upwards while maintaining the lean",
+            "Continue holding the new posture until the completion of the cue"
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder|wrist",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 127,
+      "cue": "expand_chest",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/127_expand_chest.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the 'expand_chest' cue effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary direction and magnitude to simulate the action of expanding the chest.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "Movement should be initiated by raising the torso upwards.",
+            "The shoulder joint should be moved horizontally to replicate the expansion.",
+            "Finalize the movement with a slight pause, emphasizing the chest expansion."
+          ]
+        },
+        "confidence": 0.7
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 128,
+      "cue": "eye_widen_surprise",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/128_eye_widen_surprise.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current movement does not convey the desired eye widening or realization/glag effect.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement does not effectively open the eyes or create a sudden realization or surprise effect.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "wrist",
+            "repetition": "any",
+            "hold": true,
+            "plane": "yz",
+            "axis": "y"
+          },
+          "recommended_tail_guidance": [
+            "Create an arc motion along the y-axis to open the eyes gradually.",
+            "Hold the motion to maintain the eye opening effect."
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "yz"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 130,
+      "cue": "gaze_shift_avoid",
+      "mp4": "/home/hoyeonk/sblee/dev_robosuite/data/results/render/manipulator/motion_vlm_verify_pilot90/mp4/130_gaze_shift_avoid.mp4",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended cue of gaze shift avoidance.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement directs the robot to turn its shoulder (-10 degrees), which may not effectively convey the need to avoid eye contact. This movement does not suggest any subtle rotation or avoidance of the eye.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": false,
+            "plane": null,
+            "axis": "z"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=3, deg=z:-10)",
+            "movement(joint=shoulder, rep=1, deg=x:-5)",
+            "movement(joint=shoulder, rep=1, deg=x:5)"
+          ]
+        },
+        "confidence": 0.5
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    }
+  ],
+  "verify_scoring": "gt_match",
+  "verify_scoring_version": 1,
+  "generation_config": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/manipulator/exp/result_exp7_qwen3b.json",
+  "groundtruth": "/Users/sb/Downloads/workspace/dev_robosuite/data/seed/groundtruth/gt_manipulator.json",
+  "n_correct": 30,
+  "accuracy": 0.3488372093023256
+}

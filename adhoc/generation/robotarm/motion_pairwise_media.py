@@ -206,6 +206,17 @@ def _sample_for_cfg(cfg: dict[str, Any], cfg_path: Path, idx: int, cue: str, tag
     }
 
 
+def _panel_at_progress_plain(bundle: dict[str, Any], progress: float) -> Image.Image:
+    """Plain simulator RGB frame (no alpha stack / EE trajectory overlay)."""
+    frames: list[np.ndarray] = bundle["frames"]
+    nf = len(frames)
+    if nf <= 0:
+        raise RuntimeError("empty sim bundle")
+    end_idx = int(round(progress * (nf - 1)))
+    end_idx = max(0, min(end_idx, nf - 1))
+    return Image.fromarray(np.asarray(frames[end_idx], dtype=np.uint8)).convert("RGB")
+
+
 def _panel_at_progress(bundle: dict[str, Any], progress: float) -> Image.Image:
     frames: list[np.ndarray] = bundle["frames"]
     nf = len(frames)

@@ -31,6 +31,7 @@ from adhoc.utils.repo_paths import (  # noqa: E402
     resolve_seed_shots_json,
     seed_yml_dir,
 )
+from adhoc.generation.joint_motion_schema import canonical_joint_keyword  # noqa: E402
 
 _DEFAULT_PROMPT = str(resolve_seed_prompt_txt("quadruped"))
 _DEFAULT_SHOTS = str(resolve_seed_shots_json("quadruped"))
@@ -205,6 +206,15 @@ def _validate_config(config: dict[str, Any]) -> list[str]:
             speed = mv.get("speed")
             if isinstance(speed, (int, float)) and not (0.3 <= float(speed) <= 4.0):
                 errors.append(f"Movement speed {speed} outside [0.3, 4.0]")
+            for j in joints:
+                if canonical_joint_keyword(j.get("joint")) == "base":
+                    pth = j.get("path")
+                    if not isinstance(pth, dict):
+                        errors.append("quadruped 'base' joint requires a 'path' object")
+                    else:
+                        sh = pth.get("shape")
+                        if sh and sh not in valid_shapes:
+                            errors.append(f"Invalid base path shape: {sh}")
 
         elif mtype == "path":
             path = params.get("path", {})

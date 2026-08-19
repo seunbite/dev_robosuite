@@ -1,0 +1,77 @@
+[
+  {
+    "idx": 26,
+    "cue": "highfive_invite",
+    "description": "The robot performs a small dip to gather attention, then swings its arm up and forward to present its hand vertically, like an open palm, holding it steady for a high-five.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 45,
+            "z": 40,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 2.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 65,
+            "y": 50,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.8,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 5
+              },
+              "speed": 2.2,
+              "hold_time": 2.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-08T08:48:16",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "No, the final pose has the gripper pointing up, making the target unclear, instead of presenting the palm forward for a high-five.",
+    "correction_q2": "The entire motion should be changed to end in a `front` + `vertical` pose to present a clear \"palm\" target. The structure of a dip followed by a swing-up is good, but the final pose must be corrected, and a small forward push should be added to punctuate the invitation and hold.",
+    "reasoning": "# Correction Q1: No, the final pose has the gripper pointing up, making the target unclear, instead of presenting the palm forward for a high-five.\n# Correction Q2: The entire motion should be changed to end in a `front` + `vertical` pose to present a clear \"palm\" target. The structure of a dip followed by a swing-up is good, but the final pose must be corrected, and a small forward push should be added to punctuate the invitation and hold.\n# Q1: A human would slightly wind back their arm and then swing it up and forward to present their open palm at about head height, holding it steady as an invitation.\n# Q2: candidates=P1) up+horizontal+x65,y40,z70 (previous attempt), P2) front+vertical+x65,y50,z70; winner=P2 because its `front` direction and `vertical` orientation correctly mimic an open palm presented as a target, whereas P1 points to the ceiling.\n# Q3: options=M1) pose(low)>movement(dip)>pose(high), M2) pose(low)>path(arc up); winner=M1 because the pose-based swing up is direct and energetic, and the initial dip (anticipation) makes the primary action clearer and more deliberate.\n# Q4: options=C1) a final wrist flick, C2) a small forward push at the peak of the gesture; winner=C2 because a forward push better reinforces the \"presenting a target\" action of the invitation, making it more stable and clear than a flick."
+  }
+]

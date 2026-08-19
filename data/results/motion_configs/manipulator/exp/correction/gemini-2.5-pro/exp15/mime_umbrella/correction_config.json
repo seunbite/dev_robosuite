@@ -1,0 +1,61 @@
+[
+  {
+    "idx": 7,
+    "cue": "mime_umbrella",
+    "description": "The robot holds a closed umbrella handle, pushes it straight up to open the canopy, traces a wide circle to define the round shape, and then jolts slightly as the mechanism locks in place.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 35,
+            "y": 0,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "gripper_state": 30,
+          "speed": 1.5,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 35,
+          "speed": 2.5
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "xy",
+          "radius": 20,
+          "sweep": 360,
+          "speed": 1.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "axis": "z",
+          "distance": -4,
+          "speed": 3.0,
+          "hold_time": 1.5
+        }
+      }
+    ],
+    "state": "exp15_mime_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-09T17:44:39",
+    "experiment": "exp15",
+    "generation_valid": true,
+    "correction_q1": "no, the arc motion used to define the canopy shape is on a vertical (xz) plane, which fails to represent the horizontal, dome-like shape of an open umbrella.",
+    "correction_q2": "The sequence should be: 1. A more centered pose holding the handle. 2. A fast, straight push upward. 3. A slow, wide arc on the horizontal (xy) plane to clearly trace the canopy's round shape. 4. A final, sharp downward jolt to signify the umbrella locking open, followed by a hold.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# no, the arc motion used to define the canopy shape is on a vertical (xz) plane, which fails to represent the horizontal, dome-like shape of an open umbrella.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# The sequence should be: 1. A more centered pose holding the handle. 2. A fast, straight push upward. 3. A slow, wide arc on the horizontal (xy) plane to clearly trace the canopy's round shape. 4. A final, sharp downward jolt to signify the umbrella locking open, followed by a hold.\n\n# Q1: How would a human mime this in empty space? (One sentence)\nA human would hold an imaginary vertical handle, push it straight up above their head, and then trace a large circle in the air to define the open canopy.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\nP1: dir: \"up\", gripper_orientation: \"horizontal\". This depicts holding a vertical handle from the side, which is a very common and stable way to carry a closed umbrella. P2: dir: \"down\", gripper_orientation: \"vertical\". This depicts pressing on the top of the handle, which is less natural for the initial hold. Winner is P1 because it's a more iconic pose for holding the object before opening it.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > path arc vs M2: pose > movement rep). State the winner and why.\nM1: pose(hold) > line(up) > arc(vertical plane). This was the prior attempt; the vertical arc fails to define the shape. M2: pose(hold) > line(up) > arc(horizontal plane). This sequence clearly separates the \"opening\" action from the \"shape defining\" action, using a horizontal arc that matches the round canopy. Winner is M2 for its geometric clarity.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the mime interpretation stronger and pick the best one.\nC1: A small, sharp downward jolt at the end to mime the umbrella's mechanism locking open. C2: A slight wobble after opening, as if adjusting to the weight. Winner is C1 because the sharp lock is a more distinct and iconic mechanical action associated with opening an umbrella."
+  }
+]

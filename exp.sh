@@ -12,7 +12,7 @@
 #   ONLY=8,9 MODEL_SIZE=7b bash exp.sh
 #   SUMMARY=1 bash exp.sh
 #   ALL_MODELS=1 SUMMARY=1 bash exp.sh
-#   DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all
+#   DOMAIN=tiago MODEL_SIZE=gemini bash exp.sh all
 #
 # Cluster sbatch — set env on the submit line, then sbatch (export=ALL is in #SBATCH header):
 #   ONLY=4,5,6,10 MODEL_SIZE=32b sbg exp.sh
@@ -156,7 +156,7 @@ _run_once() {
   export RESUME="${RESUME:-1}"
   export DOMAIN="${domain}"
 
-  if [[ "${domain}" == "google_robot" ]]; then
+  if [[ "${domain}" == "tiago" ]]; then
     export MOTION_PREPARE_MP4="${MOTION_PREPARE_MP4:-1}"
   else
     export MOTION_PREPARE_MP4="${MOTION_PREPARE_MP4:-0}"
@@ -180,7 +180,7 @@ _run_once() {
 
   if [[ ! -f "${exp_py}" ]]; then
     echo "[exp.sh] exp.py not found: ${ROOT}/${exp_py}" >&2
-    echo "[exp.sh] domain=${domain} — use robotarm or google_robot" >&2
+    echo "[exp.sh] domain=${domain} — use robotarm or tiago" >&2
     exit 1
   fi
 

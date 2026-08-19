@@ -1,0 +1,69 @@
+[
+  {
+    "idx": 15,
+    "cue": "mime_photographer",
+    "description": "The robot lifts an imaginary camera to its eye, makes a small side-to-side adjustment to frame the shot, then performs a sharp, quick motion simulating pressing the shutter button.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 40,
+            "y": 0,
+            "z": 40,
+            "gripper_orientation": "horizontal",
+            "gripper_value": 50
+          },
+          "speed": 1.0,
+          "hold_time": 0.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 35,
+            "y": 0,
+            "z": 70,
+            "gripper_orientation": "vertical",
+            "gripper_value": 20
+          },
+          "speed": 1.5,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "path": "line",
+          "axis": "y",
+          "distance": 0.03,
+          "repetition": 2,
+          "speed": 0.8,
+          "hold_time": 0.3
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "path": "line",
+          "axis": "z",
+          "distance": -0.02,
+          "repetition": 1,
+          "speed": 4.0,
+          "hold_time": 1.0
+        }
+      }
+    ],
+    "state": "exp15_mime_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-09T17:50:40",
+    "experiment": "exp15",
+    "generation_valid": true,
+    "correction_q1": "No, the prior config is not representative. The framing motion is a barely visible wrist wiggle and the shutter press is an ambiguous wrist flick rather than a clear button press.",
+    "correction_q2": "The new sequence will use clearer, path-based movements. It will start by lifting an imaginary camera to the 'eye' (pose), then make a small side-to-side linear shift to 'frame' the shot, and finish with a short, sharp, linear downward 'press' to represent the shutter click, holding the pose after.",
+    "reasoning": "# Correction Q1: No, the prior config is not representative. The framing motion is a barely visible wrist wiggle and the shutter press is an ambiguous wrist flick rather than a clear button press.\n# Correction Q2: The new sequence will use clearer, path-based movements. It will start by lifting an imaginary camera to the 'eye' (pose), then make a small side-to-side linear shift to 'frame' the shot, and finish with a short, sharp, linear downward 'press' to represent the shutter click, holding the pose after.\n# Q1: A human would bring their hands to their face to form a camera shape, look through the \"viewfinder\", and then press sharply down with their index finger to take the picture.\n# Q2: P1: `dir: front` + `gripper_orientation: vertical`. P2: `dir: left` + `gripper_orientation: horizontal`. Winner is P1, as it points the \"lens\" at the viewer and mimics a natural hand-grip on the side of a camera body, making the action more direct and recognizable.\n# Q3: M1: `pose(lift)` > `movement(line-y, frame)` > `movement(line-z, click)`. M2: `pose(lift)` > `movement(joint-y, frame)` > `movement(joint-z, click)`. Winner is M1 because using linear path movements creates a more stable and clear representation of a photographer adjusting their stance and pressing a button, unlike the small, localized joint wiggles of M2.\n# Q4: A1: A preparatory \"ready\" pose before lifting the camera. A2: A slight recoil after the click. Winner is A1, as a distinct \"ready\" pose sets the stage and makes the primary action of lifting the camera to the eye more deliberate and clear."
+  }
+]

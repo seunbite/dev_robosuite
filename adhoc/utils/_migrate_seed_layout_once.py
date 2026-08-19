@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SEED = ROOT / "data" / "seed"
 RES = ROOT / "data" / "results"
 MC_MANIP = RES / "motion_configs" / "manipulator"
-MC_GOOGLE = RES / "motion_configs" / "google_robot"
+MC_GOOGLE = RES / "motion_configs" / "tiago"
 MC_QUAD = RES / "motion_configs" / "quadruped"
 BUNDLES = MC_MANIP / "bundles"
 REMAINDER = SEED / "_remainder"
@@ -54,7 +54,7 @@ def main() -> int:
     if flat_prompt.is_dir() and not (SEED / "prompt" / "manipulator").exists():
         flat_prompt.rename(backup)
         (SEED / "prompt" / "manipulator").mkdir(parents=True, exist_ok=True)
-        (SEED / "prompt" / "google_robot").mkdir(parents=True, exist_ok=True)
+        (SEED / "prompt" / "tiago").mkdir(parents=True, exist_ok=True)
         (SEED / "prompt" / "quadruped").mkdir(parents=True, exist_ok=True)
         if backup.is_dir():
             for f in backup.iterdir():
@@ -68,11 +68,11 @@ def main() -> int:
                 shutil.rmtree(backup, ignore_errors=True)
     else:
         (SEED / "prompt" / "manipulator").mkdir(parents=True, exist_ok=True)
-        (SEED / "prompt" / "google_robot").mkdir(parents=True, exist_ok=True)
+        (SEED / "prompt" / "tiago").mkdir(parents=True, exist_ok=True)
         (SEED / "prompt" / "quadruped").mkdir(parents=True, exist_ok=True)
 
     (SEED / "shots" / "manipulator").mkdir(parents=True, exist_ok=True)
-    (SEED / "shots" / "google_robot").mkdir(parents=True, exist_ok=True)
+    (SEED / "shots" / "tiago").mkdir(parents=True, exist_ok=True)
     (SEED / "shots" / "quadruped").mkdir(parents=True, exist_ok=True)
 
     for name in (
@@ -85,7 +85,7 @@ def main() -> int:
         move_file(SEED / name, SEED / "yml" / name)
 
     for src_dir, robot in (
-        (SEED / "google_robot" / "prompt", "google_robot"),
+        (SEED / "tiago" / "prompt", "tiago"),
         (SEED / "quadruped_go2" / "prompt", "quadruped"),
     ):
         if src_dir.is_dir():
@@ -94,7 +94,7 @@ def main() -> int:
                     move_file(f, SEED / "prompt" / robot / f.name)
 
     for src_dir, robot in (
-        (SEED / "google_robot" / "shot", "google_robot"),
+        (SEED / "tiago" / "shot", "tiago"),
         (SEED / "quadruped_go2" / "shot", "quadruped"),
     ):
         if src_dir.is_dir():
@@ -110,7 +110,7 @@ def main() -> int:
         if p19.is_dir():
             move_tree(p19, MC_QUAD / "prompt19_locomotion_configs")
 
-    google_cfg = SEED / "google_robot" / "config"
+    google_cfg = SEED / "tiago" / "config"
     if google_cfg.is_dir():
         for f in sorted(google_cfg.glob("*.json")):
             move_file(f, MC_GOOGLE / f.name)
@@ -174,7 +174,7 @@ def main() -> int:
         except OSError:
             pass
 
-    for d in (SEED / "google_robot", SEED / "quadruped_go2", SEED / "manipulator"):
+    for d in (SEED / "tiago", SEED / "quadruped_go2", SEED / "manipulator"):
         if not d.is_dir():
             continue
         remainder_sub = REMAINDER / d.name

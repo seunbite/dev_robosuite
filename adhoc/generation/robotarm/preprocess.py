@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -12,6 +13,7 @@ if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
 from adhoc.utils.repo_paths import dev_robosuite_root  # noqa: E402
+from adhoc.generation.utils import announce_output  # noqa: E402
 
 _DEFAULT_JSONL = dev_robosuite_root() / "data" / "seed" / "_remainder" / "closest_poses_results.jsonl"
 _DEFAULT_ROBOTS = ["IIWA", "Panda", "Sawyer", "Kinova3", "Jaco", "UR5e", "XArm7"]
@@ -32,6 +34,7 @@ def run(
         print(f"Removed {stack}")
 
     robots = robots or list(_DEFAULT_ROBOTS)
+    announce_output(stack.parent, len(robots), kind="jsonl")
     py = sys.executable
     find_script = Path(__file__).with_name("legacy") / "find_closest_poses.py"
     for robot in robots:
@@ -47,7 +50,9 @@ def run(
             "--stack_jsonl_path",
             str(stack),
         ]
-        r = subprocess.run(cmd, cwd=str(_REPO))
+        env = dict(os.environ)
+        env["PYTHONPATH"] = f"{_REPO}:{env.get('PYTHONPATH', '')}".rstrip(":")
+        r = subprocess.run(cmd, cwd=str(_REPO), env=env)
         if r.returncode != 0:
             print(f"Warning: find_closest_poses failed for {robot} (exit {r.returncode})")
 

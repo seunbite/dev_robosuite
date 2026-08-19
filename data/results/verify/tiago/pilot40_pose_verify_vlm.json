@@ -1,0 +1,1030 @@
+{
+  "time": "2026-06-08T00:02:19",
+  "model": "gemini-2.5-flash",
+  "component": "pose",
+  "modality": "vlm",
+  "config_json": "data/seed/shots/tiago/shot_configs_pilot40_mobile.json",
+  "render_dir": "data/results/render/tiago",
+  "media_dir": "data/results/render/tiago/pilot40_media",
+  "total": 39,
+  "results": [
+    {
+      "idx": 7,
+      "cue": "raise_fists_victory",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g07_raise_fists_victory_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's arms are in a lowered position, which contradicts the 'raise_fists_victory' cue and the 'arm_position: \"up\"' specified in the current pose component. Furthermore, the robot's left hand is holding an object, preventing it from forming a fist, which is essential for a 'fists victory' pose.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "vertical",
+                "left_gripper_state": "closed",
+                "right_gripper_state": "closed",
+                "head": "center",
+                "x": 50,
+                "y": 60,
+                "z": 45
+              }
+            }
+          },
+          "why_change": "The initial pose must clearly show both arms raised with clenched fists, without holding any objects, to align with the 'raise_fists_victory' cue. The existing JSON's `arm_position: \"up\"` is correct, but it's not reflected in the visual. The `left_arm: \"still\"` parameter is ambiguous and seems to have led to the left arm being in an incorrect position and holding an object. Explicitly setting `left_gripper_state: \"closed\"` and `right_gripper_state: \"closed\"` ensures both hands are fists and not holding anything, and removing `left_arm: \"still\"` should allow the `arm_position: \"up\"` to apply to both arms."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 8,
+      "cue": "fist_pump",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g08_fist_pump_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm is positioned too low to be considered a 'neutral mid-chest position'. It appears closer to hip height or lower chest. Additionally, the gripper's orientation is clearly angled downwards and slightly inwards, which does not match the 'horizontal' specified in the current pose component.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "front",
+                "gripper_orientation": "neutral",
+                "head": "center",
+                "x": 55,
+                "y": 45,
+                "z": 65,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The original arm position was too low for a 'neutral mid-chest position'. The 'z' coordinate was increased from 45 to 65 to raise the arm to mid-chest height. The 'y' coordinate was decreased from 50 to 45 to slightly pull the arm back in 'anticipation' as described. The 'gripper_orientation' was changed from 'horizontal' to 'neutral' because the visual evidence does not show a horizontal gripper, and 'neutral' is more appropriate for a starting position before an upward 'fist pump' action."
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 9,
+      "cue": "flex_bicep",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g09_flex_bicep_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's arms are currently bent at the elbow and held relatively close to the body. The cue description for the 'flex_bicep' action states, 'Starting with the arm extended to the side', which requires a straight arm pointing outwards from the torso. The current visual setup does not meet this requirement, as both arms appear in a relaxed, bent state.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "out",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 55,
+                "y": 110,
+                "z": 40,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The original pose's end-effector coordinates (`y: 60`) for the right arm, in conjunction with `arm_position: \"out\"`, result in a bent arm as shown in the image. This contradicts the 'arm extended to the side' requirement for the starting position of a bicep flex. Increasing the 'y' coordinate to `110` (from `60`) will push the end effector further to the right from the robot's center, causing the inverse kinematics solver to straighten the arm more significantly to reach that 'out' position, thus meeting the cue's requirement for an extended arm."
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 10,
+      "cue": "shrug_idk",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g10_shrug_idk_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm (viewer's left) is raised as specified by `arm_position: \"up\"`, and its left arm (viewer's right) is down as specified by `left_arm: \"still\"`. While this literally matches the \"Starting with its arm already raised\" part of the description (singular 'arm'), the cue name \"shrug_idk\" and the phrase \"mimicking a classic 'I don't know' shrug\" strongly imply a bilateral action involving both arms and shoulders. Therefore, a starting pose with only one arm raised and the other down is not appropriate for a classic bilateral shrug.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 55,
+                "y": 65,
+                "z": 50,
+                "left_arm": "up"
+              }
+            }
+          },
+          "why_change": "A 'classic 'I don't know' shrug' typically involves both arms and shoulders. To correctly set up for such a bilateral gesture, both arms should be in a raised or preparatory position, not just one. Changing `left_arm` from 'still' to 'up' would ensure both arms are ready for the shrug action as implied by the cue intent.",
+          "confidence": 0.9
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 11,
+      "cue": "self_scratch_head_confused",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g11_self_scratch_head_confused_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot is in a neutral standing pose with its head centered and both arms down by its sides. This visual pose is a suitable starting point for an action involving raising an arm to scratch the head. However, the provided JSON pose component describes the `arm_position` as \"out\", which contradicts the visual representation where the arms are down and close to the body. If the JSON were to be interpreted literally, the rendered image would look different.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "still",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 55,
+                "y": 50,
+                "z": 50,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The current `arm_position` is specified as \"out\" in the JSON, which contradicts the visual representation of the robot with its arms down by its sides. To accurately reflect the visual and provide a natural starting point for the 'self_scratch_head_confused' action, the `arm_position` should be corrected to \"still\" (or 'down'). A neutral pose with arms 'still' is a more appropriate and natural starting point for an action involving raising an arm to scratch the head, compared to arms being 'out'."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 12,
+      "cue": "facepalm",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g12_facepalm_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm (viewer's left) is extended forward and slightly downwards in the image, which contradicts the 'arm raised' description in the cue and the 'arm_position: up' parameter in the current pose component. For a facepalm, the arm should visibly start in a raised position. Additionally, the gripper is oriented horizontally with its opening facing away from the robot, which is an awkward starting point for orienting it 'like a palm' to bring to the face.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 56,
+                "y": 18,
+                "z": 115,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The current render of the first pose does not show the arm in a 'raised' position as required by the cue description. The 'x,y,z' coordinates have been adjusted to place the end-effector in a clearly raised position (higher 'z' and slightly retracted 'y' to facilitate elbow bending upwards). The 'gripper_orientation' was changed from 'horizontal' to 'vertical' to provide a more natural and preparatory orientation for the subsequent wrist rotation and facepalm gesture, where the 'palm' needs to be brought to the robot's face. The previous 'horizontal' (opening away from robot) would require a more complex or less intuitive initial rotation."
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 13,
+      "cue": "point_self",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g13_point_self_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's arms in the rendered image are positioned in front of its body, slightly to the sides, with elbows bent. They are clearly visible in the foreground.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "back",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 60,
+                "y": 50,
+                "z": 40,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The cue description states that the first pose should be 'From a resting position behind its back'. However, the provided image shows the robot's arms positioned in front of its body. The corrected pose component specifies 'arm_position': 'back' to align with the cue's intended starting position."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 14,
+      "cue": "point_you",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g14_point_you_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot is shown in a neutral, ready stance. The right arm (from the robot's perspective) is positioned slightly forward and to the side, with the gripper clearly oriented vertically. This pose perfectly matches the cue's description of 'Starting from a neutral position with a vertical gripper', serving as an appropriate initial setup for the 'point_you' action.",
+        "if_not_appropriate": null,
+        "confidence": 5.0
+      }
+    },
+    {
+      "idx": 15,
+      "cue": "beckon_come_here",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g15_beckon_come_here_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm is holding a cylindrical object, which prevents it from performing a beckoning gesture. The arm is also bent at the elbow, and not in an 'extended forward position' as described in the cue. The gripper's orientation, while holding an object, is also inappropriate for initiating a beckoning motion that requires an open hand with an upward or forward-facing palm.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "extended_forward",
+                "gripper_orientation": "upward",
+                "head": "center",
+                "x": 55,
+                "y": 50,
+                "z": 55,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The robot must not be holding an object to perform a beckoning gesture, which requires an empty and open gripper. The cue explicitly states 'From an extended forward position', but the robot's arm is currently bent. The gripper should be oriented with the 'palm' facing upward to facilitate the 'curls its wrist inward' motion for beckoning. The current `arm_position: \"front\"` is visually not extended, and `gripper_orientation: \"horizontal\"` with an object is incorrect for the cue."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 16,
+      "cue": "stop_palm_out",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g16_stop_palm_out_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm, which would perform the 'stop' gesture, is not visually 'raised' as described in the cue. Instead, it appears bent and pointing slightly downwards. The gripper's orientation also does not seem prepared for a 'palm out' gesture, as its palm is not clearly facing forward or upward. The left arm is extended horizontally, which is not relevant to the cue's focus on the active arm for the 'stop' gesture.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "front_up",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 56,
+                "y": 22,
+                "z": 87,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The current `arm_position` specified as 'up' and the corresponding visual arm position do not match the cue's requirement of 'Starting with its arm raised'. The arm should be visibly elevated and positioned forward. Additionally, the `gripper_orientation` of 'horizontal' is incorrect for a 'stop_palm_out' gesture; the gripper needs to be oriented 'vertical' for the palm to face outwards. Changing `arm_position` to 'front_up' and `gripper_orientation` to 'vertical' will better prepare the robot for the described 'stop_palm_out' action."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 17,
+      "cue": "pat_stomach",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g17_pat_stomach_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The image shows the mobile manipulator in a neutral, ready stance. The robot's right arm (on the left side of the image, which is the robot's left side as stated in the cue) is slightly forward and down, not obstructing the view or already performing the action. The torso height is mid, and the head is centered. This setup appears suitable as a starting pose before the robot begins the 'pat_stomach' action, which involves moving the arm from this general position to the center of its body.",
+        "if_not_appropriate": null,
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 18,
+      "cue": "fan_face_hot",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g18_fan_face_hot_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot's right arm is raised to the side with the gripper oriented horizontally, ready to begin a fanning motion. The torso is at a mid-height and the left arm is still, which is consistent with the cue's description of 'Starting with the arm raised to the side'. The overall initial pose is appropriate for the intended action of fanning the face.",
+        "if_not_appropriate": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 19,
+      "cue": "cover_yawn_sleepy",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g19_cover_yawn_sleepy_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm (robot's left from viewer's perspective), which would perform the 'cover yawn' action, is extended too far forward and to the side. While the 'z' coordinate (87) indicates a raised position, the 'x' (56) and 'y' (22) coordinates place the end-effector significantly away from the robot's body. This extended position does not appear to be a natural or appropriate 'raised position' from which to 'lift the gripper to cover a mouth' for a yawn; it would require an awkward retraction before moving to the face.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 40,
+                "y": 0,
+                "z": 80,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The current pose of the active right arm (robot's left) is too extended forward and to the side. For the 'cover_yawn' action, which involves lifting the hand to the mouth, the arm should ideally start in a 'raised' but more retracted and centrally located position. The corrected coordinates (x=40, y=0, z=80) bring the end-effector closer to the robot's center and slightly less forward, while maintaining a 'raised' height, allowing for a more natural and direct lifting motion to cover the mouth."
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 20,
+      "cue": "rub_eye_tired",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g20_rub_eye_tired_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm is extended outwards and slightly forward, consistent with `arm_position: \"out\"`. This position is too far from the robot's head and too low to be considered \"a raised position to the side of its head\" as required by the cue for initiating an eye rub.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "pre_retreat",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 20,
+                "y": 20,
+                "z": 85,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The original pose component's `arm_position: \"out\"` combined with its `x`, `y`, and `z` coordinates places the robot's arm too far from its body and too low. The cue requires the arm to start in 'a raised position to the side of its head'. The corrected `arm_position: \"pre_retreat\"` allows for a more flexible and closer arm configuration, while `x: 20`, `y: 20`, and `z: 85` specifically place the end-effector near eye level and to the side of the head, ready to perform the rubbing action."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 21,
+      "cue": "tap_temple_think",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g21_tap_temple_think_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm, which is intended to perform the 'tap_temple_think' action, is currently positioned downwards and slightly forward. This does not align with the cue description, which explicitly states the arm should be 'Starting with the arm extended left'.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "out",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 50,
+                "y": 80,
+                "z": 65,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The current pose does not show the right arm 'extended left' as required by the cue description. To achieve this, the arm needs to be raised higher (increase z) and moved significantly to the robot's left side (increase y), while maintaining an outstretched position (adjust x slightly if needed for better extension). The suggested coordinates aim to place the end-effector higher and further to the robot's left to match the description's starting condition for the subsequent 'pulls in slightly' motion."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 22,
+      "cue": "circle_temple_crazy",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g22_circle_temple_crazy_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm is extended outwards, not at its side as described in the cue. The cue specifies the starting position of the active arm should be 'at its side'.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "side",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 60,
+                "y": 45,
+                "z": 50,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The cue explicitly states that the active arm should start 'from a starting position at its side'. The current pose has 'arm_position': 'out', which does not match this requirement. Changing 'arm_position' to 'side' aligns the initial pose with the cue's description."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 23,
+      "cue": "lean_forward_interest",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g23_lean_forward_interest_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot in the image is in a neutral, forward-facing pose. Its torso is at a mid-height, the main arm (right arm) is positioned forward with a horizontal gripper, and the head is centered. The left arm appears to be in a 'still' or default hanging position. This visually matches the parameters specified in the `current_pose_component` JSON, particularly 'torso_height: mid', 'arm_position: front', 'gripper_orientation: horizontal', and 'head: center'. The cue description states that the action 'lean_forward_interest' 'Starting from a neutral forward position'. The depicted first-pose frame accurately represents this described neutral forward starting position.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {}
+            }
+          },
+          "why_change": ""
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 24,
+      "cue": "cover_mouth_gasp",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g24_cover_mouth_gasp_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm, which is expected to perform the 'cover mouth' action, is depicted in a relaxed, downward position by its side. This contradicts the cue description's requirement for the action to start 'From a raised position'. The current visual setup is not an appropriate preparatory pose for a gasp motion.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 55,
+                "y": 25,
+                "z": 100,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The cue description explicitly states the action should start 'From a raised position'. The current pose component, despite having 'arm_position: up', renders the arm in a low, relaxed state (as seen in the image). The suggested changes to the 'x', 'y', and particularly 'z' coordinates (to 100) aim to ensure the right arm is visually and functionally in a clearly raised position, ready to perform the 'cover_mouth_gasp' action from an appropriate starting point."
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 25,
+      "cue": "cheers_toast",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g25_cheers_toast_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's arm is extended outwards at a mid-level, not raised high for a 'toast' gesture. The gripper is also oriented horizontally, which is inappropriate for holding a glass or bottle upright for toasting. A 'raised toast' position typically involves the arm being bent at the elbow, bringing the hand and object up, usually above shoulder height, with the object held vertically.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 40,
+                "y": 10,
+                "z": 100,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The original pose component had the arm extended too far forward and to the side, at a height (z=87) that is not sufficiently 'raised' for a toast. The gripper orientation was also 'horizontal', which is incorrect for holding a beverage container upright. The corrected pose increases the 'z' coordinate to raise the arm significantly, adjusts 'x' and 'y' to bring the end-effector slightly closer and more centered for a natural toast, and changes the 'gripper_orientation' to 'vertical' to simulate holding a glass properly for toasting."
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 26,
+      "cue": "highfive_invite",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g26_highfive_invite_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's arm is raised, but the gripper's orientation is 'horizontal', meaning the opening (and what would be the 'palm' for a high-five) is facing downwards or upwards, rather than forward. A classic high-five position requires the 'palm' to be oriented vertically and facing outwards, ready to make contact with another hand. The current pose does not resemble a high-five ready position.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 56,
+                "y": 22,
+                "z": 87,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The original `gripper_orientation` was 'horizontal', which makes the gripper 'palm' face downwards or upwards. For a 'highfive_invite', the gripper's 'palm' should be oriented 'vertical' and facing forward to present a classic high-five ready position, allowing for the subsequent wrist nodding motion to be natural and inviting."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 27,
+      "cue": "highfive_imitation",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g27_highfive_imitation_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm, which would perform the high-five, is positioned too low and bent. It appears to be at a height roughly equivalent to the robot's lower chest or waist. The cue describes 'starting with its arm raised in a ready position', which implies the arm should be significantly more elevated, typically around shoulder to head height, ready for a high-five motion. The current visual does not meet this requirement.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "raised",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 56,
+                "y": 22,
+                "z": 87,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The existing `arm_position: \"up\"` parameter, as rendered in the image, does not result in the arm being 'raised in a ready position' suitable for a high-five. To correctly initiate a high-five imitation, the arm needs to be significantly more elevated. Changing `arm_position` to `\"raised\"` (or a similar, more elevated state if available) is necessary to meet the cue's requirement of a 'raised' arm."
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 28,
+      "cue": "fistbump_invite",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g28_fistbump_invite_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot's right arm is extended forward, and its gripper is oriented in a way that simulates a fistbump offer, with the 'palm' facing slightly upward and 'fingers' forward. The torso height is mid, and the head is centered, which is appropriate for engaging in a fistbump. The overall pose aligns well with the cue description.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {}
+            }
+          },
+          "why_change": ""
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 30,
+      "cue": "pat_self_back",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g30_pat_self_back_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's arms are in a neutral, slightly forward and downward position, not behind its back. For the 'pat_self_back' cue, the robot's arm should start already behind its back.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "back",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 55,
+                "y": 50,
+                "z": 45,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The current pose component already specifies 'arm_position: \"back\"', which semantically matches the cue's requirement. However, the provided visual rendering does not show the arm behind the robot's back. The corrected component remains the same, highlighting that the visual output of the 'arm_position: \"back\"' parameter is not appropriate for the cue's intent, implying a discrepancy between the parameter's definition/rendering and the desired pose."
+        },
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 32,
+      "cue": "throat_cut_stop",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g32_throat_cut_stop_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The current pose shows the robot's right arm positioned to its right side. The cue description explicitly states, 'Starting with the arm extended to the left,' which contradicts the visual. The arm should be across the robot's body towards its left side for the starting position of a 'throat_cut_stop' gesture.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "left",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 60,
+                "y": 75,
+                "z": 60,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The original pose had the right arm on the robot's right side. The cue description requires the arm to start 'extended to the left' to perform a 'throat cut' motion across the body. The `arm_position` parameter was changed to 'left' to place the right arm on the robot's left side. The `x` coordinate was slightly increased to make it more 'extended', and the `y` coordinate was increased to ensure it is significantly to the left. The `z` coordinate was adjusted from 50 (mid) to 60 to better approximate 'throat level'."
+        },
+        "confidence": 5.0
+      }
+    },
+    {
+      "idx": 35,
+      "cue": "salute",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g35_salute_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot's right arm is extended forward with the gripper in a horizontal orientation, matching the 'arm extended forward' description for the starting pose of a salute. The torso height and head position also appear appropriate for the initial state.",
+        "if_not_appropriate": null,
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 36,
+      "cue": "visor_search",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g36_visor_search_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm is extended forward and slightly to the side, with the gripper at approximately chest height. This pose is described as 'arm_position: out' in the JSON. The gripper is not held 'to the side of the head like a visor' as required by the cue.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "vertical",
+                "head": "center",
+                "x": 45,
+                "y": 15,
+                "z": 95,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The cue specifies 'Starting with the hand held to the side of the head like a visor'. The current pose has the arm extended 'out' with the gripper at chest level. The corrected pose changes 'arm_position' to 'up' and adjusts the `x`, `y`, `z` coordinates to bring the gripper higher (z), closer to the robot's face (y), and closer to the side of the head (x) to more accurately represent a visor gesture."
+        },
+        "confidence": 5.0
+      }
+    },
+    {
+      "idx": 37,
+      "cue": "yield_turn",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g37_yield_turn_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm is extended forward and slightly to the side. This does not represent a 'neutral forward pose' as described in the cue, which specifies that the gesture starts *from* such a pose. Instead, the current first-pose appears to be already part of the 'outward sweeping arc' movement or too extended to be considered neutral.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "front",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 10,
+                "y": 20,
+                "z": 75,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "To establish a 'neutral forward pose' with the arm closer to the body (reduced 'x' angle) and more bent at the elbow (increased 'z' angle), as described for the starting point of the 'yield_turn' gesture. The current pose is too extended and outward for a neutral starting position."
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 39,
+      "cue": "request_turn",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g39_request_turn_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's arms are raised as required. However, the cue specifies the 'gripper held flat like a platter', but in the image, both grippers are angled downwards and not flat. Additionally, the cue implies a single-arm gesture ('the arm'), while the 'left_arm' is specified as 'still', its visual representation is raised and extended, which does not convey a neutral or non-gesturing pose for a single-arm gesture.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "up",
+                "head": "center",
+                "x": 56,
+                "y": 22,
+                "z": 87,
+                "left_arm": "down"
+              }
+            }
+          },
+          "why_change": "The original `gripper_orientation: \"horizontal\"` did not result in the gripper being 'flat like a platter' as required by the cue; it appeared angled downwards. Changing it to `\"up\"` is intended to achieve a 'palm-up' or 'flat' orientation for the gesturing arm. Additionally, the `left_arm: \"still\"` parameter's visual representation was raised and extended. To clearly indicate a non-gesturing, neutral pose for the non-active arm in a single-arm gesture, `left_arm: \"down\"` is more appropriate."
+        },
+        "confidence": 0.8
+      }
+    },
+    {
+      "idx": 40,
+      "cue": "guiding_arm",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g40_guiding_arm_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot's right arm is extended forward, and the gripper (hand) is oriented vertically, exactly as described in the cue 'Starting with the arm extended forward and the hand vertical'. The torso height is mid and the head is centered, which aligns with typical default settings. The left arm is 'still' as specified. All aspects of the first pose visually match the cue's description and the provided pose component parameters.",
+        "if_not_appropriate": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 41,
+      "cue": "protective_arm_out",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g41_protective_arm_out_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot's torso is at a mid-height, and the right arm (assuming the active arm for the cue) is in an 'up' position, bent at the elbow with the forearm raised and slightly forward. This configuration strongly resembles a 'raised-guard position', which is specified as the starting point for the 'protective_arm_out' cue. The head is centered, and the left arm is still, both of which are consistent with a preparatory protective stance.",
+        "if_not_appropriate": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 45,
+      "cue": "slow_down_request_palm_down",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g45_slow_down_request_palm_down_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot's right arm is extended forward and positioned relatively high. The gripper is oriented horizontally, which corresponds to a 'palm down' position. The other arm is still, and the head is centered. This setup is consistent with the 'high forward position with the gripper horizontal (palm down)' requirement for the first pose.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {}
+            }
+          },
+          "why_change": ""
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 50,
+      "cue": "firm_accept_forward_reach",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g50_firm_accept_forward_reach_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm is shown in a somewhat forward and elevated position. The gripper is oriented horizontally. The head is centered. The arm appears to be already partially extended, rather than in a truly 'neutral' position. Furthermore, the `y: 50` coordinate in the current pose component implies the end-effector is significantly to the robot's *left*, which contradicts the visual showing the *right* arm as the active arm.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "front",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 25,
+                "y": -25,
+                "z": 30,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The cue specifies starting 'From a neutral forward position'. The current pose with `x=45` indicates an already significantly forward extension, and `y=50` places the end-effector on the robot's left side, contradicting the visual which shows the right arm. To achieve a more 'neutral forward position' for the right arm, the arm should be brought closer to the body (smaller x), positioned correctly for the right arm's side (negative y), and at a more natural height (smaller z). The suggested `x=25, y=-25, z=30` would place the right arm in a more relaxed, less pre-extended, and correctly sided neutral pose."
+        },
+        "confidence": 5.0
+      }
+    },
+    {
+      "idx": 59,
+      "cue": "nod_yes",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g59_nod_yes_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot's torso is at a mid-height, and its right arm (the mobile manipulator) is extended forward. The gripper is oriented horizontally and positioned relatively high, which aligns with the cue's description of 'starting from a high forward position with a horizontal gripper'. The head is centered and the left arm is still, as specified. The pose is appropriate for the intent.",
+        "if_not_appropriate": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 60,
+      "cue": "shake_head_no",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g60_shake_head_no_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's head is centered, which is an appropriate starting point for a 'shake head no' gesture. However, the right arm is extended forward and raised, holding an object. For a gesture primarily performed by the head, this specific arm pose is overly prominent and distracting, and not typically associated with a neutral starting position for a 'shake head no'. The cue description, stating the 'robot's wrist shakes side-to-side', directly conflicts with the cue name 'shake_head_no'. Assuming the cue name dictates the primary action, the arm's position is not appropriate.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "still",
+                "head": "center",
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The cue name `shake_head_no` implies a head-based gesture. The current pose has the right arm extended and holding an object, which is too specific and distracting for a neutral starting pose for a head gesture. For a head gesture, the arms should generally be in a neutral or 'still' position to ensure the head is the primary focus of the 'no' signal."
+        },
+        "confidence": 0.95
+      }
+    },
+    {
+      "idx": 61,
+      "cue": "air_quotes",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g61_air_quotes_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's arms are down by its sides, with the grippers in a relaxed, slightly forward/downward orientation. This is not a suitable starting position for performing 'air quotes'. The description implies the robot's arm should be in a forward-facing position ready to perform wrist flicks, which typically requires the hands to be raised to an observable height (e.g., chest or waist level) and positioned in front of the body.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "front_medium_height",
+                "gripper_orientation": "palms_in",
+                "head": "center",
+                "x": 50,
+                "y": 50,
+                "z": 45,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The current arm position is down by the sides, which is not conducive to naturally performing the 'air quotes' gesture. For air quotes, the robot's hands need to be raised to a more visible height (e.g., chest or waist level) and brought forward, with palms facing each other or slightly forward, to allow for clear wrist flicks. The suggested changes ('front_medium_height' for arm position and 'palms_in' for gripper orientation) would place the robot in a more appropriate starting pose for this gesture."
+        },
+        "confidence": 0.5
+      }
+    },
+    {
+      "idx": 64,
+      "cue": "tilt_head_curious",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g64_tilt_head_curious_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot is in a neutral, forward-facing stance. The right arm (from the robot's perspective, viewer's left) is positioned in front of the body, holding an object (likely the 'mobile EE' mentioned in the cue) with a horizontal gripper orientation. The robot's head is centered and facing forward. The left arm (from the robot's perspective, viewer's right) is by its side, appearing still. This pose accurately represents a 'neutral forward position' as described in the cue, serving as a suitable starting point for the 'tilt_head_curious' action.",
+        "if_not_appropriate": null,
+        "confidence": 1.0
+      }
+    },
+    {
+      "idx": 66,
+      "cue": "shh_gesture",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g66_shh_gesture_pose.png",
+      "result": {
+        "pose_is_appropriate": true,
+        "visual_assessment": "The robot's right arm (from its perspective) is raised, and the gripper is in a forward and somewhat vertical orientation, which is consistent with a starting position for a 'shh' gesture. The torso height and head position are neutral. The left arm is still, as specified. This pose serves as an appropriate initial setup for the described motion of bringing the gripper to the lips.",
+        "if_not_appropriate": null,
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 74,
+      "cue": "hands_up_surrender",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g74_hands_up_surrender_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The robot's right arm is in a raised position with the gripper somewhat horizontal, which aligns with a 'raised position' preparing for a surrender gesture. However, the left arm is significantly lowered and extended forward. The cue 'hands_up_surrender' typically implies both hands being raised, making the lowered left arm inappropriate for the overall gesture's starting pose.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "up",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 56,
+                "y": 22,
+                "z": 87,
+                "left_arm": "up"
+              }
+            }
+          },
+          "why_change": "The cue 'hands_up_surrender' implies that both hands should be raised as part of the gesture. The current first pose shows the left arm in a lowered position ('still' defaults to a low visual state), which contradicts the 'hands up' intent. To appropriately set up for a 'hands up surrender' gesture, the left arm should also be in a raised position (e.g., 'up') for the initial pose."
+        },
+        "confidence": 0.9
+      }
+    },
+    {
+      "idx": 104,
+      "cue": "scale_expand",
+      "component": "pose",
+      "modality": "vlm",
+      "media": "data/results/render/tiago/pilot40_media/pose/mm19_g104_scale_expand_pose.png",
+      "result": {
+        "pose_is_appropriate": false,
+        "visual_assessment": "The image shows the robot's right arm extended significantly to its left side, which aligns with the cue's description 'arm extended to the left'. The torso is at a mid-height and the head is centered. However, the exact end-effector coordinates (x, y) provided in the JSON do not seem to fully match the visual emphasis of the arm being primarily extended to the robot's left side. Visually, the arm appears more laterally extended (large Y component) than forward (small X component). The JSON's 'x=50, y=20' suggests a more forward-left position. Additionally, the gripper in the image has its fingers pointing roughly forward and slightly down, implying a 'horizontal' or 'palm_down' orientation, rather than 'vertical' as stated in the JSON.",
+        "if_not_appropriate": {
+          "corrected_pose_component": {
+            "type": "pose",
+            "duration": 0.5,
+            "parameters": {
+              "pose": {
+                "torso_height": "mid",
+                "arm_position": "out",
+                "gripper_orientation": "horizontal",
+                "head": "center",
+                "x": 30,
+                "y": 40,
+                "z": 40,
+                "left_arm": "still"
+              }
+            }
+          },
+          "why_change": "The original pose component has `x=50, y=20` for the end-effector coordinates. While `y=20` indicates a leftward component, `x=50` (forward component) is relatively large. To better represent the visual and the cue's emphasis of 'arm extended to the left', the `y` coordinate (leftward extension) should be more prominent, and the `x` coordinate (forward extension) should be relatively smaller. Changing to `x=30, y=40` better captures a more distinct lateral extension. Additionally, the current `gripper_orientation: 'vertical'` does not match the visual of the gripper, which appears to have its fingers pointing horizontally/slightly downwards. Changing it to `horizontal` is more consistent with the image and a lateral pushing motion."
+        },
+        "confidence": 0.9
+      }
+    }
+  ]
+}

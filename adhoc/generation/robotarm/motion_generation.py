@@ -14,7 +14,9 @@ _REPO = Path(__file__).resolve().parents[3]
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
-from adhoc.utils.repo_paths import motion_configs_results_dir, resolve_seed_prompt_txt, resolve_seed_shots_json, seed_yml_dir  # noqa: E402
+from adhoc.generation.embodiment_sources import repo_rel_to_path, resolve_embodiment_paths  # noqa: E402
+from adhoc.generation.utils import announce_output  # noqa: E402
+from adhoc.utils.repo_paths import seed_yml_dir  # noqa: E402
 from legacy.config_gen_single import generate_motion_config  # noqa: E402
 from legacy.motion_generation_core import MotionGenerator, _select_initial_poses, generate  # noqa: E402,F401
 
@@ -25,20 +27,24 @@ def run(
     prompt_file: str | None = None,
     shots_json: str | None = None,
     config_json: str | None = None,
+    sources_yml: str | None = None,
     model: str = "gemini-2.5-pro",
     delay: float = 2.0,
     max_retries: int = 2,
     generate_only: list[int] | None = None,
     skip_fewshot_cues: bool = False,
     run_render: bool = True,
+    do_html: bool = False,
     sim_robot: str = "IIWA",
     hz: int = 4,
-    top_k: int = 5,
+    top_k: int = 1,
 ) -> None:
     ypath = Path(yaml_path) if yaml_path else seed_yml_dir() / "cues_new.yml"
-    prompt = str(Path(prompt_file)) if prompt_file else str(resolve_seed_prompt_txt("manipulator"))
-    shots = str(Path(shots_json)) if shots_json else str(resolve_seed_shots_json("manipulator"))
-    out = Path(config_json) if config_json else motion_configs_results_dir("manipulator") / f"motion_configs_{cue_group}.json"
+    src_opt = Path(sources_yml) if sources_yml else None
+    y_prompt, y_shots, y_out, blk = resolve_embodiment_paths("manipulator", src_opt)
+    prompt = str(Path(prompt_file)) if prompt_file else str(y_prompt)
+    shots = str(Path(shots_json)) if shots_json else str(y_shots)
+    out = Path(config_json) if config_json else y_out
     os.makedirs(out.parent, exist_ok=True)
 
     with open(ypath, "r", encoding="utf-8") as f:
@@ -56,6 +62,7 @@ def run(
             shot_list = json.load(f)
         few = {s.get("cue") for s in shot_list if isinstance(s, dict)}
         indexed = [(i, (k, d)) for i, (k, d) in indexed if k not in few]
+    announce_output(repo_rel_to_path(blk["render_dir"]), len(indexed), kind="gif")
 
     failed = 0
     for cue_idx, (cue_name, _desc) in tqdm(indexed, desc="motion_generation[robotarm]"):
@@ -87,9 +94,11 @@ def run(
 
         render_run(
             config_json=str(out),
+            do_html=do_html,
             sim_robot=sim_robot,
             hz=hz,
             top_k=top_k,
+            sources_yml=sources_yml,
         )
 
 

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "long_fewshot.schema.json",
+  "title": "Embodiment Long 1-4 few-shot",
+  "type": "object",
+  "required": [
+    "id",
+    "cue",
+    "platform",
+    "level",
+    "description",
+    "added_submotion_target",
+    "added_submotions",
+    "configs",
+    "main_component_range"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "cue": { "type": "string", "minLength": 1 },
+    "platform": {
+      "enum": [
+        "humanoid",
+        "tiago",
+        "single_arm",
+        "quadruped",
+        "roomba"
+      ]
+    },
+    "level": { "enum": ["long1", "long2", "long3", "long4"] },
+    "description": {
+      "type": "string",
+      "description": "Must explicitly enumerate every added PRE/POST submotion and explain how it frames the unchanged core."
+    },
+    "added_submotion_target": {
+      "type": "object",
+      "required": ["policy", "min", "max"],
+      "properties": {
+        "policy": {
+          "enum": ["corrected_natural_long", "count_controlled"]
+        },
+        "min": { "type": "integer", "minimum": 0 },
+        "max": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "added_submotions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["component_index", "position", "description"],
+        "properties": {
+          "component_index": { "type": "integer", "minimum": 1 },
+          "position": { "enum": ["before_core", "after_core"] },
+          "description": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "configs": {
+      "type": "object",
+      "required": ["original", "result"],
+      "properties": {
+        "original": { "$ref": "#/$defs/config" },
+        "result": { "$ref": "#/$defs/config" }
+      },
+      "additionalProperties": false
+    },
+    "main_component_range": {
+      "type": "object",
+      "required": ["start", "end", "indexing", "contract"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 1 },
+        "end": { "type": "integer", "minimum": 1 },
+        "indexing": { "const": "1-based-inclusive" },
+        "contract": {
+          "const": "Components in this range must preserve the original core semantics; context may be inserted only outside this range."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "config": {
+      "type": "object",
+      "required": ["movements"],
+      "properties": {
+        "source_code": { "type": "string" },
+        "movements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "object" }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -91,12 +91,12 @@ source scripts/cluster_env.sh /data/user_data/$USER/hf_cache
 | Machine | Command |
 |---------|---------|
 | **Server (cluster)** | `cd ~/sblee/dev_robosuite && bash exp.sh` — manipulator, all 10 tasks |
-| **Server (cluster)** | `DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all` — mobile bimanipulator |
+| **Server (cluster)** | `DOMAIN=tiago MODEL_SIZE=gemini bash exp.sh all` — mobile bimanipulator |
 | **Local (Mac)** | `cd ~/Downloads/workspace/dev_robosuite && ONLY=1,2,3,7 bash exp.sh` |
 
 ### `exp.sh` — one entry point (interactive + sbatch)
 
-`exp.sh` is the only orchestrator for pilot-90 / pilot-40 Google Robot. It works in:
+`exp.sh` is the only orchestrator for pilot-90 / pilot-40 Tiago. It works in:
 
 - **interactive**: `bash exp.sh` or `ONLY=2,3 bash exp.sh`
 - **sbatch**: `sbg --export=ALL,MODEL_SIZE=7b,ONLY=8,9 exp.sh` (partition/GPU/mem from your `sbg`/`sbg2` alias)
@@ -112,7 +112,7 @@ Override: `SKIP_ENV=1` (already activated), `SKIP_GIT_PULL=1` (no `git pull` on 
 
 ```bash
 bash exp.sh                              # manipulator full suite (32b)
-DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all
+DOMAIN=tiago MODEL_SIZE=gemini bash exp.sh all
 SUMMARY=1 bash exp.sh                    # Qwen 32B/7B/3B cross-model tables
 ONLY=1,2,3 bash exp.sh                   # subset
 MODEL_SIZE=7b ONLY=8,9 bash exp.sh
@@ -122,7 +122,7 @@ ALL_MODELS=1 SUMMARY=1 bash exp.sh       # 32b → 7b → 3b, then summary
 # sbatch (cluster)
 sbg  --export=ALL,MODEL_SIZE=7b,ONLY=8,9,MOTION_PREPARE_MP4=0 exp.sh
 sbg2 --export=ALL,MODEL_SIZE=32b,ONLY=4,5,6,10,MOTION_PREPARE_PAIRWISE=0 exp.sh
-DOMAIN=google_robot sbg2 --export=ALL,MODEL_SIZE=32b exp.sh
+DOMAIN=tiago sbg2 --export=ALL,MODEL_SIZE=32b exp.sh
 ```
 
 Motion media (exp8, exp10) — run once before verify if needed:
@@ -135,7 +135,7 @@ ONLY=8,9,10 bash exp.sh
 
 ---
 
-## Pilot-40 Google Robot (39 cues, mobile bimanipulator)
+## Pilot-40 Tiago (39 cues, mobile bimanipulator)
 
 Same **exp 1–10 protocol** as manipulator pilot-90, adapted to TIAGo pose/movement/path schema.
 
@@ -144,61 +144,61 @@ Same **exp 1–10 protocol** as manipulator pilot-90, adapted to TIAGo pose/move
 ```bash
 cd ~/sblee/dev_robosuite
 source APIKEY.sh                    # Gemini
-DOMAIN=google_robot MODEL_SIZE=gemini bash exp.sh all
-ONLY=1,2,3,7 bash exp.sh all        # subset (DOMAIN still google_robot)
-SUMMARY=1 DOMAIN=google_robot bash exp.sh all
+DOMAIN=tiago MODEL_SIZE=gemini bash exp.sh all
+ONLY=1,2,3,7 bash exp.sh all        # subset (DOMAIN still tiago)
+SUMMARY=1 DOMAIN=tiago bash exp.sh all
 ```
 
 Local Mac:
 
 ```bash
 cd ~/Downloads/workspace/dev_robosuite
-DOMAIN=google_robot MODEL_SIZE=gemini ONLY=1 bash exp.sh all
+DOMAIN=tiago MODEL_SIZE=gemini ONLY=1 bash exp.sh all
 ```
 
-**Orchestrator:** `adhoc/generation/google_robot/exp.py`  
-**Generation:** `adhoc/generation/google_robot/config_gen_mobile_vlm.py` (exp 1 & 7)  
-**Path helpers:** `adhoc/generation/google_robot/pilot40_paths.py`  
-**Prompts:** `data/seed/prompt/google_robot/exp/prompt_exp{1..10}.txt` + `_shared_*.txt`
+**Orchestrator:** `adhoc/generation/tiago/exp.py`  
+**Generation:** `adhoc/generation/tiago/config_gen_mobile_vlm.py` (exp 1 & 7)  
+**Path helpers:** `adhoc/generation/tiago/pilot40_paths.py`  
+**Prompts:** `data/seed/prompt/tiago/exp/prompt_exp{1..10}.txt` + `_shared_*.txt`
 
 ### Directory layout (symmetric to manipulator)
 
 ```
 data/seed/
-  shots/google_robot/shot_configs_pilot40_mobile.json   # 39 cue list + few-shot source
-  shots/google_robot/diverse_shots_mobile.json          # few-shot examples (exp1)
-  prompt/google_robot/exp/prompt_exp1.txt … prompt_exp10.txt
-  prompt/google_robot/exp/_shared_appropriate_means.txt
-  prompt/google_robot/exp/_shared_pose_definitions.txt
-  prompt/google_robot/exp/_shared_representative_means.txt
+  shots/tiago/shot_configs_pilot40_mobile.json   # 39 cue list + few-shot source
+  shots/tiago/diverse_shots_mobile.json          # few-shot examples (exp1)
+  prompt/tiago/exp/prompt_exp1.txt … prompt_exp10.txt
+  prompt/tiago/exp/_shared_appropriate_means.txt
+  prompt/tiago/exp/_shared_pose_definitions.txt
+  prompt/tiago/exp/_shared_representative_means.txt
   yml/_cues_new.yml                                     # cue catalog (exp1)
 
-data/results/motion_configs/google_robot/exp/
+data/results/motion_configs/tiago/exp/
   result_exp1_{model_tag}.json
   result_exp7_{model_tag}.json
 
-data/results/verify/google_robot/exp/
+data/results/verify/tiago/exp/
   score_exp1_{model_tag}.json
   score_exp7_{model_tag}.json
   result_exp2_{model_tag}.json … result_exp10_{model_tag}.json
   pilot40_suite_summary_{model_tag}.json
 
-data/results/render/google_robot/
+data/results/render/tiago/
   mm19_g*.gif                                           # rendered motions
   pilot40_media/{pose,mp4}/                             # exp2 PNG + exp8 MP4
 
 data/results/visualize/
   google_pose_groups_12/                                # pose tiles (exp5/6)
-  google_robot/pose_multitile_gt_pilot40_grid{6,12}/    # stitched grids
+  tiago/pose_multitile_gt_pilot40_grid{6,12}/    # stitched grids
 
-data/results/html/google_robot/
+data/results/html/tiago/
   exp{N}_{model_tag}.html
   index.html
 ```
 
 `{model_tag}` examples: `gemini-2.5-pro`, `mobile-map` (legacy migrated configs)
 
-### Experiment table (Pilot-40 Google Robot)
+### Experiment table (Pilot-40 Tiago)
 
 | # | Task | Prompt | Input | JSON result | HTML |
 |---|------|--------|-------|-------------|------|
@@ -216,20 +216,20 @@ data/results/html/google_robot/
 ### Media prep (exp 2, 8, 10)
 
 ```bash
-# After rendering GIFs under data/results/render/google_robot/
-python adhoc/generation/google_robot/prepare_pilot40_media.py \
-  --config-json data/results/motion_configs/google_robot/exp/result_exp7_gemini-2.5-pro.json
+# After rendering GIFs under data/results/render/tiago/
+python adhoc/generation/tiago/prepare_pilot40_media.py \
+  --config-json data/results/motion_configs/tiago/exp/result_exp7_gemini-2.5-pro.json
 
 # Pose tiles for exp 5/6 (once)
-python adhoc/generation/google_robot/generate_pose_group_tiles.py \
+python adhoc/generation/tiago/generate_pose_group_tiles.py \
   --output-root data/results/visualize/google_pose_groups_12
 ```
 
 ### Legacy migrate (optional)
 
 ```bash
-python adhoc/generation/google_robot/exp.py migrate --force
-python adhoc/generation/google_robot/exp.py summary
+python adhoc/generation/tiago/exp.py migrate --force
+python adhoc/generation/tiago/exp.py summary
 ```
 
 ---

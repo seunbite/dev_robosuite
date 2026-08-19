@@ -229,7 +229,7 @@ if __name__ == "__main__":
     def run(mode=None, robot="IIWA"):
         # Auto-detect mode if not explicitly provided
         if mode is None:
-            if robot in ["Tiago", "PandaOmron", "GoogleRobot"]:
+            if robot in ["Tiago", "PandaOmron", "Tiago"]:
                 mode = "mobile"
             else:
                 mode = "arm"

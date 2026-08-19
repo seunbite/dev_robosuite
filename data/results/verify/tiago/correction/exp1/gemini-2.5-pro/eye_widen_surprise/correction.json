@@ -1,0 +1,217 @@
+{
+  "time": "2026-07-05T23:14:47",
+  "domain": "tiago",
+  "exp_id": "1",
+  "model_tag": "gemini-2.5-pro",
+  "round": 1,
+  "parent_round": 0,
+  "correction_stem": "correction",
+  "cue": "eye_widen_surprise",
+  "base_config_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/result_exp1_gemini-2.5-pro.json",
+  "config_snapshot_json": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/tiago/exp/correction/gemini-2.5-pro/exp1/eye_widen_surprise/correction_config.json",
+  "is_correct": false,
+  "action": "corrected",
+  "correction": {
+    "exp_id": "1",
+    "correction_q1": "No, the render is too slow and smooth, looking more like a stretch than a sharp, recoiling surprise.",
+    "correction_q2": "The motion should be a single, fast recoil. The structure should be: neutral pose -> sharp step back (base path) -> snap to a final surprised pose (high torso, hands up defensively), with a long hold. This replaces the prior's sequential and disjointed torso-then-base-then-arms structure.",
+    "is_correct": false,
+    "inner_reasoning": "# Correction Q1: No, the render is too slow and smooth, looking more like a stretch than a sharp, recoiling surprise.\n# Correction Q2: The motion should be a single, fast recoil. The structure should be: neutral pose -> sharp step back (base path) -> snap to a final surprised pose (high torso, hands up defensively), with a long hold. This replaces the prior's sequential and disjointed torso-then-base-then-arms structure.\n# Q1: How would a human perform this motion? A person would perform a sharp, involuntary recoil, stepping back while their torso and head jolt up and hands fly up defensively.\n# Q2: Pose Candidates Comparison. Pose 1: `front` + `horizontal` (bilateral), a classic \"hands up\" defensive pose. Pose 2: `in` + `vertical` (bilateral), hands to face like a gasp. Winner is Pose 1 because it's a larger, more general full-body expression of surprise/shock.\n# Q3: Structure Comparison. M1: Separate steps for torso jolt, base step, and arm pose. M2: A sharp base step back followed by a single snap into the final surprised pose (high torso, hands up). Winner is M2 as it better captures a single, cohesive recoil motion rather than a sequence of distinct actions.\n# Q4: Context Reinforcement. To express surprise, the movements must be sharp and sudden. The best choice is to use maximum speed (`speed: 4.0`) on the base-step-back path and have a very fast transition into the final held pose, avoiding any intermediate pauses that would kill the momentum.",
+    "config_parsed": {
+      "cue": "eye_widen_surprise",
+      "description": "A sharp physical recoil where the robot jolts its torso up, steps back, and freezes with hands raised defensively.",
+      "movements": [
+        {
+          "type": "pose",
+          "duration": 0.1,
+          "parameters": {
+            "pose": {
+              "torso_height": "mid",
+              "arm_position": "still",
+              "gripper_orientation": "vertical",
+              "head": "center"
+            }
+          }
+        },
+        {
+          "type": "path",
+          "duration": 0.25,
+          "parameters": {
+            "path": {
+              "mode": "base",
+              "shape": "line",
+              "x": -0.1,
+              "y": 0.0,
+              "speed": 4.0
+            }
+          }
+        },
+        {
+          "type": "pose",
+          "duration": 1.5,
+          "parameters": {
+            "pose": {
+              "torso_height": "high",
+              "arm_position": "front",
+              "gripper_orientation": "horizontal",
+              "head": "up",
+              "left_arm": "mirror",
+              "elbow_bended": true,
+              "z": 80
+            }
+          }
+        }
+      ]
+    },
+    "parse_error": null,
+    "raw_text": "# Correction Q1: No, the render is too slow and smooth, looking more like a stretch than a sharp, recoiling surprise.\n# Correction Q2: The motion should be a single, fast recoil. The structure should be: neutral pose -> sharp step back (base path) -> snap to a final surprised pose (high torso, hands up defensively), with a long hold. This replaces the prior's sequential and disjointed torso-then-base-then-arms structure.\n# Q1: How would a human perform this motion? A person would perform a sharp, involuntary recoil, stepping back while their torso and head jolt up and hands fly up defensively.\n# Q2: Pose Candidates Comparison. Pose 1: `front` + `horizontal` (bilateral), a classic \"hands up\" defensive pose. Pose 2: `in` + `vertical` (bilateral), hands to face like a gasp. Winner is Pose 1 because it's a larger, more general full-body expression of surprise/shock.\n# Q3: Structure Comparison. M1: Separate steps for torso jolt, base step, and arm pose. M2: A sharp base step back followed by a single snap into the final surprised pose (high torso, hands up). Winner is M2 as it better captures a single, cohesive recoil motion rather than a sequence of distinct actions.\n# Q4: Context Reinforcement. To express surprise, the movements must be sharp and sudden. The best choice is to use maximum speed (`speed: 4.0`) on the base-step-back path and have a very fast transition into the final held pose, avoiding any intermediate pauses that would kill the momentum.\n{\n  \"cue\": \"eye_widen_surprise\",\n  \"description\": \"A sharp physical recoil where the robot jolts its torso up, steps back, and freezes with hands raised defensively.\",\n  \"movements\": [\n    {\n      \"type\": \"pose\",\n      \"duration\": 0.1,\n      \"parameters\": {\n        \"pose\": {\n          \"torso_height\": \"mid\",\n          \"arm_position\": \"still\",\n          \"gripper_orientation\": \"vertical\",\n          \"head\": \"center\"\n        }\n      }\n    },\n    {\n      \"type\": \"path\",\n      \"duration\": 0.25,\n      \"parameters\": {\n        \"path\": {\n          \"mode\": \"base\",\n          \"shape\": \"line\",\n          \"x\": -0.1,\n          \"y\": 0.0,\n          \"speed\": 4.0\n        }\n      }\n    },\n    {\n      \"type\": \"pose\",\n      \"duration\": 1.5,\n      \"parameters\": {\n        \"pose\": {\n          \"torso_height\": \"high\",\n          \"arm_position\": \"front\",\n          \"gripper_orientation\": \"horizontal\",\n          \"head\": \"up\",\n          \"left_arm\": \"mirror\",\n          \"elbow_bended\": true,\n          \"z\": 80\n        }\n      }\n    }\n  ]\n}",
+    "prompt_exp_id": "0",
+    "pipeline_exp_id": "1",
+    "vlm_media": {
+      "kind": "video/mp4",
+      "path": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/eye_widen_surprise/new_render/mm19_g128_eye_widen_surprise.mp4"
+    }
+  },
+  "input_row": {
+    "idx": 128,
+    "cue": "eye_widen_surprise",
+    "description": "A sharp physical recoil where the robot jolts its torso up, steps back, and freezes with hands raised defensively.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.2,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "still",
+            "gripper_orientation": "vertical",
+            "head": "center"
+          }
+        }
+      },
+      {
+        "type": "movement",
+        "duration": 0.2,
+        "parameters": {
+          "movement": {
+            "joints": [
+              {
+                "joint": "torso",
+                "axis": "height",
+                "degrees": [
+                  0.18,
+                  0.34
+                ]
+              },
+              {
+                "joint": "head",
+                "axis": "tilt",
+                "degrees": [
+                  0,
+                  15
+                ]
+              }
+            ],
+            "repetition": 1,
+            "speed": 4.0
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 0.3,
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "line",
+            "x": -0.15,
+            "y": 0.0,
+            "speed": 3.5
+          }
+        }
+      },
+      {
+        "type": "pose",
+        "duration": 1.2,
+        "parameters": {
+          "pose": {
+            "torso_height": "high",
+            "arm_position": "front",
+            "gripper_orientation": "horizontal",
+            "head": "up",
+            "left_arm": "mirror",
+            "elbow_bended": true,
+            "z": 85
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "gemini-2.5-pro",
+    "time": "2026-06-15 04:13:16",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "reasoning": "# Q1: A human would perform this motion by recoiling backward with a sharp intake of breath, raising their hands defensively and freezing for a moment.\n# Q2: Pose 1: `up` + `mirror` (full surrender, too extreme). Pose 2: `front` + `mirror` + `elbow_bended: true` + `z: high` (defensive recoil). Winner is Pose 2 because it's a more naturalistic startled reaction that looks like a protective reflex.\n# Q3: M1: `pose` (startled). M2: `movement` (torso/head jolt) -> `path` (base recoil) -> `pose` (hold). Winner is M2 because the sequence of dynamic motions creates a much more expressive and believable recoil than a single, static pose change.\n# Q4: Reinforcement 1: A small, sharp backward step using the mobile base. Reinforcement 2: A slight head shake. The base recoil (1) is a stronger, more holistic representation of surprise and a great use of the robot's mobility."
+  },
+  "output_row": {
+    "idx": 128,
+    "cue": "eye_widen_surprise",
+    "description": "A sharp physical recoil where the robot jolts its torso up, steps back, and freezes with hands raised defensively.",
+    "movements": [
+      {
+        "type": "pose",
+        "duration": 0.1,
+        "parameters": {
+          "pose": {
+            "torso_height": "mid",
+            "arm_position": "still",
+            "gripper_orientation": "vertical",
+            "head": "center"
+          }
+        }
+      },
+      {
+        "type": "path",
+        "duration": 0.25,
+        "parameters": {
+          "path": {
+            "mode": "base",
+            "shape": "line",
+            "x": -0.1,
+            "y": 0.0,
+            "speed": 4.0
+          }
+        }
+      },
+      {
+        "type": "pose",
+        "duration": 1.5,
+        "parameters": {
+          "pose": {
+            "torso_height": "high",
+            "arm_position": "front",
+            "gripper_orientation": "horizontal",
+            "head": "up",
+            "left_arm": "mirror",
+            "elbow_bended": true,
+            "z": 80
+          }
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-05T23:14:39",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "No, the render is too slow and smooth, looking more like a stretch than a sharp, recoiling surprise.",
+    "correction_q2": "The motion should be a single, fast recoil. The structure should be: neutral pose -> sharp step back (base path) -> snap to a final surprised pose (high torso, hands up defensively), with a long hold. This replaces the prior's sequential and disjointed torso-then-base-then-arms structure.",
+    "reasoning": "# Correction Q1: No, the render is too slow and smooth, looking more like a stretch than a sharp, recoiling surprise.\n# Correction Q2: The motion should be a single, fast recoil. The structure should be: neutral pose -> sharp step back (base path) -> snap to a final surprised pose (high torso, hands up defensively), with a long hold. This replaces the prior's sequential and disjointed torso-then-base-then-arms structure.\n# Q1: How would a human perform this motion? A person would perform a sharp, involuntary recoil, stepping back while their torso and head jolt up and hands fly up defensively.\n# Q2: Pose Candidates Comparison. Pose 1: `front` + `horizontal` (bilateral), a classic \"hands up\" defensive pose. Pose 2: `in` + `vertical` (bilateral), hands to face like a gasp. Winner is Pose 1 because it's a larger, more general full-body expression of surprise/shock.\n# Q3: Structure Comparison. M1: Separate steps for torso jolt, base step, and arm pose. M2: A sharp base step back followed by a single snap into the final surprised pose (high torso, hands up). Winner is M2 as it better captures a single, cohesive recoil motion rather than a sequence of distinct actions.\n# Q4: Context Reinforcement. To express surprise, the movements must be sharp and sudden. The best choice is to use maximum speed (`speed: 4.0`) on the base-step-back path and have a very fast transition into the final held pose, avoiding any intermediate pauses that would kill the momentum."
+  },
+  "media": {
+    "gif": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/eye_widen_surprise/correction/mm19_g128_eye_widen_surprise.gif",
+    "mp4": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/eye_widen_surprise/correction/mm19_g128_eye_widen_surprise.mp4",
+    "pose_png": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/render/tiago/correction/exp1/gemini-2.5-pro/eye_widen_surprise/correction/mm19_g128_eye_widen_surprise_pose.png",
+    "cumulative_tile_gif": null
+  }
+}

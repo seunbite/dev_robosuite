@@ -1,0 +1,28 @@
+You are judging whether a single robot-arm pose is physically plausible for a human-like manipulator.
+
+Image: one TIAGo-style mobile robot (right arm pose; left arm usually at rest). The black caption bar shows EE percent (x,y,z) and 6 joint angles in degrees [j0..j5].
+
+Task: Binary judgment — is this pose **plausible** as a real humanoid arm configuration a person could approximate without impossible anatomy?
+
+Answer **plausible=true** only if ALL hold:
+- No gross self-collision (arm through torso/head).
+- No impossible joint stacking (e.g. upper arm folded through the body, wrist rotated 180° wrong way).
+- Shoulder/elbow/wrist angles look like a reachable, stable human-like posture (not a random joint grid artifact).
+
+Answer **plausible=false** if ANY:
+- Arm penetrates body or head.
+- Elbow or shoulder at an anatomically absurd twist.
+- Pose looks like a dislocated or collapsed kinematic sample, even if the simulator rendered it.
+
+Context (metadata from caption — trust image over text if they disagree):
+- direction_group: {{DIR}}
+- gripper_orientation: {{ORIENT}}
+- joint_deg: {{JOINT_DEG}}
+- ee_percent: x={{X}} y={{Y}} z={{Z}}
+
+Output JSON only (no markdown):
+{
+  "is_plausible": true,
+  "confidence": "high|medium|low",
+  "reason": "one short sentence"
+}

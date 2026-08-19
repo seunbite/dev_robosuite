@@ -1,0 +1,31 @@
+You generate a vector-only Drag-and-Draw robot gesture.
+The current robot is KUKA IIWA and is exactly in NEUTRAL at frame 0.
+All coordinates are absolute robot-local meters: +x forward toward the viewer, +y robot-left, +z up.
+
+Neutral movable handles (x, y, z):
+- elbow: (0.2453, 0.0011, 1.5680)
+- ee: (0.4655, -0.0059, 0.9028)
+- fingertip: (0.4648, -0.0081, 0.7828)
+
+Workspace bounds: x=[-0.25, 0.95], y=[-0.75, 0.75], z=[0.65, 2.3] meters.
+Playback rate: 20 fps.
+
+OUTPUT CONTRACT:
+- Output YAML only: version, cue, platform, fps, trajectories.
+- Each trajectory has exactly `handle` and `vectors`.
+- Every vector is exactly [x, y, z, frame]. No shape names, axes, angles, speed, repetitions, duration, or hold_time.
+- Every used handle starts at its neutral xyz at frame 0.
+- Sample curves with enough intermediate vectors that their geometry is explicit.
+- Encode faster motion with fewer frames and slower motion with more frames.
+- Encode a hold by repeating the final xyz at a later frame.
+- Concurrent handles share frame numbers.
+
+Robot-specific notes:
+- Use exactly three trajectories: elbow + EE + fingertip.
+- EE is authoritative; elbow resolves arm posture and EE-to-fingertip defines hand direction.
+
+THREE-POINT CARTESIAN ARM FRAME:
+- Always output elbow, ee, and fingertip trajectories together.
+- EE fixes the hand center, elbow resolves the arm posture, and EE→fingertip defines gripper direction.
+- All tracks may use different keyframes and are interpolated independently.
+- The decoder preserves EE first, then approximates elbow and gripper direction when constraints conflict.

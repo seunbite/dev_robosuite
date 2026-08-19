@@ -29,11 +29,8 @@ from verify_pose_tiles_gemini import (  # noqa: E402
 )
 from verify_pose_pairwise_12_gemini import _pair_prompt  # noqa: E402
 
-IN_JSON = DEV_ROOT / "data/results/verify/pilot40_pose_pairwise_12_gemini.json"
-IMG_REL = "../../visualize/pose_pairwise_12"
-TILE_REL = "../../visualize/pose_groups_12"
-OUT_HTML = DEV_ROOT / "data/results/html/manipulator/pose_pairwise_12_review.html"
-THUMB_DIR = DEV_ROOT / "data/results/visualize/pose_pairwise_12/_review_tiles"
+DEFAULT_IN_JSON = DEV_ROOT / "data/results/verify/pilot40_pose_pairwise_12_gemini.json"
+DEFAULT_OUT_HTML = DEV_ROOT / "data/results/html/manipulator/pose_pairwise_12_review.html"
 CONFIG_PATHS = [
     DEV_ROOT / "data/results/motion_configs/manipulator/motion_configs_prompt_v19_sophisticated_ee_pilot10.json",
     DEV_ROOT / "data/results/motion_configs/manipulator/motion_configs_prompt_v19_sophisticated_ee_pilot20_more.json",
@@ -72,23 +69,55 @@ def _pick_one_per_cue(comps: list[dict]) -> dict[str, dict]:
     return out
 
 
-def _rel_from_repo(abs_path: str | None) -> str:
-    if not abs_path:
-        return ""
-    p = Path(abs_path)
+def _resolve_repo_path(raw: str | Path | None) -> Path | None:
+    if not raw:
+        return None
+    p = Path(str(raw))
+    if p.is_file():
+        return p
+    rel = DEV_ROOT / p
+    if rel.is_file():
+        return rel
+    if p.is_absolute():
+        return p if p.is_file() else None
+    return rel if rel.is_file() else None
+
+
+def _rel_to_html(path: Path, out_html: Path) -> str:
     try:
-        return str(p.relative_to(DEV_ROOT))
+        return str(path.relative_to(out_html.parent))
     except ValueError:
-        return p.name
+        return str(path)
+
+
+def _pair_image_path(c: dict, image_dir: Path) -> Path | None:
+    raw = c.get("pair_image")
+    if raw:
+        p = _resolve_repo_path(raw)
+        if p and p.is_file():
+            return p
+        candidate = image_dir / Path(str(raw)).name
+        if candidate.is_file():
+            return candidate
+    cue = c.get("cue", "cue")
+    idx = int(c.get("cue_idx", 0))
+    gt = c.get("gt_pose") or {}
+    wr = c.get("wrong_pose") or {}
+    pattern = f"{idx:03d}_{cue}_gt{gt.get('dir')}_{gt.get('gripper_orientation')}_vs_{wr.get('dir')}_{wr.get('gripper_orientation')}.png"
+    candidate = image_dir / pattern
+    return candidate if candidate.is_file() else None
 
 
 def _export_side_tiles(
     c: dict,
     tile_dir: Path,
     tile_pick: dict[tuple[str, str], int],
+    *,
+    thumb_dir: Path,
+    out_html: Path,
 ) -> tuple[str, str]:
-    """Save LEFT/RIGHT crop PNGs for review; return relative paths under visualize/."""
-    THUMB_DIR.mkdir(parents=True, exist_ok=True)
+    """Save LEFT/RIGHT crop PNGs for review; return paths relative to out_html."""
+    thumb_dir.mkdir(parents=True, exist_ok=True)
     cue = c["cue"]
     left = c.get("left_pose") or {}
     right = c.get("right_pose") or {}
@@ -102,12 +131,11 @@ def _export_side_tiles(
         group_path = tile_dir / f"group_{d}_{g}.png"
         idx = tile_pick.get((d, g), 1)
         out_name = f"{cue}_{side}_{d}_{g}_t{idx:02d}.png"
-        out_path = THUMB_DIR / out_name
-        rel = f"{IMG_REL}/_review_tiles/{out_name}"
+        out_path = thumb_dir / out_name
         if not out_path.is_file() and group_path.is_file():
             cell, _ = _resolve_pose_image(group_path, d, g, idx, None, False)
             cell.save(out_path)
-        paths.append(rel if out_path.is_file() else "")
+        paths.append(_rel_to_html(out_path, out_html) if out_path.is_file() else "")
 
     return paths[0], paths[1]
 
@@ -118,6 +146,9 @@ def _card(
     cfg_by_cue: dict,
     tile_dir: Path,
     tile_pick: dict[tuple[str, str], int],
+    image_dir: Path,
+    thumb_dir: Path,
+    out_html: Path,
 ) -> str:
     cue = c["cue"]
     gt = c.get("gt_pose") or {}
@@ -135,10 +166,12 @@ def _card(
             f'<p class="errmsg">{_esc(err)}</p></article>'
         )
 
-    pair_rel = _rel_from_repo(c.get("pair_image"))
-    pair_src = f"{IMG_REL}/{Path(pair_rel).name}" if pair_rel else ""
+    pair_path = _pair_image_path(c, image_dir)
+    pair_src = _rel_to_html(pair_path, out_html) if pair_path else ""
 
-    left_rel, right_rel = _export_side_tiles(c, tile_dir, tile_pick)
+    left_rel, right_rel = _export_side_tiles(
+        c, tile_dir, tile_pick, thumb_dir=thumb_dir, out_html=out_html
+    )
 
     if ok is True:
         verdict = '<span class="verdict ok">CORRECT</span>'
@@ -228,12 +261,30 @@ def _card(
 
 
 def main() -> None:
-    data = json.loads(IN_JSON.read_text(encoding="utf-8"))
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Pose pairwise (exp4) review HTML")
+    ap.add_argument("--in-json", type=Path, default=DEFAULT_IN_JSON)
+    ap.add_argument("--out-html", type=Path, default=DEFAULT_OUT_HTML)
+    args = ap.parse_args()
+
+    data = json.loads(args.in_json.read_text(encoding="utf-8"))
+    out_html: Path = args.out_html
     comps = data.get("comparisons", [])
     picked = _pick_one_per_cue(comps)
     cfg_by_cue = _configs_by_cue()
     tile_dir = Path(data.get("tile_dir", DEV_ROOT / "data/results/visualize/pose_groups_12"))
-    tile_pick = _load_tile_pick(DEV_ROOT / "data/results/verify/pose_tile_pick_by_group.json")
+    if not tile_dir.is_dir():
+        tile_dir = DEV_ROOT / "data/results/visualize/pose_groups_12"
+    tile_pick_path = data.get("tile_pick_json") or str(DEV_ROOT / "data/results/verify/pose_tile_pick_by_group.json")
+    tile_pick_file = Path(tile_pick_path)
+    if not tile_pick_file.is_file():
+        tile_pick_file = DEV_ROOT / "data/results/verify/pose_tile_pick_by_group.json"
+    tile_pick = _load_tile_pick(tile_pick_file)
+    image_dir = Path(data.get("image_dir", DEV_ROOT / "data/results/visualize/pose_pairwise_12"))
+    if not image_dir.is_dir():
+        image_dir = DEV_ROOT / "data/results/visualize/pose_pairwise_12"
+    thumb_dir = out_html.parent / f"{out_html.stem}_tiles"
 
     scored = [c for c in picked.values() if "vlm_correct" in c]
     ok = sum(1 for c in scored if c["vlm_correct"])
@@ -252,7 +303,15 @@ def main() -> None:
     )
 
     cards = "".join(
-        _card(c, cfg_by_cue=cfg_by_cue, tile_dir=tile_dir, tile_pick=tile_pick)
+        _card(
+            c,
+            cfg_by_cue=cfg_by_cue,
+            tile_dir=tile_dir,
+            tile_pick=tile_pick,
+            image_dir=image_dir,
+            thumb_dir=thumb_dir,
+            out_html=out_html,
+        )
         for cue in sorted(picked.keys())
         for c in [picked[cue]]
     )
@@ -339,9 +398,9 @@ h4 {{ margin: 16px 0 8px; font-size: 0.95rem; color: #334; }}
 </div>
 </body></html>"""
 
-    OUT_HTML.parent.mkdir(parents=True, exist_ok=True)
-    OUT_HTML.write_text(doc, encoding="utf-8")
-    print(f"Wrote {OUT_HTML} ({len(picked)} cues)")
+    out_html.parent.mkdir(parents=True, exist_ok=True)
+    out_html.write_text(doc, encoding="utf-8")
+    print(f"Wrote {out_html} ({len(picked)} cues)")
 
 
 if __name__ == "__main__":

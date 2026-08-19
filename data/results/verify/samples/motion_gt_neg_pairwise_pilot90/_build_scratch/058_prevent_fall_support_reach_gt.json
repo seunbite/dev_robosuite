@@ -1,0 +1,80 @@
+[
+  {
+    "idx": 58,
+    "cue": "prevent_fall_support_reach",
+    "description": "The robot simulates losing balance with a quick, uncontrolled drop, then rapidly extends its arm down and out in a bracing motion, ending in a tense hold as if supporting weight.",
+    "groundtruth": "",
+    "gt_fixed_first_pose": {
+      "dir": "front",
+      "x": 55,
+      "y": 50,
+      "z": 50,
+      "gripper_orientation": "horizontal"
+    },
+    "start_pose_source": "fallback_generation",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -12
+              },
+              "speed": 4.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 45,
+            "y": 70,
+            "z": 20,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 3.5,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -5
+              },
+              "speed": 2.0,
+              "hold_time": 1.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "pair_gt_positive_choreo",
+    "generation_mode": "pair_gt_positive_choreo"
+  }
+]

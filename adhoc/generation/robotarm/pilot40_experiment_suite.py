@@ -8,12 +8,25 @@ from typing import Any
 
 _REPO = Path(__file__).resolve().parent.parents[2]
 
-# --- prompts ---
-PROMPT_POSE_GEN = _REPO / "data/seed/prompt/manipulator/prompt_v19_sophisticated.txt"
-PROMPT_MOTION_GEN = _REPO / "data/seed/prompt/manipulator/prompt_gt_fixed_first_pose.txt"
-PROMPT_MOTION_PAIRWISE = (
-    _REPO / "data/seed/prompt/manipulator/prompt_motion_gt_neg_pairwise_alpha.txt"
-)
+# --- path roots (see README_PILOT.md) ---
+PROMPT_MANIPULATOR = _REPO / "data/seed/prompt/manipulator"
+PROMPT_PILOT40 = _REPO / "data/seed/prompt/pilot40"
+VERIFY_DIR = _REPO / "data/results/verify"
+SUITE_RUNNER = _REPO / "scripts/run_pilot40_qwen_suite.sh"
+SUITE_PY = _REPO / "adhoc/generation/robotarm/run_pilot40_qwen_suite.py"
+
+# --- generation prompts (step 1, 7) ---
+PROMPT_POSE_GEN = PROMPT_MANIPULATOR / "prompt_v19_sophisticated.txt"
+PROMPT_MOTION_GEN = PROMPT_MANIPULATOR / "prompt_gt_fixed_first_pose.txt"
+PROMPT_MOTION_PAIRWISE = PROMPT_PILOT40 / "exp10_motion_pairwise_mp4.txt"
+
+
+def qwen_out_dir(model_tag: str = "qwen32b") -> Path:
+    """e.g. pilot40_qwen32b, pilot40_qwen7b (set via OUT_DIR env)."""
+    return VERIFY_DIR / f"pilot40_{model_tag}"
+
+
+DEFAULT_QWEN_OUT = qwen_out_dir("qwen32b")
 
 # --- inputs ---
 POSE_CFG = (
@@ -33,9 +46,7 @@ TILE_DIR = _REPO / "data/results/visualize/pose_groups_12"
 TILE_PICK = _REPO / "data/results/verify/pose_tile_pick_by_group.json"
 MOTION_PAIRWISE_DIR = _REPO / "data/results/verify/samples/motion_gt_neg_pairwise"
 
-DEFAULT_QWEN_OUT = _REPO / "data/results/verify/pilot40_qwen32b"
-
-# Gemini reference outputs (steps 1–4, 7–10 already run; 5–6 are new for Qwen)
+# Gemini reference outputs (steps 1–4, 7–10 done; 5–6 have no pilot-40 Gemini baseline)
 GEMINI_REF: dict[int, dict[str, str]] = {
     1: {
         "configs": str(POSE_CFG.relative_to(_REPO)),
@@ -82,26 +93,44 @@ EXPERIMENT_SPECS: list[dict[str, Any]] = [
         "title": "Pose generation vs human GT",
         "kind": "pose_generation_score",
         "prompt": str(PROMPT_POSE_GEN.relative_to(_REPO)),
+        "prompt_file": None,
+        "runner": "score inline in run_pilot40_qwen_suite.py",
+        "gemini_script": "build_pose_generation_eval_review_html.py",
+        "gemini_result": "data/results/verify/pilot40_pose_eval_consolidated_scored.tsv",
+        "input_config": str(POSE_CFG.relative_to(_REPO)),
         "out_name": "exp01_pose_generation_score.json",
     },
     {
         "id": "2",
         "title": "Pose verify + regenerate — VLM (tile)",
         "kind": "pose_verify_vlm",
-        "prompt": "verify_pose_tiles_gemini (few-shot in script)",
+        "prompt_file": "exp02_pose_verify_vlm.txt",
+        "runner": "verify_pose_tiles_gemini.py",
+        "gemini_script": "verify_pose_tiles_gemini.py",
+        "gemini_result": "data/results/verify/pose_tile_verify_pilot{10,20,20_more}_gemini.json",
+        "input_config": str(POSE_CFG.relative_to(_REPO)),
         "out_name": "exp02_pose_verify_vlm.json",
     },
     {
         "id": "3",
         "title": "Pose verify + regenerate — text",
         "kind": "pose_verify_text",
-        "prompt": "verify_pose_textonly_gemini",
+        "prompt_file": "exp03_pose_verify_text.txt",
+        "runner": "verify_pose_textonly_gemini.py",
+        "gemini_script": "verify_pose_textonly_gemini.py",
+        "gemini_result": "data/results/verify/pose_textonly_verify_pilot{10,20,20_more}_gemini.json",
+        "input_config": str(POSE_CFG.relative_to(_REPO)),
         "out_name": "exp03_pose_verify_text.json",
     },
     {
         "id": "4",
         "title": "Pose pairwise (VLM) — 2-way",
         "kind": "pose_pairwise",
+        "prompt_file": "exp04_pose_pairwise_2way.txt",
+        "runner": "verify_pose_pairwise_12_gemini.py",
+        "gemini_script": "verify_pose_pairwise_12_gemini.py",
+        "gemini_result": "data/results/verify/pilot40_pose_pairwise_12_gemini.json",
+        "visual_dir": "data/results/visualize/pose_pairwise_12_pilot40",
         "out_name": "exp04_pose_pairwise_2way.json",
     },
     {
@@ -109,6 +138,11 @@ EXPERIMENT_SPECS: list[dict[str, Any]] = [
         "title": "Pose pairwise (VLM) — multitile grid 6",
         "kind": "multitile",
         "grid_sizes": "6",
+        "prompt_file": "exp05_pose_multitile_grid.txt",
+        "runner": "verify_pose_multitile_gt_gemini.py",
+        "gemini_script": "verify_pose_multitile_gt_gemini.py",
+        "gemini_result": "data/results/verify/pilot20_pose_multitile_gt_gemini.json (pilot20 only)",
+        "visual_dir": "data/results/visualize/pose_multitile_gt_pilot40_grid6",
         "out_name": "exp05_pose_multitile_grid6.json",
     },
     {
@@ -116,6 +150,11 @@ EXPERIMENT_SPECS: list[dict[str, Any]] = [
         "title": "Pose pairwise (VLM) — multitile grid 12",
         "kind": "multitile",
         "grid_sizes": "12",
+        "prompt_file": "exp05_pose_multitile_grid.txt",
+        "runner": "verify_pose_multitile_gt_gemini.py",
+        "gemini_script": "verify_pose_multitile_gt_gemini.py",
+        "gemini_result": "data/results/verify/pilot20_pose_multitile_gt_gemini.json (pilot20 only)",
+        "visual_dir": "data/results/visualize/pose_multitile_gt_pilot40_grid12",
         "out_name": "exp06_pose_multitile_grid12.json",
     },
     {
@@ -123,25 +162,43 @@ EXPERIMENT_SPECS: list[dict[str, Any]] = [
         "title": "Movement generation vs component GT",
         "kind": "motion_generation_score",
         "prompt": str(PROMPT_MOTION_GEN.relative_to(_REPO)),
+        "prompt_file": None,
+        "runner": "score inline in run_pilot40_qwen_suite.py",
+        "gemini_script": "score_pilot40_motion_gt_components.py",
+        "gemini_result": "data/results/verify/pilot40_motion_verify_metrics.json",
+        "input_config": str(MOTION_CFG.relative_to(_REPO)),
         "out_name": "exp07_motion_generation_score.json",
     },
     {
         "id": "8",
         "title": "Movement verify + regenerate — VLM (MP4)",
         "kind": "motion_verify_vlm",
+        "prompt_file": "exp08_motion_verify_vlm.txt",
+        "runner": "verify_motion_component_gemini.py",
+        "gemini_script": "verify_motion_component_gemini.py",
+        "gemini_result": "data/results/verify/pilot40_motion_component_verify_gemini.json",
+        "media_dir": "data/results/render/manipulator/motion_vlm_verify_pilot40/mp4",
         "out_name": "exp08_motion_verify_vlm.json",
     },
     {
         "id": "9",
         "title": "Movement verify + regenerate — text",
         "kind": "motion_verify_text",
+        "prompt_file": "exp09_motion_verify_text.txt",
+        "runner": "verify_motion_component_text_gemini.py",
+        "gemini_script": "verify_motion_component_text_gemini.py",
+        "gemini_result": "data/results/verify/pilot40_motion_component_verify_text_gemini.json",
+        "input_config": str(MOTION_CFG.relative_to(_REPO)),
         "out_name": "exp09_motion_verify_text.json",
     },
     {
         "id": "10",
         "title": "Movement pairwise (VLM — MP4)",
         "kind": "motion_pairwise_mp4",
-        "prompt": str(PROMPT_MOTION_PAIRWISE.relative_to(_REPO)),
+        "prompt_file": "exp10_motion_pairwise_mp4.txt",
+        "runner": "verify_motion_gt_neg_pairwise_vlm.py",
+        "gemini_script": "verify_motion_gt_neg_pairwise_vlm.py",
+        "gemini_result": "data/results/verify/samples/motion_gt_neg_pairwise/pairwise_eval_results*.json",
         "out_name": "exp10_motion_pairwise_mp4.json",
     },
 ]

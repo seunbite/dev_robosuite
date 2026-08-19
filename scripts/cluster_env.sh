@@ -17,7 +17,13 @@ export TRANSFORMERS_CACHE="$HF_ROOT/transformers"
 # Legacy alias some tools still read
 export HF_DATASETS_CACHE="$HF_ROOT/datasets"
 
+# Numba JIT cache must not live on home NFS (quota); default to /data tmp.
+NUMBA_ROOT="${NUMBA_CACHE_DIR:-/data/user_data/${USER}/tmp/numba_cache}"
+mkdir -p "$NUMBA_ROOT"
+export NUMBA_CACHE_DIR="$NUMBA_ROOT"
+
 echo "HF_HOME=$HF_HOME"
+echo "NUMBA_CACHE_DIR=$NUMBA_CACHE_DIR"
 echo "HUGGINGFACE_HUB_CACHE=$HUGGINGFACE_HUB_CACHE"
 
 if command -v quota >/dev/null 2>&1; then

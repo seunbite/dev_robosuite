@@ -1,0 +1,86 @@
+[
+  {
+    "idx": 11,
+    "cue": "self_scratch_head_confused",
+    "description": "The robot first tilts its 'head' to express confusion, slowly and thoughtfully raises its closed hand to its temple, pauses, and then performs two small, light scratches.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 35,
+            "z": 40,
+            "gripper_orientation": "vertical",
+            "gripper_open_percent": 10
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "y": -15
+              },
+              "speed": 1.0,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 45,
+            "y": 25,
+            "z": 85,
+            "gripper_orientation": "horizontal",
+            "gripper_open_percent": 10
+          },
+          "speed": 0.7,
+          "hold_time": 0.6
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 15
+              },
+              "speed": 1.8,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": -15
+              },
+              "speed": 1.8,
+              "hold_time": 0.15
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_correction",
+    "model": "gemini-2.5-pro",
+    "time": "2026-07-08T08:26:56",
+    "experiment": "exp1",
+    "generation_valid": true,
+    "correction_q1": "Correction Q1: no, the motion lacks a clear \"confused\" head tilt, the movement to the head is too direct, and the final \"scratch\" is an unconvincing lateral shake instead of a scratching motion.",
+    "correction_q2": "Correction Q2: The sequence should be recomposed to first establish confusion with a clear head tilt, then slowly raise a closed gripper to the head to show hesitation, pause thoughtfully, and finally execute a small, repeated up-and-down scratching motion with the wrist.",
+    "reasoning": "# Correction Q1: Is the prior config + full render appropriate and representative for this cue? Start with \"yes\" or \"no\", then one sentence why.\n# Correction Q1: no, the motion lacks a clear \"confused\" head tilt, the movement to the head is too direct, and the final \"scratch\" is an unconvincing lateral shake instead of a scratching motion.\n# Correction Q2: If Correction Q1 is no — how should the **entire** `movements` sequence be changed? Cover pose(s), path/movement structure, timing, and expression across the full clip. If yes, write \"n/a\".\n# Correction Q2: The sequence should be recomposed to first establish confusion with a clear head tilt, then slowly raise a closed gripper to the head to show hesitation, pause thoughtfully, and finally execute a small, repeated up-and-down scratching motion with the wrist.\n\n# Q1: How would a human perform this motion? (One sentence)\n# A human would first show confusion with a head tilt, then slowly bring their fingers to their temple, pause in thought, and then perform a few light scratches.\n# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.\n# Q2: candidates=P1) left+horizontal+x45,y25,z85, P2) back+vertical+x20,y30,z85; winner=P1 because placing the hand at the side of the \"head\" (temple) is more iconic for confused scratching than placing it at the back of the head.\n# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the winner and why.\n# Q3: options=M1 pose(start)>movement(head_tilt)>pose(to_head)>movement(scratch), M2 pose(start)>path(to_head)>movement(scratch+tilt); winner=M1 because it cleanly separates the emotional beats: first confusion, then the thoughtful act of raising the hand, then the scratch itself.\n# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the gesture interpretation stronger and pick the best one.\n# Q4: options=C1 an initial head tilt, C2 a slow movement to the head, C3 a pause before scratching; winner=C1+C2+C3, as combining the initial confusion tilt, the slow/hesitant approach, and the thoughtful pause before the scratch creates the most convincing and readable performance of confusion."
+  }
+]

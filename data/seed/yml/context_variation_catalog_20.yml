@@ -1,0 +1,110 @@
+# Exp12 — 20 situational contexts (10 character personas + 10 scenario pairs).
+# Scenarios only — do NOT use movement-component GT labels during generation.
+#
+# Build input HTML (no GPU):
+#   python adhoc/generation/robotarm/exp12_context_variation.py --html-only
+#
+# Generate + render (Gemini API + GPU for GIFs):
+#   python adhoc/generation/robotarm/exp12_context_variation.py --model gemini-2.5-pro
+
+personas:
+  grandmotherly: >
+    Warm, gentle, slightly slow; small amplitudes, soft deceleration, longer caring holds.
+  buzz_lightyear: >
+    Toy-hero theatrical: crisp poses, confident extensions, mission-briefing pauses,
+    stiff then decisive motion — Buzz Lightyear energy (not literal quotes).
+  high_extraversion: >
+    Outgoing, big, open, socially eager; larger reach, faster approach, extra flourish.
+  low_extraversion: >
+    Reserved, contained, minimal gesture; smaller range, shorter motion, inward finish.
+  high_neuroticism: >
+    Nervous, self-conscious; micro-pauses, speed jitter, incomplete commits.
+  low_neuroticism: >
+    Unflappable, steady; even timing, clean arcs, no hesitation.
+  playful_child: >
+    Bouncy, imprecise-but-eager; slight overshoot, quick recoveries, light repetition.
+  calm_steady: >
+    Smooth, unrushed, balanced; moderate speed, clean holds, low drama.
+  aggressive: >
+    Sharp, fast, emphatic; short holds, large angles, decisive beats.
+  sad_subdued: >
+    Low energy, drooping finish; slow speed, long holds, reduced peak height.
+
+scenarios:
+  formality_peer_friend: >
+    You bump into a close friend of ten years on the street — casual, horizontal rapport.
+  formality_senior_professor: >
+    You greet a distinguished professor for the first time at a conference — formal, deferential.
+  affect_euphoric_win: >
+    Your robotics team just won the competition; you acknowledge the audience, buzzing with joy.
+  affect_tired_dismissive: >
+    After an all-night lab session, a coworker greets you on the way out — weary, perfunctory.
+  space_far_hail: >
+    You spot someone ~15m down a hallway; signal that you are here without shouting.
+  space_near_quiet: >
+    In a quiet library, someone sits ~50cm away; greet softly with minimal disturbance.
+  interlocutor_children: >
+    Visiting a kindergarten; greet five-year-olds with friendly, approachable motion.
+  interlocutor_low_vision: >
+    Greeting an older user who needs steady, easy-to-track visual motion.
+  load_focused_welcome: >
+    Idle, doing nothing else — welcome the user with full attention on them.
+  load_multitask_passby: >
+    Carrying items while navigating; give a brief greet to someone passing by.
+
+_all_personas: &personas10
+  - grandmotherly
+  - buzz_lightyear
+  - high_extraversion
+  - low_extraversion
+  - high_neuroticism
+  - low_neuroticism
+  - playful_child
+  - calm_steady
+  - aggressive
+  - sad_subdued
+
+_all_scenarios: &scenarios10
+  - formality_peer_friend
+  - formality_senior_professor
+  - affect_euphoric_win
+  - affect_tired_dismissive
+  - space_far_hail
+  - space_near_quiet
+  - interlocutor_children
+  - interlocutor_low_vision
+  - load_focused_welcome
+  - load_multitask_passby
+
+_all_contexts: &all20
+  - grandmotherly
+  - buzz_lightyear
+  - high_extraversion
+  - low_extraversion
+  - high_neuroticism
+  - low_neuroticism
+  - playful_child
+  - calm_steady
+  - aggressive
+  - sad_subdued
+  - formality_peer_friend
+  - formality_senior_professor
+  - affect_euphoric_win
+  - affect_tired_dismissive
+  - space_far_hail
+  - space_near_quiet
+  - interlocutor_children
+  - interlocutor_low_vision
+  - load_focused_welcome
+  - load_multitask_passby
+
+# 7 few-shot cues (shot_configs_v19_sophisticated.json) × 20 contexts = 140 jobs.
+# idx values are shot indices (0–6), not pilot-90 manifest indices.
+runs:
+  - {idx: 0, contexts: *all20}
+  - {idx: 1, contexts: *all20}
+  - {idx: 2, contexts: *all20}
+  - {idx: 3, contexts: *all20}
+  - {idx: 4, contexts: *all20}
+  - {idx: 5, contexts: *all20}
+  - {idx: 6, contexts: *all20}

@@ -73,7 +73,7 @@ Usage: bash scripts/build_paper_figures.sh <command> [args]
   pairwise         8-panel comparison row
   qual-verify-pose    Pose pairwise qual (IDX=sel, SEED=0, GOOD_IDX/BAD_IDX optional)
   qual-verify-motion  Motion pairwise qual (task 10, 4 cols)
-  components       Pose / movement / path definition figure (--embodiment IIWA|Panda|GoogleRobot|Quadruped)
+  components       Pose / movement / path definition figure (--embodiment IIWA|Panda|Tiago|Quadruped)
   components-all   All four embodiment component figures
   persona          Persona variations (needs GOOGLE_API_KEY)
   essence10        Essence-10 generate + HTML (needs GOOGLE_API_KEY)

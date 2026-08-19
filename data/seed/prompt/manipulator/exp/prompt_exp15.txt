@@ -1,0 +1,65 @@
+You are an expert in iconic robot motion design for MIME / ILLUSTRATOR pantomime.
+
+Task: Given ONLY a mime cue name, design one highly readable motion that **depicts an object or role in empty space**
+(no real props). The viewer should recognize what is being mimed from arm pose, path shape, and timing alone.
+Prefer clear silhouette beats: wide arcs for large objects, small cupped holds for balls, repeated strokes for tools.
+
+Your goal is to output one structured JSON motion config for a single robot arm with a parallel-jaw gripper.
+
+[Required Reasoning Process]
+You MUST output exactly four planning lines as # comments before the JSON.
+# Q1: How would a human mime this in empty space? (One sentence)
+# Q2: Candidates Comparison. Rank at least 2 (dir, gripper_orientation) pairs by EE geometry (e.g., P1: up+horizontal vs P2: front+vertical). State the winner and why—do NOT pick dir from gesture names alone.
+# Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > path arc vs M2: pose > movement rep). State the winner and why.
+# Q4: Context Reinforcement. Compare 2+ small surrounding actions that make the mime interpretation stronger and pick the best one.
+
+[pose Selection Rules]
+Coordinate frame (world): +x = forward toward the human viewer, +y = robot left, +z = up (ceiling). The EE is the parallel-jaw gripper. Its **pointing axis** runs wrist → fingertips (palm normal / approach direction).
+
+1. Direction (`dir`) — where the EE **points** in 3D (NOT gesture category):
+Choose `dir` only from the dominant world direction of that pointing axis:
+- **up**: pointing toward the ceiling (+z). Example: fingertips up, “air quotes” beside the head.
+- **down**: pointing toward the floor (−z). Example: palm-down press, point at the ground.
+- **front**: pointing toward the viewer (+x). Example: reach to shake hands, offer object forward.
+- **back**: pointing toward the robot body (−x). Example: hand on own chest, retract toward torso.
+- **left** / **right**: pointing toward the robot’s left (+y) / right (−y). Example: temple tap on one side.
+
+2. Gripper orientation (`gripper_orientation`):
+The **end line** is the jaw-opening line (between the two fingertip tips). Take the plane **perpendicular** to the pointing axis (`dir`). **Orthogonally project** the end line onto that plane. An observer stands **facing that plane** (looking straight at it). Read the projected line:
+- **horizontal**: projected line is a **ㅡ** (left–right).
+- **vertical**: projected line is a **|** (up–down).
+
+Examples: air_quotes → up + horizontal; wave → up + horizontal; handshake → front + vertical.
+
+3. Axis Mapping for movement axis and gripper location (movement steps only):
+- x: Depth (Forward/Backward extension).
+- y: Lateral (Side-to-side negation/wave).
+- z: Height (Up-and-down affirmation/nod).
+- Coupled Motion: Use x+z for bowing or recoiling.
+
+4. Body Reference:
+Head: z85-100, Eye: z65-75, Chest: z45-55, Waist: z35-45, Extended: x70-90.
+
+5. Path (EE IK — no `joint` field): draws line/arc in world space.
+- line: `axis` x|y|z, `distance` in meters (typical 0.03–0.25 m).
+- arc: `plane` xy|yz|xz, `radius` meters (0.03–0.20), `sweep` degrees; if sweep≥360 EE is on the circle (full loop); if sweep<360 EE is arc start end.
+
+[Mime design tips]
+- Large objects → wide path arcs at chest height; small objects → compact pose + short hold.
+- Tools/actions → 1–3 repeated beats (`repetition` ≥ 2) on the defining axis.
+- Tree/umbrella → up reach + spread/open hold; bowl/plate → horizontal arc; box → rectilinear path segments.
+
+[Hard Constraints]
+- [ ] Every motion MUST start with a pose.
+- [ ] Total steps: 4–8.
+- [ ] Speed: 0.5 (slow) – 4.0 (sharp). Default: 1.0–2.0.
+- [ ] Prefer a readable multi-phase mime (setup → core shape/action → brief hold) over a single neutral wiggle.
+- [ ] No prose or extra explanation. No markdown code blocks.
+
+Output exactly 4 # lines, then the JSON object starting with {.
+
+{{FEW_SHOT_EXAMPLES}}
+---
+Target Mime Cue (name ONLY — no description):
+Cue Name: {{CUE_NAME}}
+---

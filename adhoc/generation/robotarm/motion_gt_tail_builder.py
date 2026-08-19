@@ -73,18 +73,19 @@ def build_tail_from_component(comp: dict[str, Any] | None) -> list[dict[str, Any
     joint = joint or "shoulder"
     directions: list[dict[str, Any]] = []
     for ax, rule in axes.items():
-        if rule == "+-":
+        if rule in ("+-", "-+"):
             mag = _OSC_MAG if rep_rule == "rep" else _MAG
+            first, second = (mag, -mag) if rule == "+-" else (-mag, mag)
             directions.append(
                 {
-                    "degrees": {ax: mag},
+                    "degrees": {ax: first},
                     "speed": 2.2,
                     "hold_time": 0.08,
                 }
             )
             directions.append(
                 {
-                    "degrees": {ax: -mag},
+                    "degrees": {ax: second},
                     "speed": 2.2,
                     "hold_time": 0.08,
                 }
@@ -132,6 +133,97 @@ def build_tail_from_component(comp: dict[str, Any] | None) -> list[dict[str, Any
     ]
 
 
+def build_tail_from_component_with_rep_override(
+    comp: dict[str, Any] | None,
+    *,
+    rep_override: str,
+    repetition_param: int | None = None,
+) -> list[dict[str, Any]]:
+    """Build tail with forced repetition semantics (exp11 neg-rep pairwise).
+
+    rep_override: ``non`` = single cycle; ``rep`` = oscillating GT-style; ``repeat3`` = same-dir ×3;
+    ``osc_repeat3`` = flip single +/- to oscillation (GT sign first: ``-``→``-+``, ``+``→``+-``), repetition=3.
+    """
+    if not comp:
+        return []
+    c = copy.deepcopy(comp)
+    if rep_override == "non":
+        c["repetition"] = "non"
+    elif rep_override == "rep":
+        c["repetition"] = "rep"
+    elif rep_override == "repeat3":
+        c["repetition"] = "non"
+    elif rep_override == "osc_repeat3":
+        c = copy.deepcopy(comp)
+        c["repetition"] = "non"
+        axes = c.get("axes") or {}
+        c["axes"] = {
+            ax: ("-+" if rule == "-" else "+-" if rule == "+" else rule)
+            for ax, rule in axes.items()
+        }
+        tail = build_tail_from_component(c)
+        if tail:
+            for step in tail:
+                if step.get("type") == "movement":
+                    p = step.get("parameters")
+                    if p is not None:
+                        p["repetition"] = 3
+        return tail
+    else:
+        raise ValueError(f"unknown rep_override: {rep_override!r}")
+    tail = build_tail_from_component(c)
+    if rep_override == "repeat3" and tail:
+        for step in tail:
+            if step.get("type") == "movement":
+                p = step.get("parameters")
+                if p is not None:
+                    p["repetition"] = 3
+    elif repetition_param is not None and tail:
+        for step in tail:
+            if step.get("type") == "movement":
+                p = step.get("parameters")
+                if p is not None:
+                    p["repetition"] = int(repetition_param)
+    return tail
+
+
+def build_config_from_gt_pose_and_rep_variant(
+    base_row: dict[str, Any],
+    comp: dict[str, Any] | None,
+    *,
+    rep_override: str,
+    state_tag: str = "motion_component_gt",
+) -> dict[str, Any] | None:
+    fixed = base_row.get("gt_fixed_first_pose")
+    if fixed:
+        pose: dict[str, Any] = {
+            "type": "pose",
+            "parameters": {"pose": copy.deepcopy(fixed), "speed": 1.0, "hold_time": 0.0},
+        }
+        start_src = "human_gt_tile_pick"
+    else:
+        pose = first_pose_step(base_row)
+        start_src = "generation"
+    if pose is None:
+        return None
+    tail = build_tail_from_component_with_rep_override(comp, rep_override=rep_override)
+    if comp and not tail:
+        return None
+    fixed_pose = copy.deepcopy((pose.get("parameters") or {}).get("pose") or {})
+    return {
+        "idx": int(base_row["idx"]),
+        "cue": base_row["cue"],
+        "description": base_row.get("description", ""),
+        "groundtruth": base_row.get("groundtruth", ""),
+        "gt_fixed_first_pose": fixed_pose,
+        "start_pose_source": start_src,
+        "movements": [pose, *tail],
+        "state": state_tag,
+        "generation_mode": state_tag,
+        "rep_variant": rep_override,
+    }
+
+
 def _parse_gt_poses(groundtruth: str) -> list[tuple[str, str]]:
     return [(a.strip(), b.strip()) for a, b in re.findall(r"\(([^,]+),\s*([^)]+)\)", groundtruth)]
 
@@ -170,8 +262,8 @@ def pose_generation_matches_human_gt(row: dict[str, Any], groundtruth: str) -> b
 
 
 def human_gt_fixed_pose_from_row(row: dict[str, Any]) -> dict[str, Any] | None:
-    """Human tile-pick pose for the primary GT (dir, gripper_orientation) group."""
-    gt = str(row.get("groundtruth") or "").strip()
+    """Human tile-pick pose for a GT (dir, gripper_orientation) pair."""
+    gt = str(row.get("groundtruth") or row.get("pose_gt") or "").strip()
     poses = _parse_gt_poses(gt)
     if not poses:
         return None
@@ -181,19 +273,42 @@ def human_gt_fixed_pose_from_row(row: dict[str, Any]) -> dict[str, Any] | None:
         _load_tile_pick,
     )
 
+    tile_pick = _load_tile_pick()
+    gt_set = set(poses)
+    ref = _first_pose_from_cfg(row)
+    # x-GT: prefer a generated pose step that already matches one listed GT pair.
+    if gt.lower().startswith("x"):
+        for step in _generation_pose_steps(row):
+            p = (step.get("parameters") or {}).get("pose") or {}
+            pair = (
+                str(p.get("dir", "")).strip(),
+                str(p.get("gripper_orientation", "")).strip(),
+            )
+            if pair in gt_set:
+                return _build_fixed_pose(pair[0], pair[1], p, tile_pick)
     d, g = poses[0]
-    return _build_fixed_pose(d, g, _first_pose_from_cfg(row), _load_tile_pick())
+    return _build_fixed_pose(d, g, ref, tile_pick)
 
 
 def resolve_first_pose_step(row: dict[str, Any]) -> tuple[dict[str, Any] | None, str]:
     """Pick start pose: generation if human-GT-correct, else human GT tile-pick."""
     gen_steps = _generation_pose_steps(row)
-    gen_step = gen_steps[0] if gen_steps else None
-    groundtruth = str(row.get("groundtruth") or "").strip()
+    groundtruth = str(row.get("groundtruth") or row.get("pose_gt") or "").strip()
     correct = pose_generation_matches_human_gt(row, groundtruth) if groundtruth else None
+    targets = _parse_gt_poses(groundtruth) if groundtruth else []
+    target_set = set(targets)
 
-    if correct is True and gen_step is not None:
-        return gen_step, "generation"
+    if correct is True and gen_steps:
+        if groundtruth.lower().startswith("x"):
+            for step in gen_steps:
+                p = (step.get("parameters") or {}).get("pose") or {}
+                pair = (
+                    str(p.get("dir", "")).strip(),
+                    str(p.get("gripper_orientation", "")).strip(),
+                )
+                if pair in target_set:
+                    return copy.deepcopy(step), "generation"
+        return gen_steps[0], "generation"
 
     human = human_gt_fixed_pose_from_row(row)
     if human:
@@ -221,21 +336,21 @@ def resolve_first_pose_step(row: dict[str, Any]) -> tuple[dict[str, Any] | None,
 
 
 def first_pose_step(row: dict[str, Any]) -> dict[str, Any] | None:
-    """First pose step from the generated motion config (legacy pairwise start)."""
+    """First pose step: prefer gt_fixed_first_pose, else first pose in movements."""
+    fixed = row.get("gt_fixed_first_pose") or {}
+    if fixed:
+        return {
+            "type": "pose",
+            "parameters": {
+                "pose": copy.deepcopy(fixed),
+                "speed": 1.0,
+                "hold_time": 0.0,
+            },
+        }
     for st in row.get("movements") or []:
         if st.get("type") == "pose":
             return copy.deepcopy(st)
-    fixed = row.get("gt_fixed_first_pose") or {}
-    if not fixed:
-        return None
-    return {
-        "type": "pose",
-        "parameters": {
-            "pose": dict(fixed),
-            "speed": 1.0,
-            "hold_time": 0.0,
-        },
-    }
+    return None
 
 
 _AXIS_CYCLIC_FWD = {"x": "y", "y": "z", "z": "x"}

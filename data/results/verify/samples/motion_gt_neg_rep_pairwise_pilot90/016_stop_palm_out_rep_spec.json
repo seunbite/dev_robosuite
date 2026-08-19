@@ -1,0 +1,32 @@
+{
+  "idx": 16,
+  "cue": "stop_palm_out",
+  "description": "Starting with its arm raised, the robot pulls back slightly before sharply pushing its gripper forward in a definitive 'stop' gesture, holding the final pose.",
+  "start_pose_source": "human_gt_tile_pick",
+  "start_pose_dir": "up",
+  "start_pose_gripper": "horizontal",
+  "start_pose_id": 208,
+  "gt_side": "left",
+  "left": "gt",
+  "right": "neg_rep",
+  "left_tail_summary": "pose(up,horizontal) → movement shoulder (x+22)",
+  "right_tail_summary": "pose(up,horizontal) → movement shoulder (x+22,x-22)",
+  "pair_mp4": "016_stop_palm_out_pair_rep.mp4",
+  "layout": "left_right_plain_mp4_stitched",
+  "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's motion best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n\nTarget cue:\n- cue: stop_palm_out\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+  "gt_repetition_label": "non",
+  "gt_rep_override": "non",
+  "neg_rep_override": "osc_repeat3",
+  "gt_movement_repetition_param": 1,
+  "neg_movement_repetition_param": 3,
+  "component": {
+    "kind": "movement",
+    "axes": {
+      "x": "+"
+    },
+    "joint": null,
+    "repetition": "non",
+    "hold": true,
+    "raw": ""
+  }
+}

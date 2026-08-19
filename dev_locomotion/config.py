@@ -15,7 +15,7 @@ class QuadrupedConfig:
     base_width: float = 0.1840
     hip_offset: float = 0.0955
     thigh_length: float = 0.2130
-    calf_length: float = 0.2300
+    calf_length: float = 0.2130
     nominal_base_height: float = 0.30
     default_abduction: float = 0.0
     default_thigh: float = 0.85

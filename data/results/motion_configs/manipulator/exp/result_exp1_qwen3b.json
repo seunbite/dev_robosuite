@@ -1,0 +1,5749 @@
+[
+  {
+    "idx": 7,
+    "cue": "raise_fists_victory",
+    "description": "The robot first places the arm into the salute lane, then tightens the elbow into the forehead angle and holds it crisply, without adding a separate release pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "right",
+            "x": 56,
+            "y": 92,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.1,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 75,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.4,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -45,
+                "z": 45
+              },
+              "speed": 1.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:41:23",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A victory gesture feels more intentional if it starts with a slight dip, rises into a brief acknowledgment, and adds a crisp peak accent instead of simply lifting and freezing.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) right+vertical+x50,y100,z50, P3) up+vertical+x50,y75,z70; winner=P1 because it gives the cleanest staging before the arm is placed laterally and folded into salute.\n# Q3: options=M1 P1>pose(right lane)>pose(forehead lane)>movement(elbow x+z fold), M2 P1>movement(shoulder+elbow), M3 P3>hold only; winner=M1 because the cue depends on staged lane placement before the final crisp angle.\n# Q4: options=C1 lane placement before the fold, C2 release pose after the fold, C3 small recoil after the fold; winner=C1 because the contextual setup makes the salute read militarily precise, whereas a release pose only weakens the locked salute impression.\n# EXAMPLE:"
+  },
+  {
+    "idx": 8,
+    "cue": "fist_pump",
+    "description": "The robot first places the arm into the celebration lane, then quickly clenches the fist and pumps it forward crisply, without adding a separate release pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 55,
+            "y": 50,
+            "z": 55,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.1,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 70,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": -45
+              },
+              "speed": 1.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:41:36",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A fist pump reads more clearly as a celebratory gesture if the robot first raises the arm to eye level, then quickly clenches the fist and pumps it forward.\n# # Q2: candidates=P1) up+horizontal+x70,y50,z50, P2) front+horizontal+x55,y50,z55, P3) up+vertical+x50,y75,z70; winner=P1 because the low front baseline makes the upward celebration and accent easiest to read.\n# # Q3: options=M1 P1>pose(right lane)>pose(front lane)>movement(fist x+z pump), M2 P1>movement(shoulder+elbow), M3 P3>hold only; winner=M1 because the cue depends on staged lane placement before the final crisp angle.\n# # Q4: options=C1 lane placement before the pump, C2 final settle after the pump, C3 small recoil after the pump; winner=C1 because the contextual setup makes the fist pump read as a military salute, whereas a release pose only weakens the locked salute impression."
+  },
+  {
+    "idx": 9,
+    "cue": "flex_bicep",
+    "description": "The robot first lowers its arm to a resting position, then sharply flexes the bicep muscle, and finally holds the flexed position without returning to a separate resting pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "bicep",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20
+              },
+              "speed": 1.5,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:41:50",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A flexed bicep reads more clearly as a gesture of confidence or readiness if the robot first lowers its arm to a resting position, then sharply flexes the bicep muscle, and finally holds the flexed position.\n# # Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the flexed bicep read as a confident gesture rather than a casual lowering.\n# # Q3: options=M1 P1>pose(resting lane)>movement(bicep x flex)>pose(flex lane), M2 P1>pose(resting lane)>movement(bicep x flex), M3 P2>pose(resting lane)>pose(flex lane); winner=M1 because the cue benefits from a staged resting position before the flex, making the gesture read as a deliberate action rather than a casual lowering.\n# # Q4: options=C1 preparatory resting position before the flex, C2 final resting pose after the flex, C3 lateral sway before the flex; winner=C1 because the prior resting position strengthens the confidence reading, whereas a final resting pose can weaken the gesture's impact."
+  },
+  {
+    "idx": 10,
+    "cue": "shrug_idk",
+    "description": "The robot gathers attention with a small dip, rises into a brief shrug, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:41:59",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 11,
+    "cue": "self_scratch_head_confused",
+    "description": "The robot first lowers its arm to scratch the head, then quickly raises it back up, and finally pauses at the raised position, creating a confused gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "arm",
+          "directions": [
+            {
+              "degrees": {
+                "x": -20,
+                "z": 20
+              },
+              "speed": 1.2,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:24:07",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The self-scratching motion reads more clearly as a confused gesture if the robot first lowers its arm to scratch the head, then quickly raises it back up, and finally pauses at the raised position.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the confused scratch and pause easiest to read.\n# Q3: options=M1 P1>pose(head lane)>movement(arm x+z scratch)>pose(head lane), M2 P1>pose(head lane)>movement(arm x+z scratch)>pose(head lane), M3 P1>pose(head lane)>pose(head lane)>movement(arm x+z scratch); winner=M1 because the cue benefits from a staged lane placement before the final pause, making the confused scratch and pause clear.\n# Q4: options=C1 preparatory head lane before the scratch, C2 final pause after the scratch, C3 lateral sway before the scratch; winner=C1 because the prior head lane supplies the social context that turns the scratch into a 'you are confused,' rather than a generic head-side motion."
+  },
+  {
+    "idx": 12,
+    "cue": "facepalm",
+    "description": "The robot first lowers its arm to a low position, then quickly raises it to a high position, and finally slams it down forcefully, creating a clear and emphatic facepalm gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "arm",
+          "directions": [
+            {
+              "degrees": {
+                "z": 28
+              },
+              "speed": 1.2,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "arm",
+          "directions": [
+            {
+              "degrees": {
+                "z": -45
+              },
+              "speed": 1.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:42:14",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A facepalm reads best when the robot first lowers its arm to a low position, then quickly raises it to a high position, and finally slams it down forcefully.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) up+vertical+x50,y50,z50; winner=P1 because the low baseline makes the facepalm easy to read before the arm is raised and slammed.\n# Q3: options=M1 P1>pose(low lane)>movement(arm x+z raise)>path(line z up)>movement(arm x+z slam), M2 P1>pose(low lane)>movement(arm x+z raise)>movement(arm x+z slam), M3 P2>pose(low lane)>pose(high lane)>movement(arm x+z raise)>path(line z up)>movement(arm x+z slam); winner=M1 because the cue benefits from a staged low-to-high transition before the final slam, making the facepalm read more dynamically.\n# Q4: options=C1 preparatory dip before the raise, C2 final settle after the slam, C3 lateral sway before the raise; winner=C1 because the prior dip strengthens the facepalm's social context, making the motion read as a deliberate and emphatic gesture rather than a casual swipe.\n# EXAMPLE:"
+  },
+  {
+    "idx": 13,
+    "cue": "point_self",
+    "description": "The robot first lowers its arm to a low position, then points one finger directly at itself, creating a clear and direct acknowledgment.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 1.2,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 1.2,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:42:33",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 14,
+    "cue": "point_you",
+    "description": "The robot first points outward as if saying 'you', then taps at the head, and finally traces a circle beside the temple so the motion reads like 'you are crazy.'",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.1,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 12
+              },
+              "speed": 1.4,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.6,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "xz",
+          "radius": 12,
+          "sweep": 720,
+          "speed": 1.2,
+          "direction": "cw"
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:42:50",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The \"point_you\" cue reads most clearly when the robot first points outward, then taps at the temple, and finally circles the finger around the temple.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the outward accusation easiest to read before the motion shifts into the head-side sign.\n# Q3: options=M1 P1>pose(front lane)>pose(head lane)>movement(wrist x tap)>path(arc xz), M2 P1>pose(head lane)>movement(wrist x tap)>path(arc xz), M3 P1>pose(front lane)>movement(wrist x tap)>path(arc xz); winner=M1 because the cue is strongest when the accusation, the head reference, and the symbolic circle all appear in sequence.\n# Q4: options=C1 point at you before the temple tap and circle, C2 final recoil pose after the circle, C3 extra settle after the circle; winner=C1 because the prior accusation supplies the social context that turns the temple actions into 'you are crazy' rather than a generic head-side motion.\n# EXAMPLE:"
+  },
+  {
+    "idx": 15,
+    "cue": "beckon_come_here",
+    "description": "The robot gently extends its arm forward, tilts the palm slightly upward, and moves the wrist smoothly to draw the viewer's attention towards itself.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 30,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:42:59",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 16,
+    "cue": "stop_palm_out",
+    "description": "The robot first lowers its arm to a low position, then sharply raises it to a vertical position, and finally holds it there, creating a clear stop gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.8,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:43:14",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A stop gesture reads most effectively when the robot first lowers its arm to a low position, then sharply raises it to a vertical position, and finally holds it there.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the stop gesture easy to read before the arm is raised vertically.\n# Q3: options=M1 P1>pose(down lane)>pose(vertical lane)>movement(wrist x+z raise), M2 P1>pose(vertical lane)>movement(wrist x+z raise), M3 P2>pose(vertical lane)>pose(down lane); winner=M1 because the cue benefits from a staged lane placement before the final crisp vertical raise.\n# Q4: options=C1 preparatory dip before the vertical raise, C2 final settle after the vertical raise, C3 lateral sway before the vertical raise; winner=C1 because the contextual setup makes the stop gesture read as a deliberate pause rather than a casual arm movement.\n# EXAMPLE:"
+  },
+  {
+    "idx": 17,
+    "cue": "pat_stomach",
+    "description": "The robot first lifts its arm to a comfortable height, then gently taps the stomach area, and finally returns to a neutral position, creating a relaxed and natural pat-stomach gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "arm",
+          "directions": [
+            {
+              "degrees": {
+                "z": 12
+              },
+              "speed": 1.2,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "stomach",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.4,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.6,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.8,
+          "hold_time": 0.0
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:43:30",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A pat-stomach gesture feels more natural and relaxed if the robot first lifts its arm to a comfortable height, then gently taps the stomach area, and finally returns to a neutral position.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the upward baseline makes the pat-stomach gesture feel more natural and relaxed.\n# Q3: options=M1 P1>pose(up lane)>movement(arm x+z lift)>pose(stomach lane)>movement(wrist x tap)>pose(down lane), M2 P1>pose(up lane)>pose(stomach lane)>pose(down lane), M3 P2>pose(front lane)>pose(stomach lane)>pose(back lane); winner=M1 because the cue benefits from a staged lift and a clear pat-stomach gesture, not just a neutral pat.\n# Q4: options=C1 preparatory lift before the pat-stomach, C2 final settle after the pat-stomach, C3 lateral sway before the pat-stomach; winner=C1 because the prior lift strengthens the pat-stomach gesture and provides a clear context for the action.\n# EXAMPLE:"
+  },
+  {
+    "idx": 18,
+    "cue": "fan_face_hot",
+    "description": "The robot first lowers its arm to a low position, then quickly raises it to a high position, and finally holds the high position for emphasis, creating a clear and deliberate fan face hot gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 18
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.4,
+          "hold_time": 0.0
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:43:44",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A fan face hot motion reads most clearly when the robot first lowers its arm to a low position, then quickly raises it to a high position, and finally holds the high position for emphasis.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the low baseline makes the quick rise and high hold easiest to read.\n# Q3: options=M1 P1>pose(low lane)>movement(shoulder x+z raise)>pose(high lane), M2 P1>pose(low lane)>pose(high lane)>movement(shoulder x+z raise), M3 P2>pose(low lane)>pose(high lane); winner=M1 because the cue benefits from a staged low-to-high transition before the final sharp rise, making the motion read as a deliberate fan face hot gesture.\n# Q4: options=C1 preparatory dip before the rise, C2 final settle after the rise, C3 lateral sway before the rise; winner=C1 because the prior dip strengthens the fan face hot impression by setting the tone before the high rise, whereas a final settle or lateral sway weakens the motion's impact.\n# EXAMPLE:"
+  },
+  {
+    "idx": 19,
+    "cue": "cover_yawn_sleepy",
+    "description": "The robot first lowers its head as if yawning, then stretches out its arms, and finally rests them on its chest, making the motion read as a sign of fatigue.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "chest",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:43:57",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot's yawning gesture reads more clearly as a sign of fatigue if it first lowers its head, then stretches out its arms, and finally rests them on its chest.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the yawning gesture read as a sign of fatigue rather than a casual stretch.\n# Q3: options=M1 P1>pose(head down)>pose(arms stretch)>pose(chest rest), M2 P1>pose(arms stretch)>pose(head down), M3 P1>pose(chest rest)>pose(head down); winner=M1 because the cue benefits from a clear staging of the head lowering, arm stretching, and chest resting in sequence.\n# Q4: options=C1 preparatory head lowering before the arms stretch, C2 final chest resting after the arms stretch, C3 lateral sway before the arms stretch; winner=C1 because the prior head lowering supplies the social context that turns the yawning gesture into a sign of fatigue rather than a casual stretch.\n# EXAMPLE:"
+  },
+  {
+    "idx": 20,
+    "cue": "rub_eye_tired",
+    "description": "The robot first lowers its arm slightly as if gathering attention, then rubs its eye tiredly and gently taps the temple to relieve strain.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 70,
+            "y": 40,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.6,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 70,
+            "y": 40,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.6,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:27:17",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot rubs its eye tiredly, gathering attention with a slight dip and then gently tapping the temple to relieve strain.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the eye rub and temple tap easier to read.\n# Q3: options=M1 P1>pose(front lane)>movement(shoulder x+z dip)>pose(temple lane)>movement(wrist x tap), M2 P1>pose(front lane)>movement(shoulder x+z)>pose(temple lane)>movement(wrist x tap), M3 P2>pose(front lane)>pose(temple lane)>movement(wrist x tap); winner=M1 because the cue benefits from a staged lane placement before the final temple tap, making the eye rub and temple tap sequence clearer.\n# Q4: options=C1 preparatory dip before the eye rub, C2 final settle after the temple tap, C3 lateral sway before the eye rub; winner=C1 because the prior eye rub supplies the context that turns the temple tap into a 'relieve strain' gesture rather than a generic head-side motion."
+  },
+  {
+    "idx": 21,
+    "cue": "tap_temple_think",
+    "description": "The robot gently taps its temple while appearing to be deep in thought, creating a sense of contemplation and introspection.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 1.2,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:44:07",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 22,
+    "cue": "circle_temple_crazy",
+    "description": "The robot first points outward as if saying 'you', then taps at the head, and finally traces a circle beside the temple so the motion reads like 'you are crazy.'",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 58,
+            "y": 58,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.1,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 12
+              },
+              "speed": 1.4,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 70,
+            "y": 40,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.6,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 2,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "xz",
+          "radius": 12,
+          "sweep": 720,
+          "speed": 1.2,
+          "direction": "cw"
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:44:19",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 23,
+    "cue": "lean_forward_interest",
+    "description": "The robot first places the arm into a front lane, then dips the shoulder gently to emphasize engagement, and finally leans forward smoothly without a separate settling pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:28:09",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A human would lean forward slightly with interest, perhaps tilting their head slightly to engage with the speaker or object.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the leaning forward easy to read and emphasizes engagement.\n# Q3: options=M1 P1>pose(front lane)>movement(shoulder x+z dip)>path(line z up), M2 P1>pose(front lane)>movement(shoulder x+z dip), M3 P2>pose(front lane)>pose(back lane)>movement(shoulder x+z dip); winner=M1 because the cue benefits from a staged front lane placement before the final dip, making the leaning forward read more naturally.\n# Q4: options=C1 preparatory dip before the lean, C2 final settle after the lean, C3 lateral sway before the lean; winner=C1 because the prior dip strengthens the leaning forward by providing a clear context of engagement rather than a trailing static pose."
+  },
+  {
+    "idx": 24,
+    "cue": "cover_mouth_gasp",
+    "description": "The robot quickly lifts its arm to cover its mouth, emphasizing a sudden gasp of surprise or shock.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:44:34",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot performs a quick, sharp motion to cover its mouth with a gasp, emphasizing surprise or shock.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the up+horizontal baseline makes the gasp motion easier to read and emphasizes the suddenness of the action.\n# Q3: options=M1 P1>pose(front lane)>movement(shoulder x+z lift)>pose(back lane)>movement(wrist x+z cover), M2 P1>pose(front lane)>movement(shoulder x+z lift)>pose(front lane)>movement(wrist x+z cover), M3 P1>pose(front lane)>movement(shoulder x+z lift)>pose(front lane)>movement(wrist x+z cover); winner=M1 because the cue benefits from a clear front-to-back transition and a crisp wrist cover, making the gasp motion read more naturally.\n# Q4: options=C1 preparatory lift before the cover, C2 final settle after the cover, C3 lateral sway before the cover; winner=C1 because the preparatory lift establishes the suddenness of the gasp, enhancing the overall impact of the motion.\n# EXAMPLE:"
+  },
+  {
+    "idx": 25,
+    "cue": "cheers_toast",
+    "description": "The robot first raises the arm to a high position, then lowers it to a comfortable level, and finally tilts the wrist to emphasize the toast.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 70,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "low",
+            "x": 55,
+            "y": 50,
+            "z": 60,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.4,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.6,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:44:48",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A toast reads more clearly when the robot first raises the arm to a high position, then lowers it to a comfortable level, and finally tilts the wrist to emphasize the toast.\n# Q2: candidates=P1) up+horizontal+x70,y50,z50, P2) front+horizontal+x55,y50,z60, P3) back+vertical+x45,y50,z60; winner=P1 because the high-up start makes the toast easy to read before the lowering and tilt.\n# Q3: options=M1 P1>pose(high lane)>pose(low lane)>movement(wrist tilt), M2 P1>pose(low lane)>movement(wrist tilt), M3 P2>pose(low lane)>pose(high lane); winner=M1 because the cue benefits from a staged high-up start and a clear lowering before the final tilt.\n# Q4: options=C1 preparatory high-up lift before the toast, C2 final settle pose after the toast, C3 lateral sway before the toast; winner=C1 because the prior high-up lift strengthens the toast reading without diluting it with an extra ending pose.\n# EXAMPLE:"
+  },
+  {
+    "idx": 26,
+    "cue": "highfive_invite",
+    "description": "The robot first extends its arm forward, then raises it slightly upward, and finally brings it down to meet the recipient's hand, creating a natural high-five invitation.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "arm",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "high five",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "arm",
+          "directions": [
+            {
+              "degrees": {
+                "x": -20,
+                "z": -10
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:45:03",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A high-five invite reads most naturally when the robot first extends its arm forward, then raises it slightly upward, and finally brings it down to meet the recipient's hand.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the forward extension and upward raise easiest to read.\n# Q3: options=M1 P1>pose(front lane)>movement(arm x+z extend)>pose(high five lane)>movement(arm x+z lower), M2 P1>pose(front lane)>movement(arm x+z extend)>pose(high five lane)>path(line x), M3 P2>pose(front lane)>pose(high five lane)>movement(arm x+z extend)>movement(arm x+z lower); winner=M1 because the cue benefits from a staged lane placement before the final lower motion, making the high-five read as a natural invitation.\n# Q4: options=C1 preparatory dip before the extend, C2 final settle after the lower, C3 lateral sway before the extend; winner=C1 because the prior dip strengthens the high-five as an invitation rather than a casual gesture.\n# EXAMPLE:"
+  },
+  {
+    "idx": 27,
+    "cue": "highfive_imitation",
+    "description": "The robot first lowers its arm to a low position, then raises it sharply to meet the other hand, and finally holds the high-five position.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "arm",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 1.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:29:31",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A high-five imitation reads most naturally when the robot first lowers its arm to a low position, then raises it sharply to meet the other hand, and finally holds the high-five position.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the low baseline makes the high-five mimicry easier to read.\n# Q3: options=M1 P1>pose(low lane)>movement(arm x+z raise)>pose(high lane), M2 P1>pose(low lane)>pose(high lane), M3 P1>pose(low lane)>pose(high lane)>pose(low lane); winner=M1 because the cue benefits from a staged low-to-high transition, making the high-five mimicry clearer and more natural.\n# Q4: options=C1 preparatory dip before the high-five, C2 final settle after the high-five, C3 lateral sway before the high-five; winner=C1 because the prior dip provides a clear context that enhances the high-five mimicry, whereas a final settle poses the motion less naturally."
+  },
+  {
+    "idx": 28,
+    "cue": "fistbump_invite",
+    "description": "The robot initiates a friendly gesture by raising one arm and extending a fist towards another person, inviting them to engage in a friendly interaction.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 30,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:45:22",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 30,
+    "cue": "pat_self_back",
+    "description": "The robot gently taps its own back with a smooth, rhythmic motion, emphasizing a sense of self-assurance and confidence.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 30,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:45:46",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 31,
+    "cue": "draw_circle_repeat",
+    "description": "The robot begins with a small preparatory lift, then draws a circle with the wrist, pauses at the center, and repeats the motion multiple times.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 1.2,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "xy",
+          "radius": 10,
+          "sweep": 360,
+          "speed": 1.0,
+          "direction": "cw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 3,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 1.2,
+              "hold_time": 0.1
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 1.2,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:49:40",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 32,
+    "cue": "throat_cut_stop",
+    "description": "The robot first lowers its arm to a low position as if preparing to cut off something, then sharply cuts off the motion with a quick, decisive gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -18
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 18
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:45:59",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A throat-cut stop reads most clearly when the robot first lowers its arm to a low position, then sharply cuts off the motion with a quick, decisive gesture.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the throat-cut stop easy to read before the quick cut.\n# Q3: options=M1 P1>pose(low lane)>movement(shoulder x+z cut), M2 P1>pose(low lane)>movement(wrist x+z cut), M3 P2>pose(low lane)>pose(head lane)>movement(shoulder x+z cut); winner=M1 because the cue benefits from a low initial position and a coupled shoulder and wrist cut, not just a single wrist cut.\n# Q4: options=C1 preparatory low position before the cut, C2 final settle pose after the cut, C3 lateral sway before the cut; winner=C1 because the prior low position strengthens the throat-cut stop impression without diluting it with an extra ending pose.\n# EXAMPLE:"
+  },
+  {
+    "idx": 33,
+    "cue": "chin_flick_dismiss",
+    "description": "The robot first lowers its chin slightly as if to acknowledge something, then quickly flicks it upward and relaxes its posture, completing the dismissive gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "chin",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "relaxed",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:57:14",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A dismissive gesture reads best when the robot first lowers its chin slightly, then quickly flicks it upward, and finishes with a relaxed posture.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the quick flick and relaxed finish easier to read.\n# Q3: options=M1 P1>pose(down lane)>movement(chin flick)>pose(relaxed lane), M2 P1>pose(relaxed lane)>movement(chin flick), M3 P2>pose(front lane)>movement(chin flick); winner=M1 because the cue benefits from a staged down-to-up transition and a relaxed finish, making the dismissive action clear.\n# Q4: options=C1 preparatory dip before the chin flick, C2 final settle after the chin flick, C3 lateral sway before the chin flick; winner=C1 because the prior dip provides a clear context for the dismissive action, making the motion read as a deliberate rejection rather than a casual gesture.\n# EXAMPLE:"
+  },
+  {
+    "idx": 34,
+    "cue": "cover_ears_too_loud",
+    "description": "The robot first dips its shoulder to establish a context of discomfort, then covers its ears to a loud noise, and holds the gesture to emphasize the annoyance.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:57:28",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The cue reads as the robot covering its ears due to loud noise, with a clear indication of discomfort or annoyance.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the ear-covering action easier to read.\n# Q3: options=M1 P1>pose(front lane)>movement(shoulder x+z dip)>pose(back lane), M2 P1>pose(front lane)>movement(shoulder x+z dip), M3 P2>pose(front lane)>pose(back lane); winner=M1 because the cue benefits from a staged lane placement before the final dip, making the motion read as a deliberate ear-covering gesture.\n# Q4: options=C1 preparatory dip before the ear-covering, C2 final settle after the ear-covering, C3 lateral sway before the ear-covering; winner=C1 because the prior dip establishes the context of the ear-covering action, making it clearer and more natural."
+  },
+  {
+    "idx": 35,
+    "cue": "salute",
+    "description": "The robot gathers attention with a small dip, rises into a brief acknowledgement, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:46:08",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 36,
+    "cue": "visor_search",
+    "description": "The robot gathers attention with a small dip, then searches through the visor with a smooth, deliberate motion, and concludes with a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:46:30",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 37,
+    "cue": "yield_turn",
+    "description": "The robot first lowers its arm to a low baseline, then smoothly pivots the shoulder to face the new direction, and holds the new stance.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.6,
+          "hold_time": 0.05
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 18
+              },
+              "speed": 1.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:46:44",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A gentle yield turn reads most naturally when the robot first lowers its arm to a low baseline, then smoothly pivots the shoulder to face the new direction, and holds the new stance.\n# Q2: candidates=P1) down+horizontal+x40,y50,z45, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x40,y50,z40; winner=P1 because the low front baseline makes the yield turn easy to read and natural.\n# Q3: options=M1 P1>pose(low lane)>movement(shoulder x+z pivot)>pose(new lane), M2 P1>pose(low lane)>pose(new lane), M3 P2>pose(new lane); winner=M1 because the cue benefits from a preparatory low stance and a smooth pivot, not just a static change of direction.\n# Q4: options=C1 preparatory low stance before the pivot, C2 final static pose after the pivot, C3 lateral sway before the pivot; winner=C1 because the prior stance strengthens the yield turn's naturalness and readability, whereas a static pose detracts from the fluidity.\n# EXAMPLE:"
+  },
+  {
+    "idx": 39,
+    "cue": "request_turn",
+    "description": "The robot first lowers its arm to a low baseline, then slowly rotates the wrist to indicate a slight adjustment, without adding a separate final settle pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:46:55",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A gentle request for a turn reads best when the robot first lowers its arm to a low baseline, then slowly rotates the wrist to indicate a slight adjustment.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the low front baseline makes the arm lowering and wrist rotation easiest to read.\n# Q3: options=M1 P1>pose(low lane)>movement(wrist x+y rotate), M2 P1>pose(low lane)>path(line x), M3 P2>pose(low lane)>pose(front lane)>movement(wrist x+y rotate); winner=M1 because the cue benefits from a staged low baseline and a smooth wrist rotation, not just a static posture.\n# Q4: options=C1 preparatory dip before the rotation, C2 final settle after the rotation, C3 lateral sway before the rotation; winner=C1 because the prior dip strengthens the request reading by giving the motion a clear social context rather than a trailing static pose.\n# EXAMPLE:"
+  },
+  {
+    "idx": 40,
+    "cue": "guiding_arm",
+    "description": "The robot receives a soft touch on its arm, which guides it to follow a specific path or direction.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 30,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:47:05",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 41,
+    "cue": "protective_arm_out",
+    "description": "The robot first lowers its arm to a low position as if taking a breath, then raises it slightly to cover the face, and finally holds the position to emphasize the gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:47:19",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A protective gesture reads most effectively when the robot first lowers its arm to a low position, then raises it slightly to cover the face, and finally holds the position to emphasize the gesture.\n# Q2: candidates=P1) down+horizontal+x40,y50,z45, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x40,y50,z40; winner=P1 because the downward baseline makes the protective gesture easy to read before the slight elevation and hold.\n# Q3: options=M1 P1>movement(shoulder z prep)>movement(shoulder x+z cover)>movement(wrist x+z hold), M2 P1>path(line x), M3 P2>path(line x); winner=M1 because the protective gesture benefits from a preparatory breath-like lift, a slight elevation to cover the face, and a respectful hold, not just a single coarse movement.\n# Q4: options=C1 preparatory breath-like lift before the cover, C2 final return pose after the cover, C3 lateral sway before the cover; winner=C1 because the pre-cover lift strengthens the protective reading without diluting it with an extra ending pose.\n# EXAMPLE:"
+  },
+  {
+    "idx": 42,
+    "cue": "escorting_gesture",
+    "description": "The robot gently guides a person forward with a smooth, forward-moving arm, maintaining a steady pace and a supportive grip.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 0.15,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:55:52",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 44,
+    "cue": "clarification_request_palm_tilt",
+    "description": "The robot first tilts its palm to gather attention, then lowers it slightly to indicate a question, and finally holds the tilted position to emphasize the query.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:49:55",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A clarification request feels more intentional if the robot first tilts its palm to gather attention, then lowers it slightly to indicate a question, and finally holds the tilted position to emphasize the query.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the upward tilt makes the palm request easier to read before the slight lowering and holding.\n# Q3: options=M1 P1>pose(front lane)>pose(palm tilt)>movement(wrist x+z tilt)>path(line z down), M2 P1>pose(front lane)>pose(palm tilt)>movement(wrist x+z tilt), M3 P1>pose(front lane)>pose(palm tilt)>pose(hold)>path(line z down); winner=M1 because the cue benefits from a staged front lane placement before the final tilt and hold, making the request clearer.\n# Q4: options=C1 preparatory tilt before the hold, C2 final settle after the hold, C3 lateral sway before the hold; winner=C1 because the prior tilt supplies the social context that turns the palm actions into a 'clarification request' rather than a generic gesture.\n# EXAMPLE:"
+  },
+  {
+    "idx": 45,
+    "cue": "slow_down_request_palm_down",
+    "description": "The robot first lowers the hand gently, then pauses briefly, and finally lowers the hand further to emphasize the slow-down request.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "horizontal",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:32:42",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A slow-down request feels more intentional if it starts with a gentle lowering of the hand, then pauses briefly, and finally lowers the hand further to emphasize the request.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the down+horizontal baseline makes the slow-down request easiest to read.\n# Q3: options=M1 P1>pose(down lane)>pose(horizontal lane)>movement(palm down)>path(line z down), M2 P1>pose(horizontal lane)>movement(palm down), M3 P2>pose(vertical lane)>movement(palm down); winner=M1 because the cue benefits from a staged lane placement before the final palm-down gesture, making the slow-down request read more naturally.\n# Q4: options=C1 preparatory dip before the palm-down, C2 final settle after the palm-down, C3 lateral sway before the palm-down; winner=C1 because the prior dip supplies the social context that turns the palm-down into a clear slow-down request rather than a generic hand gesture."
+  },
+  {
+    "idx": 46,
+    "cue": "speed_up_circular_cue",
+    "description": "The robot initiates a slow circular motion with a slight preparatory lift, then accelerates into a sharp, continuous circular path, emphasizing the speed and fluidity of the motion.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "xy",
+          "radius": 12,
+          "sweep": 360,
+          "speed": 1.0,
+          "direction": "cw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 2.0,
+              "hold_time": 0.12
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:50:06",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 47,
+    "cue": "wait_for_me_backward_palm",
+    "description": "The robot first lowers its arm in a preparatory dip, then slowly moves backward with its palm facing the viewer, creating a sense of anticipation or waiting.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:56:06",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot performs a slow, deliberate backward movement with its palm facing the viewer, creating a sense of anticipation or waiting.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P3 because the back-facing start makes the backward movement easier to read and emphasizes the anticipation.\n# Q3: options=M1 P1>pose(front lane)>path(line z back)>pose(back lane), M2 P1>pose(front lane)>pose(back lane)>path(line z back), M3 P2>pose(back lane)>path(line z back); winner=M1 because the cue benefits from a clear front-to-back transition and a smooth backward path, making the backward movement feel intentional.\n# Q4: options=C1 preparatory dip before the backward movement, C2 final settle after the backward movement, C3 lateral sway before the backward movement; winner=C1 because the preparatory dip establishes the context of anticipation, making the backward movement read as a deliberate step forward."
+  },
+  {
+    "idx": 49,
+    "cue": "polite_decline_small_push",
+    "description": "The robot first lowers its arm slightly, then pushes back gently with a small, polite gesture, and holds the push back position.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:50:14",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 50,
+    "cue": "firm_accept_forward_reach",
+    "description": "The robot gathers attention with a small dip, rises into a brief acceptance gesture, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:47:29",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 51,
+    "cue": "hesitant_accept_half_reach",
+    "description": "The robot first lowers its arm slightly as if taking a breath, then slowly extends it forward and holds the extended position with a slight pause, creating a clear sense of hesitation.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:48:45",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A hesitant acceptance reads more clearly when the robot first lowers its arm slightly, then slowly extends it forward, and finally holds the extended position with a slight pause.\n# Q2: candidates=P1) down+horizontal+x40,y50,z45, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x40,y50,z40; winner=P1 because the downward baseline makes the slow acceptance and pause easiest to read.\n# Q3: options=M1 P1>movement(shoulder z prep)>movement(shoulder x+z extend), M2 P1>path(line x), M3 P2>movement(shoulder z only); winner=M1 because the hesitation benefits from a preparatory breath-like lift and a slow, steady acceptance, not just a single coarse move.\n# Q4: options=C1 preparatory breath-like lift before the acceptance, C2 final return pose after the acceptance, C3 lateral sway before the acceptance; winner=C1 because the pre-accept lift strengthens the hesitation reading without diluting it with an extra ending pose.\n# EXAMPLE:"
+  },
+  {
+    "idx": 52,
+    "cue": "cancel_previous_offer_retract",
+    "description": "The robot first lowers its arm to a lower position, then slowly retracts it back to its original height, emphasizing the cancellation of the offer.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:35:29",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot's gesture of retracting a previous offer reads most clearly when it first lowers its arm to a lower position, then slowly retracts it back to its original height, emphasizing the cancellation of the offer.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the cancellation gesture easier to read.\n# Q3: options=M1 P1>pose(down lane)>movement(shoulder x+z dip)>path(line z up), M2 P1>pose(front lane)>movement(shoulder x+z dip), M3 P2>pose(back lane)>movement(shoulder x+z dip); winner=M1 because the cue benefits from a preparatory dip and a clear upward path, making the cancellation gesture more pronounced.\n# Q4: options=C1 preparatory dip before the retraction, C2 final settle after the retraction, C3 lateral sway before the retraction; winner=C1 because the prior dip strengthens the cancellation impression without diluting it with an extra settling pose."
+  },
+  {
+    "idx": 53,
+    "cue": "conditional_accept_pause_then_reach",
+    "description": "The robot first acknowledges the condition with a slight dip, then pauses, and finally reaches out to make a decision or offer something.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:35:45",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot performs a conditional acceptance gesture, where it first acknowledges the condition with a slight dip, then pauses, and finally reaches out to make a decision or offer something.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the initial acknowledgment and pause easier to read.\n# Q3: options=M1 P1>pose(front lane)>path(line z up)>pose(back lane)>path(line z down), M2 P1>pose(front lane)>pose(back lane)>path(line z up)>path(line z down), M3 P1>pose(front lane)>pose(back lane)>pose(front lane)>path(line z up)>path(line z down); winner=M1 because the cue benefits from a clear lane change and a smooth transition between the initial acknowledgment and the final reach.\n# Q4: options=C1 preparatory dip before the pause, C2 final settle after the reach, C3 lateral sway before the reach; winner=C1 because the prior dip provides a clear context for the pause, making the conditional acceptance gesture read more naturally."
+  },
+  {
+    "idx": 54,
+    "cue": "final_decision_down_press",
+    "description": "The robot first places the arm into the decision lane, then dips the shoulder to emphasize the decision, and finally lowers the arm decisively without a separate settling pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -18
+              },
+              "speed": 1.4,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:48:59",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A final decision down press feels more intentional if it gathers attention first, lowers the arm, and emphasizes the downward force.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the downward press easier to read before the arm lowers.\n# Q3: options=M1 P1>pose(front lane)>movement(shoulder x+z dip)>path(line z down), M2 P1>pose(front lane)>movement(shoulder x+z dip), M3 P2>pose(front lane)>pose(back lane)>movement(shoulder x+z dip); winner=M1 because the cue benefits from a staged front lane placement before the final dip and down press.\n# Q4: options=C1 preparatory dip before the down press, C2 final settle after the down press, C3 lateral sway before the down press; winner=C1 because the contextual setup makes the down press read as a deliberate decision rather than a casual gesture.\n# EXAMPLE:"
+  },
+  {
+    "idx": 55,
+    "cue": "resume_speaking_pull",
+    "description": "The robot begins with a small dip to gather attention, then smoothly pulls back one arm to prepare for a new thought or statement, maintaining a natural forward flow.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -10
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 30,
+          "speed": 1.8
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:36:18",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The cue reads as a natural continuation of speaking, with the robot's arm pulling back smoothly to prepare for a new thought or statement.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the pull feel natural and forward-looking.\n# Q3: options=M1 P1>pose(front lane)>path(line x), M2 P1>pose(up lane)>path(line x), M3 P1>pose(back lane)>path(line x); winner=M1 because the cue benefits from a forward-facing start and a smooth pull along the x-axis, which aligns with the natural flow of speaking.\n# Q4: options=C1 preparatory dip before the pull, C2 final settle after the pull, C3 lateral sway before the pull; winner=C1 because the preparatory dip provides a clear context for the pull, making it feel like a natural continuation of the previous action."
+  },
+  {
+    "idx": 56,
+    "cue": "emphasize_point_downbeat",
+    "description": "The robot begins with a slight preparatory lift, then lowers its arm in a clear, downward motion to emphasize a point, maintaining a respectful posture throughout.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 48,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:49:08",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 57,
+    "cue": "unsure_response_hand_hover_stop",
+    "description": "The robot gathers attention with a small dip, rises into a brief hovering gesture above the chest, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:50:24",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 58,
+    "cue": "prevent_fall_support_reach",
+    "description": "The robot first lowers its arm gently to gather attention, then reaches out to stabilize a fall with a firm grip, without adding a separate settling pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.4,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "gripper",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "z": 20
+              },
+              "speed": 1.6,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:56:20",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot's arm reaches out to provide support during a fall, gathering attention with a gentle dip and then stabilizing the fall with a firm grip.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the reaching and stabilizing motion easier to read.\n# Q3: options=M1 P1>pose(front lane)>movement(shoulder x+z dip)>pose(back lane)>movement(gripper x+z firm), M2 P1>pose(front lane)>movement(shoulder x+z)>pose(back lane)>movement(gripper x+z), M3 P1>pose(front lane)>pose(back lane)>movement(gripper x+z); winner=M1 because the cue benefits from a staged lane placement before the final firm grip, making the motion read as a deliberate support action.\n# Q4: options=C1 preparatory dip before the reach, C2 final settle after the reach, C3 lateral sway before the reach; winner=C1 because the prior dip supplies the social context that turns the reach into a supportive gesture rather than a generic arm movement."
+  },
+  {
+    "idx": 59,
+    "cue": "nod_yes",
+    "description": "The robot first places the arm into the salute lane, then tightens the elbow into the forehead angle and holds it crisply, without adding a separate release pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "right",
+            "x": 56,
+            "y": 92,
+            "z": 50,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.1,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 75,
+            "z": 70,
+            "gripper_orientation": "vertical"
+          },
+          "speed": 1.4,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": -45,
+                "z": 45
+              },
+              "speed": 1.5,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:47:43",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A nod yes feels more intentional if it gathers attention first, rises, and punctuates the top of the lift.\n# Q2: candidates=P1) up+horizontal+x50,y50,z50, P2) right+vertical+x50,y100,z50, P3) up+vertical+x50,y75,z70; winner=P1 because it gives the cleanest staging before the arm is placed laterally and folded into salute.\n# Q3: options=M1 P1>pose(right lane)>pose(forehead lane)>movement(elbow x+z fold), M2 P1>movement(shoulder+elbow), M3 P3>hold only; winner=M1 because the cue depends on staged lane placement before the final crisp angle.\n# Q4: options=C1 lane placement before the fold, C2 release pose after the fold, C3 small recoil after the fold; winner=C1 because the contextual setup makes the salute read militarily precise, whereas a release pose only weakens the locked salute impression.\n# EXAMPLE:"
+  },
+  {
+    "idx": 60,
+    "cue": "shake_head_no",
+    "description": "The robot first lowers its head slightly as if preparing to shake, then tilts it gently from side to side, and finally returns to a neutral position without a separate end pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "head",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "neutral",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:47:57",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A gentle shake of the head reads most naturally when the robot starts with a slight dip, then lifts the head slightly, and finally returns to a neutral position.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the head shake read as a natural, gentle movement rather than a stiff or abrupt action.\n# Q3: options=M1 P1>pose(down lane)>pose(neutral lane)>movement(head x+z tilt), M2 P1>pose(front lane)>pose(neutral lane)>movement(head x+z tilt), M3 P1>pose(back lane)>pose(neutral lane)>movement(head x+z tilt); winner=M1 because the cue benefits from a preparatory dip that sets the tone for the gentle head tilt, rather than just a neutral start and return.\n# Q4: options=C1 preparatory dip before the head tilt, C2 final neutral pose after the head tilt, C3 lateral sway before the head tilt; winner=C1 because the prior dip establishes the context of a gentle, natural movement, making the head tilt read as a soft nod rather than a rigid action.\n# EXAMPLE:"
+  },
+  {
+    "idx": 61,
+    "cue": "air_quotes",
+    "description": "The robot gathers attention with a small dip, rises into an upward acknowledgment, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:48:06",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 62,
+    "cue": "self_hug",
+    "description": "The robot first lowers its arm to touch the chest, then pulls it back to hug itself, and finally holds the embrace.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 30,
+          "speed": 1.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 30,
+          "speed": 1.2
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:51:55",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A self-hug feels more natural and intimate if the robot first lowers its arm to touch the chest, then pulls it back to hug itself, and finally holds the embrace.\n# # Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the self-hug feel more grounded and natural.\n# # Q3: options=M1 P1>pose(down lane)>path(line z down)>pose(up lane)>path(line z up), M2 P1>pose(down lane)>pose(up lane), M3 P2>pose(front lane)>path(line z down)>pose(up lane); winner=M1 because the cue benefits from a staged down-to-up motion that emphasizes the self-hug's grounding and intimacy.\n# # Q4: options=C1 preparatory dip before the hug, C2 final settle after the hug, C3 lateral sway before the hug; winner=C1 because the prior dip strengthens the self-hug's grounding and intimacy, making it feel more natural and personal."
+  },
+  {
+    "idx": 64,
+    "cue": "tilt_head_curious",
+    "description": "The robot gently tilts its head to the side, creating a curious expression while maintaining a natural posture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 10,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "head",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:48:13",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 65,
+    "cue": "raise_index_one_moment",
+    "description": "The robot gathers attention with a small dip, rises into a brief acknowledgment, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:50:33",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 66,
+    "cue": "shh_gesture",
+    "description": "The robot gathers attention with a small dip, rises into a brief acknowledgement, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:48:22",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 67,
+    "cue": "rub_arms_cold",
+    "description": "The robot first lowers its arms to establish a forward warmth context, then rubs them gently together in a rhythmic motion to warm them up.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 0.1,
+          "speed": 1.0
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:52:08",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot rubs its cold arms together in a gentle, rhythmic motion to warm them up.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the rubbing motion easier to read and emphasizes the forward warmth.\n# Q3: options=M1 P1>pose(front lane)>movement(wrist x+z rub)>path(line x), M2 P1>pose(front lane)>movement(wrist x+z rub)>path(line z), M3 P2>pose(front lane)>movement(wrist x+z rub)>path(line x); winner=M1 because the cue benefits from a clear front-facing start and a coupled wrist rub along the x-axis, making the motion read as a forward warming gesture.\n# Q4: options=C1 preparatory dip before the rub, C2 final settle after the rub, C3 lateral sway before the rub; winner=C1 because the preparatory dip establishes the forward warmth context, making the rub motion read as a deliberate effort to warm the arms."
+  },
+  {
+    "idx": 69,
+    "cue": "cross_arms_defensive",
+    "description": "The robot first lowers its arms to shield itself, then quickly raises them to form a protective barrier, creating a clear and immediate defensive stance.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "defensive",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "arms",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 1.0,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:52:21",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The defensive cross-arms gesture reads most effectively when the robot first lowers its arms to shield itself, then quickly raises them to form a protective barrier.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the defensive stance and quick rise easiest to read.\n# Q3: options=M1 P1>pose(down lane)>pose(defense lane)>movement(arms x+z raise), M2 P1>pose(defense lane)>movement(arms x+z raise), M3 P2>pose(defense lane)>pose(defense lane)>movement(arms x+z raise); winner=M1 because the cue benefits from a staged lower stance before the quick rise, making the defensive action clear and immediate.\n# Q4: options=C1 preparatory lower stance before the rise, C2 final settle pose after the rise, C3 lateral sway before the rise; winner=C1 because the prior stance provides the social context that turns the rise into a clear defensive move rather than a generic arm movement."
+  },
+  {
+    "idx": 72,
+    "cue": "palms_together_thank_you",
+    "description": "The robot first lowers its arms to a resting position, then raises them together in a symmetrical motion, and finally holds the hands together in a thank-you sign.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 0.1,
+          "speed": 1.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 0.1,
+          "speed": 1.0
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:52:35",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A gesture of gratitude feels more sincere if the robot first lowers its arms to a resting position, then raises them together in a symmetrical motion, and finally holds the hands together in a thank-you sign.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the symmetrical thank-you sign easier to read.\n# Q3: options=M1 P1>pose(down lane)>path(line x)>pose(up lane)>path(line x), M2 P1>pose(up lane)>path(line x), M3 P2>pose(up lane)>path(line x); winner=M1 because the cue benefits from a preparatory lowering and a symmetrical raising, making the thank-you sign read more naturally.\n# Q4: options=C1 preparatory lowering before the thank-you sign, C2 final settling after the thank-you sign, C3 lateral sway before the thank-you sign; winner=C1 because the prior lowering establishes the context of gratitude, making the thank-you sign read more sincerely.\n# EXAMPLE:"
+  },
+  {
+    "idx": 74,
+    "cue": "hands_up_surrender",
+    "description": "The robot gathers attention with a small dip, rises into a brief surrender gesture, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:48:32",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 75,
+    "cue": "arms_open_welcome",
+    "description": "The robot extends its arms wide in a friendly, open-handed gesture, inviting the viewer into a warm embrace.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 70,
+            "y": 70,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "z": 20
+              },
+              "speed": 1.2,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 30,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": 10
+              },
+              "speed": 1.4,
+              "hold_time": 0.5
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:52:44",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 76,
+    "cue": "stretch_arms_up",
+    "description": "The robot gathers attention with a small dip, rises into a brief acknowledgment, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:52:54",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 78,
+    "cue": "disagreement_cross_then_release",
+    "description": "The robot first dips its arm to set a defensive tone, then crosses its arms in a confrontational gesture, and finally slowly releases them to emphasize the tension and release.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:57:42",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The disagreement cross reads more clearly when the robot first crosses its arms in a defensive or confrontational gesture, then releases them slowly, emphasizing the tension and release.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the defensive gesture and release easier to read.\n# Q3: options=M1 P1>pose(front lane)>movement(shoulder x+z cross)>path(line z down), M2 P1>pose(up lane)>movement(shoulder x+z cross), M3 P2>pose(back lane)>movement(shoulder x+z cross); winner=M1 because the cue benefits from a clear front-facing start and a coupled cross and descent, not just a single cross.\n# Q4: options=C1 preparatory dip before the cross, C2 final settle after the cross, C3 lateral sway before the cross; winner=C1 because the prior dip strengthens the defensive stance and the cross, making the release read more naturally as a tension release rather than a sudden relaxation.\n# EXAMPLE:"
+  },
+  {
+    "idx": 82,
+    "cue": "frustration_down_throw",
+    "description": "The robot begins with a preparatory dip to establish a grounded stance, then throws its arm forcefully downward, emphasizing intense frustration or anger.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:56:34",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The frustration_down_throw motion reads as a sudden, forceful gesture aimed at the ground, conveying intense disappointment or anger.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the gesture feel more grounded and impactful.\n# Q3: options=M1 P1>pose(down lane)>path(line z down)>movement(wrist x+z throw), M2 P1>pose(front lane)>path(line z down)>movement(wrist x+z throw), M3 P1>pose(back lane)>path(line z down)>movement(wrist x+z throw); winner=M1 because the cue benefits from a clear downward baseline and a coupled wrist throw, making the gesture feel more forceful and impactful.\n# Q4: options=C1 preparatory dip before the throw, C2 final settle after the throw, C3 lateral sway before the throw; winner=C1 because the preparatory dip strengthens the gesture's impact and intensity, making the frustration clearer and more pronounced."
+  },
+  {
+    "idx": 84,
+    "cue": "submission_lowered_open_palm",
+    "description": "The robot first lowers its arm slowly as if preparing to submit, then opens its palm wide in a clear gesture of surrender or submission.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 30,
+          "speed": 1.2
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "palm",
+          "directions": [
+            {
+              "degrees": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              },
+              "speed": 1.5,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "open",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:56:48",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A submission gesture reads most clearly when the robot lowers its arm slowly and opens its palm wide, creating a sense of surrender or submission.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the submission gesture easier to read.\n# Q3: options=M1 P1>pose(down lane)>path(line z down)>movement(palm open)>pose(open lane), M2 P1>pose(down lane)>pose(open lane), M3 P2>pose(front lane)>pose(open lane); winner=M1 because the cue benefits from a preparatory downward dip and a clear palm opening, rather than just a static open pose.\n# Q4: options=C1 preparatory dip before the open palm, C2 final settle after the open palm, C3 lateral sway before the open palm; winner=C1 because the prior dip establishes the submission context, making the open palm read as a clear gesture of surrender rather than a generic open hand.\n# EXAMPLE:"
+  },
+  {
+    "idx": 85,
+    "cue": "dominance_high_open_hold",
+    "description": "The robot opens its parallel-jaw gripper wide and holds it open in a clear, deliberate manner, emphasizing control and dominance.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 30,
+          "speed": 1.5
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:53:03",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 86,
+    "cue": "apology_forward_lowered_hold",
+    "description": "The robot first lowers its arm as if taking a breath, then dips gracefully and holds the lower position with a slight tilt, emphasizing humility and respect.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 28,
+                "z": -18
+              },
+              "speed": 0.8,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:57:01",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A humble apology reads best when the robot first lowers its arm gracefully, then pauses at the lowest point, and finally holds the lower position with a slight tilt.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the graceful lowering and pause easiest to read.\n# Q3: options=M1 P1>movement(shoulder z prep)>movement(shoulder x+z dip), M2 P1>path(line x), M3 P2>movement(shoulder z only); winner=M1 because the cue benefits from a preparatory breath-like lift and a respectful held dip, not just a single coarse bend.\n# Q4: options=C1 preparatory breath-like lift before the dip, C2 final return pose after the dip, C3 lateral sway before the dip; winner=C1 because the pre-dip lift strengthens the humility reading without diluting it with an extra ending pose.\n# EXAMPLE:"
+  },
+  {
+    "idx": 90,
+    "cue": "start_action_forward_snap",
+    "description": "The robot begins with a sharp forward snap, emphasizing the motion's direction and impact.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 70,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 30,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:50:42",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 92,
+    "cue": "retry_action_reset_circle",
+    "description": "The robot initiates a retry action by raising one arm briefly, then circles the wrist in a small arc to reset the motion, maintaining a clear and deliberate motion.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "joint": null,
+          "plane": "xy",
+          "radius": 12,
+          "sweep": 360,
+          "speed": 1.4,
+          "direction": "cw"
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 20
+              },
+              "speed": 1.6,
+              "hold_time": 0.12
+            },
+            {
+              "degrees": {
+                "z": -20
+              },
+              "speed": 1.6,
+              "hold_time": 0.12
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:51:04",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 94,
+    "cue": "abandon_action_drop_turn",
+    "description": "The robot first lowers its arm to a resting position, then turns away smoothly, and finally drops the arm to the ground, completing the abandonment of the action.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 0.1,
+          "speed": 1.2
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "turn",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 0.1,
+          "speed": 1.2
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:54:15",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot's abandonment of an action reads most clearly when it first lowers its arm to a resting position, then turns away smoothly, and finally drops the arm to the ground.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the arm lowering and turning easiest to read.\n# Q3: options=M1 P1>pose(down lane)>path(line x)>pose(turn lane)>path(line z), M2 P1>pose(turn lane)>pose(down lane)>path(line z), M3 P2>pose(down lane)>pose(turn lane)>path(line z); winner=M1 because the cue benefits from a staged lane placement before the final turn and drop, making the abandonment clear and deliberate.\n# Q4: options=C1 preparatory dip before the turn, C2 final settle after the turn, C3 lateral sway before the turn; winner=C1 because the prior dip strengthens the abandonment context, making the turn and drop read as a smooth conclusion to the action.\n# EXAMPLE:"
+  },
+  {
+    "idx": 95,
+    "cue": "prepare_action_raise_hold",
+    "description": "The robot first lowers its arm to a low position, then raises it to a higher position while holding the object steadily.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 70,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 70,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:49:16",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 97,
+    "cue": "hesitation_pause_hold",
+    "description": "The robot first lowers its arm to a low position, pauses briefly, and then holds the arm in a relaxed but firm position, creating a natural pause before the hold.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pause",
+        "parameters": {
+          "duration": 0.1,
+          "speed": 1.0
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "hold",
+            "x": 40,
+            "y": 50,
+            "z": 45,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.8
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:51:16",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The hesitation pause hold reads most naturally when the robot first lowers its arm to a low position, pauses briefly, and then holds the arm in a relaxed but firm position.\n# Q2: candidates=P1) down+horizontal+x40,y50,z45, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x45,y50,z40; winner=P1 because the downward baseline makes the pause and hold easiest to read.\n# Q3: options=M1 P1>pose(down lane)>pause(0.1)>pose(hold lane), M2 P1>pose(low lane)>pause(0.1)>pose(hold lane), M3 P2>pose(front lane)>pause(0.1)>pose(hold lane); winner=M1 because the cue benefits from a clear low baseline and a natural pause before the hold, not just a single low position.\n# Q4: options=C1 preparatory low position before the pause, C2 final settle pose after the pause, C3 lateral sway before the pause; winner=C1 because the prior low position strengthens the pause and hold impression, making the hesitation read more naturally.\n# EXAMPLE:"
+  },
+  {
+    "idx": 104,
+    "cue": "scale_expand",
+    "description": "The robot first places the arm into the scale lane, then rises into a brief acknowledgment, and finally expands the scale crisply without adding a separate release pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 1.2
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:34:55",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot expands a scale to show its size, gathering attention with a small dip and rising into a brief acknowledgment before the scale is fully extended.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the upward expansion easier to read before the scale is fully extended.\n# Q3: options=M1 P1>pose(front lane)>pose(up lane)>path(line z), M2 P1>pose(front lane)>path(line z), M3 P2>pose(front lane)>pose(up lane); winner=M1 because the cue benefits from a staged lane placement before the final crisp expansion.\n# Q4: options=C1 preparatory dip before the expansion, C2 final settle after the expansion, C3 lateral sway before the expansion; winner=C1 because the contextual setup makes the scale read as a deliberate and measured expansion, whereas a release pose only weakens the impression of precision."
+  },
+  {
+    "idx": 106,
+    "cue": "uncertainty_wave",
+    "description": "The robot first lowers its arm to a low position, then quickly raises it back up, creating a sense of hesitation or uncertainty.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:49:30",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The uncertainty wave reads best when the robot first lowers its arm to a low position, then quickly raises it back up, creating a sense of hesitation or uncertainty.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the wave easier to read as a hesitant gesture.\n# Q3: options=M1 P1>pose(down lane)>movement(shoulder x+z dip)>path(line z up), M2 P1>pose(front lane)>movement(shoulder x+z dip), M3 P1>pose(back lane)>movement(shoulder x+z dip); winner=M1 because the cue benefits from a clear downward baseline and a coupled dip before the wave, making the hesitation read more naturally.\n# Q4: options=C1 preparatory dip before the wave, C2 final settle after the wave, C3 lateral sway before the wave; winner=C1 because the prior dip establishes the hesitation context, making the wave read as a deliberate pause rather than a casual gesture.\n# EXAMPLE:"
+  },
+  {
+    "idx": 108,
+    "cue": "interrupt_hard",
+    "description": "The robot first lowers its arm to a low position, then sharply raises it to a high position, and finally holds the new position with a crisp accent, creating a forceful interruption.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "up",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.6,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.8,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:51:30",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The interrupt hard cue reads most effectively when the robot first lowers its arm to a low position, then sharply raises it to a high position, and finally holds the new position with a crisp accent.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the low front baseline makes the sharp interrupt easy to read before the arm is raised.\n# Q3: options=M1 P1>pose(low lane)>movement(shoulder x+z raise)>pose(high lane), M2 P1>pose(low lane)>movement(shoulder x+z raise)>pose(high lane), M3 P1>pose(low lane)>pose(high lane); winner=M1 because the cue benefits from a staged low-to-high transition before the final crisp high position.\n# Q4: options=C1 preparatory dip before the raise, C2 final settle after the raise, C3 lateral sway before the raise; winner=C1 because the prior dip strengthens the interrupt's social context, making the high raise read as a forceful interruption rather than a casual gesture.\n# EXAMPLE:"
+  },
+  {
+    "idx": 109,
+    "cue": "interrupt_soft",
+    "description": "The robot gives a gentle preparatory lift as if taking a breath, then lowers its arm to signal a brief pause or acknowledgment without a separate ending pose.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:51:42",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The interrupt_soft cue reads as a soft, non-intrusive interruption, where the robot gently lowers its arm to signal a brief pause or acknowledgment.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the gentle lowering easy to read.\n# Q3: options=M1 P1>pose(down lane)>movement(shoulder x+z dip), M2 P1>pose(front lane)>movement(shoulder x+z dip), M3 P1>pose(back lane)>movement(shoulder x+z dip); winner=M1 because the cue benefits from a preparatory breath-like lift and a respectful held dip, not just a single coarse bend.\n# Q4: options=C1 preparatory breath-like lift before the dip, C2 final settle pose after the dip, C3 lateral sway before the dip; winner=C1 because the pre-dip lift strengthens the politeness reading without diluting it with an extra ending pose."
+  },
+  {
+    "idx": 114,
+    "cue": "contain_space",
+    "description": "The robot gently extends its arm to the side, creating a clear separation between itself and another object or person, emphasizing a sense of containment or distance.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 70,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 12
+              },
+              "speed": 1.4,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:53:13",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 115,
+    "cue": "expand_space",
+    "description": "The robot gathers attention with a small dip, then extends one arm outwards in a relaxed manner, creating a sense of openness and space.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": 12
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "x": 12
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:53:22",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 116,
+    "cue": "compress_space",
+    "description": "The robot gathers attention with a small dip, rises into a brief compression motion, and adds a crisp peak accent instead of simply lifting and freezing.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 60,
+            "y": 50,
+            "z": 35,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -8
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 34,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "wrist",
+          "directions": [
+            {
+              "degrees": {
+                "z": 8
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:53:32",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 117,
+    "cue": "balance_scale",
+    "description": "The robot first places its arm on a scale, adjusts its grip, and then releases it gently, creating a clear sense of balance and coordination.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "grip",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "z": 20
+              },
+              "speed": 1.2,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "balance",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "release",
+          "directions": [
+            {
+              "degrees": {
+                "x": -20,
+                "z": -20
+              },
+              "speed": 1.4,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:53:46",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot performs a delicate balance test by placing its arm on a scale, adjusting its grip, and then releasing it gently.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the adjustment and release easier to read.\n# Q3: options=M1 P1>pose(front lane)>movement(grip x+z)>pose(balance lane)>movement(release x+z), M2 P1>pose(front lane)>movement(grip x+z)>pose(balance lane), M3 P1>pose(front lane)>movement(grip x+z)>pose(balance lane)>movement(release x+z); winner=M1 because the cue benefits from a staged lane placement before the final release, making the adjustment and release clearer.\n# Q4: options=C1 preparatory grip before the balance, C2 final release pose after the balance, C3 lateral sway before the balance; winner=C1 because the prior grip supplies the context that makes the balance and release read as a coordinated effort rather than a separate actions."
+  },
+  {
+    "idx": 118,
+    "cue": "push_pull_dual",
+    "description": "The robot begins with a slight forward lean, pulls the arm back smoothly, and then pushes it forward again, creating a continuous and effective push-pull motion.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 30,
+          "speed": 1.8
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.4,
+              "hold_time": 0.3
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:54:01",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A push-pull motion reads most effectively when the robot starts with a slight forward lean, pulls the arm back, and then pushes it forward again, creating a smooth and continuous motion.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the pull and push easier to read as a coordinated motion.\n# Q3: options=M1 P1>pose(front lane)>movement(shoulder x+z pull)>path(line z), M2 P1>pose(front lane)>movement(shoulder x+z)>path(line z), M3 P2>pose(back lane)>movement(shoulder x+z)>path(line z); winner=M1 because the cue benefits from a clear front-facing start and a smooth pull and push sequence, rather than a back-facing start or a separate path.\n# Q4: options=C1 preparatory lean before the pull, C2 final static pose after the push, C3 lateral sway before the pull; winner=C1 because the preparatory lean strengthens the push-pull motion by setting the stage for the coordinated action, whereas a final static pose detracts from the fluidity of the motion."
+  },
+  {
+    "idx": 121,
+    "cue": "weight_shift_forward",
+    "description": "The robot first dips slightly to establish a baseline, then smoothly transitions into a forward-leaning posture, creating a clear sense of forward movement.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.2,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "weight",
+          "directions": [
+            {
+              "degrees": {
+                "x": 20,
+                "z": 20
+              },
+              "speed": 1.5,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:54:27",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A weight shift forward feels more intentional if it starts with a slight dip and then smoothly transitions into a forward-leaning posture.\n# Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the forward weight shift easier to read.\n# Q3: options=M1 P1>pose(down lane)>pose(front lane)>movement(weight x+z shift), M2 P1>pose(front lane)>movement(weight x+z shift), M3 P2>pose(front lane)>pose(back lane)>movement(weight x+z shift); winner=M1 because the cue benefits from a staged lane placement before the final forward lean.\n# Q4: options=C1 preparatory dip before the weight shift, C2 final settle after the weight shift, C3 lateral sway before the weight shift; winner=C1 because the contextual setup makes the weight shift read as a deliberate forward step rather than a casual lean.\n# EXAMPLE:"
+  },
+  {
+    "idx": 122,
+    "cue": "weight_shift_backward",
+    "description": "The robot first lowers its arm into a weight lane, then shifts its weight backward smoothly, and finally pulls back with a slight pause.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "weight",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "weight",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10,
+                "z": -10
+              },
+              "speed": 1.2,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "back",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:54:42",
+    "experiment": "exp1",
+    "reasoning": "# Q1: A weight shift backward feels more intentional if the robot first lowers its arm, then shifts its weight, and finally pulls back with a slight pause.\n# # Q2: candidates=P1) down+horizontal+x50,y50,z50, P2) front+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the downward baseline makes the weight shift and pull back easier to read.\n# # Q3: options=M1 P1>pose(down lane)>pose(weight lane)>movement(weight x+z shift), M2 P1>pose(weight lane)>pose(down lane)>movement(weight x+z shift), M3 P2>pose(weight lane)>pose(back lane)>movement(weight x+z shift); winner=M1 because the cue benefits from a staged lane placement before the final pull back.\n# # Q4: options=C1 preparatory dip before the weight shift, C2 final settle after the weight shift, C3 lateral sway before the weight shift; winner=C1 because the contextual setup makes the weight shift read as a deliberate step backward, whereas a final settle pose only weakens the impression of a smooth transition."
+  },
+  {
+    "idx": 123,
+    "cue": "torso_rotate_away",
+    "description": "The robot's torso smoothly pivots away from the viewer, creating a sense of retreat or departure.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "left",
+            "x": 70,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "x": -12
+              },
+              "speed": 1.2,
+              "hold_time": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "arc",
+          "plane": "xy",
+          "radius": 10,
+          "sweep": 180,
+          "speed": 1.0,
+          "direction": "cw"
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:54:50",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 124,
+    "cue": "torso_rotate_toward",
+    "description": "The robot gathers attention by slowly rotating its torso toward the viewer, creating a natural and respectful gesture.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "z",
+          "distance": 30,
+          "speed": 1.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "torso",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.0,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:54:59",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 125,
+    "cue": "lean_side_doubt",
+    "description": "The robot first lowers its arm in a relaxed manner, then leans it to the side in a questioning gesture, creating a sense of uncertainty.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "down",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "shoulder",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "side",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "elbow",
+          "directions": [
+            {
+              "degrees": {
+                "z": 10
+              },
+              "speed": 1.4,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:55:20",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 127,
+    "cue": "expand_chest",
+    "description": "The robot first lowers its chest slightly as if taking a breath, then expands it confidently with a clear front-facing start and a smooth chest expansion along the x-axis.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "chest",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.2,
+              "hold_time": 0.8
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 30,
+          "speed": 1.0
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:55:32",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot expands its chest to show confidence or openness.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the chest expansion easier to read.\n# Q3: options=M1 P1>pose(front lane)>path(line x), M2 P1>pose(up lane)>path(line x), M3 P1>pose(back lane)>path(line x); winner=M1 because the cue benefits from a clear front-facing start and a straightforward chest expansion along the x-axis.\n# Q4: options=C1 preparatory dip before the chest expansion, C2 final settle after the chest expansion, C3 lateral sway before the chest expansion; winner=C1 because the preparatory dip provides a clean start and a natural flow to the chest expansion, making the gesture read as a confident gesture rather than a casual or abrupt movement.\n# EXAMPLE:"
+  },
+  {
+    "idx": 128,
+    "cue": "eye_widen_surprise",
+    "description": "The robot's eyes quickly widen in a surprised expression, conveying a sudden realization or shock.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.0
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "eye",
+          "directions": [
+            {
+              "degrees": {
+                "x": 10
+              },
+              "speed": 1.5,
+              "hold_time": 0.1
+            }
+          ]
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:57:49",
+    "experiment": "exp1"
+  },
+  {
+    "idx": 130,
+    "cue": "gaze_shift_avoid",
+    "description": "The robot first lowers its head slightly as if preparing to look elsewhere, then shifts its gaze away from the viewer in a subtle and natural manner.",
+    "movements": [
+      {
+        "type": "pose",
+        "parameters": {
+          "pose": {
+            "dir": "front",
+            "x": 50,
+            "y": 50,
+            "z": 50,
+            "gripper_orientation": "horizontal"
+          },
+          "speed": 1.0,
+          "hold_time": 0.1
+        }
+      },
+      {
+        "type": "movement",
+        "parameters": {
+          "repetition": 1,
+          "joint": "head",
+          "directions": [
+            {
+              "degrees": {
+                "z": -10
+              },
+              "speed": 1.2,
+              "hold_time": 0.0
+            }
+          ]
+        }
+      },
+      {
+        "type": "path",
+        "parameters": {
+          "shape": "line",
+          "axis": "x",
+          "distance": 0.1,
+          "speed": 1.4
+        }
+      }
+    ],
+    "state": "exp1_pose_generation",
+    "model": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "time": "2026-06-11 15:58:02",
+    "experiment": "exp1",
+    "reasoning": "# Q1: The robot shifts its gaze away from the viewer to avoid eye contact, which can be seen as a subtle form of avoidance or disinterest.\n# Q2: candidates=P1) front+horizontal+x50,y50,z50, P2) up+horizontal+x50,y50,z50, P3) back+vertical+x50,y50,z50; winner=P1 because the front-facing start makes the gaze shift easier to read and maintain eye contact.\n# Q3: options=M1 P1>pose(front lane)>path(line x), M2 P1>pose(up lane)>path(line x), M3 P1>pose(back lane)>path(line x); winner=M1 because the cue benefits from a clear front-facing start and a straightforward line path, making the gaze shift more natural and less abrupt.\n# Q4: options=C1 preparatory dip before the gaze shift, C2 final settle after the gaze shift, C3 lateral sway before the gaze shift; winner=C1 because the preparatory dip helps establish a baseline and provides a smooth transition into the gaze shift, enhancing the naturalness of the action.\n# EXAMPLE:"
+  }
+]

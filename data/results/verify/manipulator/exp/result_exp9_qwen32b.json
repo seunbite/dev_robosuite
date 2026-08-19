@@ -1,0 +1,3048 @@
+{
+  "time": "2026-06-13T11:46:43",
+  "vlm_backend": "transformers",
+  "model": "Qwen/Qwen2.5-VL-32B-Instruct",
+  "mode": "motion_component_verify_text_only",
+  "config": "/home/hoyeonk/sblee/dev_robosuite/data/results/motion_configs/manipulator/exp/result_exp7_qwen32b.json",
+  "n": 88,
+  "rows": [
+    {
+      "cue_idx": 7,
+      "cue": "raise_fists_victory",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully capture the essence of the 'raise_fists_victory' cue. While it includes a wrist rotation and some elevation, the sequence lacks a sharp upward gesture and does not emphasize the triumphal pause at the top.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement does not include a sharp, upward trajectory along the vertical axis (z) to convey the victory gesture effectively. Additionally, there is no emphasis on the final pose to highlight the triumph. The wrist rotation seems excessive and unrelated to the gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "null",
+              "y": "null",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": true,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=wrist, rep=1, deg=z:10) -> movement(joint=shoulder, rep=1, deg=z:+90) -> movement(joint=shoulder, rep=non, deg=z:+10)",
+            "path(shape=line, joint=shoulder, axis=z, speed=2.0) -> movement(joint=shoulder, rep=non, deg=z:+0, hold_time=1.0)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 8,
+      "cue": "fist_pump",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully capture the essence of a fist pump gesture, which requires a strong upward extension, a sharp wrist accent, and a crisp final rotation. The provided movements lack the necessary dynamics and structure.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movements do not emphasize the key components of a fist pump: a strong upward extension followed by a sharp wrist rotation and a crisp final accent. Instead, the current movements include an unnecessary yaw rotation, which detracts from the intended gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+15, z:+30)",
+            "movement(joint=wrist, rep=1, deg=z:+45)",
+            "movement(joint=wrist, rep=1, deg=z:-45)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 9,
+      "cue": "flex_bicep",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'flex_bicep' gesture by utilizing sharp rotations at the wrist and elbow joints, which effectively emphasizes localized muscle contraction as described.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold time at the elbow movement to emphasize the bicep flex more prominently.",
+            "Add a slight upward lift at the shoulder to further enhance the gesture's overall impact."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 10,
+      "cue": "shrug_idk",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement is appropriate for conveying the 'shrug_idk' cue. It effectively mimics the shrugging motion by lifting the shoulder upward and backward, followed by a slight downward relaxation, which aligns well with the gesture's intent.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the magnitude of the shoulder lift slightly to enhance the uncertainty expression.",
+            "Add a subtle sway in the 'y' axis during the shrug to make it more dynamic."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 11,
+      "cue": "self_scratch_head_confused",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement partially aligns with the cue but lacks some critical elements to convey confusion and hesitation effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not fully capture the nuanced gesture required by the 'self_scratch_head_confused' cue. It needs more hesitation and a clearer depiction of uncertainty, particularly in the wrist's confused shake and the overall trajectory near the head.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+-40,z:+30), to create an upward reach with a slight vacillating motion, suggesting hesitation.",
+            "movement(joint=elbow, rep=1, deg=x:+30,z:-5), to extend the arm further while maintaining the upward trajectory.",
+            "path(shape=arc, joint=wrist, axis=yz, speed=1.2), to introduce a circular wrist motion that conveys confusion.",
+            "movement(joint=wrist, rep=3, deg=y:+5 | y:-5, hold=true), to add a subtle shaking motion that emphasizes uncertainty."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 12,
+      "cue": "facepalm",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully capture the abrupt and diagonal arc required for a facepalm gesture. While the arm moves downward, the movements appear more controlled and less expressive than needed for conveying frustration or embarrassment.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current tail movement lacks the necessary abruptness and diagonal trajectory to simulate an authentic facepalm. The sequential joint rotations do not emphasize the sudden, direct motion required for the gesture.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "-"
+            },
+            "joint": "null",
+            "repetition": "non",
+            "hold": null,
+            "plane": "xz",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:45, z:-45)",
+            "path(shape=arc, joint=null, plane=xz, speed=3.0)",
+            "movement(joint=wrist, rep=1, deg=z:-30)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "xz"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 13,
+      "cue": "point_self",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the 'point_self' cue effectively due to insufficient emphasis on pointing toward the robot's own body. The transition lacks clarity and does not include a clear directional alignment or hold.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement involves a rotation around the shoulder joint with limited directionality and lacks a clear gesture toward the robot’s own body. It also misses a strong hold to emphasize the 'point_self' cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-",
+              "y": "+",
+              "z": "+-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=y:+15, hold=true)",
+            "movement(joint=shoulder, rep=1, deg=x:-60, hold=true)",
+            "movement(joint=elbow, rep=1, deg=x:-30, hold=true)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-",
+          "y": "+",
+          "z": "+-"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 14,
+      "cue": "point_you",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement aligns well with the 'point_you' cue. It extends the arm forward along the x-axis and slightly tilts the wrist downward, which matches the described motion for pointing directly towards the viewer with emphasis.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the speed of the shoulder extension (x-axis line path) to enhance the sharpness of the pointing gesture.",
+            "Add a brief hold after the shoulder extension to emphasize the final position."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 15,
+      "cue": "beckon_come_here",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'beckon_come_here' gesture by creating a rhythmic wrist beat along the vertical axis, which aligns with the description provided.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Slightly increase the amplitude of the wrist beats (e.g., deg: z:12 | z:-12) to enhance expressiveness.",
+            "Add a subtle forward extension of the shoulder (e.g., movement(joint=shoulder, rep=1, deg=x:5)) before starting the wrist beats to emphasize beckoning."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 16,
+      "cue": "stop_palm_out",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement involves a shoulder rotation along the x-axis, which does not effectively extend the arm forward to convey a clear 'stop' gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The gesture requires extending the arm forward (along the x-axis) with the palm facing outward. The current movement only rotates the shoulder and lacks extension or a clear forward trajectory.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+30)",
+            "movement(joint=elbow, rep=1, deg=x:-90, hold=true)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 17,
+      "cue": "pat_stomach",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement matches the description of patting the stomach rhythmically using side-to-side wrist motions. The provided movement (three repetitions of 10 degrees and -10 degrees along the y-axis) aligns well with the required gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Slightly reduce the speed of the wrist movements to make the patting more gentle and natural.",
+            "Add a subtle forearm rotation to enhance the feeling of patting."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 18,
+      "cue": "fan_face_hot",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'fan_face_hot' cue by mimicking rapid, side-to-side wrist flicks, which aligns with the described action of fanning oneself.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "- Slightly increase the speed of the wrist flicks to enhance the feeling of discomfort from heat.",
+            "- Add a subtle lean of the shoulder towards the direction of the fan action to emphasize the gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 19,
+      "cue": "cover_yawn_sleepy",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement follows the desired trajectory of lifting upward, dipping downward in an arc-like fashion, and rotating the wrist to cover the face, which aligns well with the cue 'cover_yawn_sleepy'. The sequence captures the essence of a sleepy or yawning gesture effectively.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "- Increase the amplitude of the wrist rotation (deg:y) to enhance the covering effect over the face.",
+            "- Add a slight hold time after the final wrist rotation to emphasize the sleepy state."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 20,
+      "cue": "rub_eye_tired",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'rub_eye_tired' cue by simulating the action of rubbing the eye with the wrist, followed by a sagging downward motion of the shoulder to indicate tiredness.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the speed of the wrist movements slightly to enhance the 'scrubbing' effect.",
+            "Add a subtle hold at the end of the shoulder movement to emphasize the sagging posture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 21,
+      "cue": "tap_temple_think",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the cue 'tap_temple_think'. The existing motion involves a slight adjustment of the shoulder and wrist but lacks the precise tapping action near the temple required for the cue.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement does not include a clear tapping action near the temple, which is essential for conveying thoughtful reflection or deep consideration. The motion is too general and does not align with the specific requirements of the cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+3, z:+2) -> movement(joint=wrist, rep=1, deg=x:10, y:+5) -> movement(joint=wrist, rep=1, deg=x:+5, y:+5)",
+            "path(shape=arc, joint=wrist, axis=yz, speed=1.2)",
+            "movement(joint=wrist, rep=1, deg=x:-5, y:-5) -> movement(joint=shoulder, rep=1, deg=x:-3, z:-2)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-",
+          "y": "+-",
+          "z": "+"
+        },
+        "joint": "wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 22,
+      "cue": "circle_temple_crazy",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appears appropriate for conveying the 'circle_temple_crazy' cue. It consists of a slow repositioning of the arm toward the temple area followed by a fast circular motion of the wrist, which aligns well with the described gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider increasing the speed of the initial shoulder movement slightly to enhance dynamism.",
+            "Add a brief pause between the elbow movement and the arc to emphasize the transition to the circular motion."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 23,
+      "cue": "lean_forward_interest",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement aligns well with the described gesture of leaning forward with focused interest. The shoulder extension in the x-axis and the elbow tilt in the y-axis effectively convey leaning forward. The brief hold time after the elbow movement further emphasizes attentiveness.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold time slightly after the elbow movement to enhance the sense of attentiveness.",
+            "Add a subtle z-axis tilt during the shoulder movement to simulate a more natural lean."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 24,
+      "cue": "cover_mouth_gasp",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement partially aligns with the goal of moving the robot arm towards the mouth, but it lacks precision and clarity in mimicking the gesture of covering the mouth in surprise or shock.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movements do not adequately convey the specific gesture of covering the mouth. The arm's trajectory and wrist rotation do not accurately simulate the motion of bringing the hand up to the mouth and holding it there. Additionally, the sequence does not emphasize the element of surprise or shock through appropriate dynamics such as a slow, deliberate dip forward followed by a precise positioning near the mouth.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-",
+              "y": "null",
+              "z": "+-"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "1. Begin with a smooth, forward dip using the shoulder joint (movement(joint=shoulder, rep=1, deg=x:-20, z:-10)) to convey the initial surprise reaction.",
+            "2. Rotate the wrist to orient the hand in a suitable position for covering the mouth (movement(joint=wrist, rep=1, deg=y:45)).",
+            "3. Bring the arm closer to the mouth area using a combination of shoulder and elbow joints (movement(joint=elbow, rep=1, deg=x:-15, z:-5)).",
+            "4. Hold the final pose with the hand near the mouth to emphasize the gesture (movement(joint=shoulder, rep=1, deg=x:-25, z:0, hold=true))."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-",
+          "z": "+-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 25,
+      "cue": "cheers_toast",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'cheers_toast' cue by raising the arm upward, which aligns with the celebratory gesture described.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the 'z' rotation slightly (e.g., to 20 degrees) for a more emphatic upward motion.",
+            "Extend the 'hold_time' to 1 second to reinforce the celebratory pause."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 26,
+      "cue": "highfive_invite",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully capture the essence of a high-five invitation, as it lacks the openness and friendliness required for the gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement involves rotating the shoulder slightly around the z-axis and tilting the wrist forward along the x-axis. While this introduces some motion, it does not effectively convey an open, inviting gesture typical of a high-five invitation.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": null,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:+15) -> movement(joint=wrist, rep=1, deg=x:-10 | x:+10) -> movement(joint=gripper, rep=any, deg=x:+5 | x:-5)",
+            "path(shape=line, joint=shoulder, axis=x, speed=1.2)",
+            "hold(hold_time=1.0)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-",
+          "y": "+-",
+          "z": "+"
+        },
+        "joint": "wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 27,
+      "cue": "highfive_imitation",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'highfive_imitation' cue by extending the arm horizontally with a slight upward angle and rotating the wrist to present the palm outwards. The shoulder movement provides a clear extension, while the wrist rotation ensures the palm faces outward, aligning well with the cue's description.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the shoulder movement's repetition count to ensure a smoother extension (e.g., 'rep=2').",
+            "Adjust the wrist rotation speed to make the palm presentation more deliberate (e.g., 'speed=1.8')."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 28,
+      "cue": "fistbump_invite",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'fistbump_invite' cue by retracting the arm slightly backward and extending it forward again, which aligns well with the described gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adjusting the hold time for the extended position to match socially appropriate pacing.",
+            "Add a slight arc motion during extension to enhance naturalness."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 30,
+      "cue": "pat_self_back",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement aligns well with the cue 'pat_self_back.' The shoulder movement adjusts the arm toward the back, and the repeated wrist movements effectively simulate patting actions, which conveys self-reassurance.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Slightly increase the amplitude of the wrist movements by adjusting the degrees to z:12 and z:-12 for a more pronounced patting effect.",
+            "Introduce a slight arc in the wrist motion to add a natural fluidity to the patting gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 31,
+      "cue": "draw_circle_repeat",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement is appropriate for the 'draw_circle_repeat' cue, as it involves two circular arcs in the xz plane, which matches the requirement of drawing a smooth circle twice. The brief pause between repetitions (indicated by 'hold_time') also emphasizes the repeated action effectively.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider increasing the 'hold_time' between repetitions slightly to enhance the emphasis on the repeated action.",
+            "Adjust the 'radius' of the arc to match the desired size of the circle based on visual aesthetics."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 32,
+      "cue": "throat_cut_stop",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement aligns well with the described cues for performing the 'throat_cut_stop'. The side-to-side motion using the shoulder joint effectively conveys the cutting motion, and the upward jerk at the end emphasizes the 'stop' action.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the speed of the side-to-side movement slightly to enhance the sense of urgency.",
+            "Shorten the hold time after the final upward jerk to make the freeze more abrupt."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 33,
+      "cue": "chin_flick_dismiss",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully capture the sharp, dismissive nature of the chin flick gesture. While the wrist flick is present, the overall motion lacks the necessary precision and directionality required for a dismissive chin flick.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the precise upward-forward directionality and dynamic extension/backward motion expected for a chin flick. The wrist flick is too minimalistic and does not convey a strong sense of dismissal.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-+",
+              "y": "null",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "1. Begin with a slight backward extension of the arm (movement(shoulder, rep=1, deg=x:-15)) to establish the starting pose of the flick.",
+            "2. Follow with a sharp upward-forward wrist flick (movement(wrist, rep=1, deg=z:30, x:15)) to complete the dismissive gesture.",
+            "3. Optionally add a subtle sagging motion (movement(shoulder, rep=1, deg=z:-5)) at the end to reinforce the dismissive tone."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 34,
+      "cue": "cover_ears_too_loud",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the cue 'cover_ears_too_loud'. While the shoulder movement brings the arm slightly inwards, the overall motion lacks the necessary arc toward the head and the adjustment needed to cover the ears. The wrist rotation alone does not align with the cue's requirement of covering the ears.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not form an arc toward the head, nor does it sufficiently adjust the gripper to simulate covering the ears. Additionally, the wrist rotation appears disconnected from the primary goal of the cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+30,y:+45) -> movement(joint=elbow, rep=1, deg=x:+30) -> movement(joint=wrist, rep=1, deg=z:90)",
+            "path(shape=arc, joint=shoulder, axis=xz, speed=1.5)",
+            "movement(joint=gripper, rep=1, deg=x:0,y:0,z:90)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-",
+          "y": "+-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 35,
+      "cue": "salute",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement is generally appropriate for conveying the 'salute' cue. It includes raising the arm, bending the elbow, and positioning the hand near the forehead, which align with the described gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold time at the final position (wrist movement) to emphasize the formal nature of the salute.",
+            "Consider adding a slight arc motion during the wrist movement to enhance the natural feel of the gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 36,
+      "cue": "visor_search",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'visor_search' cue. It includes horizontal panning of the wrist (left and right) with subtle adjustments to the elbow, which aligns well with the description of a focused visual scan.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the range of wrist panning to enhance the impression of a thorough scan (e.g., adjust deg:y to 20/-20).",
+            "Add a slight vertical adjustment to the shoulder to simulate upward/downward scanning (e.g., movement(joint=shoulder, rep=2, deg:x:+5|-5))."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 37,
+      "cue": "yield_turn",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the `yield_turn` cue by smoothly rotating the arm laterally to the side, which aligns with the indication of yielding and readiness to give way.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adding a slight pause after the rotation to emphasize readiness more clearly.",
+            "Enhance the smoothness of the movement by adjusting the speed parameter slightly lower to create a gentler transition."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 39,
+      "cue": "request_turn",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement involves a single shoulder rotation followed by a combined x and y rotation, which does not effectively convey the idea of a gentle extension forward and a slight shift to the side. This motion seems more like a turning or twisting action rather than a clear request to turn.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current tail movement lacks a clear forward extension and the subsequent lateral shift necessary to convey the request to turn. It primarily focuses on shoulder rotations that do not align well with the intended cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+-",
+              "z": null
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": null,
+            "axis": null
+          },
+          "recommended_tail_guidance": [
+            "Step 1: Extend the arm forward gently along the +x axis (forward direction).",
+            "Step 2: After the forward extension, introduce a slight lateral shift by rotating the shoulder along the +y axis to indicate a request to turn.",
+            "Step 3: Hold the final position briefly to reinforce the gesture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+-"
+        },
+        "joint": "shoulder",
+        "repetition": "non",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 40,
+      "cue": "guiding_arm",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement is appropriate for conveying the 'guiding_arm' cue. It extends the arm smoothly forward and slightly upward, aligning with the description's requirement to guide the viewer's attention.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold time at the end to emphasize the guiding gesture.",
+            "Add a slight horizontal sweep (arc xy) at the end to enhance the guiding effect."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 41,
+      "cue": "protective_arm_out",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'protective_arm_out' cue by extending the arm outward, then subtly adjusting the position to establish a shield-like stance. This aligns well with the task of creating a protective barrier.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adding a slight rotation of the wrist (e.g., movement(joint=wrist, rep=1, deg=y:+5)) to enhance the shielding gesture.",
+            "Increase the hold time slightly during the final pose to emphasize the stable, protective stance."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 42,
+      "cue": "escorting_gesture",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the escorting gesture as intended. While extending the arm forward and upwards is partially achieved, the tap motion with the wrist is not correctly aligned with the described gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The wrist movement lacks clarity in indicating direction and emphasizing the escorting gesture. The tap should be more forward-directed along the x-axis to align with the intention of guiding someone.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "null",
+              "z": "null"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+30,z:+10)",
+            "path(shape=line, joint=wrist, axis=x, speed=1.2)",
+            "movement(joint=wrist, rep=1, deg=x:+5)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": "wrist",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 44,
+      "cue": "clarification_request_palm_tilt",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the meaning of the 'clarification_request_palm_tilt' cue. It involves a gentle tilt of the robot's palm upward, which aligns well with the request for clarification.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adding a slightly slower speed (e.g., 1.5) to emphasize the deliberate nature of the gesture.",
+            "Increase the hold_time slightly (e.g., to 0.5 seconds) to allow the gesture to linger and enhance the request for clarification."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 45,
+      "cue": "slow_down_request_palm_down",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement is appropriate for conveying the 'slow_down_request_palm_down' cue. It correctly implements wrist rotation to orient the palm downward and follows with a slow arc in the xz-plane, which aligns well with the described goal.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Slightly increase the radius of the arc to make the gesture more pronounced.",
+            "Add a brief pause (hold time) after completing the arc to reinforce the 'request' aspect."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 46,
+      "cue": "speed_up_circular_cue",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'speed_up_circular_cue' by performing a swift circular sweep using wrist rotation, which aligns with the intended symbolism of increased speed or momentum.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider speeding up the initial phase slightly to enhance the perception of acceleration.",
+            "Add a short pause or deceleration at the end to emphasize the completion of the circular motion."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 47,
+      "cue": "wait_for_me_backward_palm",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the 'wait_for_me_backward_palm' cue, as it lacks a clear backward extension of the arm and does not prominently display the palm in a waiting posture.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movements do not adequately extend the arm backward or clearly rotate to display the palm, which are key components of the cue description.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": true,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:-45, z:10) -> movement(joint=wrist, rep=1, deg=y:45)",
+            "path(shape=arc, joint=shoulder, axis=yz, speed=1.2)",
+            "movement(joint=wrist, rep=1, deg=y:15, hold=true)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-",
+          "y": "+-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 49,
+      "cue": "polite_decline_small_push",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement aligns well with the description of 'polite_decline_small_push.' It begins with a gentle extension forward using the shoulder joint and concludes with a small downward dip of the wrist, effectively conveying a soft and polite gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider increasing the hold time after the wrist dip to emphasize the polite and considerate nature of the gesture.",
+            "Add a slight pause before initiating the shoulder movement to better establish the initial neutral posture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 50,
+      "cue": "firm_accept_forward_reach",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not adequately convey the cue 'firm_accept_forward_reach' because it only involves a small rotation of the shoulder along the x-axis, which appears more like a slight gesture rather than a deliberate, controlled reach forward.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The movement is too subtle and lacks the necessary extension along the x-axis to signify a firm forward reach. Additionally, there is no clear endpoint or hold to convey acceptance.",
+          "recommended_component": {
+            "kind": "path_line",
+            "axes": {
+              "x": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": true,
+            "plane": "null",
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "Step 1: Extend the arm forward along the x-axis (line x) to achieve a deliberate forward reach.",
+            "Step 2: Hold the final position firmly to signify acceptance. This can be achieved by setting a longer hold_time at the end of the movement.",
+            "Step 3: Ensure smooth control of the speed to maintain a deliberate pace, avoiding abrupt motions."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_line",
+        "axis": "x"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 51,
+      "cue": "hesitant_accept_half_reach",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the cue 'hesitant_accept_half_reach'. The shoulder extension and wrist inclination align well with the described hesitant and cautious acknowledgment gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Slightly reduce the shoulder extension (deg:x:10 instead of x:15) to emphasize hesitation more subtly.",
+            "Add a brief pause (hold_time: 0.1) after the shoulder movement to enhance the sense of contemplation."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 52,
+      "cue": "cancel_previous_offer_retract",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement involves only retracting the shoulder joint along the x-axis, which does not convey the full intent of 'cancel_previous_offer_retract'. While retracting the arm is part of the cue, the motion needs to be more deliberate and symbolic to effectively communicate withdrawal or cancellation.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current tail movement lacks the necessary smooth extension-retraction sequence that clearly symbolizes withdrawal or cancellation. It only includes a single retraction step without an initial forward extension, making it insufficiently expressive for the cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "1",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Step 1: Extend the arm forward by moving the shoulder joint along the x-axis (+x, approximately 30 degrees). This represents the initial offering or extension phase.",
+            "Step 2: After holding the extended pose briefly, retract the arm back by moving the shoulder joint along the x-axis (-x, reversing the +x movement). This symbolizes the cancellation or withdrawal.",
+            "Step 3: Optionally, add a slight downward sagging motion of the shoulder joint (-z) to emphasize the sense of withdrawal or defeat."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "1"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 53,
+      "cue": "conditional_accept_pause_then_reach",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully capture the intended sequence of acknowledging a condition, pausing, and reaching out. The wrist gesture is present but lacks a clear pause before transitioning to an outward reach, which is crucial for conveying the 'conditional accept pause' part of the cue.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks a distinct pause phase between the wrist gesture and the outward reach. Additionally, the wrist gesture's amplitude feels somewhat abrupt and could benefit from smoothing or refinement for better readability.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "wrist",
+            "repetition": "rep",
+            "hold": true,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Step 1: Perform a small, deliberate wrist gesture (movement joint=wrist, deg=z:+10, rep=1, hold=true, speed=1.0) to indicate acknowledgment.",
+            "Step 2: Pause briefly to simulate consideration (hold time=1.0 seconds).",
+            "Step 3: Execute a smooth outward reach using a linear path along the x-axis (path shape=line, joint=shoulder, axis=x, distance=30, speed=1.5)."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "wrist",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 54,
+      "cue": "final_decision_down_press",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the intended cue 'final_decision_down_press'. The described action requires a more controlled extension downward, followed by a brief pause for emphasis, and a decisive wrist accent. The current movement lacks the necessary components for a sharp and deliberate press.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current motion does not include a controlled extension downward, a brief pause for emphasis, or a sharp wrist accent as required by the cue description.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:+10, hold_time=0.2) -> movement(joint=shoulder, rep=1, deg=z:-15, hold_time=0.0)",
+            "movement(joint=wrist, rep=1, deg=z:-20, speed=3.0, hold_time=0.0)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 55,
+      "cue": "resume_speaking_pull",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement effectively conveys the cue 'resume_speaking_pull'. The combination of shoulder extension along x-axis and wrist rotation along x-axis creates a pulling gesture that invites attention back to the speaker, aligning well with the cue's intent.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold time on the wrist movement to emphasize the pulling gesture.",
+            "Add a slight z-axis upward movement during the shoulder extension to enhance the inviting nature of the gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 56,
+      "cue": "emphasize_point_downbeat",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement is appropriate for emphasizing a point downbeat. It includes a sharp, decisive downward dip with the shoulder, which aligns well with the gesture's intent.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Slightly increase the 'z' degree to -20 to enhance the downward emphasis.",
+            "Add a brief pause (hold_time) after reaching the lowest point to reinforce the gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 57,
+      "cue": "unsure_response_hand_hover_stop",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement aligns well with the goal of hesitating by extending the arm forward and suspending the hand in mid-air. The slight forward extension of the shoulder along the +x axis creates a sense of tentative motion, which conveys uncertainty effectively.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adding a slight upward bias to the shoulder movement (e.g., z:+2) to enhance the hovering effect and emphasize indecision.",
+            "Increase the hold time at the end of the line path to maintain the hover posture longer, reinforcing the sense of hesitation."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 58,
+      "cue": "prevent_fall_support_reach",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the cue 'prevent_fall_support_reach'. While extending the arm forward is part of the cue, the provided movement only involves a shoulder rotation around the x-axis, which is insufficient to mimic a supportive gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the necessary extension of the arm forward along the +x direction and does not include an arc or line path to effectively demonstrate a supportive reach. Additionally, the grip orientation remains unchanged, which could make the gesture less expressive.",
+          "recommended_component": {
+            "kind": "path_line",
+            "axes": {
+              "x": "+"
+            },
+            "joint": "null",
+            "repetition": "non",
+            "hold": null,
+            "plane": "null",
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:30) -> path(shape=line, joint=null, axis=x, speed=1.5)",
+            "Add a slight extension in the +z direction to simulate a stabilizing gesture: movement(joint=shoulder, rep=1, deg=z:5)",
+            "Ensure the gripper orientation remains horizontal throughout the motion to maintain the supportive feel."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_line",
+        "axis": "x"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 59,
+      "cue": "nod_yes",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'nod_yes' cue by performing a subtle wrist-based vertical pivot twice, which aligns with the description provided.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold time between repetitions to 0.3 seconds for a more deliberate pause.",
+            "Consider reducing the speed slightly (e.g., to 1.5) for a smoother motion."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 60,
+      "cue": "shake_head_no",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'shake_head_no' cue. It uses lateral wrist movements (side-to-side along the y-axis) which align well with the description of a firm 'no' gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the repetition count slightly (e.g., to 4-5) to emphasize the firmness of the 'no'.",
+            "Slightly decrease the speed to make the movement more deliberate and impactful."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 61,
+      "cue": "air_quotes",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the air quotes gesture by making small lateral wrist movements (about the y-axis) in a back-and-forth pattern, which matches the expected behavior for this social cue.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider increasing the number of repetitions to enhance the fluidity and emphasis of the gesture.",
+            "Slightly reduce the speed to make the movements smoother and more deliberate."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 62,
+      "cue": "self_hug",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the 'self_hug' cue, as it lacks the inward rotation and holding posture required for an embrace-like gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movements primarily retract the arm backward and bend the elbow slightly, but they do not include the necessary inward rotation and holding phase to simulate a self-hugging gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+-"
+            },
+            "joint": "elbow",
+            "repetition": "rep",
+            "hold": true,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=elbow, rep=1, deg=x:+15) -> movement(joint=wrist, rep=1, deg=z:15) -> movement(joint=shoulder, rep=1, deg=y:+15) -> movement(repetition=any, hold=true)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+-"
+        },
+        "joint": "elbow",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 64,
+      "cue": "tilt_head_curious",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement effectively conveys a restless probing motion, aligning well with the intended cue 'tilt_head_curious'. The shoulder movements in both x and y directions simulate the restlessness, while the elbow rotation introduces a tilting effect.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the repetition count of the shoulder movements to enhance the restless exploration feel.",
+            "Slightly adjust the hold times for better dynamism during the probing sequence."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 65,
+      "cue": "raise_index_one_moment",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not effectively convey the cue 'raise_index_one_moment'. The wrist rotation alone is insufficient to mimic raising a finger, and the linear motion along the Z-axis does not provide the necessary upward extension with the gripper opening.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the critical components needed to extend the arm upward and open the gripper, which are essential for mimicking the gesture of raising a finger and holding it momentarily.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": null,
+              "y": null,
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Step 1: Add an initial movement where the shoulder joint rotates upward (Z+) to extend the arm slightly.",
+            "Step 2: Incorporate a movement to open the gripper simultaneously with the shoulder extension to mimic raising a finger.",
+            "Step 3: Hold the final pose momentarily to emphasize the action, as specified in the cue description."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 66,
+      "cue": "shh_gesture",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'shh' gesture by extending the arm forward and performing a gentle side-to-side swaying motion with the wrist, which aligns with the described behavior.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Slightly reduce the speed of the wrist movement to emphasize gentleness.",
+            "Add a subtle arc trajectory to the wrist swaying for a more fluid and natural appearance."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 67,
+      "cue": "rub_arms_cold",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'rub_arms_cold' cue. It uses the shoulder joint to arc the arm inward toward the center of the body, simulates rubbing the arm by rotating the wrist, and repeats these motions to convey the action of warming up cold arms. The structure aligns well with the described goal.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adding a slight offset in the wrist rotation to create a more natural rubbing motion, such as alternating between y:15 and y:-17 degrees to simulate varied friction.",
+            "Increase the speed of the shoulder movement slightly (e.g., from 1.2 to 1.5) to make the inward arc feel more fluid and deliberate."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 69,
+      "cue": "cross_arms_defensive",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully capture the defensive posture described in the cue, as it only involves retracting the shoulder along the x-axis without crossing the arms over the body.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement lacks the essential crossing action over the body, which is crucial for the defensive posture indicated in the cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Step 1: Movement(joint=shoulder, rep=1, deg=x:-30, y:+15) to retract and begin crossing over the body.",
+            "Step 2: Movement(joint=shoulder, rep=1, deg=x:+15, y:+15) to complete the crossing motion, positioning the arm over the body.",
+            "Step 3: Movement(joint=elbow, rep=1, deg=x:+20, z:-10) to tighten the elbow, reinforcing the defensive stance."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-",
+          "y": "+-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 72,
+      "cue": "palms_together_thank_you",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement partially aligns with the cue's intention but lacks the necessary components to convey a respectful 'thank you' gesture effectively. Specifically, it misses the key elements of a coupled backward-up motion, wrist alignment, and a conclusive palms-together gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not fully capture the graceful preparatory lift, the coupled backward-up motion, the wrist alignment, or the final palms-together gesture required for a respectful 'thank you.' The wrist movement is minimal and does not contribute to forming a coherent gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "z": "+",
+              "x": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Step 1: Begin with a preparatory lift of the shoulder (z:+) to create an upward motion.",
+            "Step 2: Add a coupled backward-up motion by moving the shoulder diagonally (x:-, z:+).",
+            "Step 3: Align the wrist by rotating it horizontally (y:0) to prepare for the palms-together gesture.",
+            "Step 4: Conclude with a palms-together gesture by bringing the hands together in front of the body, ensuring the wrists are aligned."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 74,
+      "cue": "hands_up_surrender",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the surrender gesture effectively. While it attempts to raise the arm upwards, the sequence lacks the confident and extended upward motion required for a clear surrender cue.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement does not sufficiently emphasize the raising of the arm above the head in a straightforward and deliberate manner. The final hold time is also too short, failing to reinforce the gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+-"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": true,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=z:+45, hold=true)",
+            "movement(joint=elbow, rep=1, deg=x:+30, hold=true)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 75,
+      "cue": "arms_open_welcome",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not align with the intended cue of 'arms_open_welcome.' While the start pose is correct, the specified movements do not effectively convey a welcoming gesture.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement primarily involves a slight backward rotation at the shoulder and a minor rotation at the wrist. This does not fulfill the requirement of swinging the arm inward in a graceful arc, opening the gripper, and holding the pose to convey warmth and invitation.",
+          "recommended_component": {
+            "kind": "movement|path_arc",
+            "axes": {
+              "x": "+-",
+              "y": "+-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": "xz",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:-90,y:+45,z:+10)",
+            "path(shape=arc, joint=shoulder, plane=xz, speed=1.5)",
+            "movement(joint=gripper, rep=1, deg=open, hold=true)"
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 76,
+      "cue": "stretch_arms_up",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement successfully conveys the 'stretch_arms_up' cue by incrementally extending the shoulder and elbow joints upward, with a pause midway to emphasize the action. The sequence aligns well with the described behavior.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold time at the midpoint for greater emphasis on the pause.",
+            "Consider adding a slight arc motion at the end to enhance the fluidity of the stretch."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 78,
+      "cue": "disagreement_cross_then_release",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the intended cue 'disagreement_cross_then_release'. While the movements involve shoulder and elbow adjustments, they lack the clear crossing-over action and subsequent release required for the cue.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movements do not include a clear crossing-over motion or a release back to the starting position, which are essential components of the 'disagreement_cross_then_release' cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-",
+              "y": "+-",
+              "z": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+15,y:+20,z:-10)",
+            "movement(joint=elbow, rep=1, deg=x:+25,y:-10,z:-5)",
+            "movement(joint=shoulder, rep=1, deg=x:-15,y:-20,z:+10)",
+            "path(shape=arc, joint=elbow, axis=xy, speed=1.5)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-",
+          "y": "+-",
+          "z": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 82,
+      "cue": "frustration_down_throw",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement effectively conveys a sharp, forceful downward throw motion, combined with a subtle sideways flick of the wrist, which aligns well with the frustration_down_throw cue.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the speed of the shoulder movement slightly to enhance the perception of forcefulness.",
+            "Add a slight delay before the wrist flick to emphasize the downward throw motion more clearly."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 84,
+      "cue": "submission_lowered_open_palm",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the cue's intent of a deliberate, respectful submission gesture. The motion involves raising the shoulder slightly and bending the elbow, which contradicts the requirement of lowering the arm in a submissive or offering manner.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement raises the shoulder and bends the elbow, which does not align with the cue's requirement to lower the arm respectfully. Instead, it creates an upward gesture that conflicts with the intended meaning.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "-",
+              "z": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:-15, z:-20)",
+            "movement(joint=elbow, rep=1, deg=x:30, hold=true)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "-",
+          "z": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 85,
+      "cue": "dominance_high_open_hold",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the required dominant and controlled motion described in the cue. While the shoulder rotation is a step in the right direction, the overall movement lacks sufficient reach and confidence to establish a dominant high-open pose.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement is too minimalistic and does not extend the arm adequately to achieve the desired dominant and open pose. The motion needs to be more pronounced and deliberate to convey confidence and control as specified in the cue description.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": true,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+60, z:+90)",
+            "movement(joint=elbow, rep=1, deg=x:+30)",
+            "movement(joint=wrist, rep=1, deg=y:+10)",
+            "hold(true)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 86,
+      "cue": "apology_forward_lowered_hold",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully capture the specified cue, as it involves an arc in the xz-plane but does not include the necessary lowering and holding components described in the cue.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current tail movement arcs in the xz-plane but lacks the graceful lowering towards the ground and the subsequent hold in a lowered position, which are key aspects of the apology gesture.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {
+              "x": "-",
+              "y": "null",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": "xz",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Step 1: Move the shoulder joint in a downward arc along the xz-plane to simulate a bowing motion.",
+            "Step 2: Lower the arm further along the x-axis while maintaining the arc, ensuring a smooth transition to a more vertical orientation.",
+            "Step 3: Hold the arm in the lowered position for a period to convey humility, with the wrist and elbow joints slightly bent to maintain a natural posture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "xz"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 90,
+      "cue": "start_action_forward_snap",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not convey the intended 'start_action_forward_snap' cue effectively. While rotating the shoulder along the x-axis moves the arm forward, it lacks the sharpness, decisiveness, and full extension required to signal a 'snap' motion.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement only rotates the shoulder by 45 degrees around the x-axis, which is insufficient to project a strong sense of decisive forward motion. To convey a 'snap,' the motion should involve a more aggressive forward thrust, likely involving additional joints or a combination of joint movements to achieve full extension and sharpness.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "+"
+            },
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Step 1: Extend the shoulder joint sharply forward (x+ direction) to project a decisive forward motion.",
+            "Step 2: Incorporate an elbow extension (joint=elbow, deg=x:+90) to ensure full arm extension and reinforce the snapping motion.",
+            "Step 3: Optionally, add a wrist adjustment (joint=wrist, deg=z:0, deg=y:0) to maintain a horizontal orientation throughout the motion, ensuring clarity of the gesture."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-",
+          "z": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "non"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 92,
+      "cue": "retry_action_reset_circle",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement correctly traces a circular arc in the xz-plane around the wrist, which aligns well with the cue's requirement of a reset or retry action symbolized by a single, smooth circular motion.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Adjust the radius slightly to ensure it appears proportionate relative to the robot's size and the context of the gesture.",
+            "Consider reducing the hold_time to 0.2 seconds to make the gesture feel more fluid and less static."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 94,
+      "cue": "abandon_action_drop_turn",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the intended cue 'abandon_action_drop_turn'. It involves a swift rotation of the wrist to drop the grip and a pivot of the shoulder to turn away, aligning well with the description of abandonment.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the speed of the wrist movement (deg=z:-40) slightly for a more dynamic drop effect.",
+            "Add a slight negative z-axis component to the shoulder movement to emphasize sagging downward as part of the abandonment gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 95,
+      "cue": "prepare_action_raise_hold",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'prepare_action_raise_hold' cue. It raises the arm upward using a single shoulder rotation in the z-axis, which aligns with the task of preparing for action and holding the elevated position briefly.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold_time slightly to emphasize readiness (e.g., hold_time: 0.6)",
+            "Consider adding a small initial dip before raising to gather more attention (e.g., z:-5 followed by z:20)"
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 97,
+      "cue": "hesitation_pause_hold",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'hesitation_pause_hold' cue. The small wrist motion in the y-axis aligns well with the description of uncertainty or caution, and the single repetition suffices for a hesitant gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the hold time slightly to emphasize the pause (e.g., `hold_time: 0.5`)",
+            "Add a subtle reduction in speed (`speed: 1.0`) to make the motion more deliberate"
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 104,
+      "cue": "scale_expand",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement of extending along the x-axis aligns well with the concept of 'scale_expand,' as it represents a smooth outward motion that symbolizes expansion or growth. Starting from the fixed pose with direction 'left' and vertical gripper orientation, the linear extension along the x-axis effectively conveys the intended cue.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adding a slight upward tilt (z axis) during the extension to enhance the sense of upward expansion.",
+            "Add a deceleration phase at the end of the movement to soften the stop and give a more organic feel."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 106,
+      "cue": "uncertainty_wave",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement involves repeated bending and unbending of the elbow along the y-axis, which does not convey the lateral sweep required for an uncertainty wave. This type of motion is more akin to a nodding gesture rather than a side-to-side sweep.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The movement does not align with the lateral sweep needed to convey uncertainty. It focuses on vertical bending rather than horizontal motion.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Movement(kind=movement, joint=shoulder, rep=2, deg=x:+-)",
+            "Hold the arm briefly after each swing to emphasize hesitation.",
+            "Optional refinement: Add a slight arc in the xz-plane to enhance the sweeping gesture."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": true,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 108,
+      "cue": "interrupt_hard",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement involves a slight forward extension of the shoulder and a lateral move of the elbow, but it lacks the decisive thrust forward and strong lateral shift required to convey urgency and intrusion into personal space.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement is too subtle and does not sufficiently convey the intended sense of urgency and intrusion. It needs a more pronounced forward thrust and lateral shift to align with the cue description.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "+-",
+              "z": "null"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+30) -> path(shape=line, joint=shoulder, axis=x, speed=2.0)",
+            "movement(joint=elbow, rep=1, deg=y:+20 | y:-20) -> path(shape=arc, joint=wrist, axis=xy, speed=1.5)",
+            "movement(joint=shoulder, rep=1, deg=x:-15, hold=true)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "+-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 109,
+      "cue": "interrupt_soft",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'interrupt_soft' cue. It involves a gentle upward tap of the wrist, which aligns well with the described gesture of a soft acknowledgment or nudge.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider adding a slight pause ('hold') after the tap to emphasize the subtlety of the interruption.",
+            "Adjust the speed slightly to ensure the tap feels more deliberate and fluid."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 114,
+      "cue": "contain_space",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement does not fully convey the 'contain_space' cue. While the wrist rotation might suggest some motion, it lacks the necessary extension to the right and the gripping action to simulate containing space.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement only involves a wrist rotation, which is insufficient for simulating the extending and pinching actions required for the 'contain_space' cue.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+",
+              "y": "-",
+              "z": "null"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": true,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Extend the arm to the right (line y+) before performing any grip action.",
+            "Use a quick gripping motion (movement joint=elbow, deg=y:+10, rep=1) to simulate containing space.",
+            "Hold the grip position briefly to emphasize the containment gesture."
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+",
+          "y": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep",
+        "hold": true
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 115,
+      "cue": "expand_space",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement primarily focuses on extending the shoulder forward and slightly lifting the wrist, which aligns somewhat with the 'expand_space' cue. However, it lacks the essential horizontal extension and the clear upward wrist lift required to convey the action of expanding or clearing an area effectively.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not fully capture the necessary horizontal arm extension and the pronounced wrist lift, which are critical for the 'expand_space' cue. Additionally, the speed and repetition parameters do not emphasize the symbolic nature of the gesture.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "x": "+-",
+              "y": "+",
+              "z": "null"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:+20, y:+5, speed=1.0)",
+            "path(shape=line, joint=shoulder, axis=x, speed=0.8)",
+            "movement(joint=wrist, rep=1, deg=z:+20, speed=1.2, hold_time=0.2)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "x": "+-",
+          "y": "+"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": true,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 116,
+      "cue": "compress_space",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement aligns well with the cue 'compress_space'. The shoulder movement inward along the x-axis effectively simulates pulling space closer, and the wrist rotation enhances the compression effect. The brief hold at the end captures the intended final posture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the wrist rotation amplitude slightly (deg:y:15) to emphasize the compression effect further.",
+            "Adjust the hold_time at the final position to 0.7 seconds for a more deliberate pause."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 117,
+      "cue": "balance_scale",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the cue 'balance_scale'. It matches the requirement of performing a rhythmic tilting motion of the wrist along the x-axis, which is characteristic of a balancing action. The repetition and direction align well with the described behavior.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider increasing the amplitude of the wrist tilt slightly (e.g., +/-15 degrees) to enhance the visual effect of balancing.",
+            "Add a slight hold_time after each tilt to emphasize the rhythmic nature of the motion.",
+            "Consider adding a subtle shoulder movement (e.g., x:+- minor adjust) to simulate a more natural weight shifting during balance."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 1.0
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 118,
+      "cue": "push_pull_dual",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement involves alternating shoulder rotations around the x-axis, but it does not fully capture the deliberate push-pull motion required for the 'push_pull_dual' cue. The motion described should extend and retract the arm along the x-axis rather than just rotating at the shoulder.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement uses rotations at the shoulder joint, which results in circular motion rather than linear extension/retraction along the x-axis. This does not align with the requirement of a deliberate push-pull motion.",
+          "recommended_component": {
+            "kind": "path_line",
+            "axes": {
+              "x": "+"
+            },
+            "joint": "null",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "x"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:15) -> path(shape=line, joint=shoulder, axis=x, speed=1.8)",
+            "movement(joint=shoulder, rep=1, deg=x:-15) -> path(shape=line, joint=shoulder, axis=x, speed=1.8)"
+          ]
+        },
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_line",
+        "axis": "x"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 121,
+      "cue": "weight_shift_forward",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'weight_shift_forward' cue. The shoulder joint extends slightly forward and downward, mimicking a natural weight transfer, aligning well with the intended social gesture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Slightly increase the duration of the hold_time to enhance the 'weighted' feel of the gesture.",
+            "Consider adding a subtle path_line along the x-axis to further emphasize forward extension."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 122,
+      "cue": "weight_shift_backward",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'weight_shift_backward' cue when starting from the provided fixed pose. The retracting motion along the negative X-axis followed by lifting along the Z-axis effectively mimics the human posture of shifting weight backward.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the magnitude of the lifting motion along the Z-axis to enhance the weight shift illusion.",
+            "Add a slight pause or hold after the final lift to emphasize the balanced, static posture following the shift."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 123,
+      "cue": "torso_rotate_away",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement partially captures part of the torso rotation effect but lacks the full nuance required to convey the gesture of rotating away. While the lateral shift (y-axis movement) is present, the initial inward dip and the smooth transition to mimic a torso rotation are not fully realized.",
+        "if_appropriate": {},
+        "if_not_appropriate": {
+          "why_not": "The current movement does not include an initial inward dip along the x-axis, which is essential for simulating the preparation phase of rotating away. Additionally, the lateral shift could benefit from a smoother transition, and the overall motion should better mimic the natural rotation of a torso rather than just a simple lateral move.",
+          "recommended_component": {
+            "kind": "movement",
+            "axes": {
+              "z": "-"
+            },
+            "joint": "shoulder",
+            "repetition": "rep",
+            "hold": null,
+            "plane": "null",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "movement(joint=shoulder, rep=1, deg=x:-5, speed=1.0, hold_time=0.1)",
+            "movement(joint=shoulder, rep=1, deg=y:+20, speed=1.5, hold_time=0.2)",
+            "movement(joint=shoulder, rep=1, deg=z:-5, speed=1.0, hold_time=0.1)"
+          ]
+        },
+        "confidence": 0.8
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "movement",
+        "axes": {
+          "z": "-"
+        },
+        "joint": "shoulder",
+        "repetition": "rep"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 124,
+      "cue": "torso_rotate_toward",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement appropriately conveys the 'torso_rotate_toward' cue by rotating the shoulder around the y-axis, which aligns with the lateral rotation required to acknowledge or invite the viewer. The fixed start pose (dir=front, gripper_orientation=horizontal) supports this motion effectively.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Consider increasing the hold_time slightly to emphasize the final position and ensure the robot maintains the acknowledgment stance longer.",
+            "Add a subtle post-rotation adjustment of the wrist (e.g., slight tilt) to enhance the naturalness of the gesture."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 125,
+      "cue": "lean_side_doubt",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement generally aligns with the cue 'lean_side_doubt'. The shoulder movement to the side conveys a slight lean, and the wrist twist emphasizes internal uncertainty, which fits the intended meaning.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Increase the repetition of the wrist twist to enhance the sense of internal conflict (e.g., repeat the twist 2-3 times).",
+            "Add a subtle arc path for the wrist twist (arc xz) to make the motion more organic."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.9
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": false,
+        "recommended_matches_gt": null,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 127,
+      "cue": "expand_chest",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement aligns well with the cue description, as it subtly extends the arm backward and upward, contributing to the open and confident posture.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "- Add a slight hold at the peak of the extension to emphasize confidence.",
+            "- Increase the speed slightly for a more dynamic feel."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.8
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 128,
+      "cue": "eye_widen_surprise",
+      "verify_result": {
+        "movement_is_appropriate": true,
+        "movement_assessment": "The current tail movement effectively conveys the surprise gesture by smoothly arcing backward with a slight lift, which aligns with the description provided.",
+        "if_appropriate": {
+          "optional_refinements": [
+            "Slightly increase the speed of the shoulder movement to enhance the dynamic feel of the gesture.",
+            "Add a subtle hold at the end of the elbow movement to ensure the peak is emphasized more clearly."
+          ]
+        },
+        "if_not_appropriate": {},
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": true,
+      "recommended_component": null,
+      "verify_scoring": {
+        "movement_is_appropriate": true,
+        "generation_match": true,
+        "recommended_matches_gt": null,
+        "verify_correct": true,
+        "scoring_mode": "gt_match"
+      }
+    },
+    {
+      "cue_idx": 130,
+      "cue": "gaze_shift_avoid",
+      "verify_result": {
+        "movement_is_appropriate": false,
+        "movement_assessment": "The current tail movement involves a combination of shoulder movements along both the x and y axes, but it lacks the smooth lateral arc required to simulate a gaze shift. This results in a more abrupt or angular motion rather than a fluid gaze avoidance gesture.",
+        "if_appropriate": {
+          "optional_refinements": []
+        },
+        "if_not_appropriate": {
+          "why_not": "The current movement fails to achieve the smooth lateral arc necessary for conveying the 'gaze_shift_avoid' cue. Instead of a combined x-y rotation, the movement should focus on a single axis or a coordinated arc that mimics the natural motion of shifting gaze to the side.",
+          "recommended_component": {
+            "kind": "path_arc",
+            "axes": {},
+            "joint": "shoulder",
+            "repetition": "non",
+            "hold": null,
+            "plane": "xz",
+            "axis": "null"
+          },
+          "recommended_tail_guidance": [
+            "Start with the fixed initial pose (dir=front, gripper_orientation=horizontal).",
+            "Move the shoulder along an arc in the xz-plane to simulate a smooth lateral gaze shift.",
+            "Adjust the speed to ensure the motion appears subtle and natural, avoiding abrupt movements."
+          ]
+        },
+        "confidence": 0.95
+      },
+      "movement_is_appropriate": false,
+      "recommended_component": {
+        "kind": "path_arc",
+        "plane": "xz"
+      },
+      "verify_scoring": {
+        "movement_is_appropriate": false,
+        "generation_match": false,
+        "recommended_matches_gt": false,
+        "verify_correct": false,
+        "scoring_mode": "gt_match"
+      }
+    }
+  ],
+  "verify_scoring": "gt_match",
+  "verify_scoring_version": 1,
+  "generation_config": "/Users/sb/Downloads/workspace/dev_robosuite/data/results/motion_configs/manipulator/exp/result_exp7_qwen32b.json",
+  "groundtruth": "/Users/sb/Downloads/workspace/dev_robosuite/data/seed/groundtruth/gt_manipulator.json",
+  "n_correct": 44,
+  "accuracy": 0.5
+}

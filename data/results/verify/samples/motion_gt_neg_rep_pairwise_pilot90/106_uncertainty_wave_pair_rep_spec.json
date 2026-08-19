@@ -1,0 +1,31 @@
+{
+  "idx": 106,
+  "cue": "uncertainty_wave",
+  "description": "The robot performs a slight shrug-like dip, then makes a hesitant, small side-to-side wave with its upward-facing palm, holding briefly to convey uncertainty.",
+  "start_pose_source": "human_gt_tile_pick",
+  "start_pose_dir": "up",
+  "start_pose_gripper": "horizontal",
+  "start_pose_id": 208,
+  "gt_side": "left",
+  "left": "gt",
+  "right": "neg_rep",
+  "left_tail_summary": "pose(up,horizontal) → movement shoulder (y+15,y-15,y+15,y-15)",
+  "right_tail_summary": "pose(up,horizontal) → movement shoulder (y+22,y-22)",
+  "pair_mp4": "data/results/verify/samples/motion_gt_neg_rep_pairwise_pilot90/106_uncertainty_wave_pair_rep.mp4",
+  "prompt": "You are comparing two robot-arm motions for the SAME iconic gesture cue.\n\nYou are shown a side-by-side composite video (LEFT | RIGHT). Each panel plays one motion clip.\nBoth sides use the identical fixed start pose; only the tail movement differs (especially repetition count).\n\nCoordinate frame (world): +x forward toward the viewer, +y robot left, +z up.\nMovements are joint rotations (shoulder / elbow / wrist) and/or Cartesian paths (line / arc).\n\nTask: Which side is **more appropriate** for conveying this cue — which executed motion would a human viewer more readily recognize as matching the gesture's meaning?\n   \"More appropriate\" means: which side's tail motion (trajectory, axis, timing, **repetition rhythm**) best matches what a viewer would recognize as embodying this cue's meaning — as the iconic movement for the gesture, NOT whether it is easier to animate or more energetic by default.\n\nRules:\n- Judge the **shown motion** (trajectory shape, direction, rhythm, repetition count, hold/pause if visible), not which panel looks prettier.\n- Do **NOT** assume either side is labeled ground truth.\n- Do **NOT** prefer one side only because it moves more/less, or only because of left/right position.\n- Ignore minor rendering differences; focus on whether the motion reads as the cue.\n- This task contrasts **repetition**: one side matches human GT repetition; the other deliberately flips it (GT `rep` → single cycle; GT `non` → triple repeat).\n\nTarget cue:\n- cue: uncertainty_wave\n- description: The robot performs a slight shrug-like dip, then makes a hesitant, small side-to-side wave with its upward-facing palm, holding briefly to convey uncertainty.\n\nReturn ONLY strict JSON:\n{\n  \"better_side\": \"left\" or \"right\",\n  \"motion_assessment\": \"string: which side better conveys the cue and why (trajectory, axis, repetition, hold)\",\n  \"confidence\": 0.0\n}\n",
+  "gt_repetition_label": "rep",
+  "gt_rep_override": "rep",
+  "neg_rep_override": "non",
+  "gt_movement_repetition_param": 1,
+  "neg_movement_repetition_param": 1,
+  "component": {
+    "kind": "movement",
+    "axes": {
+      "y": "+-"
+    },
+    "joint": null,
+    "repetition": "rep",
+    "hold": null,
+    "raw": ""
+  }
+}

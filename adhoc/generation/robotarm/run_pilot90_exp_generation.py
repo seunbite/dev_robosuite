@@ -29,6 +29,7 @@ from gpu_check import require_cuda_gpu  # noqa: E402
 from hf_cache_setup import setup_hf_cache  # noqa: E402
 from pilot90_experiment_suite import score_exp1, score_exp7  # noqa: E402
 from pilot90_paths import (  # noqa: E402
+    PROMPT_V19_NOTBACK,
     model_to_tag,
     result_config_path,
     score_result_path,
@@ -44,6 +45,12 @@ def main() -> None:
     p.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True)
     p.add_argument("--score", action="store_true", help="Write score_exp{N}_{tag}.json after generation")
     p.add_argument("--cues", type=str, default=None, help="Comma-separated cue subset")
+    p.add_argument(
+        "--prompt",
+        type=Path,
+        default=None,
+        help="Exp1 prompt file (default: prompt_exp1.txt; e.g. prompt_v19_notback.txt)",
+    )
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args()
 
@@ -65,7 +72,23 @@ def main() -> None:
         vlm = VLMClient(backend=backend, model=args.model)
 
     cues = [c.strip() for c in args.cues.split(",") if c.strip()] if args.cues else None
-    print(f"exp{args.exp} → {out_cfg}  model={args.model}  tag={tag}  backend={backend}", flush=True)
+    prompt_path = args.prompt
+    if prompt_path is not None and not prompt_path.is_absolute():
+        from pilot90_paths import _REPO  # noqa: WPS433
+
+        for cand in (
+            _REPO / "data/seed/prompt/manipulator" / prompt_path.name,
+            PROMPT_V19_NOTBACK if prompt_path.name == "prompt_v19_notback.txt" else None,
+            _REPO / prompt_path,
+        ):
+            if cand is not None and cand.is_file():
+                prompt_path = cand
+                break
+    print(
+        f"exp{args.exp} → {out_cfg}  model={args.model}  tag={tag}  backend={backend}"
+        + (f"  prompt={prompt_path.name}" if prompt_path else ""),
+        flush=True,
+    )
     if args.dry_run:
         print("dry-run: would generate", cues or "all manifest cues")
         return
@@ -79,6 +102,7 @@ def main() -> None:
         cues=cues,
         resume=args.resume,
         delay=args.delay,
+        prompt_path=prompt_path if args.exp == 1 else None,
         on_progress=lambda c, success: print(f"  [{'OK' if success else 'FAIL'}] {c}", flush=True),
     )
     print(f"Done exp{args.exp}: ok={ok} failed={failed} → {out_cfg}", flush=True)

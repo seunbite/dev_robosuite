@@ -85,7 +85,7 @@ def _config_path_for_sample(robot: str, sub: str) -> Path:
             / "data"
             / "results"
             / "motion_configs"
-            / "google_robot"
+            / "tiago"
             / "motion_configs_19_mobile.json"
         )
     return _config_path_for_idx(sub)

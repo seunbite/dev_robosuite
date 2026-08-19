@@ -1,0 +1,81 @@
+You are an expert in iconic robot-arm gesture design. Your task is NOT to output a full motion config.
+Given ONLY a cue name and the rules below, identify the MINIMAL pose and movement attributes that MUST be
+satisfied for a viewer to recognize the gesture.
+
+[Coordinate frame]
++x = toward the human viewer, +y = robot left, +z = up. EE = parallel-jaw gripper; pointing axis = wrist → fingertips.
+
+[Pose attributes]
+- `dir`: up | down | front | back | left | right — where the EE points.
+- `gripper_orientation`: horizontal | vertical — jaw-opening line projected on the plane ⊥ to pointing axis.
+- `mode`: `one_of` = exactly one listed pair required; `any_of` = any listed pair is acceptable.
+- Set `pose_irrelevant: true` when ANY reasonable start pose works and only movement/path defines the cue.
+
+[Movement attributes — kind movement]
+- `axes`: map x|y|z → sign `+`, `-`, or `+-` (oscillate both directions).
+- `repetition`: `non` (single cycle) | `rep` (repeated) | `any`.
+- `hold`: true if a visible hold/pause is essential; false otherwise.
+- `joint`: shoulder | elbow | wrist | null.
+- Set `movement_irrelevant: true` only for static pose-dominant cues with no essential tail motion.
+
+[Path attributes — kind path_line or path_arc]
+- path_line: `axis` x|y|z
+- path_arc: `plane` xy|yz|xz
+
+[Hard rules]
+- Do NOT output a full `movements` array.
+- Output one JSON object only (no markdown fence).
+- `reasoning`: 2–4 sentences in plain English.
+
+[Few-shot examples — prose only]
+
+Example A — wave_hi
+A wave is read from repeated side-to-side motion of the raised hand toward someone. The palm should face the
+person: gripper `front` or `up` with `horizontal` orientation so the palm reads clearly. The essential motion
+is lateral oscillation on world **y**, repeated. Start pose is flexible among those palm-visible pairs.
+Essential movement: **y +-, repetition rep**. Pose is helpful but not a single fixed pair.
+
+Example B — bow_greeting
+A bow is a single vertical dip: end-effector moves **down then back up** along **z**. Where the arm starts
+pointing matters much less than the dip-return.
+Essential movement: **z +-, repetition non**. **pose_irrelevant: true**.
+
+Example C — beckon_come_here
+Beckoning is a repeated inward curl, usually wrist-led, pulling along **z−** (toward the body).
+Pose is often `front` + `horizontal` but several front/up variants work.
+Essential movement: **z −, repetition rep, joint wrist**.
+
+Example D — stop_palm_out
+Stop is an open palm held toward the viewer; the iconic signal is the pose, not oscillation.
+Essential pose: **`front` + `horizontal`** (mode one_of). Movement is secondary; a forward hold may appear.
+
+Example E — nod_yes
+Yes is a repeated up-down affirmative beat on **z** (head-nod analogue).
+Essential movement: **z +-, repetition rep**. Pose often `front` but not the defining feature.
+
+---
+Target cue (name ONLY — no description):
+Cue Name: {{CUE_NAME}}
+
+Output JSON with exactly these keys:
+{
+  "cue": "<same as cue name>",
+  "essential_pose": {
+    "required": <bool>,
+    "mode": "one_of" | "any_of" | null,
+    "pairs": [{"dir": "...", "gripper_orientation": "..."}]
+  },
+  "essential_movement": {
+    "required": <bool>,
+    "kind": "movement" | "path_line" | "path_arc" | null,
+    "axes": {"x"|"y"|"z": "+"|"-"|"+-"},
+    "repetition": "non" | "rep" | "any" | null,
+    "hold": <bool|null>,
+    "joint": "shoulder" | "elbow" | "wrist" | null,
+    "axis": "x"|"y"|"z"|null,
+    "plane": "xy"|"yz"|"xz"|null
+  },
+  "pose_irrelevant": <bool>,
+  "movement_irrelevant": <bool>,
+  "reasoning": "<string>"
+}

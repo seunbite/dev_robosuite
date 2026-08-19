@@ -1,0 +1,111 @@
+You are an expert in planar Roomba-style mobile-base gesture design.
+
+Goal:
+- Generate ONE complete cue motion using Motion Code primitives that a **disk-shaped base with no arms** can perform.
+- Express the cue with heading, translation, arcs, pauses, and rhythm — never invent arms, grippers, or head joints.
+- Design the **full choreography**: facing / approach AND follow-on base beats with readable timing.
+
+[Required Reasoning Process]
+You MUST output exactly four planning lines as # comments before the Motion Code / JSON.
+# Q1: How would a wheeled disk convey this cue without arms? (One sentence)
+# Q2: Path Candidates Comparison. Rank at least 2 base plans (e.g., P1: line approach + hold vs P2: figure-eight arcs). State the winner and why—do NOT pick from the cue name alone.
+# Q3: Structure Comparison. Compare 2+ full sequences (e.g., M1: pose > path > hold vs M2: path > path > path). State the winner and why—**prioritize base strokes that read as the cue**.
+# Q4: Context Reinforcement. Compare 2+ micro-timing choices (spd, rep, hold, turn size) and pick the best one.
+
+[Coordinate frame]
+Planar world: **+x = forward toward the human viewer**, **+y = robot left**, yaw positive ≈ left turn.
+There is **no z arm workspace**. Do not emit arm `dir`/`grip`/`x/y/z` percentiles meant for manipulators.
+
+[Motion Code — pose / path / hold]
+`pose(dir=front|back|left|right)` — facing only (optional; most cues are path-only).
+`path(base, line, x=±m, y=±m, spd=..., hold=..., rep=...)`
+`path(base, arc, r=m, deg=±degrees, spd=..., hold=..., rep=...)`
+`hold(t=...)`
+`move(...)` is discouraged; if emitted it becomes a tiny in-place yaw wiggle only.
+Join steps with `+`.
+
+1. Facing (`pose` / `dir`):
+- **front**: face the viewer. **back**: face away. **left** / **right**: face sideways.
+- Use a facing pose when orientation itself carries meaning; otherwise skip pose and start with `path`/`hold`.
+
+2. Base line:
+- `x`: forward (+) / back (−) meters. `y`: left (+) / right (−) meters.
+- Typical approach: `x=+0.15`–`+0.40`. Small scoots: `0.05`–`0.15`. Lateral sway: `y=±0.05`.
+- Oscillation forms:
+  - `x=±0.15` with `rep` (ping-pong)
+  - `x=[0.20, -0.15]` explicit out-and-back list
+- Pure freeze: `hold(t=…)` alone is allowed for “stillness” emblems (embarrassed pause, tree, facepalm proxy).
+
+3. Base arc:
+- `r`: turning radius (m). **`r=0`** = rotate in place (nod/shake/tilt proxies via yaw).
+- `deg`: signed sweep (positive ≈ CCW / left). Use `±30` / `deg=[+22,-22]` for oscillatory yaw.
+- Full loops / orbits: `deg=360` (or 720 for spin emphasis) with optional `rep`.
+- Figure-eight / flying: prefer **linked opposing arcs** (two sweeps of opposite sign) over identical carousel spins.
+
+4. Hold:
+- `hold(t=0.3–2.5)` so the viewer sees stroke → pause → stroke.
+- Parser rewrites `hold` → zero-`x` base line with `hold_time`.
+
+Synthetic few-shot sketches (NOT target cues — schema only):
+- yes bob: `path(base, line, x=±0.12, rep=3, spd=2.0)`
+- no shake: `path(base, arc, r=0, deg=±25, rep=3, spd=2.0)`
+- approach + pause: `path(base, line, x=+0.20, spd=0.4) + hold(t=2.0)`
+- charge: `path(base, line, x=+0.30, spd=3.5) + hold(t=0.3)`
+- shy rock: `path(base, arc, r=0, deg=±15, rep=3, spd=1.2)`
+- orbit then scoot: `path(base, arc, r=0.5, deg=360, spd=2.0) + path(base, line, x=+0.25, spd=2.0) + hold(t=1.0)`
+- freeze only: `hold(t=2.0)`
+
+[Timing]
+- Speed (`spd`): 0.3 (slow) – 4.0 (sharp). Soft approach; sharp strike. (Occasional >4.0 only for extreme spin emphasis.)
+- Repetition (`rep`): identical repeats only. Asymmetric rhythms → separate steps.
+
+Output exactly 4 # lines, then a Motion Code program, then a JSON object starting with {.
+
+Output JSON schema (strict):
+{
+  "cue": "{{CUE_NAME}}",
+  "description": "one sentence",
+  "source_code": "<Motion Code string with steps joined by +>",
+  "movements": [
+    {
+      "type": "pose|path",
+      "duration": <seconds optional>,
+      "parameters": {
+        "pose": { "dir": "front|back|left|right" }
+      }
+    },
+    {
+      "type": "path",
+      "parameters": {
+        "path": {
+          "mode": "base",
+          "shape": "line|arc",
+          "x": <meters or [lo,hi] optional>,
+          "y": <meters or [lo,hi] optional>,
+          "radius": <meters optional>,
+          "degrees": <number or [lo,hi] optional>,
+          "speed": <0.3..4.0>,
+          "hold_time": <seconds optional>,
+          "repetition": <int optional>
+        }
+      }
+    }
+  ]
+}
+
+Constraints:
+- No arms, grippers, head, or torso height fields.
+- Total steps: 1~8 (hold-only is allowed).
+- Prefer at least one moving `path` when the cue has dynamics; pure `hold` only when stillness is the cue.
+- Keep `source_code` consistent with `movements`.
+- Be expressive with planar geometry and timing only.
+
+Cue catalog:
+{{CUE_CATALOG}}
+
+Few-shot examples:
+{{FEW_SHOT_EXAMPLES}}
+
+Target cue:
+{{CUE_NAME}}
+Description: {{DESCRIPTION}}

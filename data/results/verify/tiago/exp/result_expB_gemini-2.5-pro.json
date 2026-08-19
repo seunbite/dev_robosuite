@@ -1,0 +1,1821 @@
+{
+  "time": "2026-06-15T18:24:41",
+  "experiment": "B",
+  "title": "Representative pose pick (exp1 GT-correct cues)",
+  "model": "gemini-2.5-pro",
+  "prompt": "data/seed/prompt/tiago/exp/prompt_expB.txt",
+  "config_json": "data/results/motion_configs/tiago/exp/result_exp1_gemini-2.5-pro.json",
+  "score_json": null,
+  "groundtruth": "data/seed/groundtruth/gt_tiago.json",
+  "input_composition": {
+    "filter_pipeline": "exp1 generation → pose matches GT → pool filter: arm_position + gripper_orientation + elbow_bended",
+    "vlm_input": "numbered pool tile PNG + cue name + prompt_expB",
+    "pool_source": "list_pose_bank_candidates (plausible metadata + bank fallback)"
+  },
+  "n_cues": 30,
+  "n_with_pick": 28,
+  "by_pose_class": {
+    "back_vertical_any": 1,
+    "front_vertical_n": 1,
+    "in_horizontal_b": 1,
+    "in_vertical_b": 2,
+    "up_horizontal_b": 2,
+    "front_vertical_b": 7,
+    "front_vertical_any": 1,
+    "in_horizontal_any": 1,
+    "front_horizontal_b": 9,
+    "out_horizontal_n": 1,
+    "out_horizontal_b": 1,
+    "out_horizontal_any": 1,
+    "still_vertical_any": 2
+  },
+  "results": [
+    {
+      "idx": 13,
+      "cue": "point_self",
+      "description": "Points one hand toward its own chest with a tapping motion to signify 'me', followed by a slight nod.",
+      "pose_class": "back_vertical_any",
+      "nominal_pose": {
+        "arm_position": "back",
+        "gripper_orientation": "vertical",
+        "elbow_bended": null,
+        "x": null,
+        "y": null,
+        "z": 75
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g13_point_self_pool.png",
+      "n_tiles": 1,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          75.0
+        ],
+        "n_pool": 1,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_skipped": "single_candidate",
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 1796.5561410000003,
+        "x": 62.446,
+        "y": 81.885,
+        "z": 50.0,
+        "r_arm_rad": [
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          1.5707963267948966,
+          1.5707963267948966
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 15,
+        "elbow_bended": true
+      }
+    },
+    {
+      "idx": 14,
+      "cue": "point_you",
+      "description": "Points forward with one arm in an assertive, deictic gesture to indicate 'you'.",
+      "pose_class": "front_vertical_n",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "vertical",
+        "elbow_bended": false,
+        "x": null,
+        "y": null,
+        "z": 75
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g14_point_you_pool.png",
+      "n_tiles": 5,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          75.0
+        ],
+        "n_pool": 5,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": true
+      },
+      "vlm_result": {
+        "best_tile_index": 2,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 2 presents the most iconic and representative pose for 'point_you'. The arm is raised to a natural, assertive level (roughly shoulder height) and extended directly forward, clearly indicating a target in front of the robot. Tile 1 points too low and to the side, resembling a gesture towards an object on the table rather than a person. Tiles 3, 4, and 5 are neutral poses and do not fit the cue at all. Tile 2 is the only pose that a human would immediately recognize as pointing at them.",
+        "runner_up_tile_index": 1,
+        "confidence": 1.0
+      },
+      "vlm_pick_index": 2,
+      "picked_entry": {
+        "rank": 2,
+        "dist2": 1639.6446020000003,
+        "x": 76.549,
+        "y": 32.399,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          1.5707963267948966,
+          1.5707963267948966,
+          -1.5707963267948966,
+          0.0
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 11,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g14_point_you_pool_review.png"
+    },
+    {
+      "idx": 18,
+      "cue": "fan_face_hot",
+      "description": "Waves one hand back and forth in front of the face to indicate feeling hot.",
+      "pose_class": "in_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "in",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": 60,
+        "y": null,
+        "z": 90
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g18_fan_face_hot_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          60.0,
+          50.0,
+          90.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 2,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 2 is the most representative pose for 'fan_face_hot'. The hand is positioned directly in front of the robot's face, which is the most direct and iconic starting point for a fanning motion. Tile 1 is a plausible but less direct starting point, with the hand too far to the side. Tiles 3 and 4 are incorrect as the hand is positioned too low, near the chest or waist.",
+        "runner_up_tile_index": 1,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 2,
+      "picked_entry": {
+        "rank": 2,
+        "dist2": 1190.8869619999996,
+        "x": 74.469,
+        "y": 74.56,
+        "z": 70.549,
+        "r_arm_rad": [
+          1.5707963267948966,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 13,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g18_fan_face_hot_pool_review.png"
+    },
+    {
+      "idx": 20,
+      "cue": "rub_eye_tired",
+      "description": "Robot lowers its torso and head, then brings a hand up to its eye and rubs it with a slight head shake, indicating tiredness.",
+      "pose_class": "in_vertical_b",
+      "nominal_pose": {
+        "arm_position": "in",
+        "gripper_orientation": "vertical",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 90
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g20_rub_eye_tired_pool.png",
+      "n_tiles": 3,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          90.0
+        ],
+        "n_pool": 3,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 2,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 2 is the most representative because the arm is brought across the chest, a clear and natural preparatory motion for bringing the hand up to the face to rub an eye. This inward position strongly suggests an action directed at the robot's own body, specifically the upper torso or head. Tiles 1 and 3 show the arm further out to the side, making the intended action much more ambiguous.",
+        "runner_up_tile_index": 3,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 2,
+      "picked_entry": {
+        "rank": 2,
+        "dist2": 4071.719709,
+        "x": 72.325,
+        "y": 94.422,
+        "z": 50.0,
+        "r_arm_rad": [
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 14,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g20_rub_eye_tired_pool_review.png"
+    },
+    {
+      "idx": 22,
+      "cue": "circle_temple_crazy",
+      "description": "Rotates the index finger in a circle near the temple to indicate 'crazy'.",
+      "pose_class": "in_vertical_b",
+      "nominal_pose": {
+        "arm_position": "in",
+        "gripper_orientation": "vertical",
+        "elbow_bended": true,
+        "x": null,
+        "y": 75,
+        "z": 85
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g22_circle_temple_crazy_pool.png",
+      "n_tiles": 3,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          75.0,
+          85.0
+        ],
+        "n_pool": 3,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 is the only pose where the hand is raised to the height of the temple, which is the crucial starting position for the 'circle_temple_crazy' gesture. The elbow is appropriately bent and the hand is positioned correctly to begin the circular motion. Tiles 2 and 3 show the arm much too low, around the waist or chest level, which has no association with the cue.",
+        "runner_up_tile_index": 3,
+        "confidence": 1.0
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 2100.619709,
+        "x": 72.325,
+        "y": 94.422,
+        "z": 50.0,
+        "r_arm_rad": [
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 14,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g22_circle_temple_crazy_pool_review.png"
+    },
+    {
+      "idx": 26,
+      "cue": "highfive_invite",
+      "description": "Raises one palm upward in an energetic and expectant way to invite a high five.",
+      "pose_class": "up_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "up",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 90
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g26_highfive_invite_pool.png",
+      "n_tiles": 3,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          90.0
+        ],
+        "n_pool": 3,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 is the most representative pose for a high-five invitation. The arm is raised high and forward with an open gripper, clearly and energetically presenting a target for a high five. This pose is iconic and immediately understandable. Tiles 2 and 3 are far too low and passive; they look more like resting poses or gestures of uncertainty rather than an expectant invitation.",
+        "runner_up_tile_index": 3,
+        "confidence": 1.0
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 375.75292600000006,
+        "x": 48.874,
+        "y": 32.399,
+        "z": 81.957,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 1,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g26_highfive_invite_pool_review.png"
+    },
+    {
+      "idx": 27,
+      "cue": "highfive_imitation",
+      "description": "Raises a hand high and swings it down in a fast arc, pausing at the end to simulate an energetic high-five.",
+      "pose_class": "up_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "up",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": 50,
+        "y": null,
+        "z": 85
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g27_highfive_imitation_pool.png",
+      "n_tiles": 3,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          85.0
+        ],
+        "n_pool": 3,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 is the only pose that clearly represents the start of a \"high-five.\" The arm is raised high, and the gripper is oriented in a classic 'ready' position, perfectly matching the cue's description of 'raises a hand high.' Tiles 2 and 3 show the arm in a low or mid-level position, which is entirely inappropriate for the start of a high-five gesture.",
+        "runner_up_tile_index": 3,
+        "confidence": 1.0
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 320.322926,
+        "x": 48.874,
+        "y": 32.399,
+        "z": 81.957,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 1,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g27_highfive_imitation_pool_review.png"
+    },
+    {
+      "idx": 28,
+      "cue": "fistbump_invite",
+      "description": "Extends a closed fist forward with a slight nod, inviting a fist bump.",
+      "pose_class": "front_vertical_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "vertical",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 75
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g28_fistbump_invite_pool.png",
+      "n_tiles": 5,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          75.0
+        ],
+        "n_pool": 5,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 2,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 2 best represents the iconic pose for a fist bump invitation. The arm is extended forward towards a potential interactant, with the elbow bent in a natural, non-aggressive way, and the fist is clearly presented. Tile 1 is too far to the side. Tiles 4 and 5 are too retracted and look more like preparatory poses. Tile 3 is a neutral stance and not an invitation at all. Tile 2 is the clearest and most direct representation of the cue.",
+        "runner_up_tile_index": 1,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 2,
+      "picked_entry": {
+        "rank": 2,
+        "dist2": 1639.6446020000003,
+        "x": 76.549,
+        "y": 32.399,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          1.5707963267948966,
+          1.5707963267948966,
+          -1.5707963267948966,
+          0.0
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 11,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g28_fistbump_invite_pool_review.png"
+    },
+    {
+      "idx": 31,
+      "cue": "draw_circle_repeat",
+      "description": "Draws a circle in the air with the hand to indicate repetition or a looping action.",
+      "pose_class": "front_vertical_any",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "vertical",
+        "elbow_bended": null,
+        "x": 75,
+        "y": null,
+        "z": 75
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g31_draw_circle_repeat_pool.png",
+      "n_tiles": 5,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          75.0,
+          50.0,
+          75.0
+        ],
+        "n_pool": 5,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 is the most representative starting pose for drawing a circle. The arm is extended forward into the shared interaction space, ready to begin the circular motion. Tiles 3, 4, and 5 are neutral resting poses and do not indicate any gesture. Tile 2 has the arm too far out to the side, which is less common for this particular cue.",
+        "runner_up_tile_index": 2,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 846.7684250000001,
+        "x": 74.405,
+        "y": 35.12,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 7,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g31_draw_circle_repeat_pool_review.png"
+    },
+    {
+      "idx": 32,
+      "cue": "throat_cut_stop",
+      "description": "Slices a flat hand horizontally across the throat to signal 'stop' or 'cut'.",
+      "pose_class": "in_horizontal_any",
+      "nominal_pose": {
+        "arm_position": "in",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": null,
+        "x": null,
+        "y": 70,
+        "z": 90
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g32_throat_cut_stop_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          70.0,
+          90.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 is the most representative pose for a 'throat cut' gesture. The robot's hand is positioned perfectly at the side of its 'neck' or 'throat' area, with the gripper oriented horizontally, ready to begin the slicing motion across the front. This is the iconic starting position for this specific gesture. Tile 2 is too far out to the side, Tile 3 is far too low, and Tile 4 shows the hand in the middle of the chest, which is less clear as a starting pose and could be a midpoint.",
+        "runner_up_tile_index": 4,
+        "confidence": 1.0
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 997.8669619999994,
+        "x": 74.469,
+        "y": 74.56,
+        "z": 70.549,
+        "r_arm_rad": [
+          1.5707963267948966,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 13,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g32_throat_cut_stop_pool_review.png"
+    },
+    {
+      "idx": 37,
+      "cue": "yield_turn",
+      "description": "Presents an open palm forward and sweeps it back in a gentle arc to offer the turn to someone.",
+      "pose_class": "front_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 40
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g37_yield_turn_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          40.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 2,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 2 is the most representative starting pose for a 'yield turn' gesture. The arm is extended outward and to the side with the elbow bent, creating a clear, open, and offering posture, like a human would do for an 'after you' motion. This pose serves as an excellent starting point for the described sweep back. Tile 1 is too low and neutral. Tiles 3 and 4 have the hand too high and close to the body, which looks more like a beckoning or defensive pose rather than yielding.",
+        "runner_up_tile_index": 1,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 2,
+      "picked_entry": {
+        "rank": 2,
+        "dist2": 917.0184250000002,
+        "x": 74.405,
+        "y": 35.12,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0,
+          0.0
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 6,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g37_yield_turn_pool_review.png"
+    },
+    {
+      "idx": 40,
+      "cue": "guiding_arm",
+      "description": "Extends an arm to the side and sweeps it forward to guide or indicate a direction.",
+      "pose_class": "out_horizontal_n",
+      "nominal_pose": {
+        "arm_position": "out",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": false,
+        "x": null,
+        "y": 25,
+        "z": 75
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g40_guiding_arm_pool.png",
+      "n_tiles": 1,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          25.0,
+          75.0
+        ],
+        "n_pool": 1,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_skipped": "single_candidate",
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 1251.267876,
+        "x": 48.874,
+        "y": 0.0,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          -1.5707963267948966,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 1,
+        "elbow_bended": false
+      }
+    },
+    {
+      "idx": 42,
+      "cue": "escorting_gesture",
+      "description": "Guides a person by sweeping an open hand to the side, followed by a head and body turn in the same direction.",
+      "pose_class": "out_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "out",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": 75,
+        "y": 25,
+        "z": 40
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g42_escorting_gesture_pool.png",
+      "n_tiles": 2,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          75.0,
+          25.0,
+          40.0
+        ],
+        "n_pool": 2,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 2,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 2 presents a classic guiding or escorting pose. The arm is raised with the forearm parallel to the floor, clearly and unambiguously indicating a direction, as in 'this way, please'. This is a much stronger and more iconic representation of the cue compared to Tile 1, where the arm is lower and could be interpreted as a simple offering gesture rather than a directional one.",
+        "runner_up_tile_index": 1,
+        "confidence": 1.0
+      },
+      "vlm_pick_index": 2,
+      "picked_entry": {
+        "rank": 2,
+        "dist2": 1642.2083210000003,
+        "x": 48.874,
+        "y": 19.862,
+        "z": 70.549,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 6,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g42_escorting_gesture_pool_review.png"
+    },
+    {
+      "idx": 44,
+      "cue": "clarification_request_palm_tilt",
+      "description": "Raises a hand palm-up and tilts it while tilting the head, asking for clarification.",
+      "pose_class": "front_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 75
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g44_clarification_request_palm_tilt_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          75.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 2,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 2 presents the most classic and easily recognizable pose for a clarification request. The arm is bent at a natural angle, bringing the hand up and forward with the palm clearly facing upwards. This posture is a very common human gesture for 'what?' or 'I don't understand'. Tile 1 is too high and wide, Tile 3 is too outstretched and presentational, and Tile 4 is too low and passive.",
+        "runner_up_tile_index": 1,
+        "confidence": 1.0
+      },
+      "vlm_pick_index": 2,
+      "picked_entry": {
+        "rank": 2,
+        "dist2": 1344.1490339999998,
+        "x": 84.348,
+        "y": 62.023,
+        "z": 70.549,
+        "r_arm_rad": [
+          1.5707963267948966,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 17,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g44_clarification_request_palm_tilt_pool_review.png"
+    },
+    {
+      "idx": 45,
+      "cue": "slow_down_request_palm_down",
+      "description": "Requests to slow down by repeatedly pressing one open palm downward.",
+      "pose_class": "front_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 70
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g45_slow_down_request_palm_down_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          70.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 is the most representative starting pose for a 'slow down' gesture. The arm is raised to a visible height, with the palm facing down, clearly poised to begin the downward pressing motion. The pose is natural and unambiguous. Tile 3 is a decent alternative but the arm is held closer to the body, making the gesture less pronounced. Tile 2 extends the arm too far to the side, and Tile 4 appears to be at the end of the pressing motion, not the start.",
+        "runner_up_tile_index": 3,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 386.7291179999999,
+        "x": 58.754,
+        "y": 32.399,
+        "z": 70.549,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 2,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g45_slow_down_request_palm_down_pool_review.png"
+    },
+    {
+      "idx": 46,
+      "cue": "speed_up_circular_cue",
+      "description": "Encourages faster action with a repeated circular hand motion ending in a forward flick.",
+      "pose_class": "front_vertical_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "vertical",
+        "elbow_bended": true,
+        "x": 60,
+        "y": null,
+        "z": 75
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g46_speed_up_circular_cue_pool.png",
+      "n_tiles": 5,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          60.0,
+          50.0,
+          75.0
+        ],
+        "n_pool": 5,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 positions the arm and hand in a clear preparatory stance directly in front of the robot's body. This is the most iconic and natural starting point for a gesture involving a circular motion aimed at encouraging someone to speed up. The elbow is bent and the hand is ready to initiate the action. Tile 2 is a plausible alternative, but the arm is extended too far to the side, making it less focused and direct for a 'speed up' cue. Tiles 3, 4, and 5 are all neutral or resting poses and do not signal any gestural intent.",
+        "runner_up_tile_index": 2,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 1053.918425,
+        "x": 74.405,
+        "y": 35.12,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 7,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g46_speed_up_circular_cue_pool_review.png"
+    },
+    {
+      "idx": 48,
+      "cue": "continue_on_forward_roll",
+      "description": "Encourages continuation with a forward rolling hand motion, followed by a slight nod.",
+      "pose_class": "front_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 75
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g48_continue_on_forward_roll_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          75.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 is the most representative starting pose. The arm is raised and forward, with the hand positioned perfectly to initiate a forward rolling motion, which is central to the 'continue_on_forward_roll' cue. It's a clear, encouraging, and natural-looking starting point for this gesture, superior to the other options which are either too far to the side (3), too close to the body (2), or less dynamically positioned (4).",
+        "runner_up_tile_index": 4,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 406.23911799999985,
+        "x": 58.754,
+        "y": 32.399,
+        "z": 70.549,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 2,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g48_continue_on_forward_roll_pool_review.png"
+    },
+    {
+      "idx": 49,
+      "cue": "polite_decline_small_push",
+      "description": "A gentle refusal gesture with a low stance, an averted gaze, and a soft forward push of the palm followed by a small waggle.",
+      "pose_class": "front_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 40
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g49_polite_decline_small_push_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          40.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 shows the arm in a low, slightly forward position, which is a perfect starting point for a gentle, polite push-away gesture. The pose is non-confrontational and matches the 'low stance' and 'small' aspects of the cue. Tile 3 is too high and reads as a more forceful 'stop' gesture. Tile 2 is too far out to the side for a forward push. Tile 4 is too retracted and defensive.",
+        "runner_up_tile_index": 3,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 684.786475,
+        "x": 74.405,
+        "y": 54.949,
+        "z": 31.957,
+        "r_arm_rad": [
+          0.0,
+          1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 8,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g49_polite_decline_small_push_pool_review.png"
+    },
+    {
+      "idx": 53,
+      "cue": "conditional_accept_pause_then_reach",
+      "description": "Shows hesitation with a partial reach and head tilt, then commits with a final forward extension.",
+      "pose_class": "front_vertical_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "vertical",
+        "elbow_bended": true,
+        "x": 30,
+        "y": null,
+        "z": 50
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g53_conditional_accept_pause_then_reach_pool.png",
+      "n_tiles": 5,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          30.0,
+          50.0,
+          50.0
+        ],
+        "n_pool": 5,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 2,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 2 best represents the \"pause\" and \"hesitation\" aspect of the cue. The arm is raised and the elbow is bent, holding the hand back in a classic pose of consideration before committing to the full reach. It's a much stronger and more readable starting point for this specific gesture than the other, more neutral or relaxed poses.",
+        "runner_up_tile_index": 1,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 2,
+      "picked_entry": {
+        "rank": 2,
+        "dist2": 2321.8464750000003,
+        "x": 74.405,
+        "y": 54.949,
+        "z": 31.957,
+        "r_arm_rad": [
+          0.0,
+          1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0,
+          0.0
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 13,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g53_conditional_accept_pause_then_reach_pool_review.png"
+    },
+    {
+      "idx": 56,
+      "cue": "emphasize_point_downbeat",
+      "description": "Accents a point with a sharp downward hand chop from a raised, authoritative posture.",
+      "pose_class": "front_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": 60,
+        "y": null,
+        "z": 80
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g56_emphasize_point_downbeat_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          60.0,
+          50.0,
+          80.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "is_representative": true,
+        "fits_cue": true,
+        "assessment": "Tile 1 is the best choice because the arm is held high in a 'raised, authoritative posture,' which perfectly sets up the 'sharp downward hand chop' described in the cue. This elevated starting position strongly implies the potential for a forceful downward movement, making it the most iconic and representative pose for this specific gesture. The other poses are either too low or oriented incorrectly to convey the same sense of emphasis and preparation.",
+        "runner_up_tile_index": 2,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 400.66911799999986,
+        "x": 58.754,
+        "y": 32.399,
+        "z": 70.549,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 2,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g56_emphasize_point_downbeat_pool_review.png"
+    },
+    {
+      "idx": 57,
+      "cue": "unsure_response_hand_hover_stop",
+      "description": "Raises one hand into a soft stop position, then tilts head to the side to express uncertainty and holds the pose.",
+      "pose_class": "front_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 70
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g57_unsure_response_hand_hover_stop_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          70.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 presents the most balanced and iconic pose for a 'soft stop' gesture. The arm is raised to a natural height in front of the body, with the hand clearly visible and oriented forward. It's not extended too far out to the side like tile 2, nor is it tucked in too close to the body like tiles 3 and 4. This intermediate 'hovering' position effectively communicates hesitation and uncertainty, making it the most representative starting point for the cue.",
+        "runner_up_tile_index": 3,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 386.7291179999999,
+        "x": 58.754,
+        "y": 32.399,
+        "z": 70.549,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 2,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g57_unsure_response_hand_hover_stop_pool_review.png"
+    },
+    {
+      "idx": 76,
+      "cue": "stretch_arms_up",
+      "description": "The robot raises its torso, lifts its head, and stretches both arms high upwards in a gesture of relief or waking up.",
+      "pose_class": "out_horizontal_any",
+      "nominal_pose": {
+        "arm_position": "out",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": null,
+        "x": null,
+        "y": null,
+        "z": 70
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g76_stretch_arms_up_pool.png",
+      "n_tiles": 3,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          70.0
+        ],
+        "n_pool": 3,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 3,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 3 is the most representative because it shows the robot in a classic T-pose with arms stretched wide. This is a universally recognized posture for stretching. While the cue specifies stretching 'up', this wide-armed stretch is a very common component of that action and is the most iconic 'stretch' pose among the three options. Tile 1 looks more like flexing, and Tile 2 is too low-energy and relaxed to represent an active stretch.",
+        "runner_up_tile_index": 1,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 3,
+      "picked_entry": {
+        "rank": 3,
+        "dist2": 2901.267876,
+        "x": 48.874,
+        "y": 0.0,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          -1.5707963267948966,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 1,
+        "elbow_bended": false
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g76_stretch_arms_up_pool_review.png"
+    },
+    {
+      "idx": 86,
+      "cue": "apology_forward_lowered_hold",
+      "description": "A deep bow with hands clasped low, head tilted down and aside, conveying sincere apology.",
+      "pose_class": "still_vertical_any",
+      "nominal_pose": {
+        "arm_position": "still",
+        "gripper_orientation": "vertical",
+        "elbow_bended": null,
+        "x": null,
+        "y": null,
+        "z": null
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g86_apology_forward_lowered_hold_pool.png",
+      "n_tiles": 0,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": null,
+        "n_pool": 0,
+        "n_hand_ok": 0,
+        "source": null,
+        "elbow_bended_relaxed": null
+      },
+      "error": "empty pool after dir/orient/bended filter"
+    },
+    {
+      "idx": 92,
+      "cue": "retry_action_reset_circle",
+      "description": "Draws a circle in the air with one hand and gives a little shake to signify a reset or retry.",
+      "pose_class": "front_vertical_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "vertical",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 80
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g92_retry_action_reset_circle_pool.png",
+      "n_tiles": 5,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          80.0
+        ],
+        "n_pool": 5,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 presents the most iconic and clear starting pose for drawing a circle in the air. The arm is raised and extended forward, away from the body, creating a clear 'canvas' for the subsequent motion. This pose unambiguously signals the intent to perform a gesture in the space in front of the robot. Tiles 4 and 5 are too close to the body, and Tile 3 is a neutral resting pose, making them unsuitable. Tile 2 is a decent alternative but slightly less clear and preparatory than Tile 1.",
+        "runner_up_tile_index": 2,
+        "confidence": 0.95
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 1717.0184250000002,
+        "x": 74.405,
+        "y": 35.12,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 7,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g92_retry_action_reset_circle_pool_review.png"
+    },
+    {
+      "idx": 97,
+      "cue": "hesitation_pause_hold",
+      "description": "The robot raises its hand partway as if to act, then freezes and slowly turns its head, conveying thoughtful hesitation.",
+      "pose_class": "front_vertical_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "vertical",
+        "elbow_bended": true,
+        "x": 30,
+        "y": null,
+        "z": 65
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g97_hesitation_pause_hold_pool.png",
+      "n_tiles": 5,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          30.0,
+          50.0,
+          65.0
+        ],
+        "n_pool": 5,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 5,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 5 is the most representative because it depicts the classic, iconic gesture of raising a hand toward the head, which is universally understood as a sign of thinking, contemplation, or hesitation. This directly matches the 'thoughtful hesitation' part of the cue, making it much less ambiguous than the other poses, which show a more generic pause in motion.",
+        "runner_up_tile_index": 1,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 5,
+      "picked_entry": {
+        "rank": 5,
+        "dist2": 4362.721478,
+        "x": 84.375,
+        "y": 62.023,
+        "z": 29.482,
+        "r_arm_rad": [
+          1.5707963267948966,
+          1.5707963267948966,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          0.0
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 18,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g97_hesitation_pause_hold_pool_review.png"
+    },
+    {
+      "idx": 104,
+      "cue": "scale_expand",
+      "description": "Shows something getting bigger by moving both hands apart symmetrically while lifting the gaze.",
+      "pose_class": "front_vertical_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "vertical",
+        "elbow_bended": true,
+        "x": null,
+        "y": 65,
+        "z": 40
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g104_scale_expand_pool.png",
+      "n_tiles": 5,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          65.0,
+          40.0
+        ],
+        "n_pool": 5,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "This pose is the most representative starting position for a 'scale_expand' gesture. The hands are close together and in a low, neutral position, perfectly setting up the subsequent motion of moving them apart and up to indicate something getting larger. Poses 3, 4, and 5 depict the gesture already in progress or at its end state, making them unsuitable as the starting pose. Tile 2 is a plausible start, but Tile 1's more compact configuration provides a better initial state for a gesture about expansion.",
+        "runner_up_tile_index": 2,
+        "confidence": 0.95
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 761.3164750000001,
+        "x": 74.405,
+        "y": 54.949,
+        "z": 31.957,
+        "r_arm_rad": [
+          0.0,
+          1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 13,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g104_scale_expand_pool_review.png"
+    },
+    {
+      "idx": 106,
+      "cue": "uncertainty_wave",
+      "description": "A hesitant, wobbling hand wave combined with a head tilt and slight torso lift to convey uncertainty or a shrug.",
+      "pose_class": "front_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 60
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g106_uncertainty_wave_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          60.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 is the most representative pose for an \"uncertainty_wave\" or shrug. The arm is raised to the side with a bent elbow, in a classic \"I don't know\" gesture. This pose clearly communicates uncertainty and serves as an excellent starting point for the described hesitant wave. Tile 4 is also a good candidate, but its more forward and centered arm position is slightly less iconic for a shrug than the open, shoulder-raised posture of Tile 1.",
+        "runner_up_tile_index": 4,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 497.70911800000005,
+        "x": 58.754,
+        "y": 32.399,
+        "z": 70.549,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          0.0,
+          1.5707963267948966,
+          0.0,
+          -1.5707963267948966
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 2,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g106_uncertainty_wave_pool_review.png"
+    },
+    {
+      "idx": 107,
+      "cue": "exploration_reach",
+      "description": "Robot raises its torso, scans with its head, and tentatively extends one arm in a slight arc to explore a space.",
+      "pose_class": "front_horizontal_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "horizontal",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 75
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g107_exploration_reach_pool.png",
+      "n_tiles": 4,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          75.0
+        ],
+        "n_pool": 4,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 3,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 3 is the most representative pose for an \"exploration_reach\". The arm is extended forward into the space in front of the robot, clearly indicating an intention to reach out and explore. The moderate elbow bend perfectly captures the 'tentative' nature described in the cue, suggesting a careful, inquisitive motion. In contrast, Tile 1's arm is raised high but not projected forward as much, looking less like an exploration. Tile 2 is too retracted, and Tile 4 is simply a neutral stance.",
+        "runner_up_tile_index": 1,
+        "confidence": 1.0
+      },
+      "vlm_pick_index": 3,
+      "picked_entry": {
+        "rank": 3,
+        "dist2": 1442.0184250000002,
+        "x": 74.405,
+        "y": 35.12,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0,
+          0.0
+        ],
+        "selected": false,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 6,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g107_exploration_reach_pool_review.png"
+    },
+    {
+      "idx": 109,
+      "cue": "interrupt_soft",
+      "description": "Gently raises a hand with a slight forward push and head tilt to politely signal a desire to speak.",
+      "pose_class": "front_vertical_b",
+      "nominal_pose": {
+        "arm_position": "front",
+        "gripper_orientation": "vertical",
+        "elbow_bended": true,
+        "x": null,
+        "y": null,
+        "z": 70
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g109_interrupt_soft_pool.png",
+      "n_tiles": 5,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": [
+          50.0,
+          50.0,
+          70.0
+        ],
+        "n_pool": 5,
+        "n_hand_ok": null,
+        "source": "plausible_set",
+        "elbow_bended_relaxed": false
+      },
+      "vlm_result": {
+        "best_tile_index": 1,
+        "looks_natural": true,
+        "fits_cue": true,
+        "is_representative": true,
+        "assessment": "Tile 1 provides the most iconic and representative pose for a soft interruption. The arm is raised to a noticeable height, around shoulder level, with a clear but non-aggressive forward extension. This combination effectively signals a polite desire to speak, much like a person raising their hand in a meeting. Tile 2 is a decent runner-up but is lower and more extended, which could be interpreted as a 'stop' or 'hold on' gesture rather than a request to speak. Tiles 4 and 5 are too retracted and subtle to be effective signals, while Tile 3 is a neutral resting pose.",
+        "runner_up_tile_index": 2,
+        "confidence": 0.9
+      },
+      "vlm_pick_index": 1,
+      "picked_entry": {
+        "rank": 1,
+        "dist2": 1217.0184250000002,
+        "x": 74.405,
+        "y": 35.12,
+        "z": 50.0,
+        "r_arm_rad": [
+          0.0,
+          0.0,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          -1.5707963267948966,
+          0.0
+        ],
+        "selected": true,
+        "head_hand_gap_ok": true,
+        "source": "plausible_set",
+        "tile_idx": 7,
+        "elbow_bended": true
+      },
+      "model": "gemini-2.5-pro",
+      "review_image": "data/results/visualize/tiago/expB_representative/mm19_g109_interrupt_soft_pool_review.png"
+    },
+    {
+      "idx": 128,
+      "cue": "eye_widen_surprise",
+      "description": "A sharp physical recoil where the robot jolts its torso up, steps back, and freezes with hands raised defensively.",
+      "pose_class": "still_vertical_any",
+      "nominal_pose": {
+        "arm_position": "still",
+        "gripper_orientation": "vertical",
+        "elbow_bended": null,
+        "x": null,
+        "y": null,
+        "z": null
+      },
+      "grid_image": "data/results/visualize/tiago/expB_representative/mm19_g128_eye_widen_surprise_pool.png",
+      "n_tiles": 0,
+      "pool_meta": {
+        "bank_dir": null,
+        "bank_orient": null,
+        "target_xyz": null,
+        "n_pool": 0,
+        "n_hand_ok": 0,
+        "source": null,
+        "elbow_bended_relaxed": null
+      },
+      "error": "empty pool after dir/orient/bended filter"
+    }
+  ],
+  "pick_score_marks": {
+    "point_you": "warn",
+    "fan_face_hot": "ok",
+    "rub_eye_tired": "ok",
+    "circle_temple_crazy": "warn",
+    "highfive_invite": "ok",
+    "highfive_imitation": "ok",
+    "fistbump_invite": "ok",
+    "draw_circle_repeat": "warn",
+    "throat_cut_stop": "ok",
+    "yield_turn": "ok",
+    "escorting_gesture": "bad",
+    "clarification_request_palm_tilt": "ok",
+    "slow_down_request_palm_down": "bad",
+    "speed_up_circular_cue": "ok",
+    "continue_on_forward_roll": "ok",
+    "polite_decline_small_push": "ok",
+    "conditional_accept_pause_then_reach": "warn",
+    "emphasize_point_downbeat": "ok",
+    "unsure_response_hand_hover_stop": "warn",
+    "stretch_arms_up": "ok",
+    "retry_action_reset_circle": "ok",
+    "hesitation_pause_hold": "ok",
+    "scale_expand": "ok",
+    "uncertainty_wave": "bad",
+    "exploration_reach": "ok",
+    "interrupt_soft": "warn"
+  },
+  "pick_score_counts": {
+    "ok": 17,
+    "warn": 6,
+    "bad": 3
+  },
+  "pick_acc_ok_over_ok_plus_bad": 0.85,
+  "montage_image": "data/results/visualize/tiago/expB_representative/expB_pick_vs_nonpick_montage.png",
+  "montage_subset_cues": [
+    "fan_face_hot",
+    "rub_eye_tired",
+    "highfive_invite",
+    "highfive_imitation",
+    "fistbump_invite",
+    "throat_cut_stop",
+    "yield_turn",
+    "clarification_request_palm_tilt",
+    "point_you",
+    "escorting_gesture"
+  ]
+}

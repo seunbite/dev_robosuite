@@ -58,6 +58,50 @@ def _orthogonal_axis(axis: str) -> str:
 
 
 PATH_SPEED_DEG_PER_SEC = 30.0
+POSE_TRIM_STEP_M = 0.03
+POSE_TRIM_MAX_DQ_RAD = 0.14
+MOVEMENT_MAX_DQ_RAD = np.deg2rad(12.0)
+_EE_PCT_BOUNDS_CACHE: dict[str, tuple[float, float]] | None = None
+_EE_AXIS_SPAN_FALLBACK_M = {"x": 0.38, "y": 0.36, "z": 0.48}
+
+
+def _pose_xyz_resolution_mode() -> str:
+    return os.environ.get("MANIPULATOR_POSE_XYZ_MODE", "legacy").strip().lower()
+
+
+def _pose_xyz_axes_specified(pose_def: dict) -> tuple[str, ...]:
+    return tuple(a for a in ("x", "y", "z") if isinstance(pose_def.get(a), (int, float)))
+
+
+def _pose_pct_delta_to_meters(axis: str, delta_pct: float, bounds: dict[str, tuple[float, float]]) -> float:
+    lo, hi = bounds[axis]
+    span = float(hi - lo)
+    if span < 1e-6:
+        span = _EE_AXIS_SPAN_FALLBACK_M[axis]
+    return float(delta_pct) / 100.0 * span
+
+
+def _hold_frame_count(hold_time: float, hz: int) -> int:
+    """Config hold_time × hz (no minimum); matches legacy render rule."""
+    return int(hold_time * hz)
+
+
+def _motion_frame_count(duration: float, hz: int) -> int:
+    """At least one frame per movement/transition segment."""
+    return max(1, int(duration * hz))
+
+
+def _smoothstep01(t: float) -> float:
+    t = max(0.0, min(1.0, float(t)))
+    return t * t * (3.0 - 2.0 * t)
+
+
+def _clamp_joint_deltas(base_q: np.ndarray, q_frame: np.ndarray, max_abs_delta: float) -> None:
+    """Limit per-frame joint change (tiago render_mobile_config parity)."""
+    for i in range(len(q_frame)):
+        d = float(q_frame[i] - base_q[i])
+        if abs(d) > max_abs_delta:
+            q_frame[i] = base_q[i] + float(np.clip(d, -max_abs_delta, max_abs_delta))
 
 
 def _path_duration_from_length(path_length_deg: float, speed: float) -> float:
@@ -304,6 +348,7 @@ class MotionGenerator:
         camera_elevation_deg: float = 42.0,
         camera_azimuth_deg: float = 92.0,
         camera_spherical_m: float = 1.06,
+        ignore_xyz: bool = True,
     ):
         """
         Initialize the motion generator.
@@ -342,6 +387,7 @@ class MotionGenerator:
         self.camera_elevation_deg = float(camera_elevation_deg)
         self.camera_azimuth_deg = float(camera_azimuth_deg)
         self.camera_spherical_m = float(camera_spherical_m)
+        self.ignore_xyz = bool(ignore_xyz)
         
         # Create output directory
         os.makedirs(self.output_dir, exist_ok=True)
@@ -577,23 +623,36 @@ class MotionGenerator:
         if not roll_filtered:
             roll_filtered = filtered_joints
 
-        # Select joint based on preference
+        # Select by world-axis alignment first.  The authored joint group is a
+        # soft preference: it may break a close score, but must not force a DOF
+        # whose Cartesian motion is dominated by another axis.
         sorted_by_dof_id = sorted(roll_filtered, key=lambda x: x[2])
-        n = len(sorted_by_dof_id)
+        all_by_dof_id = sorted(sorted_joints, key=lambda x: x[2])
+        n = len(all_by_dof_id)
 
         if joint_preference in ('shoulder', 'elbow', 'wrist'):
             t1 = max(1, n // 3)
             t2 = max(t1 + 1, (2 * n + 2) // 3)
-            groups = {
-                'shoulder': sorted_by_dof_id[:t1],
-                'elbow': sorted_by_dof_id[t1:t2],
-                'wrist': sorted_by_dof_id[t2:],
+            preferred_dofs = {
+                'shoulder': {joint[2] for joint in all_by_dof_id[:t1]},
+                'elbow': {joint[2] for joint in all_by_dof_id[t1:t2]},
+                'wrist': {joint[2] for joint in all_by_dof_id[t2:]},
             }
-            candidate_joints = groups[joint_preference]
+            candidate_joints = [
+                joint for joint in roll_filtered
+                if joint[2] in preferred_dofs[joint_preference]
+            ]
             if not candidate_joints:
-                print(f"  Warning: No joints in '{joint_preference}' group, falling back to best overall")
-                candidate_joints = roll_filtered
-            selected = max(candidate_joints, key=lambda x: x[3])
+                print(f"  Warning: No eligible joints in preferred '{joint_preference}' group")
+            preference_bonus = 1.15
+            selected = max(
+                roll_filtered,
+                key=lambda joint: (
+                    float(joint[3])
+                    * (preference_bonus if joint[2] in preferred_dofs[joint_preference] else 1.0),
+                    float(joint[3]),
+                ),
+            )
         elif joint_preference == 'proximal':
             mid = n // 2
             proximal_half = sorted_by_dof_id[:mid] or sorted_by_dof_id
@@ -807,6 +866,135 @@ class MotionGenerator:
         mujoco_data = self.env.sim.data._data
         site_id = mujoco.mj_name2id(mujoco_model, mujoco.mjtObj.mjOBJ_SITE, self.jacobian_calculator.eef_site_name)
         return np.array(mujoco_data.site_xpos[site_id], dtype=float).copy()
+
+    def _use_xyz_trim(self) -> bool:
+        return (not self.ignore_xyz) and _pose_xyz_resolution_mode() == "trim"
+
+    def _calibrate_ee_pct_bounds(self) -> dict[str, tuple[float, float]]:
+        # Probe low/high percentile poses for EE spans, then restore the caller's
+        # configuration. Without restore, the first xyz-trim in a process (often
+        # cue1) continues from the last calibration pose instead of the bank pose.
+        saved_q = self._get_joint_positions().copy()
+        poses = self.jacobian_calculator.pose_database
+        bounds: dict[str, tuple[float, float]] = {}
+        try:
+            for axis_idx, axis in enumerate(("x", "y", "z")):
+                pct_key = f"{axis}_pct"
+                ranked = sorted(poses, key=lambda p: float(p.get(pct_key, 50)))
+                if len(ranked) < 2:
+                    mid = float(self._get_eef_position()[axis_idx])
+                    span = _EE_AXIS_SPAN_FALLBACK_M[axis]
+                    bounds[axis] = (mid - span / 2, mid + span / 2)
+                    continue
+                low_p = ranked[max(0, len(ranked) // 20)]
+                high_p = ranked[min(len(ranked) - 1, len(ranked) * 19 // 20)]
+                self.jacobian_calculator._set_pose_from_data(low_p)
+                lo_ee = float(self._get_eef_position()[axis_idx])
+                self.jacobian_calculator._set_pose_from_data(high_p)
+                hi_ee = float(self._get_eef_position()[axis_idx])
+                if lo_ee > hi_ee:
+                    lo_ee, hi_ee = hi_ee, lo_ee
+                if hi_ee - lo_ee < 0.05:
+                    mid = (lo_ee + hi_ee) / 2
+                    span = _EE_AXIS_SPAN_FALLBACK_M[axis]
+                    bounds[axis] = (mid - span / 2, mid + span / 2)
+                else:
+                    bounds[axis] = (lo_ee, hi_ee)
+        finally:
+            self._set_joint_positions(saved_q)
+        return bounds
+
+    def _ensure_ee_pct_bounds(self) -> dict[str, tuple[float, float]]:
+        global _EE_PCT_BOUNDS_CACHE
+        if _EE_PCT_BOUNDS_CACHE is None:
+            _EE_PCT_BOUNDS_CACHE = self._calibrate_ee_pct_bounds()
+        return _EE_PCT_BOUNDS_CACHE
+
+    def _apply_pose_xyz_trim_instant(self, pose_def: dict, bank_pose: dict) -> None:
+        """EE line correction per axis — instant, no GIF frames (same rule as tiago trim)."""
+        axes = _pose_xyz_axes_specified(pose_def)
+        if not axes:
+            return
+        try:
+            from legacy.path_ee_ik import get_eef_quat_wxyz, ik_move_eef_to
+        except ImportError:
+            from path_ee_ik import get_eef_quat_wxyz, ik_move_eef_to
+
+        bounds = self._ensure_ee_pct_bounds()
+        mujoco_model = self.env.sim.model._model
+        mujoco_data = self.env.sim.data._data
+        ik = self.jacobian_calculator.ik_solver
+        site_id = ik.site_ids[0]
+        axis_idx = {"x": 0, "y": 1, "z": 2}
+        trim_spec: list[tuple[str, float]] = []
+        for axis in axes:
+            target_pct = float(pose_def[axis])
+            selected_pct = float(bank_pose.get(f"{axis}_pct", 50))
+            delta_pct = target_pct - selected_pct
+            if abs(delta_pct) < 0.01:
+                continue
+            delta_m = _pose_pct_delta_to_meters(axis, delta_pct, bounds)
+            if abs(delta_m) < 1e-6:
+                continue
+            trim_spec.append((axis, delta_m))
+        if not trim_spec:
+            return
+
+        mujoco.mj_forward(mujoco_model, mujoco_data)
+        hold_quat = get_eef_quat_wxyz(mujoco_model, mujoco_data, site_id)
+        anchor = self._get_joint_positions().copy()
+        for axis, distance_m in trim_spec:
+            ai = axis_idx[axis]
+            n_sub = max(1, int(np.ceil(abs(distance_m) / POSE_TRIM_STEP_M)))
+            step_m = distance_m / n_sub
+            for _ in range(n_sub):
+                cur = self._get_eef_position()
+                target = cur.copy()
+                target[ai] += step_m
+                ik_move_eef_to(
+                    ik_solver=ik,
+                    mujoco_model=mujoco_model,
+                    mujoco_data=mujoco_data,
+                    site_id=site_id,
+                    target_pos=target,
+                    quat_wxyz=hold_quat,
+                )
+                new_q = self._get_joint_positions()
+                delta = new_q - anchor
+                delta = np.clip(delta, -POSE_TRIM_MAX_DQ_RAD, POSE_TRIM_MAX_DQ_RAD)
+                self._set_joint_positions(anchor + delta)
+                anchor = self._get_joint_positions().copy()
+        print(f"  Applied xyz-trim on axes: {[a for a, _ in trim_spec]}")
+
+    def _select_bank_pose_trim_mode(
+        self,
+        matching_poses: List[Dict],
+        *,
+        pose_def: Optional[Dict] = None,
+        current_joint_pos: Optional[np.ndarray] = None,
+        pose_index: Optional[int] = None,
+    ) -> Dict:
+        if pose_index is not None:
+            for pose in matching_poses:
+                if pose.get("pose_id") == pose_index:
+                    return pose
+        if current_joint_pos is not None:
+            selected, _ = self._find_closest_pose(current_joint_pos, matching_poses, pose_def=None)
+            return selected
+        return sorted(
+            matching_poses,
+            key=lambda p: (float(p.get("orientation_diff_deg", 999)), int(p.get("pose_id", 0))),
+        )[0]
+
+    def _set_pose_from_bank(self, pose_def: Optional[Dict], bank_pose: Dict) -> None:
+        self.jacobian_calculator._set_pose_from_data(bank_pose)
+        if self._use_xyz_trim() and isinstance(pose_def, dict):
+            self._apply_pose_xyz_trim_instant(pose_def, bank_pose)
+
+    def _joint_positions_for_pose(self, pose_def: Optional[Dict], bank_pose: Dict) -> np.ndarray:
+        """Bank pose + xyz-trim target joints (apply trim before transition lerp)."""
+        self._set_pose_from_bank(pose_def, bank_pose)
+        return self._get_joint_positions().copy()
 
     def _probe_axis_delta(
         self,
@@ -1056,42 +1244,60 @@ class MotionGenerator:
                             print(f"Warning: pose_id {pose_index} not found, falling back to deterministic selection")
 
                     if selected_pose is None:
-                        selected = _select_initial_poses(
-                            matching_poses,
-                            pose_param if isinstance(pose_param, dict) else None,
-                            top_k=1,
-                        )
-                        if not selected:
-                            raise ValueError(f"No deterministic initial pose found for {pose_display_name}")
-                        selected_pose = selected[0]
+                        if self._use_xyz_trim():
+                            selected_pose = self._select_bank_pose_trim_mode(
+                                matching_poses,
+                                pose_def=pose_param if isinstance(pose_param, dict) else None,
+                                pose_index=pose_index,
+                            )
+                        else:
+                            selected = _select_initial_poses(
+                                matching_poses,
+                                pose_param if isinstance(pose_param, dict) else None,
+                                top_k=1,
+                            )
+                            if not selected:
+                                raise ValueError(f"No deterministic initial pose found for {pose_display_name}")
+                            selected_pose = selected[0]
 
                     pose_id = selected_pose['pose_id']
-                    print(f"Selected pose with pose_id {pose_id}: rank {selected_pose.get('rank', 'N/A')}")
+                    mode = "xyz-trim bank pick" if self._use_xyz_trim() else "percentile rank"
+                    print(f"Selected pose with pose_id {pose_id}: {mode}")
                 else:
                     # For non-initial poses, keep dir / orientation filtering and
                     # choose the closest pose from the robot's actual current state.
                     if current_pose is not None:
                         current_joint_pos = self._get_joint_positions()
-                        selected_pose, pose_metrics = self._find_closest_pose(
-                            current_joint_pos,
-                            matching_poses,
-                            pose_param if isinstance(pose_param, dict) else None,
-                        )
-                        xyz_info = ""
-                        if pose_metrics["xyz_axes"]:
-                            xyz_axes = "/".join(pose_metrics["xyz_axes"])
-                            xyz_info = (
-                                f", {xyz_axes} pct delta {pose_metrics['xyz_distance']:.1f}"
-                                f" (threshold {pose_metrics['xyz_threshold_pct']:.1f}, "
-                                f"within={pose_metrics['within_xyz_threshold']})"
+                        if self._use_xyz_trim():
+                            selected_pose = self._select_bank_pose_trim_mode(
+                                matching_poses,
+                                current_joint_pos=current_joint_pos,
                             )
-                        print(
-                            f"Found closest pose with pose_id {selected_pose['pose_id']}: "
-                            f"{pose_metrics['selection_mode']} | "
-                            f"proximal delta {pose_metrics['proximal_score']:.1f} deg | "
-                            f"weighted joint delta {pose_metrics['weighted_joint_score']:.1f} | "
-                            f"joint delta {pose_metrics['joint_score']:.1f} deg{xyz_info}"
-                        )
+                            print(
+                                f"Found closest pose with pose_id {selected_pose['pose_id']}: "
+                                "xyz-trim joint-only pick"
+                            )
+                        else:
+                            selected_pose, pose_metrics = self._find_closest_pose(
+                                current_joint_pos,
+                                matching_poses,
+                                pose_param if isinstance(pose_param, dict) else None,
+                            )
+                            xyz_info = ""
+                            if pose_metrics["xyz_axes"]:
+                                xyz_axes = "/".join(pose_metrics["xyz_axes"])
+                                xyz_info = (
+                                    f", {xyz_axes} pct delta {pose_metrics['xyz_distance']:.1f}"
+                                    f" (threshold {pose_metrics['xyz_threshold_pct']:.1f}, "
+                                    f"within={pose_metrics['within_xyz_threshold']})"
+                                )
+                            print(
+                                f"Found closest pose with pose_id {selected_pose['pose_id']}: "
+                                f"{pose_metrics['selection_mode']} | "
+                                f"proximal delta {pose_metrics['proximal_score']:.1f} deg | "
+                                f"weighted joint delta {pose_metrics['weighted_joint_score']:.1f} | "
+                                f"joint delta {pose_metrics['joint_score']:.1f} deg{xyz_info}"
+                            )
                     if pose_id is None:
                         pose_id = selected_pose['pose_id']
                 
@@ -1102,12 +1308,13 @@ class MotionGenerator:
                 if current_pose is None:
                     # First pose: just set it and hold (no speed/interpolation needed)
                     print("Setting first pose...")
-                    self.jacobian_calculator._set_pose_from_data(selected_pose)
+                    pose_def = pose_param if isinstance(pose_param, dict) else None
+                    self._set_pose_from_bank(pose_def, selected_pose)
                     current_pose_name = pose_param  # Store the pose parameter (string or dict)
                     current_pose = selected_pose
                     
                     # Hold at pose for hold_time
-                    num_frames = int(hold_time * hz)
+                    num_frames = _hold_frame_count(hold_time, hz)
                     for _ in range(num_frames):
                         image = self._capture_image()
                         frames.append(Image.fromarray(image))
@@ -1125,32 +1332,31 @@ class MotionGenerator:
                     # Transition from the robot's real current state so movement->pose
                     # respects whatever the preceding movement actually did.
                     start_joint_pos = self._get_joint_positions()
-                    end_joint_pos = self._pose_data_to_joint_positions(selected_pose)
+                    pose_def = pose_param if isinstance(pose_param, dict) else None
+                    end_joint_pos = self._joint_positions_for_pose(pose_def, selected_pose)
                     
                     # Calculate movement duration and number of frames
                     duration = 1.0 / speed
-                    num_transition_frames = max(1, int(duration * hz))
+                    num_transition_frames = _motion_frame_count(duration, hz)
                     
-                    # Interpolate from start to end pose
+                    # Lerp to trim-inclusive target (tiago: trim before transition)
+                    q_prev = start_joint_pos.copy()
                     for frame_idx in range(num_transition_frames):
-                        t = (frame_idx + 1) / num_transition_frames  # 0 to 1
-                        interpolated_joint_pos = start_joint_pos * (1 - t) + end_joint_pos * t
-                        
+                        u = _smoothstep01((frame_idx + 1) / num_transition_frames)
+                        interpolated_joint_pos = start_joint_pos * (1.0 - u) + end_joint_pos * u
+                        _clamp_joint_deltas(q_prev, interpolated_joint_pos, MOVEMENT_MAX_DQ_RAD)
+                        q_prev = interpolated_joint_pos.copy()
                         self._set_joint_positions(interpolated_joint_pos)
-                        
-                        # Capture frame
                         image = self._capture_image()
                         frames.append(Image.fromarray(image))
                     
                     print(f"  Captured {num_transition_frames} transition frames (speed: {speed}, duration: {duration:.2f}s)")
                     
-                    # Set final pose (to ensure exact position)
-                    self.jacobian_calculator._set_pose_from_data(selected_pose)
-                    current_pose_name = pose_param  # Store the pose parameter (string or dict)
+                    current_pose_name = pose_param
                     current_pose = selected_pose
                     
                     # Hold at final pose for hold_time
-                    num_hold_frames = int(hold_time * hz)
+                    num_hold_frames = _hold_frame_count(hold_time, hz)
                     for _ in range(num_hold_frames):
                         image = self._capture_image()
                         frames.append(Image.fromarray(image))
@@ -1301,7 +1507,7 @@ class MotionGenerator:
                                 secondary_joint_idx = None
 
                         duration = 1.0 / effective_dir_speed
-                        num_movement_frames = max(1, int(duration * hz))
+                        num_movement_frames = _motion_frame_count(duration, hz)
                         joint_offsets = {}
                         for move in axis_moves:
                             joint_offsets.setdefault(move["joint_idx"], 0.0)
@@ -1351,19 +1557,22 @@ class MotionGenerator:
 
                         self._set_joint_positions(current_joint_pos)
 
+                        q_prev_mov = current_joint_pos.copy()
                         for frame_idx in range(num_movement_frames):
-                            t = (frame_idx + 1) / num_movement_frames
+                            u = _smoothstep01((frame_idx + 1) / num_movement_frames)
                             new_joint_pos = current_joint_pos.copy()
                             for joint_idx, offset in safe_joint_offsets.items():
-                                new_joint_pos[joint_idx] += t * offset
+                                new_joint_pos[joint_idx] += u * offset
                             _apply_style_offsets(
                                 new_joint_pos,
-                                t=t,
+                                t=u,
                                 primary_joint_idx=axis_moves[0]["joint_idx"] if axis_moves else None,
                                 secondary_joint_idx=secondary_joint_idx,
                                 elegant_curve=elegant_curve_strength,
                                 zittering=zittering_strength,
                             )
+                            _clamp_joint_deltas(q_prev_mov, new_joint_pos, MOVEMENT_MAX_DQ_RAD)
+                            q_prev_mov = new_joint_pos.copy()
                             self._set_joint_positions(new_joint_pos)
                             image = self._capture_image()
                             frames.append(Image.fromarray(image))
@@ -1382,7 +1591,7 @@ class MotionGenerator:
                         
                         # Hold at target position if dir_hold_time > 0
                         if effective_dir_hold_time > 0:
-                            num_hold_frames = int(effective_dir_hold_time * hz)
+                            num_hold_frames = _hold_frame_count(effective_dir_hold_time, hz)
                             for _ in range(num_hold_frames):
                                 image = self._capture_image()
                                 frames.append(Image.fromarray(image))
@@ -1422,35 +1631,50 @@ class MotionGenerator:
                             raise ValueError(f"No matching poses found for target_pose fallback: {target_pose}")
 
                         current_joint_pos = self._get_joint_positions()
-                        selected_pose, pose_metrics = self._find_closest_pose(
-                            current_joint_pos,
-                            matching_poses,
-                            target_pose if isinstance(target_pose, dict) else None,
-                        )
-                        xyz_info = ""
-                        if pose_metrics["xyz_axes"]:
-                            xyz_axes = "/".join(pose_metrics["xyz_axes"])
-                            xyz_info = (
-                                f", {xyz_axes} pct delta {pose_metrics['xyz_distance']:.1f}"
-                                f" (threshold {pose_metrics['xyz_threshold_pct']:.1f}, "
-                                f"within={pose_metrics['within_xyz_threshold']})"
+                        if self._use_xyz_trim():
+                            selected_pose = self._select_bank_pose_trim_mode(
+                                matching_poses,
+                                current_joint_pos=current_joint_pos,
                             )
-                        print(
-                            f"Found target pose with pose_id {selected_pose['pose_id']}: "
-                            f"{pose_metrics['selection_mode']} | "
-                            f"proximal delta {pose_metrics['proximal_score']:.1f} deg | "
-                            f"weighted joint delta {pose_metrics['weighted_joint_score']:.1f} | "
-                            f"joint delta {pose_metrics['joint_score']:.1f} deg{xyz_info}"
-                        )
+                        else:
+                            selected_pose, pose_metrics = self._find_closest_pose(
+                                current_joint_pos,
+                                matching_poses,
+                                target_pose if isinstance(target_pose, dict) else None,
+                            )
+                            xyz_info = ""
+                            if pose_metrics["xyz_axes"]:
+                                xyz_axes = "/".join(pose_metrics["xyz_axes"])
+                                xyz_info = (
+                                    f", {xyz_axes} pct delta {pose_metrics['xyz_distance']:.1f}"
+                                    f" (threshold {pose_metrics['xyz_threshold_pct']:.1f}, "
+                                    f"within={pose_metrics['within_xyz_threshold']})"
+                                )
+                            print(
+                                f"Found target pose with pose_id {selected_pose['pose_id']}: "
+                                f"{pose_metrics['selection_mode']} | "
+                                f"proximal delta {pose_metrics['proximal_score']:.1f} deg | "
+                                f"weighted joint delta {pose_metrics['weighted_joint_score']:.1f} | "
+                                f"joint delta {pose_metrics['joint_score']:.1f} deg{xyz_info}"
+                            )
+                        if self._use_xyz_trim():
+                            print(
+                                f"Found target pose with pose_id {selected_pose['pose_id']}: "
+                                "xyz-trim joint-only pick"
+                            )
 
                         start_joint_pos = current_joint_pos
-                        end_joint_pos = self._pose_data_to_joint_positions(selected_pose)
+                        pose_def = target_pose if isinstance(target_pose, dict) else None
+                        end_joint_pos = self._joint_positions_for_pose(pose_def, selected_pose)
                         duration = 1.0 / path_speed
-                        num_transition_frames = max(1, int(duration * hz))
+                        num_transition_frames = _motion_frame_count(duration, hz)
 
+                        q_prev = start_joint_pos.copy()
                         for frame_idx in range(num_transition_frames):
-                            t = (frame_idx + 1) / num_transition_frames
-                            interpolated_joint_pos = start_joint_pos * (1 - t) + end_joint_pos * t
+                            u = _smoothstep01((frame_idx + 1) / num_transition_frames)
+                            interpolated_joint_pos = start_joint_pos * (1.0 - u) + end_joint_pos * u
+                            _clamp_joint_deltas(q_prev, interpolated_joint_pos, MOVEMENT_MAX_DQ_RAD)
+                            q_prev = interpolated_joint_pos.copy()
                             self._set_joint_positions(interpolated_joint_pos)
                             image = self._capture_image()
                             frames.append(Image.fromarray(image))
@@ -1460,12 +1684,11 @@ class MotionGenerator:
                             f"(speed: {path_speed}, duration: {duration:.2f}s)"
                         )
 
-                        self.jacobian_calculator._set_pose_from_data(selected_pose)
                         current_pose_name = target_pose
                         current_pose = selected_pose
 
                         hold_time = parameters.get('hold_time', 0.0)
-                        num_hold_frames = int(hold_time * hz)
+                        num_hold_frames = _hold_frame_count(hold_time, hz)
                         for _ in range(num_hold_frames):
                             image = self._capture_image()
                             frames.append(Image.fromarray(image))
@@ -1505,7 +1728,7 @@ class MotionGenerator:
                 hold_time = parameters.get('hold_time', 0.0)
                 print(f"\n--- Gripper (visual no-op) ---")
                 print(f"Target open: {target_open}, Hold: {hold_time}")
-                num_hold_frames = int(hold_time * hz)
+                num_hold_frames = _hold_frame_count(hold_time, hz)
                 for _ in range(num_hold_frames):
                     image = self._capture_image()
                     frames.append(Image.fromarray(image))
@@ -1684,6 +1907,7 @@ def generate(
     overlay_progress_bar: bool = True,
     progress_bar_style: str = "typed",
     gif_filename_suffix: Optional[str] = None,
+    ignore_xyz: bool = True,
 ):
     """
     Main function to generate robot motions.
@@ -1711,7 +1935,11 @@ def generate(
         overlay_progress_bar: If False, do not draw the colored step progress bar on frames.
         progress_bar_style: ``typed``, ``simple``, or ``none`` (only used when overlay is on).
         gif_filename_suffix: Optional suffix embedded in output ``.gif`` name (helps locate the file).
+        ignore_xyz: If False, use xyz-trim renderer (closest dir/grip pose + EE trim to target xyz).
     """
+
+    if not ignore_xyz:
+        os.environ.setdefault("MANIPULATOR_POSE_XYZ_MODE", "trim")
 
     saved_gif_path: Optional[str] = None
 
@@ -1788,6 +2016,7 @@ def generate(
         camera_elevation_deg=camera_elevation_deg,
         camera_azimuth_deg=camera_azimuth_deg,
         camera_spherical_m=camera_spherical_m,
+        ignore_xyz=ignore_xyz,
     )
     _debug_log("generate: MotionGenerator constructed")
 
@@ -1832,9 +2061,12 @@ def generate(
             print(f"Selected {len(selected_poses)} unique initial poses (top_k={top_k})")
 
             if len(selected_poses) == 1:
+                exec_pose_index = selected_poses[0]["pose_id"]
+                if generator._use_xyz_trim():
+                    exec_pose_index = None
                 _ret = generator.execute_cue(
                     cue=cue,
-                    pose_index=selected_poses[0]['pose_id'],
+                    pose_index=exec_pose_index,
                     config_path=effective_config_path,
                     proximal_degree_scale=proximal_degree_scale,
                     hz=effective_hz,
