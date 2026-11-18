@@ -8,6 +8,8 @@ from typing import Any
 
 import yaml
 
+from .pose_envelopes import validate_pose_envelopes
+
 PROGRAM_FILES = {
     "human_nonanthropomorphic30.json",
     "gemini_nonanthropomorphic30.json",
@@ -52,9 +54,12 @@ def validate_release(root: str | Path) -> dict[str, int]:
     evaluations = list((root / "evaluation").glob("*.json"))
     for path in evaluations:
         _load_json(path)
+    envelopes = validate_pose_envelopes(root / "pose_envelopes/manifest.json")
     return {
         "program_files": len(PROGRAM_FILES),
         "program_rows": rows,
         "evaluation_files": len(evaluations),
         "synthetic_cues": len(cues.get("cues", {})),
+        "g1_valid_poses": envelopes["unitree_g1"]["valid_count"],
+        "tiago_valid_poses": envelopes["tiago"]["valid_count"],
     }

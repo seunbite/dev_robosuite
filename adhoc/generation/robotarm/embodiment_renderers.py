@@ -234,10 +234,21 @@ _G1_EE_BODY_LEFT = "left_wrist_yaw_link"
 def _g1_feasible_pose_rows() -> list[dict[str, Any]]:
     global _G1_FEASIBLE_POSE_CACHE
     if _G1_FEASIBLE_POSE_CACHE is None:
+        from motion_programs.pose_envelopes import load_pose_envelopes
+
         payload = json.loads(_G1_FEASIBLE_POSES.read_text(encoding="utf-8"))
         rows = payload.get("poses") or []
         if not isinstance(rows, list) or not rows:
             raise ValueError(f"No G1 feasible poses in {_G1_FEASIBLE_POSES}")
+        allowed = set(
+            load_pose_envelopes()["embodiments"]["unitree_g1"][
+                "valid_configuration_ids"
+            ]
+        )
+        actual = {int(row["pose_id"]) for row in rows}
+        if actual != allowed:
+            raise ValueError("G1 pose records differ from the paper allowlist")
+        rows = [row for row in rows if int(row["pose_id"]) in allowed]
         _G1_FEASIBLE_POSE_CACHE = rows
     return _G1_FEASIBLE_POSE_CACHE
 

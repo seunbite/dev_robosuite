@@ -42,6 +42,11 @@ paper inputs are versioned under `data/paper`; selected results are published
 in `docs/`, and media can be rebuilt when the required simulator assets are
 available.
 
+G1 and TIAGo use closed-world pose-envelope allowlists: only the 206 G1 and 47
+TIAGo IDs in [`data/paper/pose_envelopes/manifest.json`](data/paper/pose_envelopes/manifest.json)
+are valid for paper rendering. The manifest distinguishes rule-based filtering
+from handcrafted visual curation.
+
 ## Models and data
 
 The release includes human-authored programs and outputs from Gemini 2.5 Pro

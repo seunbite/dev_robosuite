@@ -19,6 +19,7 @@ be supplied through environment variables and must never be committed.
 | Paper artifact | Input | Analysis / renderer |
 |---|---|---|
 | Motion Program grammar | `data/paper/motion_program_schema.yaml` | `motion_programs.compiler` |
+| G1/TIAGo pose envelopes | `data/paper/pose_envelopes/manifest.json` | `motion_programs.pose_envelopes` |
 | Human-like attribute analysis | `data/paper/evaluation/humanoid_attribute_summary.json` | `papers/icra2027_motion_abstraction/score_humanoid_loc_dir_move.py` |
 | Non-anthropomorphic transfer | `data/paper/evaluation/transfer_outcomes_50.json` | `papers/icra2027_motion_abstraction/analyze_transfer_50.py` |
 | Program richness | `data/paper/evaluation/program_complexity.json` | `papers/icra2027_motion_abstraction/analyze_program_complexity_30.py` |
@@ -41,6 +42,8 @@ assets are available, but exact pixels may vary with renderer versions.
 pytest -q tests/test_release.py
 python -m motion_programs.cli compile --platform roomba \
   'pose(dir=front) + path(base, line, x=-0.15) + hold(t=1.0)'
+python -m motion_programs.cli pose-valid --platform unitree_g1 14
+python -m motion_programs.cli pose-valid --platform tiago 'front|horizontal|2'
 ```
 
 Rendering requires embodiment-specific assets. G1 rendering additionally

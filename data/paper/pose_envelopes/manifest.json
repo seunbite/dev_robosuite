@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0",
+  "validity_policy": "closed_world_allowlist",
+  "validity_definition": "Only configuration IDs listed in valid_configuration_ids are valid. Every other lattice configuration is invalid for paper rendering, including configurations that were not individually hand-labeled.",
+  "embodiments": {
+    "unitree_g1": {
+      "display_name": "Unitree G1",
+      "candidate_count": 1458,
+      "valid_count": 206,
+      "invalid_count": 1252,
+      "valid_fraction": 0.141289,
+      "configuration_id": {
+        "type": "integer",
+        "field": "pose_id"
+      },
+      "configuration_records": "../../seed/unitree_g1/g1_feasible_poses_metadata.json",
+      "selection_pipeline": [
+        {
+          "stage": "enumeration",
+          "mode": "rule",
+          "description": "Enumerate {-90, 0, +90} degrees at each of seven right-arm joints, restricted to values within the robot joint limits; 1,458 candidates remain."
+        },
+        {
+          "stage": "hard_feasibility",
+          "mode": "rule",
+          "description": "Reject collision, shoulder-to-wrist distance below 0.20 m, and end-effector x percentile below 10; the paper reports 659 removals."
+        },
+        {
+          "stage": "structure_and_coverage",
+          "mode": "rule",
+          "description": "Classify direction and gripper orientation, deduplicate nearby xyz/palm configurations, and remove sharply reversing or corkscrew joint folds."
+        },
+        {
+          "stage": "visual_curation",
+          "mode": "handcrafted",
+          "description": "Authors visually removed algorithmically valid but unnatural wrist, elbow, and shoulder configurations. Exact removal IDs and reasons are retained in configuration_records.filter_history."
+        }
+      ],
+      "valid_configuration_ids": [
+        14, 38, 220, 240, 523, 688, 735, 798, 1041, 1118,
+        5, 31, 51, 62, 74, 141, 157, 223, 237, 526, 606, 661, 685, 738, 801, 1005, 1021, 1028, 1038, 1044, 1052, 1111, 1131,
+        13, 37, 84, 569, 608, 689, 797, 1011, 1040, 1093, 1117, 1193, 1258,
+        16, 40, 87, 120, 519, 535, 542, 552, 558, 599, 680, 788, 1014, 1031, 1057, 1096, 1202,
+        44, 69, 83, 203, 311, 525, 568, 607, 690, 707, 733, 796, 1145, 1192, 1212,
+        33, 49, 56, 66, 72, 80, 113, 139, 159, 194, 302, 528, 545, 571, 716, 1003, 1046, 1113, 1138, 1195, 1215,
+        11, 58, 119, 206, 231, 245, 284, 490, 541, 547, 551, 598, 704, 714, 720, 728, 983, 1091, 1203, 1256,
+        4, 24, 55, 61, 65, 75, 81, 132, 195, 211, 218, 228, 234, 242, 275, 301, 321, 544, 605, 717, 1027, 1033, 1037, 1047, 1084, 1104, 1190, 1200, 1206, 1214, 1247,
+        41, 60, 76, 518, 679, 699, 712, 789, 805, 1121,
+        32, 193, 213, 303, 319, 527, 686, 1004, 1112,
+        39, 88, 204, 221, 247, 286, 310, 575, 706, 1119, 1144,
+        12, 42, 85, 124, 207, 230, 244, 250, 307, 313, 517, 537, 560, 703, 709, 713, 723, 729, 1012, 1059, 1092, 1147, 1257,
+        178, 202, 265
+      ]
+    },
+    "tiago": {
+      "display_name": "PAL Robotics TIAGo",
+      "candidate_count": 729,
+      "valid_count": 47,
+      "invalid_count": 682,
+      "valid_fraction": 0.064472,
+      "configuration_id": {
+        "type": "string",
+        "format": "{direction}|{gripper_orientation}|{tile_idx}",
+        "note": "tile_idx is only unique inside a direction/orientation group, so the composite ID is required."
+      },
+      "configuration_records": "../../seed/tiago/plausible_poses_metadata.jsonl",
+      "selection_pipeline": [
+        {
+          "stage": "enumeration",
+          "mode": "rule",
+          "description": "Enumerate {-90, 0, +90} degrees at each of six arm joints: 3^6 = 729 candidates."
+        },
+        {
+          "stage": "grouping_and_coverage",
+          "mode": "rule",
+          "description": "Classify candidates into six directions by two gripper orientations, apply the hand/head workspace check, and construct balanced xyz coverage grids."
+        },
+        {
+          "stage": "visual_curation",
+          "mode": "handcrafted",
+          "description": "Authors manually selected 47 plausible configurations across the 12 groups. Thirty-two additional configurations were explicitly labeled unnatural; every non-allowlisted candidate is invalid under the closed-world policy."
+        }
+      ],
+      "valid_configuration_ids": [
+        "front|horizontal|2", "front|horizontal|4", "front|horizontal|6", "front|horizontal|8", "front|horizontal|17", "front|horizontal|18", "front|horizontal|20",
+        "front|vertical|7", "front|vertical|11", "front|vertical|13", "front|vertical|18", "front|vertical|23",
+        "back|horizontal|1", "back|horizontal|19", "back|vertical|15",
+        "in|horizontal|2", "in|horizontal|10", "in|horizontal|13", "in|horizontal|17",
+        "in|vertical|2", "in|vertical|9", "in|vertical|14",
+        "out|horizontal|1", "out|horizontal|6", "out|horizontal|11",
+        "out|vertical|1", "out|vertical|2", "out|vertical|16",
+        "up|horizontal|1", "up|horizontal|2", "up|horizontal|10", "up|horizontal|15", "up|horizontal|16", "up|horizontal|22", "up|horizontal|24",
+        "up|vertical|1", "up|vertical|2", "up|vertical|11", "up|vertical|14", "up|vertical|18",
+        "down|horizontal|1", "down|horizontal|2", "down|horizontal|6",
+        "down|vertical|1", "down|vertical|10", "down|vertical|21", "down|vertical|23"
+      ],
+      "explicit_manual_invalid_configuration_ids": [
+        "front|horizontal|10", "front|horizontal|13", "front|horizontal|14",
+        "front|vertical|14", "front|vertical|19", "front|vertical|21", "front|vertical|24",
+        "back|horizontal|7", "back|horizontal|17",
+        "back|vertical|1", "back|vertical|11", "back|vertical|13",
+        "in|horizontal|12", "in|vertical|3", "in|vertical|13",
+        "out|horizontal|8", "out|horizontal|12", "out|horizontal|19", "out|horizontal|25",
+        "out|vertical|7", "out|vertical|15", "out|vertical|21",
+        "up|horizontal|9", "up|vertical|21",
+        "down|horizontal|10", "down|horizontal|13", "down|horizontal|15",
+        "down|vertical|6", "down|vertical|11", "down|vertical|17", "down|vertical|22", "down|vertical|25"
+      ]
+    }
+  }
+}

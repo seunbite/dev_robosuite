@@ -1583,15 +1583,31 @@ def _get_plausible_poses() -> list[dict]:
     global _PLAUSIBLE_POSES
     if _PLAUSIBLE_POSES is not None:
         return _PLAUSIBLE_POSES
+    from motion_programs.pose_envelopes import load_pose_envelopes
+
     p = os.path.join(_REPO_ROOT, "data", "seed", "tiago", "plausible_poses_metadata.jsonl")
     if not os.path.isfile(p):
-        _PLAUSIBLE_POSES = []
-        return []
+        raise FileNotFoundError(f"Missing TIAGo paper pose allowlist: {p}")
     out = []
     with open(p, "r", encoding="utf-8") as f:
         for line in f:
             if line.strip():
                 out.append(json.loads(line))
+    allowed = set(
+        load_pose_envelopes()["embodiments"]["tiago"]["valid_configuration_ids"]
+    )
+    actual = {
+        f"{row['arm_position']}|{row['gripper_orientation']}|{row['tile_idx']}"
+        for row in out
+    }
+    if actual != allowed:
+        raise ValueError("TIAGo pose records differ from the paper allowlist")
+    out = [
+        row
+        for row in out
+        if f"{row['arm_position']}|{row['gripper_orientation']}|{row['tile_idx']}"
+        in allowed
+    ]
     _PLAUSIBLE_POSES = out
     return out
 
@@ -1612,7 +1628,7 @@ def list_pose_bank_candidates(
     pose: dict,
     *,
     top_k: int | None = None,
-    plausible_only: bool = False,
+    plausible_only: bool = True,
     relax_elbow_if_empty: bool = False,
     ignore_xyz: bool = False,
 ) -> dict:
@@ -1760,7 +1776,8 @@ def list_pose_bank_candidates(
             "source": "plausible_set",
         }
 
-    # 2. Fallback to full bank if no plausible matches
+    # 2. Legacy-only fallback to the full bank when explicitly requested with
+    # plausible_only=False. Paper rendering uses the closed-world allowlist.
     bank = _get_pose_bank_entries()
     qn = _default_qpos(env)
     _apply_pose_nominal(qn, pose)
