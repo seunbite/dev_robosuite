@@ -126,6 +126,7 @@ def run(
     sources_yml: str | None = None,
     skip_existing: bool = False,
     palette_yml: str | None = None,
+    start_from_neutral: bool = False,
 ) -> None:
     src_opt = Path(sources_yml) if sources_yml else None
     _, _, yaml_cfg, blk = resolve_embodiment_paths("manipulator", src_opt)
@@ -182,6 +183,7 @@ def run(
                 output_dir=str(out),
                 hz=hz,
                 top_k=top_k,
+                start_from_neutral=start_from_neutral,
             )
             after = set(robot_out.glob("*.gif"))
             new_files = sorted(after - before, key=lambda p: p.stat().st_mtime, reverse=True)

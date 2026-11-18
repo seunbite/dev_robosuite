@@ -1,0 +1,36 @@
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.6pt}
+\renewcommand{\arraystretch}{0.98}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lllrrrrrr@{}}
+\toprule
+\textbf{Robot} & \textbf{Generator} & \textbf{Category} &
+$x{\downarrow}$ & $y{\downarrow}$ & $z{\downarrow}$ &
+Rch${\uparrow}$ & Plm${\uparrow}$ & Mov${\uparrow}$ \\
+\midrule
+ \multirow{4}{*}{IIWA} & Gemini & All & 21.7 & 10.0 & 10.2 & 70.0 & 71.4 & 66.7 \\
+  & Qwen-32B & All & 28.3 & 16.9 & 10.2 & 60.0 & 53.6 & 63.3 \\
+  & Qwen-7B & All & 30.0 & 13.8 & 11.2 & 36.7 & 39.3 & 40.0 \\
+  & Random & All & 31.8 & 29.0 & 28.8 & 16.7 & 50.0 & 11.1 \\
+\midrule
+ \multirow{4}{*}{Stretch} & Gemini & All & 12.5 & --- & 11.3 & 69.2 & 100.0 & 80.0 \\
+  & Qwen-32B & All & 24.2 & --- & 14.8 & 42.3 & 76.9 & 46.7 \\
+  & Qwen-7B & All & 24.2 & --- & 13.7 & 30.8 & 42.3 & 43.3 \\
+  & Random & All & 31.9 & --- & 30.0 & 16.7 & 50.0 & 11.1 \\
+\midrule
+ \multirow{4}{*}{Roomba} & Gemini & All & --- & --- & --- & --- & --- & 66.7 \\
+  & Qwen-32B & All & --- & --- & --- & --- & --- & 33.3 \\
+  & Qwen-7B & All & --- & --- & --- & --- & --- & 10.0 \\
+  & Random & All & --- & --- & --- & --- & --- & 11.1 \\
+\bottomrule
+\end{tabular}%
+}
+\caption{Attribute agreement vs.\ human GT on the 30-cue inventory (no category split).
+$x$/$y$/$z$: mean $|\Delta|$ body-\% on GT-specified pose axes ($\downarrow$; omitted predicted axes filled at $50$).
+Rch/Plm/Mov: agreement \% ($\uparrow$). Roomba has no recognition-critical location, reach, or palm.
+Random: $x$/$y$/$z$ $=$ $\mathbb{E}[|U{-}g|]$ for $U{\sim}\mathrm{Unif}[0,100]$; Rch $=$ $1/6$; Plm $=$ $1/2$ (H/V); Mov $=$ $1/9$.
+Gemini $=$ Gemini~2.5~Pro; Qwen-32B/7B $=$ Qwen2.5-VL-32B/7B.}
+\label{tab:nonhumanoid-olm}
+\end{table}

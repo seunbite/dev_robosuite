@@ -234,6 +234,34 @@ def _eef_body_pos(env, side: str) -> np.ndarray:
     return env.sim.data.body_xpos[rid].copy()
 
 
+def _eef_body_rot(env, side: str) -> np.ndarray:
+    """Hand-body world rotation used as the parallel-translation lock."""
+    ee_body = R_EE_BODY if side == "right" else L_EE_BODY
+    rid = env.sim.model.body_name2id(ee_body)
+    return np.asarray(env.sim.data.body_xmat[rid], dtype=np.float64).reshape(3, 3).copy()
+
+
+def _rotmat_err_world(R_cur: np.ndarray, R_des: np.ndarray) -> np.ndarray:
+    """Small-angle world-frame orientation error (axis × sin(theta))."""
+    rel = (
+        np.asarray(R_des, dtype=np.float64).reshape(3, 3)
+        @ np.asarray(R_cur, dtype=np.float64).reshape(3, 3).T
+    )
+    return 0.5 * np.asarray(
+        [rel[2, 1] - rel[1, 2], rel[0, 2] - rel[2, 0], rel[1, 0] - rel[0, 1]],
+        dtype=np.float64,
+    )
+
+
+def _rotmat_err_deg(R_cur: np.ndarray, R_des: np.ndarray) -> float:
+    rel = (
+        np.asarray(R_des, dtype=np.float64).reshape(3, 3)
+        @ np.asarray(R_cur, dtype=np.float64).reshape(3, 3).T
+    )
+    cos_theta = float(np.clip((np.trace(rel) - 1.0) * 0.5, -1.0, 1.0))
+    return float(np.degrees(math.acos(cos_theta)))
+
+
 def _eef_grip_site_pos(env, side: str) -> np.ndarray:
     _, site_name = _ARM_SIDE_META[side]
     sid = env.sim.model.site_name2id(site_name)
@@ -310,30 +338,82 @@ def _dls_track_arm_to_cartesian_target(
     *,
     side: str,
     target_pos: np.ndarray,
+    target_rot: np.ndarray | None = None,
     max_iters: int = PATH_DLS_MAX_ITERS,
     pos_tol_m: float = PATH_DLS_POS_TOL_M,
+    ori_tol_rad: float = 0.05,
     damping: float = PATH_DLS_LAMBDA,
     max_dq: float = PATH_DLS_MAX_DQ,
+    pos_weight: float = 1.0,
+    ori_weight: float = 2.5,
 ) -> None:
-    """6-DOF damped least-squares IK on hand body — smooth cumulative EE paths."""
+    """DLS IK on the hand body, optionally preserving full EE orientation.
+
+    With ``target_rot`` this is the Tiago counterpart of G1's parallel EE
+    translate: position and the bank-selected 3x3 hand orientation are solved
+    together. A step that would exceed the orientation guard is rejected in
+    favour of the best orientation-preserving partial position solution.
+    """
     ee_body, arm_qvel = _arm_side_kinematics(side)
     rid = env.sim.model.body_name2id(ee_body)
     q_idxs = [int(arm_qvel[i]) for i in range(6)]
     target = np.asarray(target_pos, dtype=np.float64).reshape(3)
-    diag = (float(damping) ** 2) * np.eye(3, dtype=np.float64)
+    R_des = (
+        None
+        if target_rot is None
+        else np.asarray(target_rot, dtype=np.float64).reshape(3, 3)
+    )
+    task_dim = 6 if R_des is not None else 3
+    diag = (float(damping) ** 2) * np.eye(task_dim, dtype=np.float64)
+    best_q = q_frame.copy()
+    best_pos_err = float("inf")
+    best_ori_deg = 0.0
     for _ in range(max_iters):
         env.sim.data.qpos[:] = q_frame
         env.sim.forward()
-        err = target - env.sim.data.body_xpos[rid].copy()
-        if float(np.linalg.norm(err)) < pos_tol_m:
-            break
+        pos_err = target - env.sim.data.body_xpos[rid].copy()
+        pos_norm = float(np.linalg.norm(pos_err))
         jacp = env.sim.data.get_body_jacp(ee_body).reshape(3, -1)[:, q_idxs]
-        dq = jacp.T @ np.linalg.solve(jacp @ jacp.T + diag, err)
+        if R_des is None:
+            if pos_norm < pos_tol_m:
+                break
+            err = pos_err
+            jac = jacp
+        else:
+            R_cur = _eef_body_rot(env, side)
+            ori_err = _rotmat_err_world(R_cur, R_des)
+            ori_norm = float(np.linalg.norm(ori_err))
+            ori_deg = _rotmat_err_deg(R_cur, R_des)
+            if ori_deg <= 6.0 and (
+                pos_norm < best_pos_err - 1e-5
+                or (abs(pos_norm - best_pos_err) <= 1e-5 and ori_deg < best_ori_deg)
+            ):
+                best_q = q_frame.copy()
+                best_pos_err = pos_norm
+                best_ori_deg = ori_deg
+            if pos_norm < pos_tol_m and ori_norm < ori_tol_rad:
+                break
+            if ori_deg > 8.0:
+                q_frame[:] = best_q
+                break
+            jacr = env.sim.data.get_body_jacr(ee_body).reshape(3, -1)[:, q_idxs]
+            err = np.concatenate(
+                [float(pos_weight) * pos_err, float(ori_weight) * ori_err]
+            )
+            jac = np.vstack(
+                [float(pos_weight) * jacp, float(ori_weight) * jacr]
+            )
+        dq = jac.T @ np.linalg.solve(jac @ jac.T + diag, err)
         dq_norm = float(np.linalg.norm(dq))
         if dq_norm > max_dq:
             dq *= max_dq / dq_norm
         for i, qi in enumerate(q_idxs):
             q_frame[qi] = float(q_frame[qi]) + float(dq[i])
+    if R_des is not None:
+        env.sim.data.qpos[:] = q_frame
+        env.sim.forward()
+        if _rotmat_err_deg(_eef_body_rot(env, side), R_des) > 6.0:
+            q_frame[:] = best_q
 
 
 def _track_arm_to_cartesian_target(
@@ -415,6 +495,7 @@ def _follow_path_arc_progress(
     pp: float,
     pp_prev: float,
     side: str,
+    target_rot: np.ndarray | None = None,
 ) -> None:
     delta = _path_arc_progress_delta(
         start_pos,
@@ -434,6 +515,7 @@ def _follow_path_arc_progress(
         q_frame,
         side=side,
         target_pos=cur + delta,
+        target_rot=target_rot,
     )
 
 
@@ -448,6 +530,7 @@ def _follow_path_line_progress(
     pp_prev: float,
     side: str,
     reps: int = 1,
+    target_rot: np.ndarray | None = None,
 ) -> None:
     delta = _path_line_progress_delta(
         start_pos,
@@ -467,6 +550,7 @@ def _follow_path_line_progress(
         q_frame,
         side=side,
         target_pos=cur + delta,
+        target_rot=target_rot,
     )
 
 
@@ -1059,14 +1143,30 @@ def _apply_frontview_framing(
             cid = env.sim.model.camera_name2id(cname)
             env.sim.model.cam_fovy[cid] = 55.0
         cid = env.sim.model.camera_name2id(CAM)
-        bx, by, bz = _CAM_FRONT_BASE
-        # Stay on the front axis (looking at the robot); scale pulls the camera
-        # further "back" from the subject so arm tips stay in frame.
-        env.sim.model.cam_pos[cid] = (
-            float(bx) * float(cam_pos_scale),
-            float(by),
-            float(bz) * (0.55 + 0.45 * float(cam_pos_scale)),
-        )
+        override = getattr(env, "_tiago_cam_pos", None)
+        if override is not None:
+            env.sim.model.cam_pos[cid] = (
+                float(override[0]),
+                float(override[1]),
+                float(override[2]),
+            )
+        quat = getattr(env, "_tiago_cam_quat", None)
+        if quat is not None:
+            env.sim.model.cam_quat[cid] = (
+                float(quat[0]),
+                float(quat[1]),
+                float(quat[2]),
+                float(quat[3]),
+            )
+        if override is None:
+            bx, by, bz = _CAM_FRONT_BASE
+            # Stay on the front axis (looking at the robot); scale pulls the camera
+            # further "back" from the subject so arm tips stay in frame.
+            env.sim.model.cam_pos[cid] = (
+                float(bx) * float(cam_pos_scale),
+                float(by),
+                float(bz) * (0.55 + 0.45 * float(cam_pos_scale)),
+            )
         env.sim.model.cam_fovy[cid] = float(cam_fovy)
         try:
             env.sim.forward()
@@ -1791,6 +1891,8 @@ def _apply_pose_xyz_trim_instant(
     env.sim.data.qpos[:] = q
     env.sim.forward()
     ee_start = _eef_body_pos(env, side)
+    # XYZ is a parallel translation: keep the exact bank-selected hand frame.
+    hold_rot = _eef_body_rot(env, side)
     for spec in trim_spec:
         axis = str(spec["axis"])
         distance_m = float(spec["distance_m"])
@@ -1808,7 +1910,11 @@ def _apply_pose_xyz_trim_instant(
             env.sim.forward()
             cur = _eef_body_pos(env, side)
             _dls_track_arm_to_cartesian_target(
-                env, q, side=side, target_pos=cur + delta,
+                env,
+                q,
+                side=side,
+                target_pos=cur + delta,
+                target_rot=hold_rot,
             )
             _clamp_arm_deltas(q_step_anchor, q, POSE_TRIM_MAX_DQ_RAD)
             q_step_anchor = q.copy()
@@ -1833,7 +1939,11 @@ def _apply_pose_xyz_trim_instant(
                 env.sim.forward()
                 cur = _eef_body_pos(env, side)
                 _dls_track_arm_to_cartesian_target(
-                    env, q, side=side, target_pos=cur + delta,
+                    env,
+                    q,
+                    side=side,
+                    target_pos=cur + delta,
+                    target_rot=hold_rot,
                 )
                 _clamp_arm_deltas(q_step_anchor, q, POSE_TRIM_MAX_DQ_RAD)
                 q_step_anchor = q.copy()
@@ -2048,7 +2158,8 @@ def _snapshots_for_base_path(
         by += y_dist
     elif shape == "arc":
         radius = float(path.get("radius", 0.0))
-        degrees = float(path.get("degrees", 90))
+        # Motion Code → JSON uses ``sweep``; accept ``degrees`` as alias.
+        degrees = float(path.get("degrees", path.get("sweep", 90)))
         total_rad = math.radians(degrees)
         n_frames = path_n_frames(
             fps=FPS,
@@ -2709,7 +2820,14 @@ def render_config(
                                     val = np.deg2rad(delta_deg)
                                 q_frame[qi] = val
 
-                if has_bilateral_cart:
+                # Tiago's left/right arm chains are already URDF-mirrored: an
+                # authored ``left_arm=mirror`` therefore means identical six
+                # joint values after every right-arm update. Re-copying here
+                # prevents the movement-axis sign logic from double-mirroring
+                # shoulder roll (one hand up while the other goes down).
+                if arms_mirrored:
+                    _remirror_left_arm_joints(q_frame)
+                if has_bilateral_cart and not arms_mirrored:
                     _stagger_if_overlapping(env, q_frame)
                 _gripper_qpos_keep(base_q, q_frame)
                 # World-axis wrist/elbow IK targets are absolute from base_q each
@@ -2789,8 +2907,11 @@ def render_config(
                 if side == "both":
                     ee_start_r = _eef_body_pos(env, "right")
                     ee_start_l = _eef_body_pos(env, "left")
+                    ee_rot_r = _eef_body_rot(env, "right")
+                    ee_rot_l = _eef_body_rot(env, "left")
                 else:
                     ee_start_r = _eef_body_pos(env, side)
+                    ee_rot_r = _eef_body_rot(env, side)
 
                 plane = _normalize_path_plane(str(path.get("plane", "xy")))
                 sweep_deg = float(path.get("sweep", path.get("degrees", 360)))
@@ -2858,6 +2979,7 @@ def render_config(
                                 pp_prev=pp_prev,
                                 side="right",
                                 reps=reps,
+                                target_rot=ee_rot_r,
                             )
                             if mirror_bilateral:
                                 # Remirror after right IK; independent left EE IK
@@ -2874,6 +2996,7 @@ def render_config(
                                     pp_prev=pp_prev,
                                     side="left",
                                     reps=reps,
+                                    target_rot=ee_rot_l,
                                 )
                         else:
                             _follow_path_line_progress(
@@ -2886,6 +3009,7 @@ def render_config(
                                 pp_prev=pp_prev,
                                 side=side,
                                 reps=reps,
+                                target_rot=ee_rot_r,
                             )
                     else:
                         radius_m = _arc_radius_meters(float(path.get("radius", 0.12)))
@@ -2900,6 +3024,7 @@ def render_config(
                                 pp=pp,
                                 pp_prev=pp_prev,
                                 side="right",
+                                target_rot=ee_rot_r,
                             )
                             if not mirror_bilateral:
                                 _follow_path_arc_progress(
@@ -2912,6 +3037,7 @@ def render_config(
                                     pp=pp,
                                     pp_prev=pp_prev,
                                     side="left",
+                                    target_rot=ee_rot_l,
                                 )
                         else:
                             _follow_path_arc_progress(
@@ -2924,6 +3050,7 @@ def render_config(
                                 pp=pp,
                                 pp_prev=pp_prev,
                                 side=side,
+                                target_rot=ee_rot_r,
                             )
 
                     _gripper_qpos_keep(path_anchor_q, q_frame)

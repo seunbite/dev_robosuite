@@ -1,0 +1,206 @@
+\documentclass[letterpaper,10pt,conference]{ieeeconf}
+\IEEEoverridecommandlockouts
+\overrideIEEEmargins
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{url}
+
+\title{Personality Is in the Mapping:\\How Context--Behavior Relationships Shape Robot Personality}
+\author{Anonymous Authors}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+\begin{abstract}
+Social robots must appear as particular individuals, not merely competent interactants, while acting from a small shared action vocabulary. We argue that robot personality is neither a distinctive gesture set nor a trait label attached to each prompt. It is a stable difference in how contextual costs and benefits shape choice: $x \!\rightarrow\! (C,B,P_0) \!\rightarrow\! P_\theta(a|x)$. A large language model supplies the commonsense map from an open-ended situation to this decision representation; an explicit personality vector $\theta$ then deforms a normative policy $P_0$ instead of regenerating a persona from scratch. Across three studies, we test whether an LLM can recover this structure, whether its compiled policies approach human-authored context--action signatures, and whether a physical robot can remain identifiable while suppressing personality under strong situational constraints. All values in this planning draft are placeholders to be replaced by measured results.
+\end{abstract}
+
+\section{Introduction}
+A robot that waits beside a friend in a quiet room and a robot that waits beside twenty strangers in a meeting have performed the same primitive, \texttt{wait}. Observers do not treat those events as the same personality evidence. The second wait is costly for an extravert and cheap for a reserved agent; the first is weakly diagnostic for either. Existing HRI personality work often encodes traits as style parameters (speech rate, gesture amplitude) or as a natural-language persona consumed independently in each turn. Both collapse personality onto the action itself. We ask instead whether personality lives in \emph{how the same limited actions are allocated across situations}.
+
+This question is forced by embodiment. Humans have high-bandwidth channels---lexicon, prosody, face, gaze, history. Most robots reuse a handful of socially meaningful moves: approach, wait, initiate, help, inspect, continue-task. Personality therefore cannot be a private action inventory. It must be recombination: $P_i(a)$ may match $P_j(a)$ while $P_i(a|x) \neq P_j(a|x)$.
+
+Foundation models make locally plausible behavior cheap. Generating an appropriate action \emph{one situation at a time} does not specify what makes those actions belong to the same social individual. Direct persona prompting is the right baseline, and the hypothesis of this paper is that it yields locally sensible moves without a globally coherent preference function.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+\item \textbf{A contextual definition}: personality is a stable sensitivity to the costs and benefits of actions across situations, separated from social intelligence and raw action frequency.
+\item \textbf{A controllable compiler}: an LLM instantiates $\{{\mathcal A}(x),C(a,x),B(a,x),P_0(a|x)\}$, while a reusable $\theta$ specifies the individual.
+\item \textbf{A closed evaluation loop}: realization asks whether a target personality yields a coherent policy; inference asks whether observers recover it; an embodied study tests whether suppression preserves identity and competence.
+\end{enumerate}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_concept.pdf}
+\caption{\textbf{Intelligence models context; personality changes sensitivity.} (a)~A low-capacity agent maps fewer contextual variables to behavior, whereas a socially intelligent agent responds to a richer set of relevant variables. Curve complexity is a visual analogy, not a claim that intelligence is arbitrary nonlinearity. (b)~A normative mapping $f(x)$ is deformed by a stable personality term $b_\theta(x)$. In this example, group size changes initiation differently for extraverted and reserved agents; both return toward the norm where interaction is impossible or highly constrained. Curves are conceptual placeholders.}
+\label{fig:teaser}
+\end{figure*}
+
+\section{Related Work}
+\paragraph{Situation--behavior signatures.}
+Trait psychology historically averaged behavior across situations. Mischel and Shoda's CAPS account locates consistency in stable \emph{if--then} profiles: the person is the pattern of which situations elicit which responses~\cite{mischel1995}. Whole Trait Theory treats traits as density distributions of states plus social-cognitive mechanisms that map situations onto those states~\cite{fleeson2015}. Our engineering problem inverts description: given a desired signature, emit a finite set of context--action pairs that make that person identifiable.
+
+\paragraph{Robot personality.}
+HRI has endowed robots with extraversion via speech and gesture parameters, matched robot--user traits, and shown that preferred personality depends on task and role~\cite{esterwood2021review}. Context-sensitive care-robot work is closest in spirit~\cite{andriella2021}; it extracts verbal/nonverbal cues in a particular assistive game. We instead treat a bounded, shared action vocabulary as the expressive bottleneck and separate normative social intelligence $P_0$ from individual weights $\theta$.
+
+\paragraph{LLM personas and social reasoning.}
+Prompted agents can produce individual differences, but benchmarks expose gaps between local persona fidelity and long-horizon coherence~\cite{samuel2025personagym,qi2026coherence}. HRI deployments of LLM-generated expressive behavior inherit local plausibility without an explicit cross-context identity constraint~\cite{mahadevan2024}. Conversely, LLMs can estimate candidate actions, likely consequences, and ordinary social norms in situations that cannot be exhaustively hand-coded. We therefore treat free-form prompting as the primary baseline and use the LLM as a \emph{social model}, not as the personality itself.
+
+\section{Definition}
+At the observable level, behavior is $y_i(x)=f(x)+b_{\theta_i}(x)$: $f$ captures competent context sensitivity and $b_{\theta_i}$ a stable individual deformation. The decomposition becomes operational through a choice model. Let $x$ be a social context and $a \in {\mathcal A}(x)$ an available robot action. A normative policy $P_0(a|x)$ is the acceptable behavior distribution for a competent, unindividuated agent. Contextual benefits and costs $B(a,x),C(a,x)\in\mathbb{R}^k$ include helping value, information gain, social exposure, effort, autonomy intrusion, and safety risk. Define $\phi(a,x)=[B(a,x);-C(a,x)]$ and an individual deviation $\Delta\theta_i$ from population-average weighting:
+\begin{align}
+P_i(a|x)
+&=\frac{P_0(a|x)}{Z_i(x)}
+\exp\!\left(\beta s(x)\Delta\theta_i^\top\phi(a,x)\right), \nonumber\\
+s(x)&=\frac{H[P_0(\cdot|x)]}{\log|{\mathcal A}(x)|}.
+\label{eq:policy}
+\end{align}
+Thus, \textbf{personality is a stable individual difference in how contextual costs and benefits shape behavioral choice}. A single action carries little identity; an observer infers $\hat\theta$ from an episode set $\{(x_t,a_t)\}_{1:T}$. The reference policy is essential: without $P_0$, personality and generic misunderstanding of the situation are confounded.
+
+\paragraph{Situational pressure and suppression.}
+The normalized entropy $s(x)$ measures how much room the situation leaves for individual expression. Emergencies and explicit user constraints make $P_0$ sharp, so $s(x)$ falls and $P_i$ approaches $P_0$. We call this \emph{personality suppression}. It is not inconsistency: rigid agents that insist on a constant deviation from $P_0$ may look more ``in character'' locally and less socially intelligent globally.
+
+\paragraph{Diagnosticity.}
+Two personalities are distinguished by contexts where cost--benefit trade-offs flip the argmax under $\theta_i$ vs.\ $\theta_j$. Same marginal action counts with different conditionals are the intended identification of personality versus mere activity level.
+
+\paragraph{Role of the LLM.}
+The LLM is not the personality. It (i)~parses open $x$ into $({\mathcal A},C,B,P_0)$, (ii)~compiles natural-language personas into $\theta$, (iii)~proposes diagnostic and adversarial contexts. Direct prompting $a=\mathrm{LLM}(x,\text{persona})$ skips the explicit $\theta$ and is hypothesized to be locally good and globally noisy.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig2_mapping.pdf}
+\caption{\textbf{Personality lies in how contexts and actions are composed.} The left circle is a large context space $\mathcal{X}$; the right circle is the robot's limited action space $\mathcal{A}$. Gray denotes information already given to the model or observer; blue denotes the relation that must be composed or inferred. (a)~\emph{Personality realization}: given a target latent policy $p_\theta(a|x)$ and available possibilities, the system composes a sparse context--action signature $\mathcal{S}_\theta$ (blue). The faint alternative connects the same actions to different contexts and would express a different personality. (b)~\emph{Personality inference}: given sparse observed relations (gray), an observer recovers the latent mapping $\hat p_\theta$ (blue). Identity is carried by the topology of the mapping, not by either set of points alone.}
+\label{fig:framework}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig3_human_llm.pdf}
+\caption{\textbf{Human--LLM comparison (planned result layout; all values are placeholders).} (a)~Personality identification as evidence accumulates. (b)~Direct prompting remains locally plausible but falls behind the compiler and human-authored policy on cross-context coherence, identity, controllability, and held-out contexts. (c)~Qualitative cases localize disagreements to the situation--action mapping; replace cards with robot stills and verbatim participant evidence. Error bars and inferential marks will be added after data collection.}
+\label{fig:sig}
+\end{figure*}
+
+\paragraph{Evaluation questions.}
+\textit{RQ1---Social model}: can an LLM recover human judgments of action costs, benefits, norms, and diagnostic situations?
+\textit{RQ2---Realization}: does an explicit compiler produce context--action signatures that are closer to human-authored policies than direct persona prompting?
+\textit{RQ3---Inference}: can observers recover personality from conditional allocations when marginal action frequencies are matched?
+\textit{RQ4---Embodiment}: can a physical robot suppress personality in strong situations without losing identity across the full encounter?
+
+\section{Study 1: Can an LLM Instantiate the Model?}
+\paragraph{Stimuli.}
+We generated a bank of $N{=}1000$ everyday assistive-robot contexts by crossing social exposure, relationship, user availability, urgency, uncertainty, and robot workload, then using an LLM to realize each cell in natural language. A stratified $n{=}120$ subset was independently annotated (all counts are placeholders). The shared action vocabulary contained ten primitives: \texttt{approach}, \texttt{wait}, \texttt{initiate}, \texttt{respond-only}, \texttt{help}, \texttt{continue-task}, \texttt{retry}, \texttt{give-up}, \texttt{act-quickly}, and \texttt{inspect-first}. Annotators rated helping value, information gain, social exposure, effort, safety risk, missed-help cost, and autonomy intrusion.
+
+\paragraph{Protocol and analysis.}
+For every feasible $(x,a)$ pair, five annotators and the preregistered LLM rated each cost/benefit dimension on a 1--7 scale. A separate sample selected acceptable actions without a persona, yielding $P_0$. Finally, the LLM and trained human authors each selected four contexts expected to distinguish a target persona pair; random sets were matched on topic and action feasibility. We report dimension-wise rank correlation and calibration, top-$k$ agreement on ${\mathcal A}(x)$, Jensen--Shannon distance to human $P_0$, and mixed-effects logistic models for personality identification with context source as a fixed effect and rater/context as random effects.
+
+\paragraph{Finding 1: The LLM is useful but imperfect (placeholder).}
+Human--LLM cost ratings correlated at $r_s{=}0.71$ (Fig.~\ref{fig:llm}a), with the largest errors on autonomy intrusion and indirect social cost. Four model-selected diagnostic episodes yielded $61\%$ identity recovery, compared with $34\%$ for topic-matched random episodes and $68\%$ for human-selected episodes (4AFC chance $25\%$; Fig.~\ref{fig:llm}b). As situational constraint increased, compiled policies approached $P_0$, while direct persona prompting showed a weaker and less monotonic decline in $D_{\mathrm{KL}}$ (Fig.~\ref{fig:llm}c). If retained by measured data, this result licenses the LLM as a front-end for open-ended social structure, not as a substitute for an explicit individual policy.
+
+\noindent\textit{Takeaway.} The LLM need not be a coherent personality to estimate the social decision variables from which one can be constructed.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig4_llm_capability.pdf}
+\caption{\textbf{Can the LLM instantiate the decision model? All values are placeholders.} (a)~Human--LLM agreement on contextual cost ratings. (b)~Identity recovery from random, LLM-selected, and human-selected diagnostic episodes. (c)~Distance from the normative policy as situational pressure increases. Final plots will show confidence intervals, participant-level points, and preregistered model tests.}
+\label{fig:llm}
+\end{figure*}
+
+\section{Study 2: Human vs.\ LLM Realization and Inference}
+\paragraph{Design.}
+The shared universe contained six personas in opposing pairs (\emph{extraverted/reserved}, \emph{helpful/self-prioritizing}, and \emph{cautious/adventurous}), $|{\mathcal X}|{=}1000$, and $|{\mathcal A}|{=}10$. Three generators received the same persona description and feasible action set: \emph{persona prompt} let the LLM choose directly from $x$; \emph{compiler} let the LLM estimate $(C,B,P_0)$ and then applied one frozen $\Delta\theta$ across all contexts; \emph{human policy} aggregated choices from trained authors using the same structured interface. Authors did not participate as perception raters.
+
+\paragraph{Finding 2: Identity accumulates across contexts (placeholder).}
+Independent raters saw $T\in\{1,2,4,8,16\}$ context--action episodes and selected one of four persona descriptions. The placeholder trend reaches $41\%$, $68\%$, and $74\%$ at $T{=}8$ for prompt, compiler, and human policies, respectively (Fig.~\ref{fig:sig}a). The planned analysis is a mixed-effects logistic regression over generator, $\log_2T$, and their interaction. The claim is set-level: one action may be ambiguous, but a coherent signature should become identifiable as evidence accumulates.
+
+\paragraph{Finding 3: Context, not frequency, carries identity (placeholder).}
+We used minimum-cost matching to make opposing personas produce identical action histograms while preserving different context allocations. Raters received actions only or context plus actions. Placeholder forced-choice accuracy was $28$--$31\%$ without context and $64$--$71\%$ with context (Fig.~\ref{fig:inf}b). This is the cleanest test of the paper's central claim: personality perception tracks $P(a|x)$ rather than activity counts $P(a)$.
+
+\paragraph{Finding 4: Structure closes the global human--LLM gap (placeholder).}
+Raters scored local appropriateness, cross-context coherence (``could these choices come from the same agent?''), identity fit, controllability after swapping $\Delta\theta$, and held-out-context generalization. Placeholder means suggest that prompting is slightly stronger on local appropriateness (4.21 vs.\ 4.12) but weaker on coherence (2.88 vs.\ 4.01) and control (2.41 vs.\ 4.22; Fig.~\ref{fig:sig}b). We code disagreements as \emph{context parse}, \emph{cost/benefit estimate}, \emph{norm estimate}, \emph{personality weight}, or \emph{action feasibility} errors. Figure~\ref{fig:sig}c reserves space for representative success, prompt-only inconsistency, compiler error, and personality-suppression cases.
+
+\noindent\textit{Takeaway.} Direct prompting can win one decision at a time while losing the identity formed across decisions.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig5_inference.pdf}
+\caption{\textbf{Inference ablations (placeholder values).} (a)~Identity recovery as observations accumulate. (b)~Matched-marginal forced choice: hiding $x$ removes most identity evidence; restoring $x$ recovers it even when $P(a)$ is identical. This context-visible versus context-hidden contrast is the principal test of the theory.}
+\label{fig:inf}
+\end{figure*}
+
+\section{Study 3: In-Person Robot}
+\paragraph{Platform and design.}
+A mobile manipulator (placeholder: \texttt{[ROBOT]}) performed a 12--15-minute assistive script comprising a lobby with confederates, a dropped object near a moving cart, a help request, a do-not-disturb interval, and a simulated urgency. The planned $3\times2$ between-participant design crosses controller---\emph{prompt-only}, \emph{rigid signature}, or \emph{adaptive compiler}---with target personality---\emph{extraverted} or \emph{reserved}. The rigid controller preserves a fixed personality deviation; the adaptive controller scales it by $s(x)$. Each participant encounters one robot identity across all five scenes, avoiding carry-over between personalities. The placeholder sample is $N{=}72$ ($12$ per cell), to be replaced by a power analysis.
+
+\paragraph{Measures and analysis.}
+Participants first classify the robot's personality without being shown the manipulation label, then rate identity strength, situational appropriateness, perceived intelligence, likeability, and trust. Behavioral measures include response latency, accepted help, and compliance with the robot's request. The confirmatory models test controller, target personality, and situational strength with participant and scene random effects. Recognition alone is insufficient: the adaptive controller must remain no less identifiable than the rigid controller while improving appropriateness in strong situations.
+
+\paragraph{Finding 5: Suppression preserves competence (placeholder).}
+Adaptive and rigid controllers were similarly recognizable in the intended result pattern (3.98 vs.\ 4.12 on the plotting scale), while adaptive behavior was rated more appropriate (4.26 vs.\ 3.21) and intelligent (4.11 vs.\ 3.18). Prompt-only behavior occupied the middle on local fit but was less identifiable (3.05). The critical interaction is scene strength: rigid and adaptive policies may differ in weak lobby scenes, but only the adaptive personalities should converge on the normative action during explicit do-not-disturb and urgency scenes. Figure~\ref{fig:robot} reserves the right panel for participant-level identity--appropriateness trade-offs rather than condition means alone.
+
+\noindent\textit{Takeaway.} A recognizable agent need not advertise its trait in every scene; knowing when not to do so is part of social intelligence.
+
+\paragraph{Qualitative notes to replace with quotes.}
+\texttt{[Pxx: noticed the same outgoing identity before and after a do-not-disturb scene]} and \texttt{[Pyy: described the rigid controller as recognizable but intrusive during urgency]}. Exact quotation marks are intentionally omitted until verbatim transcripts exist.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig6_robot_qual.pdf}
+\caption{\textbf{Qualitative robot grid (placeholder frames).} Columns contrast personas in a shared scene, then show suppression (do-not-disturb, emergency) vs.\ a rigid extravert that keeps initiating. Replace gray boxes with captured stills; keep the 2$\times$4 layout so the page argument stays ``same scene, different allocation'' plus ``strong situation, shared action.''}
+\label{fig:qual}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig7_robot_ratings.pdf}
+\caption{\textbf{Embodied HRI results (placeholder values).} (a)~Post-interaction ratings. The confirmatory claim is adaptive $\geq$ rigid on identity and adaptive $>$ rigid on appropriateness and perceived intelligence. (b)~Participant-level identity--appropriateness trade-off; diamonds denote condition means. Replace all values, intervals, and inferential marks with measured data.}
+\label{fig:robot}
+\end{figure*}
+
+\section{Discussion}
+The paper makes one claim: \emph{personality is structured variation across contexts under a shared action vocabulary}. The cost--benefit layer explains why the same action can support different inferences, and the normative policy separates individual preference from generic social competence. Study~1 asks whether an LLM can supply the open-world structure that earlier rule-based systems had to enumerate. Study~2 tests whether explicit structure adds global coherence beyond direct prompting and whether observers use conditional rather than marginal behavior. Study~3 tests the central tension in the body: an agent should be identifiable where alternatives are acceptable and should suppress identity where norms become decisive.
+
+\paragraph{What a positive result would and would not establish.}
+It would show that a small set of actions can communicate different social identities through contextual allocation, that LLM commonsense can populate an explicit policy model, and that suppression can read as competence rather than inconsistency. It would not establish a universal personality ontology, recover the Big Five, or show that $\theta$ is culturally invariant.
+
+\paragraph{Limitations.}
+$P_0$ is role-, culture-, and population-specific. Ten primitives deliberately expose semantic reuse but omit speech content, prosody, and long-term relationship history. The compiler inherits stereotypes and calibration errors from the LLM. Human-authored policies are a comparison point, not objective ground truth. Finally, a scripted laboratory encounter cannot establish longitudinal identity; a follow-up should test whether users predict behavior in unseen situations days later.
+
+\section{Conclusion}
+Social intelligence and personality answer different questions: intelligence estimates what a situation affords and demands; personality specifies how one individual trades those consequences off. Treating the LLM as the former and a stable, inspectable $\theta$ as the latter turns personality generation from repeated role-play into policy construction. The proposed studies evaluate the full loop from open-ended context, through bounded robot action, to human inference of a coherent social individual.
+
+\section*{Figure inventory for an 8-page HRI PDF}
+\textbf{p.1} Abstract, problem definition, contributions, and related work.\\
+\textbf{p.2} Fig.~\ref{fig:teaser}: $f(x)$ versus $f(x)+b_\theta(x)$; observable and mechanistic definitions.\\
+\textbf{p.3} Fig.~\ref{fig:framework}: forward personality realization and inverse personality inference over context/action spaces; evaluation questions.\\
+\textbf{p.4} Study~1 and Fig.~\ref{fig:llm}: LLM capability and suppression.\\
+\textbf{p.5} Study~2 and Fig.~\ref{fig:sig}: human--LLM quantitative and qualitative comparison.\\
+\textbf{p.6} Fig.~\ref{fig:inf}: evidence accumulation and the matched-marginal ablation; Study~3 protocol.\\
+\textbf{p.7} Figs.~\ref{fig:qual} and~\ref{fig:robot}: robot stills, ratings, trade-off, and transcript evidence.\\
+\textbf{p.8} Discussion, limitations, conclusion, and references.\\
+If space is tight, merge the repeated evidence-accumulation curve in Fig.~\ref{fig:inf} into Fig.~\ref{fig:sig}; do not drop the matched-marginal contrast or the adaptive/rigid identity--appropriateness scatter. Those two panels distinguish this paper from a generic ``persona prompting improves ratings'' study.
+
+{\small
+\begin{thebibliography}{9}
+\bibitem{mischel1995}
+W.~Mischel and Y.~Shoda, ``A cognitive-affective system theory of personality: Reconceptualizing situations, dispositions, dynamics, and invariance in personality structure,'' \emph{Psychological Review}, vol.~102, no.~2, pp.~246--268, 1995.
+\bibitem{fleeson2015}
+W.~Fleeson and E.~Jayawickreme, ``Whole trait theory,'' \emph{Journal of Research in Personality}, vol.~56, 2015.
+\bibitem{esterwood2021review}
+C.~Esterwood and L.~P.~Robert, ``A systematic review of human and robot personality in health care human--robot interaction,'' \emph{Frontiers in Robotics and AI}, vol.~8, 2021.
+\bibitem{andriella2021}
+A.~Andriella, H.~Siqueira, D.~Fu, et al., ``Do I have a personality? Endowing care robots with context-dependent personality traits,'' \emph{International Journal of Social Robotics}, vol.~13, pp.~2081--2102, 2021.
+\bibitem{samuel2025personagym}
+V.~Samuel, H.~P.~Zou, Y.~Zhou, et al., ``PersonaGym: Evaluating persona agents and LLMs,'' in \emph{Findings of EMNLP}, pp.~6999--7022, 2025.
+\bibitem{qi2026coherence}
+Y.~Qi, X.~Zhang, R.~Zeng, et al., ``Beyond static persona consistency: Dynamic persona coherence in LLM role-playing,'' in \emph{Proc.\ ACL}, 2026.
+\bibitem{mahadevan2024}
+K.~Mahadevan et al., ``Generative expressive robot behaviors using large language models,'' in \emph{Proc.\ ACM/IEEE HRI}, 2024.
+\end{thebibliography}
+}
+
+\end{document}

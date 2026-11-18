@@ -61,11 +61,12 @@ def main() -> None:
         "axes.labelsize": 13,
         "xtick.labelsize": 8.5,
         "ytick.labelsize": 13,
-        "legend.fontsize": 10.5,
+        "legend.fontsize": 8.0,
         "axes.edgecolor": "#202020",
         "axes.linewidth": 1.0,
     })
-    fig, ax = plt.subplots(figsize=(10.2, 3.1))
+    fig, ax = plt.subplots(figsize=(10.2, 2.85))
+
     styles = (
         ("All", "#1F6FEB"),
         ("Human-like", "#202020"),
@@ -104,19 +105,25 @@ def main() -> None:
         framealpha=1.0,
         facecolor="white",
         edgecolor="#202020",
-        ncol=2,
+        ncol=3,
         loc="upper right",
-        bbox_to_anchor=(0.985, 0.985),
-        borderpad=0.55,
-        handlelength=2.4,
-        columnspacing=0.9,
-        labelspacing=0.45,
+        bbox_to_anchor=(0.995, 0.995),
+        borderpad=0.30,
+        handlelength=1.35,
+        handletextpad=0.35,
+        columnspacing=0.55,
+        labelspacing=0.25,
+        fontsize=8.0,
     )
     fig.tight_layout(pad=0.28)
-    fig.savefig(OUT.with_suffix(".png"), dpi=220, bbox_inches="tight", facecolor="white")
-    fig.savefig(OUT.with_suffix(".svg"), bbox_inches="tight", facecolor="white")
+    paper_fig = REPO / "papers/icra2027_motion_abstraction/figures/figure16_cue_difficulty.png"
+    for path in (OUT.with_suffix(".png"), OUT.with_suffix(".svg"), paper_fig):
+        try:
+            fig.savefig(path, dpi=220, bbox_inches="tight", facecolor="white")
+            print(path)
+        except OSError as exc:
+            print(f"skip save {path} ({exc})")
     plt.close(fig)
-    print(OUT.with_suffix(".png"))
 
 
 if __name__ == "__main__":

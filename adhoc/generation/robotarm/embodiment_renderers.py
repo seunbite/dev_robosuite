@@ -83,7 +83,7 @@ def _progress_overlay(image: np.ndarray, index: int, total: int) -> Image.Image:
     draw.rounded_rectangle(
         (margin, y0, margin + (width - 2 * margin) * frac, y0 + 5),
         radius=2,
-        fill=(66, 133, 244),
+        fill=(31, 111, 235),
     )
     return out
 
@@ -192,6 +192,41 @@ _G1_ARM_JOINTS_RIGHT = (
     "right_wrist_pitch_joint",
     "right_wrist_yaw_joint",
 )
+# Proximal DOFs — primary carriers of EE position in parallel translate.
+_G1_ARM_JOINTS_RIGHT_PROXIMAL = (
+    "right_shoulder_pitch_joint",
+    "right_shoulder_roll_joint",
+    "right_shoulder_yaw_joint",
+    "right_elbow_joint",
+)
+_G1_ARM_JOINTS_RIGHT_WRIST = (
+    "right_wrist_roll_joint",
+    "right_wrist_pitch_joint",
+    "right_wrist_yaw_joint",
+)
+# Full right arm for 6D (pos+ori) parallel translate.
+_G1_ARM_JOINTS_RIGHT_TRANSLATE = _G1_ARM_JOINTS_RIGHT_PROXIMAL + _G1_ARM_JOINTS_RIGHT_WRIST
+# DLS joint weights (larger → move less). Proximal preferred for reach;
+# wrists available but costly — mainly cancel orientation drift.
+_G1_EE_TRANSLATE_JOINT_WEIGHTS = {
+    "right_shoulder_pitch_joint": 0.55,
+    "right_shoulder_roll_joint": 0.65,
+    "right_shoulder_yaw_joint": 1.2,
+    "right_elbow_joint": 0.30,
+    "right_wrist_roll_joint": 1.6,
+    "right_wrist_pitch_joint": 1.6,
+    "right_wrist_yaw_joint": 1.6,
+}
+# Ori-recovery pass: freeze proximal-ish, let wrists fix orientation.
+_G1_EE_ORI_RECOVER_WEIGHTS = {
+    "right_shoulder_pitch_joint": 4.0,
+    "right_shoulder_roll_joint": 4.0,
+    "right_shoulder_yaw_joint": 3.5,
+    "right_elbow_joint": 4.0,
+    "right_wrist_roll_joint": 0.35,
+    "right_wrist_pitch_joint": 0.35,
+    "right_wrist_yaw_joint": 0.35,
+}
 _G1_EE_BODY = "right_wrist_yaw_link"
 _G1_EE_BODY_LEFT = "left_wrist_yaw_link"
 
@@ -490,16 +525,20 @@ def _g1_feasible_pose_target(
     if str(pose.get("left_arm", "still")).lower() == "mirror":
         _g1_remirror_left_arm(target, joint_map)
     # Optional: snap EE to the Motion Code xyz target (residual parallel translate).
-    # Substeps are IK-only and never become GIF frames.
+    # Substeps are IK-only and never become GIF frames. Wrists stay at bank angles.
     if _g1_pose_xyz_mode() == "translate":
         target = _g1_apply_ee_xyz_world(target, model, joint_map, pose)
-    # Palm compound: wrist IK only when palm is valid for this dir|orient.
-    # Invalid tokens (e.g. front + vert|palmfront) skip IK and keep bank wrist.
+    # Palm compound: wrist IK only when the bank hit does not already carry the
+    # requested palm (otherwise palm IK rewrites bank orientation — often wrongly).
     direction = str(pose.get("arm_position", "front")).lower()
     bank_orient, palm = _g1_parse_grip(pose.get("gripper_orientation", ""))
     palm = _g1_resolve_palm_for_category(direction, bank_orient, palm)
     if palm:
-        target = _g1_apply_palm_orientation(target, model, joint_map, pose)
+        bank_palm = str(
+            selected.get("palm_semantic") or _g1_visual_palm_semantic(selected) or ""
+        ).lower()
+        if bank_palm != palm:
+            target = _g1_apply_palm_orientation(target, model, joint_map, pose)
     return target
 
 
@@ -547,6 +586,25 @@ def _g1_remirror_left_arm(q: np.ndarray, joint_map: dict[str, int]) -> None:
             q[joint_map[lname]] = sign * float(q[joint_map[rname]])
 
 
+def _g1_rotmat_err(R_cur: np.ndarray, R_des: np.ndarray) -> np.ndarray:
+    """Orientation error as a 3-vector (axis × sinθ) in world frame.
+
+    Uses ``0.5 vee(R_des R_cur^T − (·)^T)`` so small angles ≈ rotation vector.
+    """
+    R = np.asarray(R_des, dtype=float).reshape(3, 3) @ np.asarray(R_cur, dtype=float).reshape(3, 3).T
+    return 0.5 * np.array(
+        [R[2, 1] - R[1, 2], R[0, 2] - R[2, 0], R[1, 0] - R[0, 1]],
+        dtype=float,
+    )
+
+
+def _g1_ori_err_deg(R_cur: np.ndarray, R_des: np.ndarray) -> float:
+    """Geodesic orientation error in degrees between two rotation matrices."""
+    R = np.asarray(R_des, dtype=float).reshape(3, 3) @ np.asarray(R_cur, dtype=float).reshape(3, 3).T
+    tr = float(np.clip((np.trace(R) - 1.0) * 0.5, -1.0, 1.0))
+    return float(np.degrees(math.acos(tr)))
+
+
 def _g1_dls_ee_to_target(
     model: mujoco.MjModel,
     data: mujoco.MjData,
@@ -554,47 +612,218 @@ def _g1_dls_ee_to_target(
     joint_map: dict[str, int],
     target_pos: np.ndarray,
     *,
+    target_rot: np.ndarray | None = None,
+    joint_names: tuple[str, ...] | list[str] | None = None,
+    joint_weights: dict[str, float] | None = None,
     max_iters: int = 40,
     pos_tol_m: float = 0.012,
+    ori_tol_rad: float = 0.06,
     damping: float = 0.08,
     max_dq: float = 0.25,
+    pos_weight: float = 1.0,
+    ori_weight: float = 1.35,
 ) -> None:
-    """Damped least-squares IK: move right wrist body to ``target_pos`` (world)."""
+    """Damped least-squares IK for right EE.
+
+    If ``target_rot`` is given, solves a 6D task (position + orientation) on the
+    full arm so parallel translate preserves bank hand orientation. Otherwise
+    falls back to position-only on the given joints (default: proximal).
+    """
     try:
         bid = model.body(_G1_EE_BODY).id
     except Exception:
         return
+    use_ori = target_rot is not None
+    names = (
+        tuple(joint_names)
+        if joint_names is not None
+        else (_G1_ARM_JOINTS_RIGHT_TRANSLATE if use_ori else _G1_ARM_JOINTS_RIGHT_PROXIMAL)
+    )
+    weights = joint_weights if joint_weights is not None else _G1_EE_TRANSLATE_JOINT_WEIGHTS
     dof_ids: list[int] = []
     qpos_ids: list[int] = []
-    for name in _G1_ARM_JOINTS_RIGHT:
+    w_diag: list[float] = []
+    q_lo: list[float] = []
+    q_hi: list[float] = []
+    for name in names:
         if name not in joint_map:
             continue
         jnt = model.joint(name)
         dof_ids.append(int(jnt.dofadr[0]))
         qpos_ids.append(int(joint_map[name]))
+        w_diag.append(max(1e-3, float(weights.get(name, 1.0))))
+        try:
+            q_lo.append(float(jnt.range[0]))
+            q_hi.append(float(jnt.range[1]))
+        except Exception:
+            q_lo.append(-math.pi)
+            q_hi.append(math.pi)
     if not dof_ids:
         return
+    w_inv = np.diag(1.0 / np.asarray(w_diag, dtype=float))
     target = np.asarray(target_pos, dtype=float).reshape(3)
-    diag = (float(damping) ** 2) * np.eye(3, dtype=float)
+    R_des = None if not use_ori else np.asarray(target_rot, dtype=float).reshape(3, 3)
+    task_dim = 6 if use_ori else 3
+    diag = (float(damping) ** 2) * np.eye(task_dim, dtype=float)
     jacp = np.zeros((3, model.nv), dtype=float)
+    jacr = np.zeros((3, model.nv), dtype=float)
     for _ in range(max_iters):
         data.qpos[:] = q
         mujoco.mj_forward(model, data)
-        err = target - np.asarray(data.xpos[bid], dtype=float)
-        if float(np.linalg.norm(err)) < pos_tol_m:
-            break
-        jacp[:] = 0.0
-        mujoco.mj_jacBody(model, data, jacp, None, bid)
-        j = jacp[:, dof_ids]
+        pos_err = target - np.asarray(data.xpos[bid], dtype=float)
+        if use_ori:
+            assert R_des is not None
+            R_cur = np.asarray(data.xmat[bid], dtype=float).reshape(3, 3)
+            ori_err = _g1_rotmat_err(R_cur, R_des)
+            if (
+                float(np.linalg.norm(pos_err)) < pos_tol_m
+                and float(np.linalg.norm(ori_err)) < ori_tol_rad
+            ):
+                break
+            err = np.concatenate([pos_weight * pos_err, ori_weight * ori_err])
+            jacp[:] = 0.0
+            jacr[:] = 0.0
+            mujoco.mj_jacBody(model, data, jacp, jacr, bid)
+            j = np.vstack(
+                [
+                    pos_weight * jacp[:, dof_ids],
+                    ori_weight * jacr[:, dof_ids],
+                ]
+            )
+        else:
+            if float(np.linalg.norm(pos_err)) < pos_tol_m:
+                break
+            err = pos_err
+            jacp[:] = 0.0
+            mujoco.mj_jacBody(model, data, jacp, None, bid)
+            j = jacp[:, dof_ids]
         try:
-            dq = j.T @ np.linalg.solve(j @ j.T + diag, err)
+            jw = j @ w_inv
+            dq = w_inv @ (j.T @ np.linalg.solve(jw @ j.T + diag, err))
         except np.linalg.LinAlgError:
             break
         nrm = float(np.linalg.norm(dq))
         if nrm > max_dq:
             dq *= max_dq / nrm
-        for qi, dqi in zip(qpos_ids, dq):
-            q[qi] = float(q[qi]) + float(dqi)
+        for qi, dqi, lo, hi in zip(qpos_ids, dq, q_lo, q_hi):
+            q[qi] = float(np.clip(float(q[qi]) + float(dqi), lo, hi))
+
+
+def _g1_lock_right_wrist(q: np.ndarray, joint_map: dict[str, int], wrist_lock: dict[str, float]) -> None:
+    for name, ang in wrist_lock.items():
+        if name in joint_map:
+            q[joint_map[name]] = float(ang)
+
+
+def _g1_right_wrist_lock(q: np.ndarray, joint_map: dict[str, int]) -> dict[str, float]:
+    return {
+        name: float(q[joint_map[name]])
+        for name in _G1_ARM_JOINTS_RIGHT_WRIST
+        if name in joint_map
+    }
+
+
+def _g1_dls_ee_parallel(
+    model: mujoco.MjModel,
+    data: mujoco.MjData,
+    q: np.ndarray,
+    joint_map: dict[str, int],
+    target_pos: np.ndarray,
+    target_rot: np.ndarray,
+    *,
+    max_iters: int = 50,
+    pos_tol_m: float = 0.010,
+    ori_tol_rad: float = 0.05,
+    pos_weight: float = 1.0,
+    ori_weight: float = 2.5,
+    joint_weights: dict[str, float] | None = None,
+) -> None:
+    """Parallel-translate EE: hit ``target_pos`` while holding ``target_rot``."""
+    _g1_dls_ee_to_target(
+        model,
+        data,
+        q,
+        joint_map,
+        target_pos,
+        target_rot=target_rot,
+        joint_names=_G1_ARM_JOINTS_RIGHT_TRANSLATE,
+        joint_weights=joint_weights or _G1_EE_TRANSLATE_JOINT_WEIGHTS,
+        max_iters=max_iters,
+        pos_tol_m=pos_tol_m,
+        ori_tol_rad=ori_tol_rad,
+        pos_weight=pos_weight,
+        ori_weight=ori_weight,
+        damping=0.12,
+        max_dq=0.20,
+    )
+
+
+def _g1_ee_ori_recover(
+    model: mujoco.MjModel,
+    data: mujoco.MjData,
+    q: np.ndarray,
+    joint_map: dict[str, int],
+    hold_pos: np.ndarray,
+    target_rot: np.ndarray,
+) -> None:
+    """Wrist-led pass: restore orientation while softly holding current EE position."""
+    _g1_dls_ee_to_target(
+        model,
+        data,
+        q,
+        joint_map,
+        hold_pos,
+        target_rot=target_rot,
+        joint_names=_G1_ARM_JOINTS_RIGHT_TRANSLATE,
+        joint_weights=_G1_EE_ORI_RECOVER_WEIGHTS,
+        max_iters=40,
+        pos_tol_m=0.015,
+        ori_tol_rad=0.03,
+        pos_weight=0.6,
+        ori_weight=4.0,
+        damping=0.10,
+        max_dq=0.25,
+    )
+
+
+# Back-compat alias (old proximal-only entry point).
+def _g1_dls_ee_proximal(
+    model: mujoco.MjModel,
+    data: mujoco.MjData,
+    q: np.ndarray,
+    joint_map: dict[str, int],
+    target_pos: np.ndarray,
+    *,
+    wrist_lock: dict[str, float] | None = None,
+    max_iters: int = 40,
+    pos_tol_m: float = 0.012,
+    target_rot: np.ndarray | None = None,
+) -> None:
+    """EE IK. If ``target_rot`` given → orientation-preserving; else proximal pos-only."""
+    del wrist_lock
+    if target_rot is not None:
+        _g1_dls_ee_parallel(
+            model,
+            data,
+            q,
+            joint_map,
+            target_pos,
+            target_rot,
+            max_iters=max_iters,
+            pos_tol_m=pos_tol_m,
+        )
+        return
+    _g1_dls_ee_to_target(
+        model,
+        data,
+        q,
+        joint_map,
+        target_pos,
+        joint_names=_G1_ARM_JOINTS_RIGHT_PROXIMAL,
+        joint_weights=_G1_EE_TRANSLATE_JOINT_WEIGHTS,
+        max_iters=max_iters,
+        pos_tol_m=pos_tol_m,
+    )
 
 
 def _g1_apply_ee_xyz_world(
@@ -603,10 +832,13 @@ def _g1_apply_ee_xyz_world(
     joint_map: dict[str, int],
     pose: dict[str, Any],
 ) -> np.ndarray:
-    """After categorical pose: translate EE in world toward body-centered x/y/z.
+    """After categorical / bank pose: parallel-translate EE to body-centered xyz.
 
-    Unspecified axes keep the categorical EE coordinate (never invent defaults).
-    ``left_arm=mirror`` remirrors after the right-arm IK.
+    Preserves the bank EE orientation (full 3×3) as the primary constraint.
+    Position is approached in small substeps with 6D DLS; after each step a
+    wrist-led recovery restores orientation. If a further step would push
+    orientation error past ~5°, progress stops — better leave residual xyz
+    than flip the hand. ``left_arm=mirror`` remirrors after IK.
     """
     axes = [a for a in ("x", "y", "z") if isinstance(pose.get(a), (int, float))]
     if not axes:
@@ -624,18 +856,76 @@ def _g1_apply_ee_xyz_world(
     mujoco.mj_forward(model, data)
     torso = np.asarray(data.xpos[tid], dtype=float)
     cur = np.asarray(data.xpos[rid], dtype=float).copy()
+    R0 = np.asarray(data.xmat[rid], dtype=float).reshape(3, 3).copy()
     target = cur.copy()
     for axis in axes:
         idx = {"x": 0, "y": 1, "z": 2}[axis]
         target[idx] = float(torso[idx]) + _g1_pct_to_delta_m(float(pose[axis]), axis)
 
-    # Substep in case of large jumps (match google trim spirit).
     delta = target - cur
     dist = float(np.linalg.norm(delta))
-    n_sub = max(1, int(math.ceil(dist / 0.04)))
+    if dist < 1e-4:
+        return out
+
+    # Fine substeps; never take a last giant jump into joint-limit failure.
+    n_sub = max(2, int(math.ceil(dist / 0.02)))
+    ori_limit_deg = 5.0
+    best_q = out.copy()
+    best_ori = 0.0
+    best_pos_err = dist
+
     for si in range(1, n_sub + 1):
-        step_tgt = cur + delta * (si / n_sub)
-        _g1_dls_ee_to_target(model, data, out, joint_map, step_tgt)
+        frac = si / n_sub
+        # Ease-out: smaller increments near the end where limits bite.
+        eased = 1.0 - (1.0 - frac) ** 1.35
+        step_tgt = cur + delta * eased
+        trial = out.copy()
+        # Bulk 6D move — orientation weighted above position.
+        _g1_dls_ee_parallel(
+            model,
+            data,
+            trial,
+            joint_map,
+            step_tgt,
+            R0,
+            max_iters=45,
+            pos_tol_m=0.010,
+            ori_tol_rad=0.04,
+            pos_weight=1.0,
+            ori_weight=3.0,
+        )
+        data.qpos[:] = trial
+        mujoco.mj_forward(model, data)
+        hold_pos = np.asarray(data.xpos[rid], dtype=float).copy()
+        # Wrist-led orientation recovery at the achieved position.
+        _g1_ee_ori_recover(model, data, trial, joint_map, hold_pos, R0)
+
+        data.qpos[:] = trial
+        mujoco.mj_forward(model, data)
+        R = np.asarray(data.xmat[rid], dtype=float).reshape(3, 3)
+        ori = _g1_ori_err_deg(R, R0)
+        pos_err = float(np.linalg.norm(target - np.asarray(data.xpos[rid], dtype=float)))
+
+        if ori > ori_limit_deg and ori > best_ori + 0.5:
+            # Reject this step — keep best orientation-preserving config.
+            break
+
+        out = trial
+        if ori < best_ori + 0.25 and pos_err <= best_pos_err + 0.005:
+            best_q = out.copy()
+            best_ori = ori
+            best_pos_err = pos_err
+        elif ori + 0.5 < best_ori:
+            best_q = out.copy()
+            best_ori = ori
+            best_pos_err = pos_err
+
+    out = best_q
+    # Final orientation polish at whatever position we kept.
+    data.qpos[:] = out
+    mujoco.mj_forward(model, data)
+    hold = np.asarray(data.xpos[rid], dtype=float).copy()
+    _g1_ee_ori_recover(model, data, out, joint_map, hold, R0)
 
     if str(pose.get("left_arm", "still")).lower() == "mirror":
         _g1_remirror_left_arm(out, joint_map)
@@ -1316,11 +1606,12 @@ def _g1_motion_qpos(
                 data_ik.qpos[:] = base
                 mujoco.mj_forward(model, data_ik)
                 try:
-                    ee_start = np.asarray(
-                        data_ik.xpos[model.body(_G1_EE_BODY).id], dtype=float
-                    ).copy()
+                    ee_bid = model.body(_G1_EE_BODY).id
+                    ee_start = np.asarray(data_ik.xpos[ee_bid], dtype=float).copy()
+                    ee_R0 = np.asarray(data_ik.xmat[ee_bid], dtype=float).reshape(3, 3).copy()
                 except Exception:
                     ee_start = np.zeros(3, dtype=float)
+                    ee_R0 = np.eye(3, dtype=float)
                 q_work = base.copy()
                 for i in range(n):
                     t = i / max(n - 1, 1)
@@ -1331,14 +1622,16 @@ def _g1_motion_qpos(
                     a0, a1 = plane_axes
                     target[a0] += radius * (math.cos(angle) - 1.0)
                     target[a1] += radius * math.sin(angle)
-                    _g1_dls_ee_to_target(
+                    _g1_dls_ee_parallel(
                         model,
                         data_ik,
                         q_work,
                         joint_map,
                         target,
+                        ee_R0,
                         max_iters=60,
                         pos_tol_m=0.004,
+                        ori_tol_rad=0.05,
                     )
                     if mirror_left:
                         _g1_remirror_left_arm(q_work, joint_map)
@@ -1403,11 +1696,12 @@ def _g1_motion_qpos(
                     data_ik.qpos[:] = base
                     mujoco.mj_forward(model, data_ik)
                     try:
-                        ee_start = np.asarray(
-                            data_ik.xpos[model.body(_G1_EE_BODY).id], dtype=float
-                        ).copy()
+                        ee_bid = model.body(_G1_EE_BODY).id
+                        ee_start = np.asarray(data_ik.xpos[ee_bid], dtype=float).copy()
+                        ee_R0 = np.asarray(data_ik.xmat[ee_bid], dtype=float).reshape(3, 3).copy()
                     except Exception:
                         ee_start = np.zeros(3, dtype=float)
+                        ee_R0 = np.eye(3, dtype=float)
                     q_work = base.copy()
                     for i in range(n):
                         if oscillate:
@@ -1418,7 +1712,17 @@ def _g1_motion_qpos(
                         offset = lo + (hi - lo) * progress
                         target = ee_start.copy()
                         target[ax_idx] = float(ee_start[ax_idx]) + offset
-                        _g1_dls_ee_to_target(model, data_ik, q_work, joint_map, target)
+                        _g1_dls_ee_parallel(
+                            model,
+                            data_ik,
+                            q_work,
+                            joint_map,
+                            target,
+                            ee_R0,
+                            max_iters=50,
+                            pos_tol_m=0.006,
+                            ori_tol_rad=0.05,
+                        )
                         if mirror_left:
                             _g1_remirror_left_arm(q_work, joint_map)
                         seq.append(q_work.copy())
@@ -1579,6 +1883,10 @@ def render_unitree_g1(
     *,
     force: bool = False,
     fps: int = 20,
+    camera_lookat: tuple[float, float, float] = (0.0, 0.0, 0.85),
+    camera_distance: float = 2.7,
+    camera_azimuth: float = 145,
+    camera_elevation: float = -8,
 ) -> dict[str, Path]:
     if not _G1_XML.is_file():
         raise FileNotFoundError(f"Unitree G1 MJCF missing: {_G1_XML}")
@@ -1591,10 +1899,10 @@ def render_unitree_g1(
         renderer = mujoco.Renderer(model, height=480, width=480)
         camera = mujoco.MjvCamera()
         camera.type = mujoco.mjtCamera.mjCAMERA_FREE
-        camera.lookat[:] = (0.0, 0.0, 0.85)
-        camera.distance = 2.7
-        camera.azimuth = 145
-        camera.elevation = -8
+        camera.lookat[:] = camera_lookat
+        camera.distance = float(camera_distance)
+        camera.azimuth = float(camera_azimuth)
+        camera.elevation = float(camera_elevation)
         for row in rows:
             idx, cue = int(row["idx"]), str(row["cue"])
             gif = out_dir / f"emb_g{idx:02d}_{cue}.gif"
@@ -1624,16 +1932,9 @@ _ROOMBA_XML = """
   <visual>
     <headlight ambient="0.45 0.45 0.45" diffuse="0.8 0.8 0.8"/>
   </visual>
-  <asset>
-    <texture name="checker" type="2d" builtin="checker"
-             rgb1="0.22 0.26 0.32" rgb2="0.86 0.88 0.92"
-             width="512" height="512"/>
-    <material name="checker_floor" texture="checker" texrepeat="10 10"
-              texuniform="true" reflectance="0.05"/>
-  </asset>
   <worldbody>
     <light pos="0 -2 4" dir="0 0 -1"/>
-    <geom type="plane" size="3 3 0.1" material="checker_floor"/>
+    <geom type="plane" size="3 3 0.1" rgba="0.74 0.75 0.77 1"/>
     <body name="roomba" pos="0 0 0.09">
       <freejoint/>
       <geom type="cylinder" size="0.22 0.06" rgba="0.10 0.12 0.15 1"/>
@@ -1910,7 +2211,7 @@ def render_roomba(
     out_dir.mkdir(parents=True, exist_ok=True)
     model = mujoco.MjModel.from_xml_string(_ROOMBA_XML)
     data = mujoco.MjData(model)
-    renderer = mujoco.Renderer(model, height=420, width=520)
+    renderer = mujoco.Renderer(model, height=480, width=480)
     camera = mujoco.MjvCamera()
     camera.type = mujoco.mjtCamera.mjCAMERA_FREE
     camera.lookat[:] = (0.0, 0.0, 0.0)

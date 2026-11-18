@@ -43,6 +43,56 @@ def clamp_speed(speed: float) -> float:
     return float(min(SPD_MAX, max(SPD_MIN, float(speed))))
 
 
+# Real-robot / DROID cap: stretch time so authored ``spd`` never exceeds these.
+# Never speeds motion up. Override with MOTION_MAX_EE_M_S / MOTION_MAX_QDOT_DEG_S.
+_DEFAULT_MAX_EE_M_S = 0.08
+_DEFAULT_MAX_QDOT_DEG_S = 30.0
+
+
+def max_ee_m_s() -> float:
+    try:
+        return max(0.02, float(os.environ.get("MOTION_MAX_EE_M_S", str(_DEFAULT_MAX_EE_M_S))))
+    except ValueError:
+        return _DEFAULT_MAX_EE_M_S
+
+
+def max_qdot_rad_s() -> float:
+    try:
+        deg = float(os.environ.get("MOTION_MAX_QDOT_DEG_S", str(_DEFAULT_MAX_QDOT_DEG_S)))
+    except ValueError:
+        deg = _DEFAULT_MAX_QDOT_DEG_S
+    return math.radians(max(10.0, deg))
+
+
+def stretch_duration(
+    authored_s: float,
+    *,
+    ee_travel_m: float = 0.0,
+    max_abs_dq_rad: float = 0.0,
+) -> tuple[float, str]:
+    """Return ``(duration_s, reason)``. ``reason`` is empty if no stretch.
+
+    Caps Cartesian speed and peak |Δq|/Δt. Used by manipulator GIF + npz.
+    """
+    t = max(0.0, float(authored_s))
+    reasons: list[str] = []
+    ee_cap = max_ee_m_s()
+    q_cap = max_qdot_rad_s()
+    travel = abs(float(ee_travel_m))
+    dq = abs(float(max_abs_dq_rad))
+    if travel > 1e-6:
+        need = travel / ee_cap
+        if need > t + 1e-9:
+            reasons.append(f"EE {travel:.3f}m @{ee_cap:.2f}m/s")
+            t = need
+    if dq > 1e-9:
+        need = dq / q_cap
+        if need > t + 1e-9:
+            reasons.append(f"|Δq| {math.degrees(dq):.1f}° @{math.degrees(q_cap):.0f}°/s")
+            t = need
+    return t, "; ".join(reasons)
+
+
 def frame_bounds(fps: int) -> tuple[int, int]:
     """Deprecated no-op bounds (kept for call-site compat). No clamping."""
     del fps

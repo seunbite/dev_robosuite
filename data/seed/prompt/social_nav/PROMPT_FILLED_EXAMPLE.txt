@@ -1,0 +1,262 @@
+Adapt this Motion Program to the context below.
+
+Keep the cue identity: a viewer must still recognize the same cue.
+You may (1) edit attributes on existing steps (spd, hold, deg, dist, x, y, r, rep, torso, z, …)
+and/or (2) add components before and/or after the current program
+so the motion also conveys what this context requires.
+
+Write for roomba. Use only tokens in the grammar.
+
+[CUE]
+stop_palm_out
+
+[DESCRIPTION OF CUE]
+Raise one hand with open palm facing outward toward the addressee and hold.
+
+[CONTEXT]
+show_to_older_adult — 움직임이 느린 노인에게, 천천히 또렷이 보여져야 하는 상황
+The viewer is an older adult who tracks motion slowly and walks slowly. The robot is not acting elderly. It is showing the same cue in a way they can follow: predictable, no sudden reverse, longer dwell, more standoff so it does not loom.
+
+[RULES]
+spd: 0.55
+hold: 1.8
+amp: 1.1
+rep: 0
+approach: retreat
+height: mid
+channels:
+- base
+- arm
+- head
+pre:
+- orient
+post:
+- hold_long
+forbid:
+- sharp_strike
+- full_spin
+forbid_means:
+  sharp_strike: any step with spd >= 3.0
+  full_spin: path(base, arc) with |deg| >= 300
+# hard constraints
+- No step may carry spd >= 3.0. A sharp strike is wrong here.
+- No path(base, arc, ...) with |deg| >= 300. Full rotations are out.
+
+[CURRENT MOTION CODE]
+path(base, arc, r=0, deg=±15, rep=2, spd=2.0) + path(base, line, x=0.2, spd=2.5) + hold(t=1.5)
+
+[GRAMMAR — roomba]
+roomba:
+  robot: Roomba-style base
+  components:
+  - pose
+  - path
+  - hold
+  coordinate_frame:
+    definition: 'Planar world: +x = forward toward the human viewer, +y = robot left, yaw positive ≈ left
+      turn. No z arm workspace. Never invent arms, grippers, or head joints.
+
+      '
+    axes:
+      x:
+        meaning: forward_back
+        positive: toward_viewer
+      y:
+        meaning: left_right
+        positive: robot_left
+  notes: 'Most cues are path-only (pose facing optional). move(...) discouraged (becomes tiny in-place
+    yaw). Total steps 1–8; hold-only allowed when stillness is the cue. Soft approach; sharp strike.
+
+    '
+  pose:
+    syntax: pose(dir=front|back|left|right)
+    definition: 'Facing only. Use when orientation itself carries meaning; otherwise skip pose and start
+      with path/hold. Almost unused in Human GT (path/hold dominate).
+
+      '
+    facing:
+      dsl_key: dir
+      json_key: dir
+      type: enum
+      required: true
+      definition: 'front = face the viewer; back = face away; left/right = face sideways.
+
+        '
+      values:
+      - front
+      - back
+      - left
+      - right
+      aliases:
+        forward: front
+        facing_person: front
+        orient_to_person: front
+        face_person: front
+  path:
+    syntax: path(base, line|arc, ...)
+    definition: 'Only planar base strokes. line: x forward(+)/back(−), y left(+)/right(−). Typical approach
+      x=+0.15–+0.40; small scoots 0.05–0.15; lateral sway y=±0.05. Oscillation: x=±0.15 with rep, or x=[0.20,-0.15]
+      explicit list. Arc: r turning radius; r=0 = rotate in place (nod/shake/tilt proxies via yaw). deg
+      signed sweep (positive ≈ CCW/left); ±30 or deg=[+22,-22] for oscillatory yaw. Full loops deg=360
+      (or 720 spin emphasis). Figure-eight / flying: prefer linked opposing arcs over identical carousel
+      spins.
+
+      '
+    timing:
+      speed:
+        dsl_key: spd
+        json_key: speed
+        type: float
+        unit: none
+        definition: 'Playback / motion speed multiplier. 0.3 = slow / soft approach; 4.0 = sharp / strike.
+          Vary setup (0.6–1.2), core (1.5–3.5), settle (0.5–1.0). Avoid all beats at 3–4 unless one sharp
+          strike.
+
+          '
+        range:
+          min: 0.3
+          max: 4.0
+          typical_min: 0.5
+          typical_max: 3.5
+        default: 1.0
+        required: false
+      repetition:
+        dsl_key: rep
+        json_key: repetition
+        type: int
+        definition: 'Number of identical repeats of the same joint/axis/range or path stroke (e.g. nod
+          3×, path y ping-pong 4×). Asymmetric rhythms (move–pause–move–move) must use separate steps
+          — do not fake them with a high rep + high speed.
+
+          '
+        range:
+          min: 1
+          max: 8
+          typical_min: 1
+          typical_max: 4
+        default: 1
+        required: false
+      hold_time:
+        dsl_key: hold
+        json_key: hold_time
+        type: float
+        unit: seconds
+        definition: 'Pause after the beat so the viewer sees move → hold → move. Typical readable holds
+          0.15–1.5s; multi-beat cues (beckon, rub, pat) often need ≥0.25s between beats. Static emblem
+          freezes often use 1.2–1.5s.
+
+          '
+        range:
+          min: 0.0
+          max: 2.5
+          typical_min: 0.1
+          typical_max: 1.5
+        default: 0.0
+        required: false
+    mode:
+      type: enum
+      values:
+      - base
+      required: true
+      default: base
+    shape:
+      type: enum
+      values:
+      - line
+      - arc
+      required: true
+    x:
+      type: range
+      unit: meters
+      forms:
+      - scalar
+      - ±
+      - '[lo,hi]'
+      definition: Forward (+) / back (−) meters.
+      range:
+        min: -0.5
+        max: 0.5
+        typical_min: -0.15
+        typical_max: 0.4
+    y:
+      type: range
+      unit: meters
+      forms:
+      - scalar
+      - ±
+      - '[lo,hi]'
+      definition: Left (+) / right (−) meters (lateral sway).
+      range:
+        min: -0.2
+        max: 0.2
+        typical_min: -0.05
+        typical_max: 0.05
+    radius:
+      dsl_key: r
+      type: float
+      unit: meters
+      definition: Turning radius; 0 = in-place rotate.
+      range:
+        min: 0.0
+        max: 1.0
+        typical_min: 0.0
+        typical_max: 0.8
+    degrees:
+      dsl_key: deg
+      type: range
+      unit: degrees
+      forms:
+      - scalar
+      - ±
+      - '[lo,hi]'
+      definition: Signed yaw sweep; 360/720 for full spins.
+      range:
+        min: -720
+        max: 720
+        typical_min: -180
+        typical_max: 360
+    speed:
+      dsl_key: spd
+      json_key: speed
+      type: float
+      definition: '0.3 = slow / soft approach; 4.0 = sharp. Soft approach; sharp strike. Occasional >4.0
+        only for extreme spin emphasis.
+
+        '
+      range:
+        min: 0.3
+        max: 4.5
+        typical_min: 0.3
+        typical_max: 4.0
+      notes: Human GT uses up to spd=4.5 on roomba spin cues.
+  hold:
+    syntax: hold(t=...)
+    definition: 'Freeze so the viewer sees stroke → pause → stroke. Pure hold(t=…) alone is allowed for
+      stillness emblems (embarrassed pause, tree, facepalm proxy). Parser rewrites hold → zero-x base
+      line with hold_time.
+
+      '
+    duration:
+      dsl_key: t
+      type: float
+      unit: seconds
+      required: true
+      definition: Freeze duration 0.3–2.5s typical.
+      range:
+        min: 0.3
+        max: 2.5
+        typical_min: 0.5
+        typical_max: 2.0
+  move:
+    definition: 'Discouraged on roomba. If emitted, becomes a tiny in-place yaw wiggle only.
+
+      '
+    unsupported: true
+
+[OUTPUT]
+JSON only. No markdown fences.
+{
+  "motion_code": "<one line, steps joined by + or &>",
+  "identity_beat": "<the step that still carries the cue>",
+  "changes": ["<what you changed or added, and why>"]
+}

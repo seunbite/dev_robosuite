@@ -237,8 +237,9 @@ def _arc_joints_analytic(
         j["wrist_pitch"] = seed["wrist_pitch"] + 0.15 * s
     else:  # yz — signed bowl-ish: lateral yaw + vertical lift (sin)
         # Matches EE arc convention: −sweep dips down (bowl ∪), +sweep rises.
-        amp_yaw = 0.40 + 1.8 * r
-        amp_lift = 0.10 + 0.9 * r
+        # Scale with r (no large lift floor) so rub_eye r≈0.02 stays a small circle.
+        amp_yaw = 0.12 + 4.0 * r
+        amp_lift = max(0.02, 2.2 * r)
         j["wrist_yaw"] = seed["wrist_yaw"] + amp_yaw * (c - 1.0)
         j["lift"] = seed["lift"] + amp_lift * s
     return _clamp_joints(j)
@@ -529,8 +530,12 @@ def _stretch_states(
                     n = _path_n(
                         oscillating=False, sweep_deg=total, radius_m=radius
                     )
+                    # Match Roomba: short high-spd in-place turns can round to n=0/1
+                    # under FRAME_SCALE and vanish from the GIF / trajectory.
+                    if abs(total) > 1e-6 and force_n is None:
+                        n = max(n, 4)
                     for i in range(n):
-                        t = i / max(n - 1, 1)
+                        t = i / max(n - 1, 1) if n > 1 else 1.0
                         theta = math.radians(total * t)
                         yaw = yaw0 + theta
                         if radius > 1e-5:
@@ -778,7 +783,7 @@ def render_stretch(
     out_dir.mkdir(parents=True, exist_ok=True)
     model = mujoco.MjModel.from_xml_path(str(_STRETCH_SCENE))
     data = mujoco.MjData(model)
-    renderer = mujoco.Renderer(model, height=480, width=560)
+    renderer = mujoco.Renderer(model, height=480, width=480)
     camera = mujoco.MjvCamera()
     camera.type = mujoco.mjtCamera.mjCAMERA_FREE
     camera.lookat[:] = (0.15, 0.0, 0.65)

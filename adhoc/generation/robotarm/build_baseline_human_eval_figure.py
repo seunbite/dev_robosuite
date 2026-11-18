@@ -162,48 +162,48 @@ def main() -> None:
     }
     OUT.mkdir(parents=True, exist_ok=True)
     stem = OUT / "cueid_human_cue_identification_with_traj_baselines"
-    stem.with_suffix(".json").write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    try:
+        stem.with_suffix(".json").write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+    except OSError as exc:
+        # Paper-only regenerations may lack write access under data/results.
+        print(f"skip json write ({exc})")
 
-    # Full-width paper panel: preserve the plotting height and add a separate
-    # strip above it for the legend.  Do not compress the axes to make room.
-    fig, ax = plt.subplots(figsize=(9.8, 3.98))
+    # Joint gray, Cartesian white, Selective Cartesian white+hatch,
+    # Symbolic (LLM) blue, Symbolic (Human) black.
+    fig, ax = plt.subplots(figsize=(9.8, 2.85))
     x = list(range(len(DISPLAY)))
-    ax.plot(x, human_authored, color="#202020", marker="o", linestyle="-", linewidth=2.0,
-            markersize=7, label="Human-authored")
-    for xi, value in zip(x, human_authored):
-        ax.text(xi, value + 2.2, f"{value:.1f}", ha="center", va="bottom",
-                fontsize=10.5, color="#202020")
-    width = 0.18
-    # Match Figure 3's paper vocabulary: black / white / dashed / blue.
-    bar_groups = (
-        (
-            ax.bar([v - 1.5 * width for v in x], xyzrpy, width, color="#202020", edgecolor="#202020",
-                   linewidth=1.3, label="Cartesian-Space"),
-            xyzrpy,
-            "white",
-        ),
-        (
-            ax.bar([v - 0.5 * width for v in x], joint, width, color="white", edgecolor="#202020",
-                   linewidth=1.3, label="Joint-Space"),
-            joint,
-            "#202020",
-        ),
-        (
-            ax.bar([v + 0.5 * width for v in x], ours, width, color="white", edgecolor="#202020",
-                   linewidth=1.3, hatch="//", label="Motion Program"),
-            ours,
-            "#202020",
-        ),
-        (
-            ax.bar([v + 1.5 * width for v in x], trajectory, width, color="#1F6FEB", edgecolor="#1F6FEB",
-                   linewidth=1.3, label="Trajectory Sketching"),
-            trajectory,
-            "white",
-        ),
+    width = 0.15
+    joint_bars = ax.bar(
+        [v - 2.0 * width for v in x], joint, width,
+        color="#b0b0b0", edgecolor="#202020", linewidth=1.15, label="Joint",
     )
-    for bars, values, text_color in bar_groups:
+    cart_bars = ax.bar(
+        [v - 1.0 * width for v in x], xyzrpy, width,
+        color="white", edgecolor="#202020", linewidth=1.15, label="Cartesian",
+    )
+    sel_bars = ax.bar(
+        [v + 0.0 * width for v in x], trajectory, width,
+        color="white", edgecolor="#202020", linewidth=1.15, hatch="///",
+        label="Selective Cartesian",
+    )
+    llm_bars = ax.bar(
+        [v + 1.0 * width for v in x], ours, width,
+        color="#1F6FEB", edgecolor="#1F6FEB", linewidth=1.15, label="Symbolic (LLM)",
+    )
+    hum_bars = ax.bar(
+        [v + 2.0 * width for v in x], human_authored, width,
+        color="#111111", edgecolor="#111111", linewidth=1.15, label="Symbolic (Human)",
+    )
+    labeled = (
+        (joint_bars, joint, "#202020"),
+        (cart_bars, xyzrpy, "#202020"),
+        (sel_bars, trajectory, "#202020"),
+        (llm_bars, ours, "white"),
+        (hum_bars, human_authored, "white"),
+    )
+    for bars, values, text_color in labeled:
         for bar, value in zip(bars, values):
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
@@ -213,13 +213,23 @@ def main() -> None:
                 va="top",
                 rotation=90,
                 fontsize=10.5,
-                fontweight="normal",
                 color=text_color,
             )
+    for bar, hum, llm in zip(llm_bars, human_authored, ours):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1.4,
+            f"+{hum - llm:.1f}",
+            ha="center",
+            va="bottom",
+            fontsize=9.0,
+            fontweight="bold",
+            color="#1F6FEB",
+        )
     ax.set_ylabel("Accuracy (%)", fontsize=10.5)
     ax.set_xticks(x, DISPLAY, fontsize=10.5)
     # The top margin leaves a small but unambiguous gap above the 100% labels.
-    ax.set_ylim(0, 106)
+    ax.set_ylim(0, 108)
     ax.set_yticks(range(0, 101, 20))
     ax.tick_params(axis="both", labelsize=10.5, width=1.0, length=5)
     ax.spines[["top", "right"]].set_visible(False)
@@ -240,9 +250,17 @@ def main() -> None:
         columnspacing=0.9,
         labelspacing=0.45,
     )
-    fig.subplots_adjust(left=0.075, right=0.995, bottom=0.16, top=0.77)
-    fig.savefig(stem.with_suffix(".png"), dpi=180, bbox_inches="tight", pad_inches=0.03)
-    fig.savefig(stem.with_suffix(".pdf"), bbox_inches="tight", pad_inches=0.03)
+    fig.subplots_adjust(left=0.075, right=0.995, bottom=0.18, top=0.72)
+    for path in (
+        stem.with_suffix(".png"),
+        stem.with_suffix(".pdf"),
+        REPO / "papers/icra2027_motion_abstraction/figures/figure1_human_eval.png",
+    ):
+        try:
+            fig.savefig(path, dpi=180, bbox_inches="tight", pad_inches=0.03)
+            print(path)
+        except OSError as exc:
+            print(f"skip save {path} ({exc})")
     plt.close(fig)
 
     # Keep Figures 1 and 4 on the same requested embodiment order. Their

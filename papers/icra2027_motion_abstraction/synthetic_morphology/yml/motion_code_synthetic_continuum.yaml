@@ -1,0 +1,1006 @@
+# Motion Code attribute schemas for Oddkin continuum morphologies.
+# Mirrors data/seed/yml/motion_code_embodiment.yaml conventions.
+# Geometry: yml/continuum_params.yaml · XML: ../xml/gcr_alpha{0,05,1}.xml
+#
+# Design rules
+#   1. Independently actuated channels are separate attributes / joint tokens
+#      (long vs short pincer, left paddle vs right claw, collar vs torso, …).
+#   2. pose  = opening silhouette (facing / height / EE dirs / palm|grip).
+#   3. move  = joint-space beats on those channels.
+#   4. path  = Cartesian strokes for base / EEs; in-place spinners use arc r=0
+#      (collar, crown, sat_ring, torso yaw-in-place).
+#   5. As α grows, unlock torso height → asymmetric branches → Y-arms + head.
+
+meta:
+  version: "0.2-oddkin"
+  family: oddkin
+  join: "+"
+  components_order: [pose, move, path, hold]
+  step_order:
+    json_key: order
+    type: enum
+    values: [sequential, together]
+    default: sequential
+    value_definitions:
+      sequential: "Play this step, then the next."
+      together: "Play this step concurrently with the immediately following step."
+  timing_shared: &timing_shared
+    speed:
+      dsl_key: spd
+      json_key: speed
+      type: float
+      unit: none
+      definition: >
+        Playback speed multiplier. 0.3 = soft; 4.0 = sharp strike.
+      range: {min: 0.3, max: 4.0, typical_min: 0.5, typical_max: 3.5}
+      default: 1.0
+      required: false
+    repetition:
+      dsl_key: rep
+      json_key: repetition
+      type: int
+      definition: "Identical repeats of the same beat."
+      range: {min: 1, max: 8, typical_min: 1, typical_max: 4}
+      default: 1
+      required: false
+    hold_time:
+      dsl_key: hold
+      json_key: hold_time
+      type: float
+      unit: seconds
+      definition: "Pause after the beat (move → hold → move)."
+      range: {min: 0.0, max: 2.5, typical_min: 0.1, typical_max: 1.5}
+      default: 0.0
+      required: false
+
+  coordinate_frame_world: &coord_world
+    definition: >
+      +x = forward toward the human viewer,
+      +y = robot left,
+      +z = up.
+    axes:
+      x: {meaning: depth_forward_back, positive: toward_viewer}
+      y: {meaning: lateral_left_right, positive: robot_left}
+      z: {meaning: height_up_down, positive: up}
+
+  continuum_note: >
+    Rematerialize cues onto the richest available Oddkin channel.
+    nod → α0 path(base,arc,r=0) or move(crown); α0.5 move(torso,pitch);
+    α1 move(head,tilt). Do not invent joints the XML does not expose.
+
+# ===========================================================================
+# α = 0.0 — Trileg Crown (radial arthropod)
+# Channels: base_xy/yaw · hip{0,1,2}/knee{0,1,2} · crown_spin
+# ===========================================================================
+gcr_alpha0:
+  robot: "Oddkin α=0 Trileg Crown"
+  alpha: 0.0
+  xml: ../xml/gcr_alpha0.xml
+  components: [pose, move, path, hold]
+  coordinate_frame: *coord_world
+  actuated_joints: [hip0, knee0, hip1, knee1, hip2, knee2, crown_spin]
+  dof: {base: 3, legs: 6, crown: 1, gesture: 10}
+  notes: >
+    No torso mast, no arms, no head. Facing is base yaw. Legs are three
+    independent radial chains (do not bundle them unless cue is symmetric).
+    Crown is a dorsal spinner — path(crown, arc, r=0) or move(crown, yaw).
+
+  pose:
+    syntax: "pose(dir=..., leg0=..., leg1=..., leg2=..., crown=...)"
+    definition: >
+      Opening facing + optional per-leg stance presets + crown angle class.
+      Omit leg_* for neutral radial rest.
+
+    facing:
+      dsl_key: dir
+      json_key: facing
+      type: enum
+      required: false
+      default: front
+      definition: >
+        Body facing via base yaw (where the nose/marker looks).
+      values: [front, back, left, right]
+      value_definitions:
+        front: "nose toward viewer (+x)."
+        back: "nose away (−x)."
+        left: "nose to robot left (+y)."
+        right: "nose to robot right (−y)."
+
+    leg0:
+      dsl_key: leg0
+      json_key: leg0
+      type: enum
+      required: false
+      default: rest
+      definition: >
+        Front-radial leg (hip0/knee0) stance. Independent of leg1/leg2.
+      values: [rest, raise, plant, present]
+      value_definitions:
+        rest: "neutral crawl stance."
+        raise: "hip/knee lifted (wave / present)."
+        plant: "locked low for stance."
+        present: "extended toward viewer as an invite cue."
+
+    leg1:
+      dsl_key: leg1
+      json_key: leg1
+      type: enum
+      required: false
+      default: rest
+      definition: "120° radial leg (hip1/knee1). Same values as leg0."
+      values: [rest, raise, plant, present]
+
+    leg2:
+      dsl_key: leg2
+      json_key: leg2
+      type: enum
+      required: false
+      default: rest
+      definition: "240° radial leg (hip2/knee2). Same values as leg0."
+      values: [rest, raise, plant, present]
+
+    crown:
+      dsl_key: crown
+      json_key: crown
+      type: enum
+      required: false
+      default: still
+      definition: "Dorsal crown opening angle class (absolute spin pose, not a beat)."
+      values: [still, quarter, half, full]
+      value_definitions:
+        still: "crown at home."
+        quarter: "~90° from home."
+        half: "~180°."
+        full: "~360° / wrapped."
+
+    unsupported: [grip, head, torso, elbow, x, y, z, left_arm, long_arm, short_arm, paddle, claw]
+
+  move:
+    syntax: "move(joint, axis, degrees, rep=..., spd=..., hold=...)"
+    definition: >
+      Joint-space beat. Each leg joint is addressable alone; use hip/knee
+      groups only when the cue is intentionally symmetric.
+
+    joint:
+      dsl_key: null
+      type: enum
+      required: true
+      values: [hip0, knee0, hip1, knee1, hip2, knee2, crown, base]
+      axis_by_joint:
+        hip0: [yaw]
+        hip1: [yaw]
+        hip2: [yaw]
+        knee0: [pitch]
+        knee1: [pitch]
+        knee2: [pitch]
+        crown: [yaw]
+        base: [yaw]
+      notes: >
+        Prefer path(base, …) for translational locomotion; move(base, yaw)
+        is whole-body shake with legs planted.
+
+    axis:
+      dsl_key: null
+      type: enum
+      required: true
+      values: [yaw, pitch]
+
+    degrees:
+      dsl_key: null
+      json_key: degrees
+      type: range
+      unit: degrees
+      required: true
+      forms: [scalar, "±", "[lo,hi]"]
+      range: {min: -180, max: 180, typical_min: -45, typical_max: 45}
+      examples:
+        - "move(hip0, yaw, ±30, rep=2, spd=2.0)"
+        - "move(crown, yaw, 360, spd=1.5)"
+        - "move(base, yaw, ±25, rep=3, spd=2.0)"
+
+    spd:
+      dsl_key: spd
+      json_key: speed
+      type: float
+      range: {min: 0.3, max: 4.0}
+      default: 1.0
+    rep:
+      dsl_key: rep
+      json_key: repetition
+      type: int
+      range: {min: 1, max: 8}
+      default: 1
+    hold:
+      dsl_key: hold
+      json_key: hold_time
+      type: float
+      unit: seconds
+      range: {min: 0.0, max: 2.5}
+      default: 0.0
+
+  path:
+    syntax: "path(base|crown, line|arc, ...)"
+    definition: >
+      base = planar locomotion / in-place yaw arcs.
+      crown = dorsal spinner; arc with r=0 only (in-place spin).
+    timing: *timing_shared
+
+    mode:
+      dsl_key: null
+      json_key: mode
+      type: enum
+      required: true
+      values: [base, crown]
+
+    shape:
+      dsl_key: null
+      json_key: shape
+      type: enum
+      required: true
+      values: [line, arc]
+
+    x:
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Forward (+) / back (−) base translation."
+      range: {min: -0.50, max: 0.50, typical_min: -0.20, typical_max: 0.30}
+      applies_when: {shape: line, mode: base}
+
+    y:
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Lateral base translation (+ = robot left)."
+      range: {min: -0.40, max: 0.40, typical_min: -0.20, typical_max: 0.20}
+      applies_when: {shape: line, mode: base}
+
+    radius:
+      dsl_key: r
+      json_key: radius
+      type: float
+      unit: meters
+      definition: >
+        Arc radius. crown: MUST be 0 (in-place spin).
+        base: 0 = spin-in-place yaw; >0 = curved travel.
+      range: {min: 0.0, max: 0.50}
+      applies_when: {shape: arc}
+      constraints:
+        crown: {r: 0}
+        base_spin_in_place: {r: 0}
+
+    sweep:
+      dsl_key: deg
+      json_key: sweep
+      aliases: {degrees: sweep, sweep: sweep}
+      type: range
+      unit: degrees
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Signed arc sweep. ±N = ping-pong; 360 = full turn."
+      range: {min: -720, max: 720, typical_min: -180, typical_max: 360}
+      applies_when: {shape: arc}
+
+    unsupported_modes: [ee, torso, collar]
+
+  hold:
+    syntax: "hold(t=...)"
+    duration:
+      dsl_key: t
+      json_key: hold_time
+      type: float
+      unit: seconds
+      required: true
+      range: {min: 0.15, max: 2.5, typical_min: 1.0, typical_max: 1.5}
+
+  example_programs:
+    nod_yes: "path(base, arc, r=0, deg=±12, rep=3, spd=1.5)"
+    shake_head_no: "move(base, yaw, ±25, rep=3, spd=2.0)"
+    leg_wave: "move(hip0, yaw, ±30, rep=2, spd=2.0) + move(knee0, pitch, [-20,0], rep=2)"
+    crown_spin: "path(crown, arc, r=0, deg=360, spd=1.5)"
+    crawl_advance: "path(base, line, x=0.28, spd=1.0) + move(hip0, yaw, ±20, rep=2)"
+    highfive_invite: "path(base, arc, r=0, deg=360, spd=2.5) + path(base, line, x=0.20, spd=1.2, hold=1.0) + pose(leg0=present)"
+
+# ===========================================================================
+# α = 0.5 — Canted Spine Crab (asymmetric branches)
+# Channels: base · canted spine (height+twist) · collar · long_pincer · short_pincer · antenna · flaps
+# ===========================================================================
+gcr_alpha05:
+  robot: "Oddkin α=0.5 Canted Spine Crab"
+  alpha: 0.5
+  xml: ../xml/gcr_alpha05.xml
+  components: [pose, move, path, hold]
+  coordinate_frame: *coord_world
+  actuated_joints: [flap_l, flap_r, v1_pitch, v1_yaw, v2_pitch, v2_twist, collar_spin, v3_pitch, pin_r0, pin_r1, pin_r2, pin_l0, pin_l1, antenna]
+  dof: {base: 3, spine: 5, collar: 1, long_pincer: 3, short_pincer: 2, antenna: 1, flaps: 2, gesture: 17}
+  notes: >
+    Long (right) and short (left) pincers are independent — never require them
+    to move together. Collar is independent of both. Short pincer workspace is
+    coarse (front/back/up/down); long pincer adds out/in. Torso height uses
+    stacked pitch (−pitch = high / upright on this canted spine).
+
+  pose:
+    syntax: "pose(dir=..., torso=..., long=..., short=..., long_grip=..., antenna=...)"
+    definition: >
+      Facing/twist + spine height + independent branch EE dirs.
+      long_* and short_* are separate; omit either to leave that branch at rest.
+
+    facing:
+      dsl_key: dir
+      json_key: torso_facing
+      type: enum
+      required: false
+      default: front
+      definition: >
+        Where the upper spine / marker plate faces (v1_yaw + v2_twist), relative
+        to the base. Distinct from base locomotion heading.
+      values: [front, back, left, right]
+      value_definitions:
+        front: "chest/marker toward viewer."
+        back: "chest/marker away."
+        left: "twisted toward robot left."
+        right: "twisted toward robot right."
+
+    torso_height:
+      dsl_key: torso
+      json_key: torso_height
+      type: enum
+      required: false
+      default: mid
+      definition: >
+        Canted-spine height preset via stacked v*_pitch.
+        On this body +pitch folds low; −pitch stands high.
+      values: [low, mid, high]
+      aliases: {tall: high}
+      value_definitions:
+        low: "spine folded toward ground."
+        mid: "neutral canted silhouette."
+        high: "spine extended upright."
+      maps_to_joints: [v1_pitch, v2_pitch, v3_pitch]
+
+    long_arm:
+      dsl_key: long
+      json_key: long_arm
+      type: enum
+      required: false
+      default: still
+      definition: >
+        Long right pincer EE direction (pin_r*). Independent of short.
+        Richer than short: includes lateral out/in.
+      values: [still, front, back, up, down, out, in]
+      value_definitions:
+        still: "rest beside torso."
+        front: "reach toward viewer (+x)."
+        back: "reach rearward (−x)."
+        up: "raise tip (+z)."
+        down: "lower tip (−z)."
+        out: "reach outward to robot right (−y)."
+        in: "reach across midline (+y)."
+
+    short_arm:
+      dsl_key: short
+      json_key: short_arm
+      type: enum
+      required: false
+      default: still
+      definition: >
+        Short left stub EE direction (pin_l*). Coarse 4-way + still only —
+        workspace is too small for out/in / palm compounds.
+      values: [still, front, back, up, down]
+      value_definitions:
+        still: "stub at rest."
+        front: "stub tip toward viewer."
+        back: "stub tip rearward."
+        up: "stub tip raised."
+        down: "stub tip lowered."
+
+    long_gripper:
+      dsl_key: long_grip
+      json_key: long_gripper
+      type: enum
+      required: false
+      default: open
+      definition: >
+        Long-pincer tip aperture / facing class (pin_r2). Keep simple —
+        this tip is a flat claw plate, not a full palm.
+      values: [open, close, edge, flat]
+      value_definitions:
+        open: "tip plate open / presenting."
+        close: "tip pinched shut."
+        edge: "plate edge toward viewer."
+        flat: "plate face toward viewer."
+
+    antenna:
+      dsl_key: antenna
+      json_key: antenna
+      type: enum
+      required: false
+      default: up
+      definition: "Antenna opening pose."
+      values: [up, forward, back, down]
+
+    unsupported: [head, grip, left_arm, elbow, paddle, claw, x, y, z]
+
+  move:
+    syntax: "move(joint, axis, degrees, rep=..., spd=..., hold=...)"
+    definition: >
+      Joint beats. Address long_pincer and short_pincer separately.
+      collar and torso yaw beats are in-place (prefer path r=0 for full spins).
+
+    joint:
+      dsl_key: null
+      type: enum
+      required: true
+      values:
+        - torso
+        - long_pincer
+        - short_pincer
+        - collar
+        - antenna
+        - flap_l
+        - flap_r
+        - base
+      axis_by_joint:
+        torso: [pitch, yaw, twist, height]
+        long_pincer: [yaw, pitch, tip]
+        short_pincer: [yaw, pitch]
+        collar: [yaw]
+        antenna: [roll]
+        flap_l: [roll]
+        flap_r: [roll]
+        base: [yaw]
+      notes: >
+        torso/height accepts categorical low|mid|high as degrees arg.
+        long_pincer/tip ≈ pin_r2; short has no tip axis.
+
+    axis:
+      dsl_key: null
+      type: enum
+      required: true
+      values: [pitch, yaw, twist, height, tip, roll]
+
+    degrees:
+      dsl_key: null
+      json_key: degrees
+      type: range
+      unit: degrees
+      required: true
+      forms: [scalar, "±", "[lo,hi]", categorical_height]
+      range: {min: -180, max: 180, typical_min: -40, typical_max: 40}
+      examples:
+        - "move(torso, pitch, ±15, rep=3, spd=1.5)   # nod rematerialize"
+        - "move(torso, height, high, spd=1.0)"
+        - "move(long_pincer, yaw, ±35, rep=2, spd=2.0)"
+        - "move(short_pincer, pitch, ±20, rep=2, spd=2.0)"
+        - "move(collar, yaw, 360, spd=1.2)"
+        - "move(antenna, roll, ±25, rep=2)"
+
+    spd:
+      dsl_key: spd
+      json_key: speed
+      type: float
+      range: {min: 0.3, max: 4.0}
+      default: 1.0
+    rep:
+      dsl_key: rep
+      json_key: repetition
+      type: int
+      range: {min: 1, max: 8}
+      default: 1
+    hold:
+      dsl_key: hold
+      json_key: hold_time
+      type: float
+      unit: seconds
+      range: {min: 0.0, max: 2.5}
+      default: 0.0
+
+  path:
+    syntax: "path(base|ee_long|ee_short|collar|torso, line|arc, ...)"
+    definition: >
+      base = locomotion. ee_long / ee_short = independent tip strokes.
+      collar and torso = in-place spinners / twists → arc with r=0 only.
+    timing: *timing_shared
+
+    mode:
+      dsl_key: null
+      json_key: mode
+      type: enum
+      required: true
+      values: [base, ee_long, ee_short, collar, torso]
+      notes: >
+        ee_long and ee_short must not be collapsed into a single ee token —
+        the branches are asymmetric and independently pathable.
+
+    shape:
+      dsl_key: null
+      json_key: shape
+      type: enum
+      required: true
+      values: [line, arc]
+
+    x:
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      range: {min: -0.50, max: 0.50}
+      applies_when: {shape: line, mode: base}
+
+    y:
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      range: {min: -0.40, max: 0.40}
+      applies_when: {shape: line, mode: base}
+
+    axis:
+      dsl_key: axis
+      json_key: axis
+      type: enum
+      values: [x, y, z]
+      definition: "EE line translation axis."
+      applies_when: {shape: line, mode: [ee_long, ee_short]}
+
+    distance:
+      dsl_key: dist
+      json_key: distance
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Signed EE line stroke. Keep short_pincer strokes small (≤0.08 m)."
+      range: {min: -0.30, max: 0.30, typical_min: -0.15, typical_max: 0.15}
+      applies_when: {shape: line, mode: [ee_long, ee_short]}
+      constraints:
+        ee_short: {typical_max_abs: 0.08}
+        ee_long: {typical_max_abs: 0.20}
+
+    plane:
+      dsl_key: plane
+      json_key: plane
+      type: enum
+      values: [xy, xz, yz]
+      applies_when: {shape: arc, mode: [ee_long, ee_short]}
+
+    radius:
+      dsl_key: r
+      json_key: radius
+      type: float
+      unit: meters
+      definition: >
+        Arc radius. collar and torso: MUST be 0 (in-place spin / twist).
+        base: 0 = spin-in-place; >0 = curved travel.
+        ee_*: small arcs only on short (≤0.06); long up to ~0.15.
+      range: {min: 0.0, max: 0.40}
+      applies_when: {shape: arc}
+      constraints:
+        collar: {r: 0}
+        torso: {r: 0}
+
+    sweep:
+      dsl_key: deg
+      json_key: sweep
+      aliases: {degrees: sweep}
+      type: range
+      unit: degrees
+      forms: [scalar, "±", "[lo,hi]"]
+      range: {min: -720, max: 720, typical_min: -180, typical_max: 360}
+      applies_when: {shape: arc}
+
+  hold:
+    syntax: "hold(t=...)"
+    duration:
+      dsl_key: t
+      json_key: hold_time
+      type: float
+      unit: seconds
+      required: true
+      range: {min: 0.15, max: 2.5}
+
+  example_programs:
+    nod_yes: "pose(torso=mid) + move(torso, pitch, ±12, rep=3, spd=1.5)"
+    shrug_idk: "pose(dir=front, torso=mid, long=out, short=out) + move(torso, height, high, spd=2.0, hold=0.4) + move(long_pincer, yaw, [+20,-20], spd=1.5, hold=0.3) + move(short_pincer, yaw, [-20,+20], spd=1.5) + move(torso, height, mid, spd=1.5)"
+    hands_up_surrender: "pose(dir=front, torso=mid, long=up, short=up) + pose(torso=high, long=up, short=up) + path(base, line, x=-0.15, spd=0.4) + hold(t=1.5)"
+    long_only_wag: "move(long_pincer, yaw, ±35, rep=2, spd=2.0)"
+    short_only_wag: "move(short_pincer, pitch, ±20, rep=2, spd=2.0)"
+    collar_spin: "path(collar, arc, r=0, deg=360, spd=1.2)"
+    torso_twist_in_place: "path(torso, arc, r=0, deg=±40, rep=2, spd=1.5)"
+
+# ===========================================================================
+# α = 1.0 — Branching Gesture Tree (Y-spine + claws)
+# Channels: base · trunk · sat_ring · left_paddle · right_claw · neck/head
+# ===========================================================================
+gcr_alpha1:
+  robot: "Oddkin α=1.0 Branching Gesture Tree"
+  alpha: 1.0
+  xml: ../xml/gcr_alpha1.xml
+  components: [pose, move, path, hold]
+  coordinate_frame: *coord_world
+  actuated_joints: [trunk1_yaw, trunk1_pitch, trunk2_yaw, trunk2_pitch, sat_spin, trunk3_pitch, trunk3_roll, bl0, bl1, bl2, br0, br1, br2, br3, claw0, claw1, claw2, neck_yaw, neck_pitch, head_roll]
+  dof: {base: 3, trunk: 6, sat: 1, left_paddle: 3, right_claw: 4, claw_fingers: 3, head: 3, gesture: 23}
+  notes: >
+    Left paddle and right claw are heterogeneous and independent (like
+    humanoid right vs left_arm). Paddle supports palm-orientation compounds;
+    claw supports open/close grip. Head is first-class. sat_ring is an
+    in-place spinner (path r=0). Trunk twist facing is separate from head gaze.
+
+  pose:
+    syntax: "pose(dir=..., torso=..., paddle=..., claw=..., grip=..., palm=..., head=..., elbow_p=..., elbow_c=..., x=..., y=..., z=...)"
+    definition: >
+      Facing/twist + trunk height + independent paddle/claw EE dirs + claw grip
+      + paddle palm + head gaze + optional EE percentiles on the primary (claw) arm.
+
+    facing:
+      dsl_key: dir
+      json_key: torso_facing
+      type: enum
+      required: false
+      default: front
+      definition: >
+        Trunk twist / chest facing (trunk*_yaw), where the body looks.
+        Distinct from head gaze.
+      values: [front, back, left, right]
+      value_definitions:
+        front: "chest toward viewer (+x)."
+        back: "chest away (−x)."
+        left: "trunk yawed left (+y)."
+        right: "trunk yawed right (−y)."
+
+    torso_height:
+      dsl_key: torso
+      json_key: torso_height
+      type: enum
+      required: false
+      default: mid
+      definition: "Trunk vertical extension via trunk*_pitch stack."
+      values: [low, mid, high]
+      aliases: {tall: high}
+      value_definitions:
+        low: "trunk folded toward viewer (+pitch); lowered silhouette."
+        mid: "neutral upright."
+        high: "trunk fully upright (tallest stack; pitch≈0)."
+
+    paddle_arm:
+      dsl_key: paddle
+      json_key: paddle_arm
+      type: enum
+      required: false
+      default: still
+      definition: >
+        Left paddle-branch EE direction (bl*). Independent of claw.
+        Full 6-way reach like a humanoid arm dir.
+      values: [still, front, back, in, out, up, down]
+      value_definitions:
+        still: "paddle lowered beside trunk (rest / not raised)."
+        front: "paddle toward viewer."
+        back: "paddle rearward."
+        in: "paddle toward midline."
+        out: "paddle outward to robot left."
+        up: "paddle overhead."
+        down: "paddle downward past still."
+
+    claw_arm:
+      dsl_key: claw
+      json_key: claw_arm
+      type: enum
+      required: false
+      default: still
+      definition: >
+        Right claw-branch EE direction (br*). Independent of paddle.
+        Same vocabulary as paddle. still = lowered at side, NOT raised.
+      values: [still, front, back, in, out, up, down]
+      value_definitions:
+        still: "claw lowered beside trunk (rest)."
+        front: "claw toward viewer."
+        back: "claw rearward."
+        in: "claw toward midline / near head."
+        out: "claw outward to robot right."
+        up: "claw overhead."
+        down: "claw downward past still."
+
+    gripper_orientation:
+      dsl_key: grip
+      json_key: gripper_orientation
+      type: enum
+      required: false
+      default: open
+      definition: >
+        Right claw-cluster aperture (claw0/1/2). Use for open/close emblems.
+      values: [open, close, pinch, spread]
+      value_definitions:
+        open: "fingers spread / presenting."
+        close: "cluster closed."
+        pinch: "two-finger pinch."
+        spread: "max three-finger splay."
+
+    paddle_palm:
+      dsl_key: palm
+      json_key: paddle_palm
+      type: enum
+      required: false
+      default: flat
+      definition: >
+        Left paddle face orientation (bl2 roll). Richer than α0.5 short stub —
+        palm facing is semantically load-bearing (stop, wave, invite).
+      values:
+        - flat
+        - edge
+        - palmfront
+        - palmback
+        - palmup
+        - palmdown
+        - palmin
+        - palmout
+      aliases:
+        horiz: flat
+        vert: edge
+      value_definitions:
+        flat: "paddle face roughly parallel to ground / neutral."
+        edge: "paddle edge toward viewer (knife-hand)."
+        palmfront: "paddle face toward viewer (stop / high-five)."
+        palmback: "paddle face toward self."
+        palmup: "paddle face up (invite)."
+        palmdown: "paddle face down (press)."
+        palmin: "paddle face toward midline."
+        palmout: "paddle face outward."
+
+    head:
+      dsl_key: head
+      json_key: head
+      type: enum
+      required: false
+      default: center
+      definition: "Head gaze preset (neck_yaw / neck_pitch / head_roll)."
+      values: [center, left, right, up, down]
+      value_definitions:
+        center: "look forward (+x)."
+        left: "pan left."
+        right: "pan right."
+        up: "tilt up."
+        down: "tilt down."
+
+    elbow_paddle:
+      dsl_key: elbow_p
+      json_key: elbow_paddle
+      type: bool
+      required: false
+      definition: "Whether left paddle elbow (bl1) is flexed."
+      values: [true, false]
+      dsl_literals: [T, F, true, false]
+      aliases: {T: true, F: false}
+
+    elbow_claw:
+      dsl_key: elbow_c
+      json_key: elbow_claw
+      type: bool
+      required: false
+      definition: "Whether right claw elbow (br1/br2) is flexed."
+      values: [true, false]
+      dsl_literals: [T, F, true, false]
+      aliases: {T: true, F: false}
+
+    ee_percentile_x:
+      dsl_key: x
+      json_key: x
+      type: float
+      unit: percentile
+      required: false
+      definition: >
+        Primary (claw) EE depth 0–100: 0 = back, 100 = furthest toward viewer.
+      range: {min: 0, max: 100}
+
+    ee_percentile_y:
+      dsl_key: y
+      json_key: y
+      type: float
+      unit: percentile
+      required: false
+      definition: "Primary (claw) EE lateral 0–100 (0 = robot-right outer, 100 = robot-left outer)."
+      range: {min: 0, max: 100}
+
+    ee_percentile_z:
+      dsl_key: z
+      json_key: z
+      type: float
+      unit: percentile
+      required: false
+      definition: "Primary (claw) EE height 0–100 (waist→overhead)."
+      range: {min: 0, max: 100}
+      landmarks: {waist: 40, chest: 60, neck: 75, head: 90, overhead: 100}
+
+    unsupported: [left_arm, long, short, long_grip, antenna]
+
+  move:
+    syntax: "move(joint, axis, degrees, rep=..., spd=..., hold=...)"
+    definition: >
+      Joint beats. paddle and claw are separate; head is first-class;
+      sat_ring is yaw-only spinner.
+
+    joint:
+      dsl_key: null
+      type: enum
+      required: true
+      values: [torso, paddle, claw, wrist_p, wrist_c, head, sat, base]
+      axis_by_joint:
+        torso: [pitch, yaw, roll, height]
+        paddle: [yaw, pitch, roll]
+        claw: [yaw, pitch, roll]
+        wrist_p: [roll]
+        wrist_c: [roll]
+        head: [pan, tilt, roll]
+        sat: [yaw]
+        base: [yaw]
+      notes: >
+        wrist_p = paddle tip (bl2); wrist_c = claw wrist (br3).
+        Finger aperture beats use move(claw, …) then pose(grip=…) or
+        dedicated claw_finger via grip in pose — prefer pose(grip) for open/close.
+
+    axis:
+      dsl_key: null
+      type: enum
+      required: true
+      values: [pitch, yaw, roll, height, pan, tilt]
+
+    degrees:
+      dsl_key: null
+      json_key: degrees
+      type: range
+      unit: degrees
+      required: true
+      forms: [scalar, "±", "[lo,hi]", categorical_height]
+      range: {min: -180, max: 180, typical_min: -40, typical_max: 45}
+      examples:
+        - "move(head, tilt, [-15,15], rep=3, spd=1.5)"
+        - "move(head, pan, ±20, rep=2)"
+        - "move(paddle, yaw, ±30, rep=2, spd=2.0)"
+        - "move(claw, pitch, ±25, rep=2)"
+        - "move(torso, height, high, spd=1.2)"
+        - "move(sat, yaw, 360, spd=1.0)"
+        - "move(wrist_p, roll, ±40, rep=2)  # paddle palm flap"
+
+    spd:
+      dsl_key: spd
+      json_key: speed
+      type: float
+      range: {min: 0.3, max: 4.0}
+      default: 1.0
+    rep:
+      dsl_key: rep
+      json_key: repetition
+      type: int
+      range: {min: 1, max: 8}
+      default: 1
+    hold:
+      dsl_key: hold
+      json_key: hold_time
+      type: float
+      unit: seconds
+      range: {min: 0.0, max: 2.5}
+      default: 0.0
+
+  path:
+    syntax: "path(base|ee_paddle|ee_claw|sat|torso, line|arc, ...)"
+    definition: >
+      base locomotion; ee_paddle / ee_claw independent Cartesian strokes;
+      sat and torso in-place → arc r=0 only.
+    timing: *timing_shared
+
+    mode:
+      dsl_key: null
+      json_key: mode
+      type: enum
+      required: true
+      values: [base, ee_paddle, ee_claw, sat, torso]
+
+    shape:
+      dsl_key: null
+      json_key: shape
+      type: enum
+      required: true
+      values: [line, arc]
+
+    x:
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      range: {min: -0.50, max: 0.50}
+      applies_when: {shape: line, mode: base}
+
+    y:
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      range: {min: -0.40, max: 0.40}
+      applies_when: {shape: line, mode: base}
+
+    axis:
+      dsl_key: axis
+      json_key: axis
+      type: enum
+      values: [x, y, z]
+      applies_when: {shape: line, mode: [ee_paddle, ee_claw]}
+
+    distance:
+      dsl_key: dist
+      json_key: distance
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Signed EE line stroke (typical 0.03–0.25 m)."
+      range: {min: -0.40, max: 0.40, typical_min: -0.25, typical_max: 0.25}
+      applies_when: {shape: line, mode: [ee_paddle, ee_claw]}
+
+    plane:
+      dsl_key: plane
+      json_key: plane
+      type: enum
+      values: [xy, xz, yz]
+      applies_when: {shape: arc, mode: [ee_paddle, ee_claw]}
+
+    radius:
+      dsl_key: r
+      json_key: radius
+      type: float
+      unit: meters
+      definition: >
+        Arc radius. sat and torso: MUST be 0 (in-place spin / twist).
+        base: 0 = spin-in-place; >0 = curved travel.
+      range: {min: 0.0, max: 0.50}
+      applies_when: {shape: arc}
+      constraints:
+        sat: {r: 0}
+        torso: {r: 0}
+
+    sweep:
+      dsl_key: deg
+      json_key: sweep
+      aliases: {degrees: sweep}
+      type: range
+      unit: degrees
+      forms: [scalar, "±", "[lo,hi]"]
+      range: {min: -720, max: 720, typical_min: -180, typical_max: 360}
+      applies_when: {shape: arc}
+
+  hold:
+    syntax: "hold(t=...)"
+    duration:
+      dsl_key: t
+      json_key: hold_time
+      type: float
+      unit: seconds
+      required: true
+      range: {min: 0.15, max: 2.5}
+
+  example_programs:
+    stop_palm_out: "pose(dir=front, paddle=front, palm=palmfront, claw=still, torso=mid, head=center, z=70) + hold(t=1.5)"
+    nod_yes: "pose(head=center, torso=mid) + move(head, tilt, [-12,12], rep=3, spd=1.5)"
+    shake_no: "move(head, pan, ±20, rep=3, spd=2.0)"
+    paddle_wave: "pose(paddle=out, palm=palmfront) + move(paddle, yaw, ±30, rep=3, spd=2.5)"
+    claw_close: "pose(claw=front, grip=open) + pose(claw=front, grip=close, hold=0.8)"
+    victory: "pose(paddle=up, claw=up, torso=high, grip=spread) + hold(t=1.5)"
+    depict_lion: "pose(dir=front, claw=front, grip=open, torso=low) + path(base, line, x=-0.10, spd=0.5) + path(base, line, x=0.05, spd=0.6) + path(ee_claw, line, axis=x, dist=0.25, spd=3.5) + hold(t=0.8)"
+    sat_orbit: "path(sat, arc, r=0, deg=360, spd=1.0)"
+    torso_twist: "path(torso, arc, r=0, deg=±45, rep=2, spd=1.5)"
+
+# ---------------------------------------------------------------------------
+# Cross-α rematerialization cheat-sheet (same cue → available channels)
+# ---------------------------------------------------------------------------
+rematerialize:
+  nod_yes:
+    gcr_alpha0: "path(base, arc, r=0, deg=±12, rep=3)"
+    gcr_alpha05: "move(torso, pitch, ±12, rep=3)"
+    gcr_alpha1: "move(head, tilt, [-12,12], rep=3)"
+  shake_no:
+    gcr_alpha0: "move(base, yaw, ±25, rep=3)"
+    gcr_alpha05: "path(torso, arc, r=0, deg=±25, rep=3)"
+    gcr_alpha1: "move(head, pan, ±20, rep=3)"
+  stop_palm_out:
+    gcr_alpha0: "path(base, line, x=0.12) + hold(t=1.5)  # underspec without palm"
+    gcr_alpha05: "pose(torso=high, long=front, long_grip=flat) + hold(t=1.5)"
+    gcr_alpha1: "pose(paddle=front, palm=palmfront, torso=mid) + hold(t=1.5)"
+  highfive_invite:
+    gcr_alpha0: "path(base, arc, r=0, deg=360) + path(base, line, x=0.20, hold=1.0)"
+    gcr_alpha05: "pose(torso=high, long=front) + path(base, line, x=0.15, hold=1.2)"
+    gcr_alpha1: "pose(claw=front, grip=open, paddle=still) + path(ee_claw, line, axis=x, dist=0.15, hold=1.0)"
+  shrug_idk:
+    gcr_alpha0: "pose(leg0=raise, leg1=raise, leg2=raise) + move(base, yaw, ±10, rep=2)  # weak"
+    gcr_alpha05: "pose(long=out, short=out) + move(torso, height, high, hold=0.4) + move(long_pincer, yaw, ±20) + move(short_pincer, yaw, ±20)"
+    gcr_alpha1: "pose(paddle=out, claw=out, palm=palmup, torso=mid) + move(torso, height, high, hold=0.4) + move(paddle, yaw, ±15) + move(claw, yaw, ±15)"

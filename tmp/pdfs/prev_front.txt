@@ -1,0 +1,118 @@
+Beyond Imitation: Recognizable Gestures Across Robot Morphologies
+Anonymous Authors
+Abstract— Humans readily infer intent and social meaning
+from motion, even when the moving body is far from human
+form. Robots are subject to the same perceptual process,
+as recognizable gestures do not require a human-like body,
+but do require motion that provides clear evidence for the
+intended meaning. We characterize this evidence through three
+attributes—orientation, body-relative location, and movement—
+and introduce Symbolic Motion Programs (Motion Programs),
+an executable symbolic representation that makes these at-
+tributes explicit across different robot morphologies. We evalu-
+ate 50 gesture cues across eight morphologies, including human-
+like, non-anthropomorphic, and novel synthetic robots. On
+human-like G1 and TIAGo, human-authored programs achieve
+96.7% and 93.3% recognition, compared with 63.3% and 60.0%
+for LLM-authored programs. Although LLMs often select the
+appropriate body part, they frequently mis-specify its orienta-
+tion, location, or movement. On non-anthropomorphic IIWA,
+Stretch, and Roomba, familiar human body parts disappear,
+requiring the same meaning to be expressed through different
+parts or motions. Failures here expose a form of imitation
+without sufficient understanding: models can reproduce familiar
+human movements, yet struggle to determine what made them
+meaningful and express that meaning through a different body.
+Finally, on three novel synthetic morphologies, LLMs make
+use of unfamiliar body parts and construct new realizations
+of gestures, but different meanings can collapse into similar
+motions with non-anthropomorphic cues.
+I. INTRODUCTION
+Humans capacity to see beyond the physical trajectory of
+an action and infer inner semantics has been fundamental to
+how we communicate and coordinate with one another [1].
+Remarkably, our innate sensitivity is not confined to the
+human body: we readily recover animate structure from only
+a handful of moving points [2], infer goals and intentions
+from the actions of other agents [3], and perceive agency
+and social interaction even in the motion of simple geometric
+shapes [4]. As robots increasingly coexist in human environ-
+ments, we argue that they inevitably enter this same percep-
+tual space — Every trajectory is also available for human
+interpretation conveying what the robot intends, attends to,
+or will do next [5]. From this perspective, communicative
+motion is not decorative behavior layered on top of robot
+action, but an intrinsic dimension of the every action itself.
+Prior work on expressive motion for non-anthropomorphic
+robots has largely focused on latent properties of behavior,
+such as personality, affect, or mood. These properties are well
+suited to cross-embodiment expression, as they can often
+be conveyed by modulating general characteristics such as
+speed, amplitude, rhythm, or smoothness. Humans readily
+perceive differences along these familiar latent properties.
+Anonymous submission. Identifying links are omitted for double-
+anonymous review.
+Fig. 1. Human- and LLM-authored Motion Programs realize on humanoid
+and non-humanoid (roomba) bodies. For roomba, the same communicative
+evidence should be transferred to available carriers or rematerialized through
+a different motion like human-authored programs. LLM-generated programs
+often reproduce a surface-level realization when carrier collapses.
+In contrast, gestures require compositional realizations. A
+gesture such as stop, beckon, or nod yes depends not
+only on how a robot moves, but on whether particular spatial
+and directional relationships are realized. Consequently, prior
+work on such gestures has often relied on human-authored
+behaviors or imported human motion for a small number of
+robot platforms and morphologies.
+To express a gesture, humanoids have intuitive and high-
+resolution carriers in their movement, enabled by many
+degrees of freedom. We posit that three attributes are most
+commonly important for producing a recognizable cue—
+orientation, location, and movement. As illustrated in Fig-
+ure 1, ‘beckon’ requires the hand to occupy an appropriate
+location, face a particular direction, and repeatedly move
+inward toward the body. For morphologies such as a mobile
+manipulator, a single arm, or a Roomba-like base, these
+correspondences become different or disappear entirely. The
+problem is therefore no longer simply to reproduce the same
+configuration or movement, but to determine which evidence
+should be preserved and which available part of the robot can
+carry it.
+We use Symbolic Motion Programs to make this problem
+explicit and to evaluate how well current LLMs can perform
+this translation. A Motion Program can be authored by
+either a human or an LLM, inspected and edited at the
+CONFIDENTIAL. Limited circulation. For review only.
+Manuscript 5662 submitted to 2027 IEEE International Conference on
+Robotics and Automation (ICRA). Received September 15, 2026.
+level of individual motion attributes, and mapped onto sub-
+stantially different robot morphologies. This representation
+therefore serves not only as a generation mechanism, but
+also as a diagnostic interface for comparing what humans
+and LLMs preserve when translating a gesture across bodies.
+Our results show that on humanoids, errors often arise
+from insufficient precision in recognition-critical attributes
+such as orientation or location. On more constrained bodies,
+LLMs frequently reproduce superficial aspects of a demon-
+strated motion without preserving the evidence that made
+the original gesture recognizable. In Figure 1, oscillating
+a Roomba-like base may superficially imitate the repetitive
+motion of pat stomach or beckon, yet leave the intended
+meaning highly ambiguous. Human-authored motions, in
+contrast, often combine multiple aspects of the available
+motion to convey the intended cue: for beckon, the base
+first turns and then makes short inward movements, while
+for depict flying bird, the absence of arms is com-
+pensated for by a broader bird-like path of the base. Our
+contributions are:
+1) A perceptual formulation of cross-embodiment ges-
+ture: discrete meanings are described through orienta-
+tion, body-relative location, and movement.
+2) An executable, editable generation framework: Mo-
+tion Programs let humans and LLMs author the same
+pose/movement/path representation and compile it
+deterministically across bodies.
+3) A diagnosis of present limits: humanoid experiments
+and constrained-body cases show where generated ges-
+tures preserve, rematerialize, augment, distort, or lose
+communicative evidence.

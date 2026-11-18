@@ -511,8 +511,12 @@ def convert_step_tiago(step: str) -> dict[str, Any] | None:
         if "deg" in kw or "degrees" in kw or "sweep" in kw:
             deg = kw.get("deg", kw.get("degrees", kw.get("sweep")))
             if isinstance(deg, list):
-                nums = [x for x in deg if isinstance(x, (int, float))]
-                if nums:
+                nums = [float(x) for x in deg if isinstance(x, (int, float))]
+                # Base arcs: keep [lo, hi] so Stretch/Roomba can ping-pong yaw
+                # (deg=±30). EE arcs keep a scalar sweep (last endpoint).
+                if mode == "base" and len(nums) >= 2:
+                    path["degrees"] = [nums[0], nums[-1]]
+                elif nums:
                     path["sweep"] = float(nums[-1])
                 else:
                     path["sweep"] = 30.0  # symbolic list e.g. [orient_to_person]
@@ -1581,6 +1585,9 @@ def convert_step_roomba(step: str) -> dict[str, Any] | None:
             path["y"] = _range_or_scalar(kw["y"])
         if "dist" in kw or "distance" in kw:
             path["distance"] = _range_or_scalar(kw.get("dist", kw.get("distance")))
+        # Accept len/d/length as signed distance along heading (+x forward, -x back)
+        elif any(k in kw for k in ("len", "d", "length")):
+            path["x"] = _range_or_scalar(kw.get("len", kw.get("d", kw.get("length"))))
         if "x" not in path and "y" not in path and "distance" not in path:
             path["x"] = 0.15
     else:
@@ -1937,7 +1944,14 @@ def add_excel_sheet(
     wb.save(xlsx)
 
 
-def render_tiago(rows: list[dict[str, Any]], *, out_root: Path, force: bool = False) -> dict[str, Path]:
+def render_tiago(
+    rows: list[dict[str, Any]],
+    *,
+    out_root: Path,
+    force: bool = False,
+    cam_pos: tuple[float, float, float] | None = None,
+    cam_quat: tuple[float, float, float, float] | None = None,
+) -> dict[str, Path]:
     from correction_lib import _ensure_mp4, _import_tiago_render, _save_gif_frames
 
     # Default: bank nearest then EE residual snap (trim). Callers may set
@@ -2050,6 +2064,10 @@ def render_tiago(rows: list[dict[str, Any]], *, out_root: Path, force: bool = Fa
         _frames_look_stable._expect_motion = expect_motion  # type: ignore[attr-defined]
         for attempt in range(1, 6):
             env = _make_env()
+            if cam_pos is not None:
+                env._tiago_cam_pos = tuple(float(v) for v in cam_pos)
+            if cam_quat is not None:
+                env._tiago_cam_quat = tuple(float(v) for v in cam_quat)
             try:
                 # typed progress overlay is fine when capture is healthy; flaky EGL
                 # captures already flicker without it, so keep bar off for retries≥2.
@@ -2131,7 +2149,13 @@ def render_tiago(rows: list[dict[str, Any]], *, out_root: Path, force: bool = Fa
     return out
 
 
-def render_manipulator(rows: list[dict[str, Any]], *, out_root: Path, force: bool = False) -> dict[str, Path]:
+def render_manipulator(
+    rows: list[dict[str, Any]],
+    *,
+    out_root: Path,
+    force: bool = False,
+    start_from_neutral: bool = False,
+) -> dict[str, Path]:
     robotarm = _REPO / "adhoc/generation/robotarm"
     # tiago/legacy shadows robotarm/legacy — force robotarm first
     sys.path = [p for p in sys.path if Path(p).resolve() != (_GOOGLE / "legacy").resolve()]
@@ -2175,6 +2199,7 @@ def render_manipulator(rows: list[dict[str, Any]], *, out_root: Path, force: boo
                 hz=12,
                 top_k=1,
                 ignore_xyz=False,
+                start_from_neutral=start_from_neutral,
             )
             robot_dir = scratch / "IIWA"
             gifs = sorted(robot_dir.glob("*.gif"), key=lambda p: p.stat().st_mtime, reverse=True)
@@ -2324,6 +2349,11 @@ def main() -> None:
     ap.add_argument("--out-render", type=Path, default=OUT_RENDER)
     ap.add_argument("--skip-render", action="store_true")
     ap.add_argument("--force-render", action="store_true")
+    ap.add_argument(
+        "--start_from_neutral",
+        action="store_true",
+        help="Start IIWA clips from neutral before approaching the first authored pose.",
+    )
     ap.add_argument("--max-cues", type=int, default=0, help="0 = all")
     ap.add_argument(
         "--platforms",
@@ -2392,7 +2422,12 @@ def main() -> None:
             render_tiago(g_rows, out_root=args.out_render, force=args.force_render)
         if "single_arm" in want:
             m_rows = [e["platforms"]["single_arm"] for e in configs]
-            render_manipulator(m_rows, out_root=args.out_render, force=args.force_render)
+            render_manipulator(
+                m_rows,
+                out_root=args.out_render,
+                force=args.force_render,
+                start_from_neutral=args.start_from_neutral,
+            )
         from embodiment_renderers import (
             render_stretch,
             render_roomba,

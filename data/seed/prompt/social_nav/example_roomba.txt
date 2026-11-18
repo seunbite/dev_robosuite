@@ -1,0 +1,28 @@
+Held-out cue: wave_hi. Not the target. Six programs: 순정 / var1 / var2 on roomba and stretch.
+Keep the identity beat. Add components when the situation needs a new act.
+The other body's code is analogical — emit only tokens legal on the platform you are writing for.
+
+순정 (no extra situation)
+roomba:  pose(dir=front) + path(base, arc, r=0, deg=±25, rep=3, spd=1.8)
+stretch: pose(dir=up, head=center, torso=mid, z=65) + path(ee, line, axis=y, dist=+-0.2, spd=1.8, rep=3)
+
+var1 — 상대가 등 돌리고 폰을 보고 있음. 먼저 시야로 들어가 알린 다음 흔든다.
+roomba:  path(base, arc, r=0.45, deg=70, spd=0.7) + hold(t=0.5) + pose(dir=front) + path(base, arc, r=0, deg=±25, rep=3, spd=1.8) + hold(t=1.2)
+stretch: pose(dir=still, head=center, torso=mid) + path(base, arc, r=0.40, deg=+55, spd=0.8) + hold(t=0.5) + pose(dir=up, head=center, torso=mid, z=65, x=30) + path(ee, line, axis=x, dist=+0.18, spd=1.1) + path(ee, line, axis=y, dist=+-0.2, spd=1.8, rep=3) + hold(t=1.2)
+identity_beat roomba:  path(base, arc, r=0, deg=±25, rep=3, spd=1.8)
+identity_beat stretch: path(ee, line, axis=y, dist=+-0.2, spd=1.8, rep=3)
+changes:
+- a slow base arc is the announce — new component, not a bigger wag
+- 0.5 s dwell so arriving and waving are two acts
+- stretch then reaches the arm forward on +x (x=30 → dist=+0.18) before the wave
+- the wave itself is copied from 순정 (same deg/rep/spd or same y dist/rep/spd)
+
+var2 — 앉아 있는 어린이에게, 도서관처럼 조용히. 눈높이에서 작게, 끝에 가라앉힌다.
+roomba:  path(base, line, x=-0.12, spd=0.4) + hold(t=0.6) + path(base, arc, r=0, deg=±12, rep=3, spd=0.7, hold=0.25) + hold(t=1.8) + path(base, line, x=-0.06, spd=0.35)
+stretch: pose(dir=still, head=center, torso=low, z=35) + move(head, tilt, -12, spd=0.5, hold=0.4) + pose(dir=up, grip=horiz, torso=low, z=45, head=center) + path(ee, line, axis=y, dist=+-0.08, spd=0.9, rep=3, hold=0.2) + hold(t=1.6) + path(ee, line, axis=z, dist=-0.04, spd=0.4)
+identity_beat roomba:  path(base, arc, r=0, deg=±12, rep=3, spd=0.7, hold=0.25)
+identity_beat stretch: path(ee, line, axis=y, dist=+-0.08, spd=0.9, rep=3, hold=0.2)
+changes:
+- stretch drops torso/z to the child's eye height before the wave; roomba retreats on −x (no mast to drop)
+- the wag/wave keeps the same axis and three beats; only extent and rate shrank
+- a settle is a new last component (tiny −x, or −z) — not a fourth wag

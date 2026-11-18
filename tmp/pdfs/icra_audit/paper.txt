@@ -1,0 +1,506 @@
+     Beyond Imitation: Recognizable Gestures Across Robot Morphologies
+                                                      Anonymous Authors
+
+
+   Abstract— Humans readily infer intent and social meaning
+from motion, even when the moving body is far from human
+form. Robots are subject to the same perceptual process,
+as recognizable gestures do not require a human-like body,
+but do require motion that provides clear evidence for the
+intended meaning. We characterize this evidence through three
+attributes—orientation, body-relative location, and movement—
+and introduce Symbolic Motion Programs (Motion Programs),
+an executable symbolic representation that makes these at-
+tributes explicit across different robot morphologies. We evalu-
+ate 50 gesture cues across eight morphologies, including human-
+like, non-anthropomorphic, and novel synthetic robots. On
+human-like G1 and TIAGo, human-authored programs achieve
+96.7% and 93.3% recognition, compared with 63.3% and 60.0%
+for LLM-authored programs. Although LLMs often select the
+appropriate body part, they frequently mis-specify its orienta-
+tion, location, or movement. On non-anthropomorphic IIWA,
+Stretch, and Roomba, familiar human body parts disappear,
+requiring the same meaning to be expressed through different
+parts or motions. Failures here expose a form of imitation
+without sufficient understanding: models can reproduce familiar
+human movements, yet struggle to determine what made them
+meaningful and express that meaning through a different body.       Fig. 1. Human- and LLM-authored Motion Programs realize on humanoid
+Finally, on three novel synthetic morphologies, LLMs make           and non-humanoid (roomba) bodies. For roomba, the same communicative
+                                                                    evidence should be transferred to available carriers or rematerialized through
+use of unfamiliar body parts and construct new realizations         a different motion like human-authored programs. LLM-generated programs
+of gestures, but different meanings can collapse into similar       often reproduce a surface-level realization when carrier collapses.
+motions with non-anthropomorphic cues.
+
+                      I. I NTRODUCTION
+                                                                    In contrast, gestures require compositional realizations. A
+   Humans capacity to see beyond the physical trajectory of         gesture such as stop, beckon, or nod yes depends not
+an action and infer inner semantics has been fundamental to         only on how a robot moves, but on whether particular spatial
+how we communicate and coordinate with one another [1].             and directional relationships are realized. Consequently, prior
+Remarkably, our innate sensitivity is not confined to the           work on such gestures has often relied on human-authored
+human body: we readily recover animate structure from only          behaviors or imported human motion for a small number of
+a handful of moving points [2], infer goals and intentions          robot platforms and morphologies.
+from the actions of other agents [3], and perceive agency              To express a gesture, humanoids have intuitive and high-
+and social interaction even in the motion of simple geometric       resolution carriers in their movement, enabled by many
+shapes [4]. As robots increasingly coexist in human environ-        degrees of freedom. We posit that three attributes are most
+ments, we argue that they inevitably enter this same percep-        commonly important for producing a recognizable cue—
+tual space — Every trajectory is also available for human           orientation, location, and movement. As illustrated in Fig-
+interpretation conveying what the robot intends, attends to,        ure 1, ‘beckon’ requires the hand to occupy an appropriate
+or will do next [5]. From this perspective, communicative           location, face a particular direction, and repeatedly move
+motion is not decorative behavior layered on top of robot           inward toward the body. For morphologies such as a mobile
+action, but an intrinsic dimension of the every action itself.      manipulator, a single arm, or a Roomba-like base, these
+   Prior work on expressive motion for non-anthropomorphic          correspondences become different or disappear entirely. The
+robots has largely focused on latent properties of behavior,        problem is therefore no longer simply to reproduce the same
+such as personality, affect, or mood. These properties are well     configuration or movement, but to determine which evidence
+suited to cross-embodiment expression, as they can often            should be preserved and which available part of the robot can
+be conveyed by modulating general characteristics such as           carry it.
+speed, amplitude, rhythm, or smoothness. Humans readily                We use Symbolic Motion Programs to make this problem
+perceive differences along these familiar latent properties.        explicit and to evaluate how well current LLMs can perform
+  Anonymous submission. Identifying links are omitted for double-   this translation. A Motion Program can be authored by
+anonymous review.                                                   either a human or an LLM, inspected and edited at the
+level of individual motion attributes, and mapped onto sub-
+stantially different robot morphologies. This representation
+therefore serves not only as a generation mechanism, but
+also as a diagnostic interface for comparing what humans
+and LLMs preserve when translating a gesture across bodies.
+Our results show that on humanoids, errors often arise
+from insufficient precision in recognition-critical attributes
+such as orientation or location. On more constrained bodies,
+LLMs frequently reproduce superficial aspects of a demon-
+strated motion without preserving the evidence that made
+the original gesture recognizable. In Figure 1, oscillating
+a Roomba-like base may superficially imitate the repetitive
+motion of pat stomach or beckon, yet leave the intended
+meaning highly ambiguous. Human-authored motions, in              Fig. 2. We characterize gestures across morphologies through family resem-
+                                                                  blance: attributes such as Orientation, Location, and Movement contribute
+contrast, often combine multiple aspects of the available         with varying importance to the recognition of different gesture cues.
+motion to convey the intended cue: for beckon, the base
+first turns and then makes short inward movements, while
+for depict flying bird, the absence of arms is com-               Across these systems, reliability is sought through structured
+pensated for by a broader bird-like path of the base. Our         APIs, few-shot demonstrations, executable constraints, ob-
+contributions are:                                                jective construction, or verification and correction around
+   1) A perceptual formulation of cross-embodiment ges-           the model output. Most optimize task completion or assume
+       ture: discrete meanings are described through orienta-     a predefined skill library. For gesture, however, physical
+       tion, body-relative location, and movement.                execution is not the endpoint: the motion succeeds only when
+   2) An executable, editable generation framework: Mo-           an observer recovers its intended meaning (recognition). Our
+       tion Programs let humans and LLMs author the same          distinction is therefore representational that Motion Programs
+       pose/movement/path representation and compile it           expose recognition-critical attributes as editable primitives,
+       deterministically across bodies.                           allowing the same automatic authoring pipeline to be retained
+   3) A diagnosis of present limits: humanoid experiments         across robots while the renderer changes how those attributes
+       and constrained-body cases show where generated ges-       are physically realized.
+       tures preserve, rematerialize, augment, distort, or lose
+       communicative evidence.                                             III. G ESTURE G ENERATION F RAMEWORK
+
+                    II. R ELATED W ORK                            A. Gesture: Meaning and Action Mapping
+A. Expressive Robot Motion Generation                                Gesture generation maps a meaning space G (e.g., nodding
+                                                                  yes, stopping, beckoning, or depicting a flying bird) to
+   We posit human-like robot body not a prerequisite to
+                                                                  an action space A(M ) shaped by robot morphology M .
+express concrete mind state in daily life. Early work on
+                                                                  For example, a Roomba realizes motion primarily through
+communicative robot motion authored robot-specific ges-
+                                                                  changes in x, y, and θ, whereas a humanoid has many
+tures through multimodal behavior languages [6], [7], [8] or
+                                                                  articulated carriers. Within each action space, a meaning
+designed learning to reproduce human motion from paired
+                                                                  can admit infinitely many continuous realizations, but not
+speech and motion data [9], [10], [11] using humanoid body.
+                                                                  all variations contribute equally to recognition. We suggest
+More recent work has shown that communicative motion
+                                                                  that some attributes are recognition-critical: changing them
+on a human-like body planting timing, energy, and Laban-
+                                                                  can weaken the evidence for the intended cue G and shift
+derived motion qualities to shape confidence, affect, and
+                                                                  interpretation toward plausible alternatives G′ . For example,
+social state [12], [13], [14]. These studies establish that
+                                                                  reversing the palm orientation in a stop gesture can make
+non-humanoid motion can be socially legible, but typically
+                                                                  the motion resemble ‘looking into a hand mirror’.
+focus on latent affective dimensions or platform-specific
+repertoires. On the other hand, we study how a concrete
+communicative meaning is realized as the available body           B. Recognition-Critical Attributes
+parts and motion channels change across morphologies.                In Figure 2, we identify three important attributes that
+                                                                  commonly contribute to gesture recognition, with their rela-
+B. Motion Generation with Large Language Models                   tive importance varying across gesture cues. This formulation
+   Language models generate robot motion at several levels:       follows the concept of family resemblance [19], in which cat-
+they can emit code that invokes skills [15], construct spatial    egory members share overlapping features without requiring
+objectives or value maps that guide control [16], select or pa-   a single set of necessary and sufficient conditions, making
+rameterize learned motion primitives [17], and generate or re-    some members more typical than others (e.g., typ(robin |
+trieve expressive animations from a prompted repertoire [18].     bird) > typ(penguin | bird)).
+     a) Orientation (O): Orientation describes where a                c) New Morphology: We designed one human-like
+recognition-relevant carrier—such as the head, hand, foot,       body named PaddleClaw, and two non-anthropomorphic bod-
+or torso—is directed. Although orientation is physically         ies SpineCrab and TrilegCrown. PaddleClaw is a synthetic
+continuous, we argue that many communicative distinctions        torso with a head and asymmetric paddle/claw branches,
+can be captured by a small set of discrete relations: front,     preserving coarse bilateral structure without humanoid hands.
+back, in, out, up, and down. For example, point you              Spinecrab is a body with a pitching spine and asymmetric
+should orient its pointing carrier toward the addressee in       pincers. TrilegCrown relies primarily on three legs and base
+front; stop palm out presents the palm toward front while        motion.
+directing the fingertips up.
+     b) Location (L): Location describes where the relevant
+                                                                        HPaddleClaw = {Obranch , Lbranch/head , Mart }       (6)
+carrier lies relative to the body or environment. Location is
+naturally continuous and can require different spatial reso-           HSpineCrab = {Opincer , Ltip/spine , Mspine/limb }    (7)
+lutions across cues, for example, in rub eye an incorrect
+                                                                            HTrilegCrown = {Lleg/body , Mleg/base }          (8)
+z coordinate can move the end effector from the eye to
+the forehead or nose, changing the intended interpretation.            d) Realization strategy: Transferring a gesture to a
+Therefore, continuous (x, y, z) locations are needed to spec-    different morphology changes which carriers and attributes
+ify precise cue realization.                                     are physically available. Movement structure is often com-
+     c) Movement (M ): Movement describes how a carrier          paratively portable: an axis, direction, or repetition pattern
+changes over time and captures temporal structure that           can be reconstructed with other body parts in the changed
+cannot be specified by pose alone. Movement differs in           morphology. Orientation may instead need to migrate to
+axis/sign (movement direction), extent, speed, and repetition.   another carrier when the original one does not exist, while
+Among these, axis and sign often provide particularly strong     location is particularly morphology-dependent because body-
+recognition evidence. A nod requires repeated motion along       relative landmarks and reachable regions change with em-
+the vertical (z) axis, whereas a head shake requires lateral     bodiment.
+(y) oscillation. Similarly, raise fists requires upward             • Preserved: The original or anatomically corresponding
+(z+) movement rather than downward (z−) movement.                      carrier remains available, and the recognition-relevant
+                                                                       movement and pose attributes are retained (e.g., a
+C. Transfer Across Morphologies                                        human head nod → Tiago head nod).
+                                                                    • Carrier-transferred: The original carrier is unavail-
+   Figure 5 shows all eight morphologies and their available
+                                                                       able, but another carrier reproduces approximately the
+carrier structures. Let C = O, L, M denote orientation, body-
+                                                                       same recognition-relevant attributes (e.g., vertical head
+relative location, and movement, and let H(B) denote the
+                                                                       oscillation → vertical single-arm oscillation).
+independently usable realizations available on body B.
+                                                                    • Rematerialized: The target morphology requires the
+      a) Human-like body: G1 and Tiago. G1 has a full
+                                                                       communicative structure itself to be reformulated,
+humanoid reference, with articulated hands, two arms, a
+                                                                       changing movement, orientation, or spatial relations
+head, and torso. Tiago retains a bilateral upper body and
+                                                                       rather than simply assigning them to another carrier
+head, while parallel grippers constrain palm orientation and
+                                                                       (e.g., bilateral arm flapping → a bird-like trajectory
+the mobile base provides an additional movement carrier.
+                                                                       traced by a planar mobile robot).
+
+           HG1 = {Opalm/head , Lee/head , Mart }           (1)              IV. S YMBOLIC M OTION P ROGRAMS
+                                                                    We introduce Symbolic Motion Programs (Motion Pro-
+        HTiago = {Ogrip/head , Lee/head , Mart/base }      (2)   grams), a compact executable representation of the evidence
+                                                                 that makes a gesture recognizable. As illustrated in Fig. 3, a
+     b) Non-anthropomorphic body: IIWA, Stretch and              program composes three typed primitives: pose specifies a
+Roomba. IIWA is a single arm with precise end-effector           carrier’s orientation and body-relative location; movement
+orientation and location, but all evidence is coupled to one     applies a joint-level change to an articulated carrier; and
+kinematic chain. Stretch is a mobile manipulator with a          path traces a Cartesian trajectory with an end effector or
+camera head. Roomba retains translation and yaw while            mobile base. For example, the human-authored G1 program
+lacking independent orientation, hand location, and body-        for beckon come here is
+contact carriers.                                                     pose(dir=front, grip=vert|palmin,
+                                                                      z=80, x=60) + move(wrist, x, [-35,+35],
+                                                                      rep=3, spd=3.5, hold=0.1)
+         Hsingle arm = {Ogrip/chain , Lee , Mjoint/ee }    (3)   Here, pose selects the right hand as the carrier, directs the
+                                                                 arm toward the observer, turns the palm inward, and places
+       HStretch = {Ogrip/base , Lmast/ee , Mjoint/base }   (4)   the hand high and forward in the workspace. The following
+                                                                 movement oscillates the wrist through a signed range of
+                    Hroomba = {Mbase }                     (5)   −35◦ to +35◦ three times, at speed 3.5, with a 0.1-s dwell
+                                                                            within the valid frontal workspace, and (3) avoid collapsed
+                                                                            or sharply reversing arm configurations. We then exclude
+                                                                            the remaining visibly unnatural configurations. This retains
+                                                                            45.2% of candidate poses for G1 and 93.6% for TIAGo.
+                                                                            B. Automated Stage: LLM Authoring and Simulation
+                                                                                 a) Program authoring.: For each cue–morphology pair,
+                                                                            the LLM receives the cue name, YAML description of the
+                                                                            target morphology, and five shots rather than the raw XML.
+                                                                            The model then produces a single Motion Program. A deter-
+                                                                            ministic parser converts the generated text into an executable
+                                                                            configuration and performs morphology-specific normaliza-
+                                                                            tion: omitted attributes are assigned defaults, unsupported
+                                                                            arguments are discarded, and primitives that cannot be parsed
+                                                                            are excluded. We use Gemini 2.5 Pro through the Gemini
+                                                                            API and retain one generation per cue–morphology pair.
+                                                                            For the five reported morphologies, all 150 programs in the
+                                                                            50-cue generation set passed the parser, corresponding to a
+Fig. 3. Our method Motion Program generates gestures across Unitree G1      format-failure rate of 0/150.
+(beckon), Tiago (flying bird), and IIWA (high five) using components             b) Motion compilation and rendering.: The compiler
+of Pose, Movement, and Path. We suggest that recognition-critical
+attributes such as orientation, location, and movement contribute to more
+                                                                            deterministically grounds each symbolic program into a
+canonical and recognizable realizations of a gesture.                       morphology-conditioned trajectory. For articulated robots,
+                                                                            a requested pose first filters the feasible pose set by
+                                                                            categorical attributes such as body-relative direction, grip-
+after each repetition. The program states the communicative                 per orientation, palm direction, and elbow configuration. A
+structure of the action and the morphology-specific compiler                movement is compiled relative to the selected pose. At
+determines the joint values that realize it.                                the current configuration, the compiler computes the end-
+                                                                            effector Jacobian and selects the degree of freedom whose
+A. Pre-authoring Stage: Design by Human Authors                             motion is most strongly aligned with the requested Cartesian
+   1) Morphology Schema (YAML): To provide both human                       axis, while treating the specified anatomical group—such as
+and LLM authors with explicit information about each                        the shoulder, elbow, or wrist—as a soft preference. It then
+robot’s available motion channels, we encode the morphol-                   applies the authored angular displacement and interpolates
+ogy as a text, YAML schema. The schema specifies the                        the resulting joint-space trajectory; signed ranges and rep
+meaning, value range (discrete or continuous), default value,               values produce oscillatory or repeated motions. A path is
+and examples for each available attribute. The grammar                      compiled as an inverse-kinematic end-effector trajectory for
+of movement and path remains largely shared across                          manipulators or as planar translation and yaw for mobile
+embodiments, using attributes such as joint, axis, angle,                   bases.
+speed, repetition, hold time, and arc and line parameters.                     Timing is computed uniformly from the authored spd,
+In contrast, pose attributes are more morphology-specific                   rep, and hold parameters. The speed is ranged in
+and act as filters over the robot’s available pose set to get               [0.25, 4.0]. A joint-motion beat with r repetitions has nom-
+                                                                                                       r
+the appropriate configuration.                                              inal duration Tmove = spd     whereas a path of total length
+   2) Few-Shot Examples: Human authors manually de-                         L has duration Tpath = 0.15Lspd . Given renderer rate f ,
+sign the same five cue—raising hand greeting, wave hi,                      the motion is discretized into round(0.5T f ) frames, while
+bow greeting, blow kiss, and circle temple crazy—for each                   a requested hold duration h is represented by round(hf )
+morphology. These cues do not overlap with the 50 cues                      identical frames. The current implementation uses f = 20
+used in our evaluation. Given only these examples and the                   for G1 and TIAGo trajectory generation and f = 12 for
+morphology’s YAML, few shot generation can be automated                     IIWA, Stretch, and Roomba.
+with an LLM authoring and human inspection.
+   3) Feasible Pose Sets: We additionally construct fea-                                      V. E XPERIMENT D ESIGN
+sible pose sets for G1 and TIAGo. Both have human-                            To systematically investigate our research questions on
+like upper bodies, their joint ranges exceed typical hu-                    gesture realization and recognition across morphologies, we
+man articulation; therefore physically valid but unnaturally                evaluate a broad set of 50 gesture cues across five real robot
+folded pose hampers gesture recognizability. We found this                  embodiments and three synthetic morphologies.
+difficult to filter reliably with a VLM, and instead use a
+deterministic procedure. We enumerate joint configurations                  A. Gesture set and robots
+over −90◦ , 0◦ , 90◦ within each robot’s limits and retain                     Table I presents our 50 cues, spanning diverse communica-
+poses that (1) are collision-free, (2) place the end effector               tive functions, body parts, and recognition-critical attributes.
+                                                                                                                             Human-authored           LLM-authored
+Gesture cues by required body parts
+                                                                                            100   96.7%
+                                                                                                                  93.3%                                     93.3%
+                                                                                                                                     90.0%                                   90.0%
+
+
+
+
+                                                                 Recognition accuracy (%)
+Head / Torso (n = 4): nod yes, shake head no,
+                                                                                             80
+gaze shift avoid, tilt head curious.                                                                      63.3%
+                                                                                                                          60.0%               60.0%
+                                                                                             60                                                                      56.7%
+One Hand / Arm (n = 17): draw circle repeat,                                                                                                                                         46.7%
+
+slow down request palm down, beckon come here,                                               40
+
+frustration down throw, fist pump, point you,                                                20
+stop palm out, raise index one moment,
+highfive invite, flex bicep, fistbump invite,                                                 0
+                                                                                                   Unitree G1        TIAGo               IIWA                  Stretch         Roomba
+
+clarification request palm tilt, yield turn,
+request turn, continue on forward roll,                          Fig. 4. Human recognition of human- and LLM-authored gestures across
+interrupt hard, interrupt soft.                                  five robot morphologies. Human-authored gestures maintain consistently
+One Arm + Body Relation (n = 12): cover yawn sleepy,             high recognition across robots (90.0–96.7%), whereas LLM-authored ges-
+rub eye tired, point self, salute, facepalm,                     tures are recognized less accurately and decline as the embodiment departs
+                                                                 from a humanoid morphology (63.3% on G1 to 46.7% on Roomba).
+self scratch head confused, pat stomach,
+fan face hot, cover mouth gasp, visor search,
+wait for me backward palm, throat cut stop.
+Bimanual (n = 12): shrug idk, air quotes,                              100 denote the lowest and highest reachable positions).
+arms open welcome, hands up surrender,                                 We report the mean absolute difference; thus, a value
+stretch arms up, raise fists victory,                                  of 0 indicates the same location as the GT.
+cross arms defensive, palms together thank you,                     • Orientation, Movement: We evaluate these attributes
+scale expand, self hug, push pull dual,                                using discrete exact matches. Reach uses six possible
+clap applause.
+                                                                       directions—front, back, up, down, in, and out—giving
+Depiction (n = 5): depict tree, depict big bowl,                       a random chance of 1/6. For palm orientation, G1 has
+depict lion, depict small object,
+depict flying bird.                                                    four possible orientations for a given reach direction
+                                                                       (1/4), whereas Tiago’s parallel gripper provides two
+                          TABLE I                                      (1/2). For Movement, we compare the motion axis
+T HE 50 GESTURE CUES GROUPED BY THE BODY PARTS REQUIRED FOR            (x/y/z; 1/3) and sign (+/−/±; 1/3).
+           THEIR CANONICAL HUMANOID REALIZATION .
+                                                                    3) Cross-Morphology Realization Analysis: For non-
+                                                                 humanoid morphologies, we operationalize the realization
+                                                                 strategies introduced in §III-C according to how the cue-
+The set includes conventional gestures (e.g., air quotes),       relevant carrier and attributes change across morphologies.
+bodily actions (e.g., rub eye), and iconic depictions (e.g.,        • Preserved: The same or anatomically corresponding
+depict bird), providing varied demands on both motion                  carrier is available, and its recognition-relevant Move-
+attributes and morphological carriers.                                 ment, Orientation, and Location are approximately re-
+   In §III-C, we introduce eight robot morphologies as the             tained.
+basis for cross-morphology gesture generation: human-like           • Carrier-transferred: The original carrier is unavail-
+robots (G1 and Tiago), non-anthropomorphic robots (IIWA,               able, but another carrier reproduces the characteristic
+Stretch, Roomba), and three synthetic morphologies (Paddle-            Movement while maintaining an appropriate Orientation
+Claw, SpineCrab, and TrilegCrown).                                     and Location. If the movement is transferred but its
+                                                                       orientation or location is inconsistent with the cue, we
+B. Metrics                                                             label it a Transfer Error.
+   1) Human Recognition: We use a hard-negative 4-                  • Rematerialized: The original carrier is unavailable
+Alternative Forced-Choice task (4AFC; 25% chance) to test              and the characteristic Movement changes, but the new
+whether an observer can recover the intended cue from                  movement, orientation, and location together provide
+a silent motion clip. We select the three nearest cues in              an appropriate realization of the intended cue. If the
+the Motion-Program representation using Jaccard similarity.            changed movement does not appropriately reconstruct
+These alternatives are fixed across participants, while their          the remaining attributes, or if the recognition-relevant
+presentation order is randomized. Participants watch silent            movement disappears altogether, we label it a Remate-
+clips without a viewing-time and replay limit before selection         rialization Error.
+considering the cognitive load. Ten participants each evaluate
+50 unique trials, with no trial repeated across participants.                                                                VI. R ESULTS
+   2) Attribute-Level Failure Analysis: To understand why a      A. Human-like Robots
+generated gesture succeeds or fails, we additionally compare          a) Human recognition: The 4AFC study shows a clear
+its Location, Orientation, and Movement attributes against       gap between human- and LLM-authored programs. Human-
+the corresponding human-authored ground truth (GT).              authored programs are recognized at 96.7% on G1 and 93.3%
+   • Location: We compare the x, y, and z coordinates of         on TIAGo, whereas Gemini-authored programs reach only
+     the relevant carrier (end effector), normalized to the      63.3% and 60.0%, respectively. Performance changes little
+     robot’s reachable range (e.g., z ∈ [0, 100], where 0 and    between G1 and TIAGo within each authoring condition.
+                   Location error (↓) Exact agreement (%) (↑)          Robot   Author Program length Attributes/program Types/Cue
+
+Robot Generator      x     y       z      Reach Palm Axis       Sign           Human      2.7 ± 1.1       10.3 ± 4.9        0.77
+                                                                       IIWA
+                                                                               LLM        3.0 ± 0.7       11.4 ± 2.4        0.83
+        Gemini     18.4 19.2      11.2     47.2   48.6 58.0     56.8           Human      3.9 ± 1.6       15.3 ± 6.5        1.33
+G1                                                                     Stretch
+        32B        20.5 22.9      14.0     52.4   29.8 44.4     62.2           LLM        2.8 ± 0.6       10.7 ± 1.9        1.10
+                                                                               Human      2.8 ± 1.7       11.2 ± 6.5        1.57
+        Gemini     14.7 19.8       8.7     49.1   52.8 63.2     72.2   Roomba
+TIAGo                                                                          LLM        3.2 ± 0.9        9.1 ± 3.7        1.20
+        32B        17.7 23.9       8.2     47.4   43.9 47.4     77.8
+                                                                                               TABLE III
+                               TABLE II
+                                                                         S TRUCTURAL COMPLEXITY AND COMPOSITIONAL DIVERSITY OF
+ ATTRIBUTE AGREEMENT AGAINST HUMAN - AUTHORED PROGRAMS ON
+                                                                       MATCHED HUMAN - AND LLM- AUTHORED M OTION P ROGRAMS (n = 50
+    HUMAN - LIKE ROBOTS . L OCATION REPORTS MEAN ABSOLUTE
+                                                                                        CUES PER ROW; MEAN ± SD).
+ BODY- PERCENTAGE ERROR . R EACH AND PALM REPORT CATEGORICAL
+   AGREEMENT; A XIS AND S IGN SEPARATELY EVALUATE THE TWO
+     MOVEMENT ATTRIBUTES . G EMINI = G EMINI 2.5 P RO ; 32B =
+                         Q WEN 2.5-VL-32B.                             outward reach to inward. Thus, semantic knowledge reliably
+                                                                       proposes what should move and the rough iconic stroke,
+                                                                       while embodied orientation remains the principal grounding
+                                                                       failure.
+This suggests that the gap is not specific to a particular robot,
+but persists across two broadly human-like bodies despite              B. Non-anthropomorphic Robots
+differences in their embodiment.                                            a) Human recognition: Figure 4 shows that unfamiliar
+      b) Attribute-level errors: Table II localizes this gap at        morphology does not itself prevent communication. Human-
+the attribute level. For location, Gemini’s mean z error is 11.2       authored programs remain recognizable on IIWA (90.0%),
+body-% on G1 and 8.7 on TIAGo, while errors are larger                 Stretch (93.3%), and Roomba (90.0%), despite the progres-
+along x and y (18.4/19.2 on G1 and 14.7/19.8 on TIAGo).                sive loss of hands, a head, and articulated limbs. LLM-
+Categorical attributes show a different pattern. Reach agree-          authored programs instead decline from 60.0% to 56.7% and
+ment is 47.2% and 49.1%, well above its 1/6 chance level,              46.7%, widening the human–LLM gap from 30.0 to 43.3
+indicating that the model often selects a broadly appropriate          percentage points.
+direction. Palm orientation is much weaker: Gemini reaches                  b) Cue-generation richness.: In Table III, program
+48.6% on G1 and 52.8% on TIAGo, compared with chance                   length counts components such as pose, move, path
+levels of 25% and 50%, respectively. This suggests that                while Attributes/program sums specified attributes across
+palm configuration is not reliably preserved, particularly             components in a program. Length alone, however, can-
+when it is not strongly constrained by the cue. Movement               not distinguish geometrically different motions. We there-
+is more accurately captured overall, with axis agreement               fore introduce Types/Cue: the number of distinct dynamic
+of 58.0% and 63.2% and sign agreement of 56.8% and                     families—oscillation, line, arc, and one-way joint motion.
+72.2%. However, the remaining errors are often semantically            IIWA is similar under both authoring methods, but with
+consequential: cues such as air quotes can activate the                Stretch, Human-authored programs are longer (3.9 vs. 2.8),
+appropriate carrier and repeated motion while moving along             contain more attributes (15.3 vs. 10.7), and combine more
+an incorrect axis.                                                     motion families (1.33 vs. 1.10). On Roomba, the LLM
+      c) Qualitative patterns.: The LLM’s prior knowledge              is longer (3.2 vs. 2.8) yet uses fewer attributes (9.1 vs.
+is most useful for cues with a conventional iconic form.               11.2) and fewer families (1.20 vs. 1.57). Thus, the LLM
+For depict flying bird, it spreads both arms, turns the                often adds steps without adding a comparably rich motion
+palms down, and reproduces the GT’s four z-axis flaps; for             vocabulary, whereas humans vary geometry, timing, and
+depict big bowl, it places both palms up and traces a bi-              carrier combinations according to the cue.
+lateral yz arc. It also selects the expected carrier without con-           c) Morphological collapse on Roomba.: This lack of
+fusion for movement-dominant cues: nod yes uses head tilt,             compositional diversity helps explain why Roomba clips
+shake head no uses head pan, and gaze shift avoid                      are especially confusable with their hard negatives. Across
+keeps the GT’s head-pan carrier. The failures instead reveal           the complete 50-cue LLM set, 34/50 programs (68.0%)
+semantic completion without geometric grounding: because               use fore–aft translation. Of those, 21/34 (61.8%) contain
+generation is single-pass and does not inspect the rendered            no additional rotation, arc, or lateral motion. Once the
+body, the model often captures the verbal concept but assigns          body has collapsed to a single mobile base, such programs
+attributes that do not realize it physically. In point self,           map semantically different cues—including point you,
+for example, the GT points back toward the torso, whereas              salute, highfive invite, and stretch arms up—
+the LLM sets dir=front; in cover yawn sleepy, it                       to variants of approach, retreat, and hold, reducing their
+moves a hand toward the face but replaces the GT’s upward,             contrast against nearby answer choices. Human authors in-
+horizontal hand with an inward, vertical palm. Likewise,               stead use the base’s orientation and trajectory as surrogate
+its bowl has the correct palm-up arc but reverses the GT’s             anatomy. In beckon come here, they retreat, rotate 90◦
+Fig. 5. We test eight robot morphologies, ranging from a humanoid (Unitree G1) to a Roomba, along with three novel synthetic morphologies—PaddleClaw,
+TrilegCrown, and SpineCrab. An LLM (Gemini-2.5-Pro) interprets the attribute set of each morphology and generates motion programs to realize the given
+gesture cues across these diverse embodiments.
+
+
+
+so the elongated body reads like an extended carrier, and                    platforms may benefit from memorized body-specific map-
+then oscillate its heading. These constructions do not restore               pings. We therefore introduce three synthetic morphologies
+the missing limbs, but they approximate the intended spatial                 as an out-of-distribution probe that removes this shortcut.
+relation with a richer sequence of planar evidence, consistent               As shown in Figure 5, TrilegCrown has no head, hands, or
+with the higher Human Types/Cue value.                                       stable front; SpineCrab replaces conventional limbs with a
+      d) Qualitative grounding.: The LLM is strongest when                   canted spine and two unequal pincers; and PaddleClaw, the
+orientation and location provide a scaffold for an iconic                    least unfamiliar of the three, retains a head but replaces the
+stroke. On the single arm, nod yes, shake head no,                           upper body with a paddle and a claw.
+and gaze shift avoid first place the wrist at the body                            a) Unfamiliar parts become communicative carriers:
+center with dir=front and then assign the expected                           The programs do not route every cue through a single
+oscillation or displacement axis; stretch arms up sim-                       surrogate limb. On TrilegCrown, 20 of the 30 cues use
+ilarly uses dir=up and y=50 before moving vertically.                        the front leg, 17 the base, and 9 and 7 the two other
+Depictive knowledge can also coordinate setup and timing:                    legs; on SpineCrab, 22 use the long pincer, 12 the short
+depict lion begins from a compact or rearward state and                      pincer, and 11 the spine. Carrier choice follows the cue:
+then lunges forward rapidly, while depict flying bird                        depict flying bird oscillates TrilegCrown’s two rear
+spreads the carrier and repeats a vertical flap where ar-                    legs, shake head no twists SpineCrab’s spine in place,
+ticulated arms are available. Failures arise when the cue                    and tilt head curious turns SpineCrab aside with its
+depends on a precise body-relative relation rather than a                    antenna pointed forward.
+familiar stroke. In point self, the generated humanoid
+hand points forward rather than back toward the torso; in                          b) The same meaning is rematerialized, not only reas-
+cover yawn sleepy, TIAGo reaches the face region but                         signed: For 15 of the 30 cues, the motion structure itself—
+uses a front-facing horizontal hand that weakens the covering                static pose, joint oscillation, or traced path—differs across
+relation. The model therefore often grounds where a gesture                  the three bodies, so the change goes beyond swapping a car-
+occurs and recovers its coarse motion, but remains unreliable                rier name. nod yes is a head tilt on PaddleClaw and a spine
+about how the carrier must face or contact the body to                       pitch on SpineCrab, but an in-place yaw rock of the base on
+distinguish the intended meaning.                                            TrilegCrown. beckon come here is a repeated claw or
+                                                                             pincer-tip oscillation on the two branched bodies, whereas
+C. New Morphologies                                                          TrilegCrown raises its front leg, curls the knee three times,
+  We use synthetic morphologies to ask two questions: (1)                    and advances toward the viewer. depict big bowl traces
+Can recognition-relevant attributes be defined for complex                   a vertical end-effector arc on PaddleClaw and SpineCrab
+bodies far from human? and (2) Can these attributes be                       but a 180◦ floor arc of the whole base on TrilegCrown,
+composed into Motion Programs that convey intended mean-                     changing carrier, plane, and scale together. These cases are
+ings through such unfamiliar bodies to LLM? Five familiar                    the morphology-conditioned rematerialization of Sec. III-C,
+not anatomical substitution.                                                 [2] G. Johansson, “Visual perception of biological motion and a model for
+      c) Where the probe breaks: The same programs expose                        its analysis,” Perception & psychophysics, vol. 14, no. 2, pp. 201–211,
+                                                                                 1973.
+three failures. Contrast collapse: as channels disappear, dis-               [3] A. N. Meltzoff, “Understanding the intentions of others: Re-enactment
+tinct cues share one program. On TrilegCrown, point you,                         of intended acts by 18-month-old children.” Developmental psychol-
+salute, and flex bicep all reduce to the same presented                          ogy, vol. 31, no. 5, p. 838, 1995.
+                                                                             [4] F. Heider and M. Simmel, “An experimental study of apparent behav-
+front leg, and nod yes and shake head no both become                             ior,” The American Journal of Psychology, vol. 57, no. 2, pp. 243–259,
+base yaw oscillations that differ only in amplitude (±12◦ vs.                    1944.
+±25◦ ), erasing the vertical–lateral axis contrast that defines              [5] A. D. Dragan, K. C. Lee, and S. S. Srinivasa, “Legibility and
+                                                                                 predictability of robot motion,” in 2013 8th ACM/IEEE International
+them (Sec. III-B). On SpineCrab, cover yawn sleepy                               Conference on Human-Robot Interaction (HRI). IEEE, 2013, pp.
+and facepalm are identical, and on PaddleClaw five cues                          301–308.
+are static claw poses distinguished only by a direction                      [6] S. Kopp et al., “Towards a common framework for multimodal
+                                                                                 generation: The Behavior Markup Language,” in IVA, 2006.
+token. Human-form leakage: six bilateral cues, including                     [7] M. Salem et al., “Generation and evaluation of communicative robot
+arms open welcome, cross arms defensive, and                                     gesture,” International Journal of Social Robotics, 2012.
+depict flying bird, set SpineCrab’s short pincer out                         [8] V. Chidambaram, Y.-H. Chiang, and B. Mutlu, “Designing persuasive
+                                                                                 robots: How robots might persuade people using vocal and nonverbal
+or in, a configuration its schema does not expose, in effect                     cues,” in HRI, 2012.
+reconstructing a human pair of arms; TrilegCrown’s front leg                 [9] T. Kucherenko et al., “Gesticulator: A framework for semantically-
+likewise stands in for a hand across pointing, saluting, and                     aware speech-driven gesture generation,” in ICMI, 2020.
+                                                                            [10] Y. Yoon et al., “Speech gesture generation from the trimodal context
+flexing.                                                                         of text, audio, and speaker identity,” ACM Transactions on Graphics,
+                                                                                 2020, sIGGRAPH Asia.
+                        VII. C ONCLUSION                                    [11] X. Liu et al., “BEAT: A large-scale semantic and emotional multi-
+                                                                                 modal dataset for conversational gestures,” in ECCV, 2022.
+   Humans are highly sensitive to agency and intent in                      [12] A. Zhou, D. Hadfield-Menell, A. Nagabandi, and A. D. Dragan,
+motion, attributing meaning to the movements of animals,                         “Expressive robot motion timing,” in HRI, 2017.
+                                                                            [13] H. Knight and R. Simmons, “Expressive motion with x, y and theta:
+infants, animated characters, and even simple shapes. Robots                     Laban Effort features for mobile robots,” in RO-MAN, 2014.
+enter the same perceptual process: whether a motion is                      [14] ——, “Laban head-motions convey robot state: A call for robot body
+produced for a functional purpose or deliberately designed                       language,” in ICRA, 2016.
+                                                                            [15] J. Liang et al., “Code as policies: Language model programs for
+as a gesture, once observed, it becomes evidence from                            embodied control,” in ICRA, 2023.
+which people form an interpretation. The relevant question is               [16] W. Huang et al., “VoxPoser: Composable 3D value maps for robotic
+therefore not simply whether a robot can move expressively,                      manipulation,” in CoRL, 2023.
+                                                                            [17] Y. Dai et al., “Language movement primitives: Grounding language
+but whether its particular body preserves the evidence needed                    models in robot motion,” in RSS, 2026.
+for an intended meaning. Orientation, body-relative location,               [18] K. Mahadevan et al., “Generative expressive robot behaviors using
+and movement provide compact handles for posing and di-                          large language models,” in HRI, 2024.
+                                                                            [19] E. Rosch and C. B. Mervis, “Family resemblances: Studies in the
+agnosing that question, complemented by timing, repetition,                      internal structure of categories,” Cognitive psychology, vol. 7, no. 4,
+scale, coordination, and context. Motion Programs expose                         pp. 573–605, 1975.
+these handles to both people and LLMs and compile them
+through morphology-specific renderers.
+   The results reveal two distinct limitations. On human-like
+bodies, all of the necessary carriers are available, yet LLM-
+authored programs frequently misplace and misorient them.
+On non-humanoid bodies, generation draws from a more re-
+stricted repertoire: some cues transfer or rematerialize, while
+others become ambiguous because their defining evidence
+is lost. These findings leave two concrete problems for the
+community. First, how can we lower the authoring barrier
+so that every robot can be given an editable repertoire of
+recognizable gestures, even when humans must define the
+semantics? Second, how can models learn to reason about
+a new morphology well enough to invent the right carrier
+and motion, rather than merely imitate the surface form of a
+human gesture? Answering the second question will require
+evaluation on meaning recognition across genuinely different
+bodies, not only realism on a familiar human skeleton.
+
+                             A PPENDIX
+                            R EFERENCES
+ [1] R. I. Dunbar, “The social brain hypothesis,” Evolutionary Anthropol-
+     ogy: Issues, News, and Reviews: Issues, News, and Reviews, vol. 6,
+     no. 5, pp. 178–190, 1998.
+

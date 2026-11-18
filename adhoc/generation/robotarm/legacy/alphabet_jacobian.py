@@ -291,7 +291,8 @@ class JacobianCalculator:
         matching_poses = []
         
         for pose in self.pose_database:
-            if pose.get("robot") != robot_name:
+            bank_robot = {"FR3": "Panda"}.get(str(robot_name), str(robot_name))
+            if pose.get("robot") != bank_robot:
                 continue
             
             # 1. Check if we have high-level labels (dir, gripper_orientation)
@@ -363,7 +364,11 @@ class JacobianCalculator:
                     joint_pos[active_joint_idx] = joint_angles_rad[i]
                 else:
                     print(f"Warning: active_joint_idx {active_joint_idx} >= len(joint_pos) {len(joint_pos)}")
-        
+        if str(self.robot_name) == "FR3":
+            from robosuite.models.robots.manipulators.fr3_robot import apply_bank_gripper_clock
+
+            joint_pos[:7] = apply_bank_gripper_clock(joint_pos[:7])
+
         # Set joint positions
         self.robot.set_robot_joint_positions(joint_pos)
         self.env.sim.forward()

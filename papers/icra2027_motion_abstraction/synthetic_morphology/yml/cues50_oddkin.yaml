@@ -1,0 +1,223 @@
+meta:
+  version: '0.1'
+  family: oddkin
+  n_cues: 50
+  morphologies:
+  - gcr_alpha0
+  - gcr_alpha05
+  - gcr_alpha1
+  fewshot_reference:
+  - raising_hand_greeting
+  - wave_hi
+  - bow_greeting
+  - blow_kiss
+  - circle_temple_crazy
+  note: Rematerialized Motion Codes for the paper's 30-cue pool.
+cues:
+  nod_yes:
+    gcr_alpha0: path(base, arc, r=0, deg=±12, rep=3, spd=1.5)
+    gcr_alpha05: pose(torso=mid) + move(torso, pitch, ±12, rep=3, spd=1.5)
+    gcr_alpha1: pose(head=center, torso=mid) + move(head, tilt, [-12,12], rep=3, spd=1.5)
+  shake_head_no:
+    gcr_alpha0: move(base, yaw, ±25, rep=3, spd=2.0)
+    gcr_alpha05: path(torso, arc, r=0, deg=±25, rep=3)
+    gcr_alpha1: move(head, pan, ±20, rep=3, spd=2.0)
+  draw_circle_repeat:
+    gcr_alpha0: path(base, arc, r=0.15, deg=360, rep=2, spd=1.4)
+    gcr_alpha05: pose(long=front) + path(ee_long, arc, plane=xy, r=0.08, sweep=360, rep=2)
+    gcr_alpha1: pose(claw=front) + path(ee_claw, arc, plane=xy, r=0.08, sweep=360, rep=2)
+  gaze_shift_avoid:
+    gcr_alpha0: pose(dir=left) + pose(dir=right) + pose(dir=front)
+    gcr_alpha05: pose(dir=left) + pose(dir=right) + pose(dir=front)
+    gcr_alpha1: pose(head=left) + pose(head=right) + pose(head=center)
+  fist_pump:
+    gcr_alpha0: pose(leg0=raise) + move(hip0, yaw, [0,40], rep=3, spd=2.2)
+    gcr_alpha05: pose(long=up) + move(long_pincer, pitch, [0,30], rep=3, spd=2.2)
+    gcr_alpha1: pose(claw=up, grip=close) + move(claw, pitch, [0,30], rep=3, spd=2.2)
+  tilt_head_curious:
+    gcr_alpha0: pose(dir=left) + hold(t=1.0)
+    gcr_alpha05: pose(dir=left, antenna=forward) + hold(t=1.0)
+    gcr_alpha1: pose(head=left) + move(head, roll, +20, hold=1.0)
+  cover_yawn_sleepy:
+    gcr_alpha0: path(base, arc, r=0.25, deg=15, spd=0.8) + path(base, arc, r=0.25, deg=-30, spd=0.5, hold=1.2)
+    gcr_alpha05: pose(torso=low, long=in) + hold(t=1.2)
+    gcr_alpha1: pose(claw=in, paddle=still, head=down, torso=low) + hold(t=1.2)
+  rub_eye_tired:
+    gcr_alpha0: pose(leg0=present) + move(hip0, yaw, ±15, rep=4, spd=1.2)
+    gcr_alpha05: pose(long=in) + move(long_pincer, tip, ±20, rep=4)
+    gcr_alpha1: pose(claw=in, head=center) + move(wrist_c, roll, ±25, rep=4)
+  point_you:
+    gcr_alpha0: pose(dir=front, leg0=present) + hold(t=1.4)
+    gcr_alpha05: pose(dir=front, long=front, long_grip=edge) + hold(t=1.4)
+    gcr_alpha1: pose(dir=front, claw=front, grip=pinch, paddle=still) + hold(t=1.4)
+  point_self:
+    gcr_alpha0: pose(dir=back, leg0=present) + hold(t=1.4)
+    gcr_alpha05: pose(long=back) + hold(t=1.4)
+    gcr_alpha1: pose(claw=back, grip=pinch) + hold(t=1.4)
+  beckon_come_here:
+    gcr_alpha0: pose(leg0=raise) + move(knee0, pitch, ±25, rep=3) + path(base, line, x=+0.08)
+    gcr_alpha05: pose(long=front) + move(long_pincer, tip, ±30, rep=3)
+    gcr_alpha1: pose(claw=front, grip=open, elbow_c=T) + move(claw, pitch, ±25, rep=3)
+  stop_palm_out:
+    gcr_alpha0: path(base, line, x=+0.12) + hold(t=1.5)
+    gcr_alpha05: pose(torso=high, long=front, long_grip=flat) + hold(t=1.5)
+    gcr_alpha1: pose(paddle=front, palm=palmfront, claw=still, torso=mid) + hold(t=1.5)
+  salute:
+    gcr_alpha0: pose(leg0=present) + hold(t=1.4)
+    gcr_alpha05: pose(long=up, short=still) + hold(t=1.4)
+    gcr_alpha1: pose(claw=up, grip=edge-like, head=center) + hold(t=1.4)
+  raise_index_one_moment:
+    gcr_alpha0: pose(leg0=raise) + hold(t=1.3)
+    gcr_alpha05: pose(short=up) + hold(t=1.3)
+    gcr_alpha1: pose(claw=up, grip=pinch, elbow_c=T) + hold(t=1.3)
+  highfive_invite:
+    gcr_alpha0: path(base, arc, r=0, deg=360, spd=2.5) + path(base, line, x=+0.20, hold=1.0) + pose(leg0=present)
+    gcr_alpha05: pose(torso=high, long=front) + path(base, line, x=+0.15, hold=1.2)
+    gcr_alpha1: pose(claw=front, grip=open) + path(ee_claw, line, axis=x, dist=+0.15, hold=1.0)
+  shrug_idk:
+    gcr_alpha0: pose(leg0=raise, leg1=raise, leg2=raise) + move(base, yaw, ±10, rep=2)
+    gcr_alpha05: pose(long=out, short=out) + move(torso, height, high, hold=0.4) + move(long_pincer, yaw,
+      ±20) + move(short_pincer, yaw, ±20)
+    gcr_alpha1: pose(paddle=out, claw=out, palm=palmup) + move(torso, pitch, +15, hold=0.4) + move(paddle,
+      yaw, ±15) + move(claw, yaw, ±15)
+  flex_bicep:
+    gcr_alpha0: pose(leg0=present) + hold(t=1.3)
+    gcr_alpha05: pose(long=up) + move(long_pincer, pitch, -40, hold=1.2)
+    gcr_alpha1: pose(claw=out, elbow_c=T, grip=close) + hold(t=1.3)
+  air_quotes:
+    gcr_alpha0: pose(leg0=raise, leg1=raise) + move(hip0, yaw, ±20, rep=2) + move(hip1, yaw, ±20, rep=2)
+    gcr_alpha05: pose(long=up, short=up) + move(long_pincer, tip, ±25, rep=2) + move(short_pincer, pitch,
+      ±25, rep=2)
+    gcr_alpha1: pose(claw=up, paddle=up, grip=pinch) + move(wrist_c, roll, ±30, rep=2) + move(wrist_p,
+      roll, ±30, rep=2)
+  arms_open_welcome:
+    gcr_alpha0: pose(leg0=raise, leg1=raise, leg2=raise) + hold(t=1.4)
+    gcr_alpha05: pose(long=out, short=out, torso=mid) + hold(t=1.4)
+    gcr_alpha1: pose(paddle=out, claw=out, palm=palmup) + hold(t=1.4)
+  hands_up_surrender:
+    gcr_alpha0: pose(leg0=raise, leg1=raise, leg2=raise) + path(base, line, x=-0.15) + hold(t=1.3)
+    gcr_alpha05: pose(torso=high, long=up, short=up) + path(base, line, x=-0.15) + hold(t=1.3)
+    gcr_alpha1: pose(paddle=up, claw=up, grip=open) + path(base, line, x=-0.12) + hold(t=1.3)
+  stretch_arms_up:
+    gcr_alpha0: pose(leg0=raise, leg1=raise, leg2=raise, crown=half) + hold(t=1.4)
+    gcr_alpha05: pose(torso=high, long=up, short=up) + hold(t=1.4)
+    gcr_alpha1: pose(paddle=up, claw=up, torso=high) + hold(t=1.4)
+  raise_fists_victory:
+    gcr_alpha0: pose(leg0=present, leg1=raise) + hold(t=1.4)
+    gcr_alpha05: pose(long=up, short=up, long_grip=close) + hold(t=1.4)
+    gcr_alpha1: pose(paddle=up, claw=up, grip=close) + hold(t=1.4)
+  cross_arms_defensive:
+    gcr_alpha0: pose(leg0=plant, leg1=plant, leg2=plant) + hold(t=1.4)
+    gcr_alpha05: pose(long=in, short=in, torso=mid) + hold(t=1.4)
+    gcr_alpha1: pose(paddle=in, claw=in) + hold(t=1.4)
+  palms_together_thank_you:
+    gcr_alpha0: pose(dir=front) + path(base, line, x=+0.08) + move(base, yaw, 0, hold=1.2)
+    gcr_alpha05: pose(long=front, short=front) + move(torso, pitch, +20, hold=1.0)
+    gcr_alpha1: pose(paddle=front, claw=front, palm=palmin) + move(torso, pitch, +20, hold=1.0)
+  facepalm:
+    gcr_alpha0: pose(leg0=present) + path(base, line, x=-0.05) + hold(t=1.3)
+    gcr_alpha05: pose(long=in, torso=low) + hold(t=1.3)
+    gcr_alpha1: pose(claw=in, head=down, paddle=still) + hold(t=1.3)
+  depict_tree:
+    gcr_alpha0: path(base, line, x=+0.12) + pose(leg0=present) + pose(leg1=raise) + pose(leg2=raise) +
+      hold(t=1.0)
+    gcr_alpha05: pose(torso=high) + pose(long=up, short=out) + hold(t=1.2)
+    gcr_alpha1: pose(torso=high, paddle=up, claw=out) + hold(t=1.2)
+  depict_big_bowl:
+    gcr_alpha0: path(base, arc, r=0.28, deg=-180, spd=0.9) + hold(t=0.8)
+    gcr_alpha05: pose(long=out, short=out) + path(ee_long, arc, plane=yz, r=0.12, sweep=-120)
+    gcr_alpha1: pose(paddle=out, claw=out) + path(ee_claw, arc, plane=yz, r=0.14, sweep=-120)
+  depict_lion:
+    gcr_alpha0: path(base, line, x=-0.10) + path(base, line, x=+0.05) + path(base, line, x=+0.18) + pose(leg0=present)
+    gcr_alpha05: pose(long=front) + path(base, line, x=-0.08) + path(ee_long, line, axis=x, dist=+0.15)
+    gcr_alpha1: pose(claw=front, grip=open, torso=low) + path(base, line, x=-0.10) + path(ee_claw, line,
+      axis=x, dist=+0.20)
+  depict_small_object:
+    gcr_alpha0: pose(leg0=raise) + move(knee0, pitch, ±12, rep=2) + hold(t=0.8)
+    gcr_alpha05: pose(short=front) + move(short_pincer, pitch, ±15, rep=2) + hold(t=0.8)
+    gcr_alpha1: pose(claw=front, grip=pinch, z=55) + move(claw, pitch, ±12, rep=2) + hold(t=0.8)
+  depict_flying_bird:
+    gcr_alpha0: move(hip1, yaw, ±30, rep=4) + move(hip2, yaw, ±30, rep=4)
+    gcr_alpha05: pose(long=out, short=out) + move(long_pincer, yaw, ±35, rep=4) + move(short_pincer, yaw,
+      ±35, rep=4)
+    gcr_alpha1: pose(paddle=out, claw=out) + move(paddle, yaw, ±35, rep=4) + move(claw, yaw, ±35, rep=4)
+  self_scratch_head_confused:
+    gcr_alpha0: pose(leg0=present) + move(hip0, yaw, ±25, rep=3)
+    gcr_alpha05: pose(long=in, short=still) + move(long_pincer, pitch, ±20, rep=3)
+    gcr_alpha1: pose(claw=in, head=center) + move(claw, pitch, ±20, rep=3)
+  pat_stomach:
+    gcr_alpha0: pose(leg0=present) + move(hip0, yaw, ±25, rep=3)
+    gcr_alpha05: pose(long=in, short=still) + move(long_pincer, pitch, ±20, rep=3)
+    gcr_alpha1: pose(claw=in, head=center) + move(claw, pitch, ±20, rep=3)
+  fan_face_hot:
+    gcr_alpha0: pose(leg0=present) + move(hip0, yaw, ±25, rep=3)
+    gcr_alpha05: pose(long=in, short=still) + move(long_pincer, pitch, ±20, rep=3)
+    gcr_alpha1: pose(claw=in, head=center) + move(claw, pitch, ±20, rep=3)
+  cover_mouth_gasp:
+    gcr_alpha0: pose(leg0=present) + move(hip0, yaw, ±25, rep=3)
+    gcr_alpha05: pose(long=in, short=still) + move(long_pincer, pitch, ±20, rep=3)
+    gcr_alpha1: pose(claw=in, head=center) + move(claw, pitch, ±20, rep=3)
+  fistbump_invite:
+    gcr_alpha0: pose(leg0=present) + path(base, line, x=+0.18)
+    gcr_alpha05: pose(long=front) + path(base, line, x=+0.18)
+    gcr_alpha1: pose(claw=front, grip=close) + path(base, line, x=+0.18)
+  throat_cut_stop:
+    gcr_alpha0: pose(leg0=raise, crown=quarter) + hold(t=1.0)
+    gcr_alpha05: pose(long=front) + move(collar, yaw, ±12, rep=2) + hold(t=1.0)
+    gcr_alpha1: pose(paddle=front, palm=palmfront) + hold(t=1.0)
+  visor_search:
+    gcr_alpha0: pose(leg0=present) + move(hip0, yaw, ±25, rep=3)
+    gcr_alpha05: pose(long=in, short=still) + move(long_pincer, pitch, ±20, rep=3)
+    gcr_alpha1: pose(claw=in, head=center) + move(claw, pitch, ±20, rep=3)
+  yield_turn:
+    gcr_alpha0: pose(leg0=present) + path(base, line, x=-0.18)
+    gcr_alpha05: pose(long=out) + path(base, line, x=-0.18)
+    gcr_alpha1: pose(paddle=out, palm=palmup) + path(base, line, x=-0.18)
+  request_turn:
+    gcr_alpha0: pose(leg0=present) + path(base, line, x=+0.18)
+    gcr_alpha05: pose(long=front) + path(base, line, x=+0.18)
+    gcr_alpha1: pose(claw=front, grip=close) + path(base, line, x=+0.18)
+  slow_down_request_palm_down:
+    gcr_alpha0: pose(leg0=raise, crown=quarter) + hold(t=1.0)
+    gcr_alpha05: pose(long=front) + move(collar, yaw, ±12, rep=2) + hold(t=1.0)
+    gcr_alpha1: pose(paddle=front, palm=palmfront) + hold(t=1.0)
+  scale_expand:
+    gcr_alpha0: move(hip0, yaw, ±30, rep=2) + move(hip1, yaw, ∓30, rep=2)
+    gcr_alpha05: pose(long=out, short=out) + move(long_pincer, yaw, ±25, rep=2)
+    gcr_alpha1: pose(paddle=out, claw=out) + move(paddle, z, ±20, rep=2) + move(claw, z, ∓20, rep=2)
+  clarification_request_palm_tilt:
+    gcr_alpha0: path(crown, arc, r=0, deg=±40, rep=2)
+    gcr_alpha05: path(torso, arc, r=0, deg=±30, rep=2)
+    gcr_alpha1: pose(paddle=front, palm=palmup) + move(paddle, roll, ±25, rep=2)
+  continue_on_forward_roll:
+    gcr_alpha0: pose(leg0=present) + path(base, line, x=+0.18)
+    gcr_alpha05: pose(long=front) + path(base, line, x=+0.18)
+    gcr_alpha1: pose(claw=front, grip=close) + path(base, line, x=+0.18)
+  interrupt_hard:
+    gcr_alpha0: pose(leg0=raise, crown=quarter) + hold(t=1.0)
+    gcr_alpha05: pose(long=front) + move(collar, yaw, ±12, rep=2) + hold(t=1.0)
+    gcr_alpha1: pose(paddle=front, palm=palmfront) + hold(t=1.0)
+  interrupt_soft:
+    gcr_alpha0: pose(leg0=raise, crown=quarter) + hold(t=1.0)
+    gcr_alpha05: pose(long=front) + move(collar, yaw, ±12, rep=2) + hold(t=1.0)
+    gcr_alpha1: pose(paddle=front, palm=palmfront) + hold(t=1.0)
+  self_hug:
+    gcr_alpha0: move(hip0, yaw, ±30, rep=2) + move(hip1, yaw, ∓30, rep=2)
+    gcr_alpha05: pose(long=out, short=out) + move(long_pincer, yaw, ±25, rep=2)
+    gcr_alpha1: pose(paddle=out, claw=out) + move(paddle, z, ±20, rep=2) + move(claw, z, ∓20, rep=2)
+  push_pull_dual:
+    gcr_alpha0: move(hip0, yaw, ±30, rep=2) + move(hip1, yaw, ∓30, rep=2)
+    gcr_alpha05: pose(long=out, short=out) + move(long_pincer, yaw, ±25, rep=2)
+    gcr_alpha1: pose(paddle=out, claw=out) + move(paddle, z, ±20, rep=2) + move(claw, z, ∓20, rep=2)
+  wait_for_me_backward_palm:
+    gcr_alpha0: pose(leg0=present) + path(base, line, x=-0.18)
+    gcr_alpha05: pose(long=out) + path(base, line, x=-0.18)
+    gcr_alpha1: pose(paddle=out, palm=palmup) + path(base, line, x=-0.18)
+  frustration_down_throw:
+    gcr_alpha0: move(crown, yaw, ±45, rep=2) + path(base, arc, r=0, deg=90)
+    gcr_alpha05: pose(torso=high) + move(long_pincer, pitch, -35) + path(base, arc, r=0, deg=90)
+    gcr_alpha1: pose(torso=high, claw=down) + move(claw, z, -35) + path(base, arc, r=0, deg=90)
+  clap_applause:
+    gcr_alpha0: move(hip0, yaw, ±30, rep=2) + move(hip1, yaw, ∓30, rep=2)
+    gcr_alpha05: pose(long=out, short=out) + move(long_pincer, yaw, ±25, rep=2)
+    gcr_alpha1: pose(paddle=out, claw=out) + move(paddle, z, ±20, rep=2) + move(claw, z, ∓20, rep=2)

@@ -7,6 +7,7 @@ NOTE: IK is only supported for the following robots:
 :Baxter:
 :Sawyer:
 :Panda:
+:FR3:
 :GR1FixedLowerBody:
 :XArm7:
 :UR5e:
@@ -32,7 +33,7 @@ from robosuite.utils.control_utils import *
 from robosuite.utils.ik_utils import IKSolver, get_nullspace_gains
 
 # Dict of supported ik robots
-SUPPORTED_IK_ROBOTS = {"Baxter", "Sawyer", "Panda", "GR1", "GR1FixedLowerBody", "XArm7", "UR5e", "IIWA", "Jaco", "Kinova3"}
+SUPPORTED_IK_ROBOTS = {"Baxter", "Sawyer", "Panda", "FR3", "GR1", "GR1FixedLowerBody", "XArm7", "UR5e", "IIWA", "Jaco", "Kinova3"}
 
 
 class InverseKinematicsController(JointPositionController):

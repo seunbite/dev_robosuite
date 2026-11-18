@@ -1,0 +1,22 @@
+Stretch has three independent carriers that can run together:
+  1. base path  — where the robot is going
+  2. arm + mast — where you should go, or what is being indicated
+     (dir, grip, x, z, torso, elbow; path(ee, ...); move(shoulder|elbow|wrist|torso))
+  3. head       — who is being addressed, what is being attended to
+     (head=; move(head, pan|tilt, ...))
+
+Use the extra channels. Do not serialize everything onto the base the way a
+Roomba must. Prefer:
+- securing attention on the head, leaving the arm free to deliver the beat
+- deference as torso=low and a small −x, not as a long retreat
+- a seated or child addressee as z / torso dropping toward their eye height
+- a far or crowded addressee as z / torso rising so the stroke clears bodies
+- time-critical as cutting base travel first, keeping the arm beat
+- emergency as a crisp arm/head onset, not a spin
+- carrying a load: the arm is gone. Re-express the identity beat on head
+  and/or base. pose(...) may keep only head= (and dir=still). No path(ee),
+  no move(shoulder|elbow|wrist|torso), no grip/torso/elbow/x/y/z.
+
+`&` means two steps run together (e.g. a head turn during a base arc). Use
+it when the situation needs simultaneous evidence. Join sequential steps
+with `+`.

@@ -49,12 +49,18 @@ def load_cues() -> dict[int, dict[str, Any]]:
 
 def contrastive_block(target: dict[str, Any], foil: dict[str, Any]) -> str:
     return (
-        f"Contrastive constraint: make the motion for \"{target['cue']}\" clearly "
-        f"distinguishable from the foil cue \"{foil['cue']}\" "
+        f"Contrastive + contextualization constraint: make the motion for \"{target['cue']}\" "
+        f"clearly distinguishable from the foil cue \"{foil['cue']}\" "
         f"({foil.get('description') or ''}). "
-        "A human viewer should not confuse your output with that foil. "
-        "Emphasize the distinctive timing, path shape, and staging of the target cue; "
-        "do not produce a generic tip-up / small-arc that could read as either cue."
+        "A human viewer should not confuse your output with that foil.\n"
+        "If a short core alone would still look like the foil on a Roomba "
+        "(shared tip-up / small arc / advance-and-hold), you MUST add motion context: "
+        "pre-core and/or post-core submotions (path/move/hold stages) that enlarge the "
+        "semantic margin so an observer can infer the target cue, not merely produce "
+        "a different-looking trajectory.\n"
+        f"Emphasize distinctive timing, path shape, and staging tied to the target meaning; "
+        f"do not emit a generic carrier that could read as either cue, and do not invent "
+        f"arbitrary flourishes that fail to connect to \"{target['cue']}\"."
     )
 
 
@@ -332,6 +338,14 @@ def run_trajectory(client: Any, model: str, pairs: list[dict], cues: dict[int, d
 def write_gallery(all_rows: dict[str, list[dict]]) -> Path:
     import html as H
 
+    captions: dict[str, dict[str, str]] = {}
+    cap_path = OUT / "captions.json"
+    if cap_path.is_file():
+        try:
+            captions = json.loads(cap_path.read_text(encoding="utf-8"))
+        except Exception:
+            captions = {}
+
     cards = []
     # group by target
     keys = [(p["target_idx"], p["foil_idx"]) for p in PAIRS]
@@ -339,18 +353,24 @@ def write_gallery(all_rows: dict[str, list[dict]]) -> Path:
     for ti, fi in keys:
         t, f = cues[ti], cues[fi]
         cells = []
+        pair_caps = captions.get(f"{t['cue']}|{f['cue']}", {})
         for method in ("motion_program", "joint", "xyzrpy", "trajectory"):
             rows = all_rows.get(method, [])
             hit = next((r for r in rows if int(r["idx"]) == ti and r.get("foil") == f["cue"]), None)
+            cap = H.escape(str(pair_caps.get(method) or (hit or {}).get("caption") or ""))
+            cap_html = f"<p class='cap'>{cap}</p>" if cap else ""
             if hit and hit.get("render_ok") and Path(hit.get("render_gif") or "").is_file():
                 rel = os.path.relpath(hit["render_gif"], OUT)
                 cells.append(
                     f"<div class='cell'><div class='m'>{H.escape(method)}</div>"
-                    f"<img src='{H.escape(rel)}?v=1'></div>"
+                    f"<img src='{H.escape(rel)}?v=1'>{cap_html}</div>"
                 )
             else:
                 err = H.escape(str((hit or {}).get("error") or "missing"))
-                cells.append(f"<div class='cell'><div class='m'>{H.escape(method)}</div><p class='fail'>{err}</p></div>")
+                cells.append(
+                    f"<div class='cell'><div class='m'>{H.escape(method)}</div>"
+                    f"<p class='fail'>{err}</p>{cap_html}</div>"
+                )
         cards.append(
             f"<section><h2>{H.escape(t['cue'])} <span>≠</span> {H.escape(f['cue'])}</h2>"
             f"<div class='row'>{''.join(cells)}</div></section>"
@@ -364,6 +384,7 @@ h1{{font-size:1.2rem}} h2{{font-size:1rem;margin:1.2rem 0 .4rem}} h2 span{{color
 .cell{{background:#1a1a1a;border:1px solid #333;padding:6px}}
 .cell img{{width:100%;display:block;background:#000}}
 .m{{font-size:.75rem;color:#9aa;margin-bottom:4px}}
+.cap{{font-size:.72rem;color:#cbd5e1;line-height:1.35;margin:.45rem 0 0}}
 .fail{{color:#f88;font-size:.8rem}}
 </style></head><body>
 <h1>Roomba contrastive generation — distinguish target from foil</h1>

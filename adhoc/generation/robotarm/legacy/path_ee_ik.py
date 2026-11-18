@@ -22,6 +22,7 @@ if _ROBOTARM_DIR not in sys.path:
 from motion_speed import V_REF_M_PER_S as PATH_EE_M_PER_S_AT_UNIT_SPEED
 from motion_speed import _frame_scale as _frame_scale
 from motion_speed import clamp_speed as _clamp_speed
+from motion_speed import stretch_duration as _stretch_duration
 PATH_IK_MAX_ITERS = 80
 PATH_IK_POS_TOL_M = 0.004
 
@@ -158,7 +159,11 @@ def path_duration_seconds(params: dict[str, Any]) -> float:
     speed = _clamp_speed(float(params.get("speed", 1.0)))
     length_m = max(0.01, path_length_meters(params))
     rep = max(1, int(params.get("repetition", 1)))
-    return (length_m * rep) / (speed * PATH_EE_M_PER_S_AT_UNIT_SPEED)
+    authored = (length_m * rep) / (speed * PATH_EE_M_PER_S_AT_UNIT_SPEED)
+    duration, why = _stretch_duration(authored, ee_travel_m=length_m * rep)
+    if why:
+        print(f"  speed-safe path: {authored:.2f}s → {duration:.2f}s ({why})")
+    return duration
 
 
 def _axis_unit(axis: str) -> np.ndarray:
@@ -354,6 +359,7 @@ def execute_path_ee_ik(
             f"speed={effective_speed}, frames={num_frames}"
         )
         u = _axis_unit(axis)
+        q_prev = np.asarray(generator._get_joint_positions(), dtype=np.float64).copy()
         for k in range(num_frames):
             # phase advances through ``rep`` full 왔다갔다 sets
             phase = (k / max(num_frames - 1, 1)) * (rep if _is_distance_span(dist) or rep > 1 else 1.0)
@@ -367,8 +373,18 @@ def execute_path_ee_ik(
                 target_pos=target,
                 quat_wxyz=hold_quat,
             )
-            generator._set_joint_positions(generator._get_joint_positions())
-            frames.append(Image.fromarray(capture_image_fn()))
+            generator._apply_ik_qpos_to_robot()
+            q_now = np.asarray(generator._get_joint_positions(), dtype=np.float64).copy()
+            generator._record_q_lerp(q_prev, q_now, hz, frames)
+            q_prev = q_now
+        generator._apply_ik_qpos_to_robot()
+        end_pos = generator._get_eef_position()
+        delta = end_pos - start_pos
+        print(
+            f"  EE start={np.round(start_pos, 3).tolist()} "
+            f"end={np.round(end_pos, 3).tolist()} "
+            f"Δxyz={np.round(delta, 3).tolist()}m"
+        )
     elif shape in ("arc", "circle"):
         plane = normalize_plane(str(parameters.get("plane", "xy")))
         sweep = float(parameters.get("sweep", 360))
@@ -384,6 +400,7 @@ def execute_path_ee_ik(
             f"speed={effective_speed}, frames={num_frames}"
         )
         targets = arc_waypoints(parameters, start_pos, num_frames)
+        q_prev = np.asarray(generator._get_joint_positions(), dtype=np.float64).copy()
         for target in targets:
             ik_move_eef_to(
                 ik_solver=ik,
@@ -393,8 +410,11 @@ def execute_path_ee_ik(
                 target_pos=target,
                 quat_wxyz=hold_quat,
             )
-            generator._set_joint_positions(generator._get_joint_positions())
-            frames.append(Image.fromarray(capture_image_fn()))
+            generator._apply_ik_qpos_to_robot()
+            q_now = np.asarray(generator._get_joint_positions(), dtype=np.float64).copy()
+            generator._record_q_lerp(q_prev, q_now, hz, frames)
+            q_prev = q_now
+        generator._apply_ik_qpos_to_robot()
     else:
         raise ValueError(f"Unsupported EE path shape: {shape}")
 

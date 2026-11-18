@@ -38,6 +38,7 @@ def run(
     sim_robot: str = "IIWA",
     hz: int = 4,
     top_k: int = 1,
+    start_from_neutral: bool = False,
 ) -> None:
     ypath = Path(yaml_path) if yaml_path else seed_yml_dir() / "cues_new.yml"
     src_opt = Path(sources_yml) if sources_yml else None
@@ -99,6 +100,7 @@ def run(
             hz=hz,
             top_k=top_k,
             sources_yml=sources_yml,
+            start_from_neutral=start_from_neutral,
         )
 
 

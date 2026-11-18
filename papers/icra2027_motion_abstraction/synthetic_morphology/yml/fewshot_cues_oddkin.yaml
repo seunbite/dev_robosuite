@@ -1,0 +1,78 @@
+# Oddkin rematerialization of the unified few-shot cue set (5).
+# Source cues: data/seed/shots/embodiment_unified/shots.yaml (n_per_robot: 5)
+# Attribute schema: motion_code_synthetic_continuum.yaml
+#
+# Cues:
+#   raising_hand_greeting · wave_hi · bow_greeting · blow_kiss · circle_temple_crazy
+
+meta:
+  version: "0.1"
+  family: oddkin
+  source_shots: data/seed/shots/embodiment_unified/shots.yaml
+  cues:
+    - raising_hand_greeting
+    - wave_hi
+    - bow_greeting
+    - blow_kiss
+    - circle_temple_crazy
+
+# ---------------------------------------------------------------------------
+gcr_alpha0:
+  robot: "Oddkin α=0 Trileg Crown"
+  programs:
+    raising_hand_greeting: >
+      pose(dir=front, leg0=rest) + pose(dir=front, leg0=present)
+      + path(base, line, x=+0.18, spd=1.6, hold=0.3)
+    wave_hi: >
+      pose(dir=front, leg0=raise) + move(hip0, yaw, ±35, rep=3, spd=1.8, hold=0.15)
+    bow_greeting: >
+      pose(dir=front) + path(base, line, x=+0.15, spd=0.8, hold=0.4)
+      + path(base, line, x=-0.12, spd=0.8)
+    blow_kiss: >
+      pose(dir=front) + path(base, arc, r=0, deg=±12, rep=1, spd=2.5, hold=0.3)
+      + path(base, line, x=+0.28, spd=2.8)
+    circle_temple_crazy: >
+      pose(dir=front) + path(base, arc, r=0.12, deg=540, spd=1.2)
+
+gcr_alpha05:
+  robot: "Oddkin α=0.5 Canted Spine Crab"
+  programs:
+    raising_hand_greeting: >
+      pose(dir=front, torso=mid, long=still, short=still)
+      + pose(dir=front, torso=mid, long=up, short=still)
+      + hold(t=0.4)
+    wave_hi: >
+      pose(dir=front, torso=mid, long=up, short=still)
+      + move(long_pincer, yaw, ±30, rep=3, spd=1.8, hold=0.15)
+    bow_greeting: >
+      pose(dir=front, torso=high, long=still, short=still)
+      + move(torso, height, low, spd=0.8, hold=0.5)
+      + move(torso, height, mid, spd=0.9)
+    blow_kiss: >
+      pose(dir=front, torso=mid, long=up, long_grip=close, short=still)
+      + pose(dir=front, torso=mid, long=front, long_grip=open, short=still)
+      + path(ee_long, line, axis=x, dist=+0.12, spd=3.0)
+    circle_temple_crazy: >
+      pose(dir=front, torso=mid, long=in, short=still)
+      + path(collar, arc, r=0, deg=540, spd=1.2)
+
+gcr_alpha1:
+  robot: "Oddkin α=1.0 Branching Gesture Tree"
+  programs:
+    raising_hand_greeting: >
+      pose(dir=front, torso=mid, claw=still, paddle=up, palm=flat, x=55, y=48, z=88, grip=open)
+      + hold(t=0.9)
+    wave_hi: >
+      pose(dir=front, torso=mid, claw=up, paddle=still, palm=edge, x=55, y=40, z=90, grip=open)
+      + move(claw, y, ±, rep=3, spd=1.8, hold=0.12)
+    bow_greeting: >
+      pose(dir=front, torso=mid, claw=down, paddle=down, head=center)
+      + move(torso, pitch, +, spd=0.85, hold=0.35)
+      + move(torso, pitch, 0, spd=0.95)
+    blow_kiss: >
+      pose(dir=front, torso=mid, claw=back, paddle=still, palm=edge, grip=open, x=23, y=43, z=63)
+      + pose(dir=front, torso=mid, claw=front, paddle=still, palm=edge, grip=open, x=78, y=42, z=55)
+      + hold(t=0.5)
+    circle_temple_crazy: >
+      pose(dir=front, torso=mid, claw=up, paddle=still, palm=edge, grip=open, x=25, y=29, z=78)
+      + path(ee_claw, arc, plane=yz, r=0.06, sweep=540, spd=1.2)

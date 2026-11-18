@@ -1,0 +1,71 @@
+% Drop-in replacement for \section{Results} ... (up to \section{Conclusion}).
+% Numbers and their sources:
+%   Human-like carrier vs attribute : analyze_humanlike_carrier_vs_attribute.py -> humanlike_carrier_vs_attribute.md
+%   Non-anthropomorphic strategy    : analyze_transfer_50.py -> transfer_outcomes_50.json, figure_nonanthropomorphic_strategy_50.pdf
+%   Roomba collapse signatures      : computed from transfer_outcomes_50.json (Roomba target_code)
+%   Synthetic probe                 : analyze_synthetic_probe30.py -> synthetic_probe30.md
+
+\section{Results}
+\label{sec:analysis}
+We use morphology to take generation apart in three steps rather than to rank eight robots. Human-like robots ask whether generation can realize the right attributes when the right body exists. Non-anthropomorphic robots ask whether the meaning survives once that body disappears. Synthetic robots ask whether a realization can be constructed for a body with no familiar precedent. Each step tests a different part of our claim.
+
+\subsection{Human-like Robots: What Does Generation Get Wrong?}
+\label{sec:results-humanlike}
+G1 and TIAGo provide nearly every carrier the cue inventory requires, so a failure on these bodies cannot be attributed to a missing head, arm, or hand. They are therefore our cleanest diagnostic condition. With the same morphology and the same representation, human-authored programs are recognized at $96.7\%$ on G1 and $93.3\%$ on TIAGo, whereas LLM-authored programs reach $63.3\%$ and $60.0\%$ (Table~\ref{tab:humanoid-overall}). The gap lies in authoring, not in the body.
+
+\begin{table}[t]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{1.5pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}lrrrrrrrrr@{}}
+\toprule
+& \multicolumn{2}{c}{\textbf{Recognition}} & \multicolumn{3}{c}{\textbf{Location error}} & \multicolumn{4}{c}{\textbf{Exact agreement}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(l){7-10}
+\textbf{Robot} & \textbf{Human} & \textbf{LLM} & $x$ & $y$ & $z$ & \textbf{Reach} & \textbf{Palm} & \textbf{Move} & \textbf{2-arm} \\
+\midrule
+G1 & 96.7 & 63.3 & 18.4 & 19.2 & 11.2 & 47.2 & 48.6 & 50.6 & 19.0 \\
+TIAGo & 93.3 & 60.0 & 14.7 & 19.8 & 8.7 & 49.1 & 52.8 & 56.1 & 16.7 \\
+\bottomrule
+\end{tabular*}
+\caption{Human-like robots. Recognition (\%) compares human- and LLM-authored Motion Programs. Location reports mean absolute body-percentage error against the human-authored program; Reach, Palm, Move, and two-arm Move report exact agreement (\%).}
+\label{tab:humanoid-overall}
+\end{table}
+
+The attribute audit shows where the gap arises. Generation usually selects the right body part: on G1, $58$ of $78$ LLM-authored programs activate the same carriers as the human program, and on TIAGo $38$ of $57$ do. The errors appear one level down. Among these carrier-matched programs, $50/58$ on G1 and $30/38$ on TIAGo still differ from the human program in at least one recognition-critical attribute. Orientation is the most frequent error ($44$ and $25$), followed by location, counted as a deviation of at least $20$ body-\% on any axis ($38$ and $19$), and movement axis or sign ($18$ and $12$). \texttt{air\_quotes} engages both arms, as it should, but with the wrong palm orientation and stroke. \texttt{salute} raises the correct arm with the wrong reach, palm, and placement, so it reads as a generic raised hand. \texttt{beckon\_come\_here} uses the correct hand but loses its palm orientation and repeated inward flap. By contrast, \texttt{nod\_yes} and \texttt{shake\_head\_no}, whose identity rests almost entirely on a head-movement axis, match on both carrier and movement. Coordination is weakest: two-arm Movement agreement falls to $19.0\%$ on G1 and $16.7\%$ on TIAGo.
+
+Current models thus produce structurally valid programs on the correct carrier, yet often fail to instantiate the attribute that makes the gesture recognizable. This is our first evidence that imitating a gesture's outline is not enough: recognizability depends on precise evidence.
+
+\subsection{Non-anthropomorphic Robots: What Survives When the Human Carrier Disappears?}
+\label{sec:results-nonanthro}
+On IIWA, Stretch, and Roomba the question changes. Because these bodies differ from the human reference, a direct $x$/$y$/$z$ comparison against a human program no longer measures error. What matters is how the communicative evidence is transformed onto the body that remains. \TBD{Recognition of human- vs.\ LLM-authored programs: IIWA [--]\,/\,[--], Stretch [--]\,/\,[--], Roomba [--]\,/\,[--].}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/figure_nonanthropomorphic_strategy_50.pdf}
+\caption{Realization strategy of the 50 LLM-authored Motion Programs on each non-anthropomorphic robot, coded from the program against its humanoid reference (\S\ref{sec3.3}). As human-like carriers disappear, preservation gives way to rematerialization.}
+\label{fig:nonanthro-transfer-50}
+\end{figure}
+
+\paragraph{From preservation to rematerialization}
+Figure~\ref{fig:nonanthro-transfer-50} shows the expected shift. IIWA preserves $44\%$ of cues on an analogous carrier, Stretch $42\%$, and Roomba none. Rematerialization rises correspondingly from $46\%$ to $54\%$ to $80\%$. Carrier transfer remains a minor strategy throughout ($10\%$, $4\%$, and $20\%$), so as the human carrier disappears the model rarely finds a single substitute carrier; it rebuilds the motion instead. \texttt{beckon\_come\_here} illustrates the progression. IIWA keeps the forward hand and repeated wrist stroke along $x$, Stretch rebuilds it as a repeated elbow stroke, and Roomba turns it into a fore--aft approach oscillation of the base.
+
+\paragraph{Which meanings travel}
+The strategy depends on what defines a cue. One-arm cues are the most portable on a single arm, where IIWA preserves $12$ of $17$. Bimanual cues cannot be preserved on one chain, and IIWA rematerializes $9$ of $12$. Movement-dominant cues keep their stroke even on the base: on Roomba, three of the four head and torso cues transfer their characteristic movement, with \texttt{nod\_yes} becoming a fore--aft oscillation and \texttt{shake\_head\_no} an in-place yaw oscillation, so the two remain distinct as translation versus rotation. Cues defined by palm orientation, body-relative location, or two-hand configuration have no such stroke to carry, and Roomba rematerializes $16$ of $17$ one-arm and $11$ of $12$ bimanual cues. \TBD{Recognition by cue type is required to show which of these rematerialized realizations remain recognizable.}
+
+\paragraph{Roomba: when meanings collapse}
+Roomba is the limiting case, and its value lies less in how many cues succeed than in how many remain separable. Ignoring magnitude and timing, its $50$ programs reduce to $29$ distinct motion structures. Eight cues---\texttt{point\_you}, \texttt{stop\_palm\_out}, \texttt{salute}, \texttt{raise\_index\_one\_moment}, \texttt{highfive\_invite}, \texttt{stretch\_arms\_up}, \texttt{fistbump\_invite}, and \texttt{interrupt\_hard}---become the same forward advance and hold, differing only in distance ($0.2$--$0.3$\,m), speed, and hold time. Four more (\texttt{nod\_yes}, \texttt{fist\_pump}, \texttt{beckon\_come\_here}, and \texttt{slow\_down\_request\_palm\_down}) share one fore--aft oscillation. Morphology therefore does not impose a binary boundary on expression. Roomba still separates nodding from shaking, but the cues distinguished by palm orientation and hand placement compress into approach, which reduces how well meanings can be told apart.
+
+\subsection{Synthetic Robots: Can Generation Work Without a Familiar Body Prior?}
+\label{sec:results-synthetic}
+Known robots test whether gestures survive increasingly constrained embodiments; synthetic bodies test whether a realization can be constructed when familiar morphology-specific priors are unavailable. Because G1 through Roomba are familiar platforms, their realizations may draw on memorized mappings (\emph{nod}~$\rightarrow$~head). TrilegCrown has no head, hands, or stable front; SpineCrab replaces arms with a canted spine and unequal pincers; PaddleClaw keeps a head but splits the upper body into a paddle and a claw. Without human evaluation or human reference programs, we analyze the 30 screening cues on each body against its schema.
+
+\TBD{Provenance: these 90 programs were written by the designers against the schemas and are not outputs of the Gemini pipeline, so the observations below characterize the representation. A claim about the generator requires generating the same set with the schema's built-in rematerialization examples removed from the prompt.}
+
+\paragraph{Unfamiliar parts become carriers, and realizations are rebuilt}
+Carrier choice follows the cue rather than a fixed surrogate limb. TrilegCrown uses its front leg in $20$ of $30$ cues and its base in $17$; SpineCrab uses its long pincer in $22$ and its spine in $11$. \texttt{depict\_flying\_bird} oscillates TrilegCrown's two rear legs, and \texttt{shake\_head\_no} twists SpineCrab's spine in place. For $15$ of the $30$ cues the motion structure itself changes across the three bodies. \texttt{nod\_yes} is a head tilt, a spine pitch, and an in-place base rock, and \texttt{depict\_big\_bowl} moves from a vertical end-effector arc to a $180^{\circ}$ floor arc of the whole base. This is morphology-conditioned rematerialization rather than anatomical substitution.
+
+\paragraph{Where it breaks}
+The same programs expose the limits. On TrilegCrown, \texttt{point\_you}, \texttt{salute}, and \texttt{flex\_bicep} reduce to one presented leg, and \texttt{nod\_yes} and \texttt{shake\_head\_no} become base yaw oscillations that differ only in amplitude, erasing the axis contrast that distinguished them on the human body. Human form also leaks back in: six bilateral cues set SpineCrab's short pincer \texttt{out} or \texttt{in}, a configuration its schema does not expose, reconstructing a pair of arms the body lacks. The representation extends to novel bodies, but extension does not guarantee recognizability: the fewer independent channels a body offers, the more meanings compete for the same carrier and stroke.
+
+Taken together, the three groups separate what the catalog of robots would otherwise confound. Imitating a human gesture's outline is not enough even when the body matches, because the evidence must be precise. The human form itself is not required, because evidence can be carried or rebuilt by another body. What is ultimately needed is therefore not a library of human gestures but the ability to construct a communicative realization from the affordances of the body at hand.

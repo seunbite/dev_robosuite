@@ -10,7 +10,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-import tiktoken
 import yaml
 
 
@@ -18,9 +17,10 @@ REPO = Path(__file__).resolve().parents[3]
 UNIFIED = REPO / "data/results/shots/embodiment_unified/shot_cues_yml_5.json"
 DRAG_DRAW = REPO / "data/seed/shots/drag_draw/fewshot_cues_yml_5.yaml"
 OUT = REPO / "data/results/drag_draw/token_cost"
+PAPER_FIG = REPO / "papers/icra2027_motion_abstraction/figures/figure3_tokens.pdf"
 PLATFORMS = ("humanoid", "tiago", "single_arm", "stretch", "roomba")
 METHODS = ("joint", "xyzrpy", "ours", "drag_draw")
-GROUPED_METHODS = ("xyzrpy", "joint", "ours", "drag_draw")
+GROUPED_METHODS = ("xyzrpy", "joint", "drag_draw", "ours")
 LABELS = {
     "joint": "Joint-Space Demonstration",
     "xyzrpy": "Cartesian-Space Demonstration",
@@ -36,20 +36,20 @@ SHORT_LABELS = {
 COLORS = {
     "joint": "#202020",
     "xyzrpy": "#202020",
-    "ours": "#202020",
-    "drag_draw": "#1F6FEB",
+    "ours": "#1F6FEB",
+    "drag_draw": "#202020",
 }
 BAR_FACE_COLORS = {
     "joint": "white",
     "xyzrpy": "#202020",
-    "drag_draw": "#1F6FEB",
-    "ours": "white",
+    "drag_draw": "white",
+    "ours": "#1F6FEB",
 }
 HATCHES = {
     "joint": None,
     "xyzrpy": None,
-    "drag_draw": None,
-    "ours": "//",
+    "drag_draw": "//",
+    "ours": None,
 }
 LINE_STYLES = {
     "joint": ("-", "o"),
@@ -103,6 +103,8 @@ def _normalize_drag_draw(payload: dict, n: int) -> dict:
 
 
 def count_tokens(*, fixed_frames: int | None = None) -> dict:
+    import tiktoken
+
     encoder = tiktoken.get_encoding("o200k_base")
     unified = json.loads(UNIFIED.read_text(encoding="utf-8"))
     drag = yaml.safe_load(DRAG_DRAW.read_text(encoding="utf-8"))
@@ -200,6 +202,9 @@ def _paper_style() -> None:
 def _save(fig: plt.Figure, stem: str) -> None:
     fig.savefig(OUT / f"{stem}.png", dpi=220, bbox_inches="tight")
     fig.savefig(OUT / f"{stem}.svg", bbox_inches="tight")
+    fig.savefig(OUT / f"{stem}.pdf", bbox_inches="tight")
+    if stem == "option_a_grouped_vertical_bars":
+        fig.savefig(PAPER_FIG, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -308,8 +313,16 @@ def plot_option_b(report: dict) -> None:
 
 
 def main() -> None:
+    import sys
+
     OUT.mkdir(parents=True, exist_ok=True)
     _paper_style()
+    if "--plot-existing" in sys.argv:
+        report = json.loads((OUT / "token_count_report.json").read_text(encoding="utf-8"))
+        plot_option_a(report)
+        plot_option_b(report)
+        print(f"replotted existing report from {OUT / 'token_count_report.json'}")
+        return
     raw = count_tokens(fixed_frames=None)
     (OUT / "token_count_report_raw_frames.json").write_text(
         json.dumps(raw, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"

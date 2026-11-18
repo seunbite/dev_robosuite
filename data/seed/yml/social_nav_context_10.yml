@@ -1,0 +1,225 @@
+# Social-navigation context catalog — 10 viewing situations.
+#
+# Labels are who/where the gesture must be *shown to*, not a style the robot
+# should imitate. Keys are English slugs; `label` is the one-line situation.
+#
+# Cue set: 19 social-navigation cues (nav_eval ∪ practice deck).
+# Grid: 19 cues × 10 contexts = 190 programs per platform.
+
+cues_19:
+  - {idx: 1,  cue: nod_yes}
+  - {idx: 2,  cue: shake_head_no}
+  - {idx: 4,  cue: gaze_shift_avoid}
+  - {idx: 6,  cue: tilt_head_curious}
+  - {idx: 8,  cue: rub_eye_tired}
+  - {idx: 9,  cue: point_you}
+  - {idx: 10, cue: point_self}
+  - {idx: 11, cue: beckon_come_here}
+  - {idx: 12, cue: stop_palm_out}
+  - {idx: 14, cue: raise_index_one_moment}
+  - {idx: 15, cue: highfive_invite}
+  - {idx: 16, cue: shrug_idk}
+  - {idx: 18, cue: air_quotes}
+  - {idx: 19, cue: arms_open_welcome}
+  - {idx: 20, cue: hands_up_surrender}
+  - {idx: 23, cue: cross_arms_defensive}
+  - {idx: 25, cue: facepalm}
+  - {idx: 26, cue: depict_tree}
+  - {idx: 28, cue: depict_lion}
+
+contexts:
+
+  routine:
+    label: 평범한 낮 복도에서, 마주친 성인 한 명에게 보여져야 하는 상황
+    desc: >
+      Ordinary daytime corridor. One familiar standing adult is looking at the
+      robot. No time pressure, normal lighting and clearance. Control condition.
+    spd: 1.0
+    hold: 1.0
+    amp: 1.0
+    rep: 0
+    approach: neutral
+    height: mid
+    channels: [base, arm, head]
+    pre: []
+    post: []
+    forbid: []
+
+  urgent_emergency:
+    label: 급하거나 위험한 상황에서, 상대가 바로 알아보게 보여져야 하는 상황
+    desc: >
+      The person must read the cue immediately — the robot is short on time,
+      or something nearby is unsafe. Keep the same cue, but make onset sharp
+      and drop polite extras. Do not shout a different emblem.
+    spd: 1.8
+    hold: 0.55
+    amp: 1.2
+    rep: 0
+    approach: advance
+    height: high
+    channels: [base, arm, head]
+    pre: [orient]
+    post: [hold_short]
+    forbid: [circle, full_spin]
+
+  show_to_older_adult:
+    label: 움직임이 느린 노인에게, 천천히 또렷이 보여져야 하는 상황
+    desc: >
+      The viewer is an older adult who tracks motion slowly and walks slowly.
+      The robot is not acting elderly. It is showing the same cue in a way
+      they can follow: predictable, no sudden reverse, longer dwell, more
+      standoff so it does not loom.
+    spd: 0.55
+    hold: 1.8
+    amp: 1.1
+    rep: 0
+    approach: retreat
+    height: mid
+    channels: [base, arm, head]
+    pre: [orient]
+    post: [hold_long]
+    forbid: [sharp_strike, full_spin]
+
+  show_to_small_child:
+    label: 키가 작은 어린이에게, 놀라지 않게 눈높이에서 보여져야 하는 상황
+    desc: >
+      The viewer is a small child within reach. The robot is not acting like
+      a child. Drop the carrier toward their eye height, keep amplitudes
+      small, decelerate gently, bias away rather than toward, and settle
+      instead of ending mid-stroke.
+    spd: 0.45
+    hold: 1.6
+    amp: 0.6
+    rep: 0
+    approach: retreat
+    height: low
+    channels: [base, arm, head]
+    pre: []
+    post: [settle]
+    forbid: [sharp_strike, full_spin, advance_large]
+
+  show_to_seated_person:
+    label: 앉아 있는 사람(휠체어 등)에게, 그 눈높이에서 보여져야 하는 상황
+    desc: >
+      The viewer is seated, eye height around one metre. A signal sent above
+      a standing adult's head is missed. Drop the carrier, give more lateral
+      clearance, and warn before a turn.
+    spd: 0.7
+    hold: 1.5
+    amp: 1.0
+    rep: 0
+    approach: neutral
+    height: low
+    channels: [base, arm, head]
+    pre: [orient]
+    post: [hold_short]
+    forbid: [full_spin]
+
+  quiet_place:
+    label: 도서관처럼 조용한 곳에서, 방해하지 않고 보여져야 하는 상황
+    desc: >
+      A library, a night ward, or a recorded meeting. Disturbance is the
+      cost. Minimal travel, slow and small, long holds instead of
+      repetition. Spins and strikes read as noise even when silent.
+    spd: 0.5
+    hold: 1.4
+    amp: 0.5
+    rep: -1
+    approach: neutral
+    height: mid
+    channels: [base, arm, head]
+    pre: []
+    post: [hold_long]
+    forbid: [sharp_strike, full_spin, advance_large]
+
+  crowded_passage:
+    label: 사람들 사이로 가려지지 않게, 위에서 보여져야 하는 상황
+    desc: >
+      Other bodies stand between the robot and the viewer. The stroke must
+      clear them, while the base must not sweep into anyone. Less floor
+      translation, more elevated stroke.
+    spd: 0.8
+    hold: 1.2
+    amp: 0.7
+    amp_arm: 1.2
+    rep: 0
+    approach: neutral
+    height: high
+    channels: [base, arm, head]
+    pre: [scan]
+    post: []
+    forbid: [advance_large, full_spin]
+
+  far_away:
+    label: 복도 끝 약 10미터 떨어진 사람에게 보여져야 하는 상황
+    desc: >
+      The viewer is far enough that a small stroke reads as jitter. Larger
+      extent, extra repetition, slower rate, longer final hold.
+    spd: 0.8
+    hold: 1.3
+    amp: 1.5
+    rep: 1
+    approach: neutral
+    height: high
+    channels: [base, arm, head]
+    pre: []
+    post: [hold_long]
+    forbid: []
+
+  carrying_load:
+    label: 로봇이 짐을 든 채로, 팔 없이 보여줘야 하는 상황
+    desc: >
+      Stretch's arm is committed to a payload. The cue must survive on head
+      and base only — the same channel budget Roomba always has. Cap
+      acceleration so the load is not jerked.
+    spd: 0.6
+    hold: 1.3
+    amp: 0.8
+    rep: 0
+    approach: neutral
+    height: mid
+    channels: [base, head]
+    pre: []
+    post: [hold_short]
+    forbid: [sharp_strike, full_spin]
+
+  approaching_from_behind:
+    label: 상대의 등 뒤에서, 놀라지 않게 먼저 알리고 보여줘야 하는 상황
+    desc: >
+      The person is facing away. A sudden stroke at their back startles.
+      Announce first (heading, a small soundless prep, or a wide approach
+      into view), then deliver the cue once they can see it.
+    spd: 0.7
+    hold: 1.4
+    amp: 0.9
+    rep: 0
+    approach: retreat
+    height: mid
+    channels: [base, arm, head]
+    pre: [orient, scan]
+    post: [hold_short]
+    forbid: [sharp_strike, advance_large]
+
+forbid_definitions:
+  sharp_strike: any step with resolved spd >= 3.0
+  full_spin: path(base, arc, ...) with |deg| >= 300
+  advance_large: path(base, line, ...) with x >= +0.30
+  circle: path(base, arc, ...) with r >= 0.20
+
+_all_contexts: &contexts10
+  - routine
+  - urgent_emergency
+  - show_to_older_adult
+  - show_to_small_child
+  - show_to_seated_person
+  - quiet_place
+  - crowded_passage
+  - far_away
+  - carrying_load
+  - approaching_from_behind
+
+grid:
+  platforms: [roomba, stretch]
+  contexts: *contexts10
+  n_cues: 19
+  n_programs_per_platform: 190

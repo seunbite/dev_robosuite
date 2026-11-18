@@ -1,0 +1,354 @@
+           Automatic and Scalable Gesture Generation
+                   with a Language Anchor
+                     Author Names Omitted for Anonymous Review. Paper-ID [add your ID here]
+
+
+   Abstract—To generate expressive and semantically coherent          AI models fail to learn the core "motion-semantics" that
+robot gesture, traditional approaches rely on discrete motion         should remain invariant across platforms. Second, current data
+libraries or end-to-end learning from human demonstrations.           collection paradigms rely heavily on human labor-intensive
+However, these approaches are hard to adapt in non-humanoid
+embodiment and lack controllability, scalability, and inter-          methods like teleoperation or motion capture. These methods
+pretability. In this work, we propose L ANGUAGE A NCHORING            are not only unscalable but also struggle to generate the
+TO M OTION G ENERATION (LA2M): a framework that builds                subtle, "near-miss" variations—such as a hesitant wave or
+continuous, structured motion spaces around archetypal gestures       an enthusiastic nod—that define the rich manifold of human
+and enables controlled variation along semantic and persona-          expression.
+driven dimensions. We construct expressive robot motion man-
+ifolds through a fully automated and scalable pipeline that              In this work, we propose that robot gestures should be
+requires no manual motion design. [[point: language anchoring]        modeled not as discrete, handcrafted trajectories, but as Ex-
+The system automatically selects archetypal poses from a brute-       pressive Motion Manifolds built upon the principle of com-
+force joint configuration space and composes precise archetypal       positionality. We argue that a complex expressive motion can
+motions by specifying key movement attributes such as repetition,     be decomposed into an archetypal pose and a set of dynamic
+amplitude, spatial direction, and joint location. This explicit and
+programmatic formulation enables a single archetypal motion to        movements. For instance, a "shy nod" is a composition of a
+serve as a reusable and extensible representation, from which         specific initial pose and a rhythmic nodding movement. By
+diverse, context-aware expressive motions can be systematically       treating motion as a structured combination of these elements,
+generated.]Sb To evaluate our framework, we introduce three           we can generate all different and even highly complicated
+complementary metrics: (1) accuracy – the degree to which gen-        motions—such as "startled" or "shy" behaviors—that would
+erated motions preserve archetypal gesture identity, assessed via
+human and model-based evaluators; (2) diversity – the richness        be nearly impossible to capture through traditional imitation
+of the generated motion space, measured using manifold coverage       learning or discrete libraries.
+and statistical variation of joint trajectories; and (3) expressive      Building on this insight, we introduce a fully automated,
+performance – the ability of robots to convey intended affect         programmatic pipeline for constructing expressive robot mo-
+or persona, quantified through user studies and classification of     tion. We leverage the broad world knowledge of Large Lan-
+motion attributes. Our results demonstrate that LA2M produce
+gestures that are more diverse, semantically consistent, and
+                                                                      guage Models (LLMs) to define archetypal motions—robot-
+persona-adaptive than conventional discrete motion libraries or       agnostic semantic anchors. From these anchors, we scale up
+unstructured procedural generation.                                   the dataset by applying structured perturbations in joint space
+                                                                      and temporal parameters, conditioned on "persona-guided"
+                       I. I NTRODUCTION                               prompts (e.g., "confident," "sad," or "energetic"). This creates
+   Robots are increasingly deployed in human-centered envi-           a continuous and interpretable space of motion that preserves
+ronments such as homes, hospitals, and public spaces, where           the gesture’s identity while supporting vast expressive varia-
+their ability to communicate intent and affect through motion         tion.
+is as critical as functional task execution. As shown in Figure          To validate the utility of our approach, we address a critical
+1, gestures such as waving, nodding, or beckoning are not             research question: Can a model trained on these manifolds
+merely physical movements but expressive acts. However, a             bridge the morphology gap? We show that while state-of-
+fundamental gap remains in how robots and humans process              the-art Vision-Language Models (VLMs) like GPT-4o and
+these motions. While humans possess an innate ability to              Gemini perform well on human-like forms, their recognition
+recognize the "intent" of a gesture across drastically different      capabilities decay sharply on non-humanoid manipulators. We
+embodiments—from humanoid robots to simple industrial                 then demonstrate that an Evaluator Model trained on our
+manipulators—current AI models struggle to generalize this            procedurally generated dataset significantly outperforms these
+semantic meaning once the morphology deviates from the                general-purpose models, effectively learning the "science" of
+human form.                                                           expressive motion across diverse robot embodiments.
+   We identify two primary bottlenecks that hinder the devel-            The main contributions of this work are as follows:
+opment of truly expressive and recognizable robot motion.                • A Taxonomy of Expressive Motion: We provide a clear
+First, the field often conflates semantically iconic gestures,              distinction between semantically iconic and pragmatically
+which carry a stable and inherent meaning (e.g., a "come here"              contextual gestures, focusing on the former to establish
+gesture), with pragmatically contextual gestures, which depend              a robust baseline for motion-semantic recognition across
+entirely on specific situational cues. Without decoupling these,            morphologies.
+                                                  Fig. 1.   Dataset generation pipeline.
+
+
+
+  • Compositional Motion Generation Pipeline: A fully auto-            while systems like SARGes introduce "intent chain reason-
+    mated and programmatic framework that constructs large-            ing" to structure gesture semantics. However, LLM-based
+    scale expressive motion manifolds through the decompo-             approaches often face challenges regarding computational la-
+    sition of pose and movement, enabling the generation of            tency and "hallucinations" of physically infeasible movements.
+    complex cues without human teleoperation.                          To ensure stability, Dynamic Movement Primitives (DMPs)
+  • A Specialized Motion Evaluator: We present an evaluator            model motor skills as stable nonlinear dynamical systems
+    model trained on our generated data that demonstrates              based on spring-damper equations , contrasting with end-to-
+    superior generalization in recognizing expressive intent,          end models like MotionGPT that treat motion as a discrete
+    bridging the performance gap between human intuition               "foreign language". Unlike pure black-box generation or rigid
+    and current large-scale VLMs.                                      libraries, we propose a representation where the technical
+  • Scalability Across Embodiments: We demonstrate the ef-             objective is to find an optimal trajectory τ that minimizes the
+    fectiveness of our pipeline on diverse robots (Humanoids           distance to an expressive expert reference.
+    and Manipulators), providing a principled pathway for
+    robots with non-humanoid structures to engage in intu-                     III. P ROGRAMMATIC G ENERATION OF LA2M
+    itive nonverbal communication.                                        This section describes how LA2M is generated from
+                     II. R ELATED W ORK                                language-defined gesture concepts into executable robot tra-
+                                                                       jectories through a fully programmatic pipeline.
+A. Definitional Frameworks of Gesture Generation
+   The foundation of robot gesture research lies in the classi-        A. Taxonomy of Gestures
+fication of non-verbal communicative actions. Communicative
+                                                                          Extensive psychological and sociological literature suggests
+gestures are defined as intentional actions with immediately
+                                                                       that a universal set of gestures is non-existent, as gestural
+recognizable features, typically characterized by a three-phase
+                                                                       meanings are inherently fluid and culturally contingent. We
+internal structure: preparation, stroke, and retraction. Follow-
+                                                                       propose a gesture taxonomy based on two guiding principles.
+ing the widely adopted McNeill’s taxonomy, gestures are
+                                                                       First, we adopt a kinematic-centered definition to avoid the
+categorized into five functional types: (i) iconic, depicting
+                                                                       semantic ambiguity where a single intent (e.g., Requesting)
+concrete objects; (ii) metaphoric, representing abstract con-
+                                                                       may map to various motions across contexts (e.g., beckoning,
+cepts; (iii) deictic, referential pointing; (iv) beat, rhythmic
+                                                                       pointing). Second, as shown in Table I we categorize gestures
+movements; and (v) discourse, which structure the dialogue.
+                                                                       into Morphology-aligned cues and Morphology-extended
+Early standardized frameworks, such as the SAIBA archi-
+                                                                       cues based on the performability of our current robot con-
+tecture and Behavior Markup Language (BML), attempted
+                                                                       figuration with a single 6 or 7-DOF arm with a parallel-jaw
+to unify multimodal generation by defining precise "sync-
+                                                                       gripper.
+points" (e.g., stroke-start, relax) to coordinate speech and
+motion. Commercial platforms like the Pepper and NAO                      1) Morphology-aligned cues: They are classified by their
+robots utilize the ALAnimatedSpeech module, which relies               functional target during human-robot interaction.
+on a fixed repository of hand-authored animations triggered               • Social / Basic: Standardized motions for crossing social
+by keyword-based tags. While these systems provide reliable                  thresholds, establishing rapport, and maintaining interper-
+execution, they are inherently limited by their finite libraries             sonal etiquette (e.g., wave_hi, salute).
+and struggle to adapt to the fluid, high-dimensional nature of            • Self-Oriented: Gestures expressing self-touch or prox-
+natural social interaction.                                                  imity to the robot’s own frame (e.g., scratch_head,
+                                                                             facepalm).
+B. Automatic Generation with Morphology Gap                               • Conversational: Abstract rhythmic motions used to reg-
+   Recent advancements have shifted toward automatic synthe-                 ulate dialogue flow, provide emphasis, and manage turn-
+sis to bypass these manual costs. High-level planning frame-                 taking (e.g., yield_turn, emphasize_point).
+works like GenEM and EMOTION leverage the in-context                      • Navigational / Functional: Pragmatic cues directed to-
+learning and reasoning of Large Language Models (LLMs)                       ward physical space or task status to guide user movement
+to translate natural language into parameterized control code,               or signal actions (e.g., guiding_arm, stop_palm_out).
+                                                          TABLE I
+    C OMPREHENSIVE TAXONOMY OF ROBOT G ESTURES . M ORPHOLOGY- ALIGNED C UES ARE CATEGORIZED BY INTERACTION TARGETS , WHILE
+    M ORPHOLOGY- EXTENDED C UES ARE CATEGORIZED BY THE HARDWARE CONSTRAINTS (F INGERS , D UAL - ARM , T ORSO , AND C ONTEXTUAL
+                         SUBSTITUTES ) PREVENTING THEIR EXECUTION ON A SINGLE 6-DOF ARM PLATFORM .
+
+
+ Morphology-aligned Cues (Executable with Single Arm + Parallel Jaw)
+ Category              Basic / Social                   Self-Oriented                     Conversational            Navigational / Functional
+ Gestures              wave_hi                          scratch_head_confused             yield_turn                point_you
+                       raising_hand_greet               facepalm                          request_turn              point_me
+                       handshake_offer                  pat_stomach                       turn_yield_lower          stop_palm_out
+                       handshake_imitation              fan_face_hot                      emphasize_point           protective_arm_out
+                       highfive_invite                  rub_eye_tired                     wait_for_me               prevent_fall_support
+                       highfive_imitation               flex_bicep                        continue_on_roll          polite_decline_push
+                       fistbump_invite                  fist_pump                         open_palm_offering        slow_down_push
+                       salute                           point_self                        resume_speaking_pull      speed_up_circular
+                                                        relief_release                    cancel_offer_retract      throat_cut_stop
+                                                        frustration_throw                 conditional_accept        stop_action_freeze
+                                                        satisfaction_clench               unsure_hover_stop         retry_action_reset
+
+ Morphology-extended Cues (Inexecutable due to Hardware Constraints)
+ Category              Dexterity (Fingers)              Bimanual (Dual-Arm)               Posture (Torso/Leg)       Substitutes (Others)
+ Gestures              air_quotes                       self_hug                          bow_greeting              shrug_idk
+                       shh_gesture                      cross_arms_defensive              deep_bow_apology          escorting_gesture
+                       tap_temple_think                 palms_together                    nod_yes                   laughter_substitute
+                       circle_temple_crazy              rub_arms_cold                     shake_head_no             shame_shy_substitute
+                       raise_index_moment               cover_ears_too_loud               tilt_head_curious         listening_lean
+                       beckon_come_here                 big_heart_above_head              lean_forward_interest     small_rhythmic_bounce
+                       curl_fingers_give_me             raise_fists_victory               step_back_surprised       allow_entry_open
+                       zip_lips_secret                  arms_open_welcome                 cover_mouth_gasp          disbelief_hold_drop
+                       chin_flick_dismiss               stretch_arms_up                   cover_yawn_sleepy         prepare_action_lift
+                       drum_fingers                     disagreement_cross                hand_over_heart           hesitation_pause
+                       blow_kiss                        stop_entry_cross                  visor_search              commit_action_fast
+                       fistbump_imitation               disappointment_fold               submission_lowered        disengage_step_back
+                       clarification_tilt               one_arm_cross_rest                dominance_high_hold       pat_self_back
+                                                                                          apology_forward_low
+                                                                                          gratitude_small_bow
+
+
+
+
+  2) Morphology-extended cues: Dynamic cues encompass                           A. Pose
+gestures that remain inexecutable within the current single-                       Pose establishes a static configuration that specifies the
+arm setting and are sub-classified by their specific hardware                   semantic posture and 3D location of the robot arm. Every
+requirements:                                                                   gesture begins with a pose, which serves as the initial anchor
+  • Dexterity (Finger-Required): Cues necessitating inde-                       pose. This anchor is crucial because it determines the earliest
+     pendent articulation of multiple finger joints for nuanced                 readable configuration of the gesture and strongly influences
+     symbolic expression (e.g., air_quotes, shh_gesture).                       recognizability.
+  • Bimanual (Dual-Arm Required): Relational or symmet-                            We parameterize pose using spatially meaningful variables:
+     rical actions requiring the coordinated movement of two                       • direction (dir): the coarse facing or anchoring direction
+     separate limbs (e.g., self_hug, cross_arms).                                    of the end-effector in the gesture space, chosen from
+  • Posture (Torso/Leg Required): Bodily expressions de-                             front, back, left, right, up, and down.
+     pending on the shifting of the center of mass, waist bend-                    • gripper orientation: the orientation of the gripper in 3D
+     ing, or head orientation (e.g., bow_greeting, nod_yes).                         space, i.e., the way the end-effector is presented to the
+  • Contextual / Substitutes: Complex behaviors involv-                              viewer, chosen from vertical and horizontal.
+     ing whole-body resonance or specialized kinematic sub-                        • position (x, y, z): the normalized 3D location of the
+     stitutions for missing joints (e.g., shrug_idk, laugh-                          end-effector, where each axis ranges from 0 to 100.
+     ter_substitute).
+                                                                                B. Movement
+       IV. P RIMITIVES FOR L ANGUAGE A NCHORING                                    Movement represents articulated joint motion around a
+   As shown in Figure 1, to convert natural-language such as                    fixed anchor. Unlike pose, which specifies where the arm is
+‘beckoning’ or ‘wave hi’ into motions that a single robot arm                   placed, movement specifies how a chosen joint changes over
+can actually execute, control, and automatically identify, we                   time to express the gesture.
+introduce language anchoring. Under this framework, every                          We parameterize movement as follows:
+gesture is represented as a composition of three primitives:                       • joint: the robot joint to be actuated, such as shoulder,
+pose, movement, and path. By adjusting the parameters                                elbow, or wrist.
+of these primitives, we can generate diverse motion variations                     • axis-aligned degrees: the angular change applied along
+while preserving the core components that define the gesture.                        one or more semantic axes, such as x, y, or z, which
+                                               Fig. 2.   Example of a figure caption.
+
+
+
+    determine the directional character of the motion (e.g.,           • joint: the reference joint whose motion defines the visible
+    {x : −30}).                                                          path.
+  • repetition: the number of times the local articulated              • axis or plane: the spatial dimension along which the path
+    motion is repeated.                                                  is traced, such as a single axis (x, y, z) or a 2D plane
+  • speed: how fast the joint motion is executed.                        (xy, xz, yz).
+  • hold time: how long the motion pauses after each artic-            • distance / radius / sweep: the magnitude of the path,
+    ulated beat.                                                         depending on the chosen shape.
+                                                                       • speed: how fast the trajectory is traversed.
+C. Path
+   Path represents translational or geometric motion through
+space, used when the trajectory itself carries semantic mean-              V. L ANGUAGE -G UIDED G ESTURE C ONSTRUCTION
+ing. Unlike movement, which changes joint articulation lo-
+cally, path emphasizes the visible route traced by the end-            This section describes the pipeline for converting implicit
+effector.                                                           gesture knowledge within a Large Language Model (LLM)
+   We parameterize path with the following variables:               into executable robot motions. The process consists of three
+   • shape: the geometric form of the trajectory, such as a         stages: LLM-based Configuration Generation, Retrieval and
+      line or arc.                                                  Rendering, and VLM-based Verification.
+                                                                      TABLE II
+                                                                      P ROMPT.
+
+  Part                    Prompt Content
+  Overview                You are an expert in iconic robot motion design. Your goal is to create one highly readable motion cue for a single robot
+                          arm with a parallel-jaw gripper and output it as a structured JSON.
+
+                          Output exactly 3 # lines, then the JSON object starting with {.
+  Reasoning               You MUST output exactly three planning lines as # comments before the JSON.
+                          # Q1: How would a human perform this motion? (One sentence)
+                          # Q2: Candidates Comparison. Rank at least 2 initial directions (e.g., P1: front+vertical vs P2: up+horizontal). State the
+                          winner and why.
+                          # Q3: Structure Comparison. Compare 2+ primitive sequences (e.g., M1: pose > movement vs M2: pose > path). State the
+                          winner and why.
+  Generation Rules        1. Direction (dir):
+                          - front: Handshake / offering.
+                          - back: Indicating "me".
+                          - up: Greeting / high-five.
+                          - down: At attention / resting.
+                          - left/right: Lateral actions (e.g., rubbing eyes, tapping temple).
+
+                          2. Orientation:
+                          - vertical: Perpendicular to ground (Handshake, shush).
+                          - horizontal: Parallel to ground (Wave, presenting, Grabbing cup).
+
+                          3. Axis Mapping for movement axis and gripper location:
+                          - x: Depth (Forward/Backward extension).
+                          - y: Lateral (Side-to-side negation/wave).
+                          - z: Height (Up-and-down affirmation/nod).
+                          - Coupled Motion: Use x+z for bowing or recoiling.
+
+                          4. Body Reference:
+                          Head: z85-100, Eye: z65-75, Chest: z45-55, Waist: z35-45, Extended: x70-90.
+  Hard Constraints        - Every motion MUST start with a pose.
+                          - Total steps: 2–8.
+                          - Speed: 0.5 (slow) – 4.0 (sharp). Default: 1.0–2.0.
+                          - No prose or extra explanation. No markdown code blocks.
+  Few-shot                {{FEW_SHOT_EXAMPLES}}
+  Target Cue              Target Cue:
+                          Cue Name: {{CUE_NAME}}
+
+
+
+A. LLM Configuration Generation                                              B. Retrieval and Rendering
+                                                                                The generated configuration is instantiated into robot mo-
+  As shown in Table II, our configuration generation leverages               tions and rendered via the MuJoCo simulator. We employ two
+explicit reasoning and few-shot examples to bridge the gap                   distinct retrieval strategies.
+between natural language and robot primitives.                                     a) Discretized Pose Retrieval: To handle the continuous
+                                                                             joint space, we discretize the pose space into six directional
+     a) Explicit Reasoning: The model follows a three-step
+                                                                             categories. A pose database is precomputed by assigning
+reasoning path: (Q1) Description: Describing how a human
+                                                                             discrete angles (−90◦ , 0◦ , 90◦ ) to robot joints. We retrieve the
+naturally performs the target gesture. (Q2) Initial Pose Selec-
+                                                                             top-k poses (default k = 10) that best match the requested x,
+tion: Evaluating candidate anchor poses based on direction,
+                                                                             y, z coordinates and gripper orientation. If no explicit target
+gripper orientation, and 3D position to select the most ap-
+                                                                             is given during a pose → pose transition, the system selects
+propriate one for a single-arm robot. (Q3) Movement Design:
+                                                                             the pose that minimizes joint displacement to ensure smooth
+Choosing the optimal motion structure—comprising pose,
+                                                                             motion.
+movement, and path—that follows the initial anchor.
+                                                                                   b) Jacobian-based Movement Retrieval: For movement
+     b) Few-shot Examples: Since our motion primitives are                   primitives, we compute the end-effector Jacobian at the current
+not inherent to general-purpose LLMs, we provide seven                       state to identify joints that contribute most strongly to the
+curated examples. Each shot includes a configuration and                     target semantic axis (x, y, or z). Joints are ranked by their
+its corresponding reasoning path (Q1–Q3). These examples                     alignment with the desired axis while penalizing unintended
+are designed to cover essential semantic diversity, including                motion in other axes. Finally, we apply kinematic preferences
+various movement patterns (e.g., pose → movement) and                        (e.g., shoulder, elbow, wrist) to select the optimal joint
+directional axes (e.g., up, front).                                          for the motion.
+C. Automatic Verification with VLM                                       D. Failure Cases
+   Since the initial configuration is generated without visual                               VII. D ISCUSSION
+grounding, the intended semantics may diverge from the                   A. Morphology-Invariant Motion Science
+rendered geometry. To address this, we introduce an automatic            B. Limitations: Beyond Manipulation
+verification stage using a Vision-Language Model (VLM).For
+                                                                           While our focus is on upper-body and arm gestures,
+each gesture, a tiled image of the top-k candidate poses
+                                                                         we discuss the challenges of applying Language Anchoring
+is fed into the VLM. We utilize alpha-composited tiled
+                                                                         to locomotion-heavy robots (e.g., quadrupeds or navigators)
+images, which overlay motion frames into a single visual
+                                                                         where physical stability constraints may override purely se-
+summary to preserve spatial structure while reducing temporal
+                                                                         mantic motion.
+redundancy. The VLM then selects the candidate that best
+aligns with the gesture’s semantics. Our evaluation with 50                                 VIII. C ONCLUSION
+samples demonstrates that this VLM-based selection signifi-                 We have presented a framework for scalable gesture gen-
+cantly outperforms random baseline and shows high agreement              eration that bridges the gap between language and robot
+with human judgments (N %) in identifying attributes such as             kinematics. By utilizing Language Anchors and Expressive
+direction and relative placement.                                        Motion Manifolds, we provide a pathway for robots of any
+                                                                         form to engage in meaningful human-robot interaction.
+                     Direction                XYZ Compare
+                                                                                         IX. ACKNOWLEDGMENTS
+                Frame     + Arrow     Total     X       Y       Z
+                                                                                                R EFERENCES
+  Random         0.17       0.17      0.50     0.50   0.50    0.50
+  Frontview      0.45       0.55      0.60     0.44   0.50    1.00
+  Sideview       0.45       0.55      0.85     0.83   0.60    1.00
+                               TABLE III
+ P OSE - FACTORED EVALUATION RESULTS ON IIWA. D IRECTION USES 20
+SAMPLES EACH FOR PLAIN AND ARROW SETTINGS . XYZ C OMPARE USES
+ 20 SAMPLES OVERALL . F OR F RONTVIEW, PER - AXIS ACCURACIES ARE x
+(4/9), y (3/6), AND z (5/5). F OR S IDEVIEW, PER - AXIS ACCURACIES ARE
+                     x (5/6), y (3/5), AND z (9/9).
+
+
+
+
+        VI. A NALYSIS AND E VALUATION OF LA2M
+
+A. Human-Subject Validation
+  We report results from user studies (Table 1) assessing the
+quality, recognizability, and perceived affect of the generated
+gestures.
+
+B. Configurability: Persona-Guided Variations
+   We show how the manifolds support systematic "persona-
+driven" perturbations (e.g., "confident," "hesitant"). We an-
+alyze the statistical variation in joint space to prove that
+the identity of the anchor is preserved despite expressive
+variations.
+
+C. Dynamic Functional Mapping
+  This section introduces the concept of Dynamic Functional
+Mapping. We analyze how the human perception of a robot’s
+anatomy shifts based on motion. For instance, the same
+physical wrist joint can be perceived as a "head" during
+a nodding motion or as a "shoulder" during a sweeping
+gesture. This "Kinetic Re-segmentation" suggests that motion
+can overcome hardware limitations by redefining the robot’s
+functional structure in the observer’s mind.
+                                                        TABLE IV
+         C OMPARING DISCRIMINATION PERFORMANCE BETWEEN HUMAN AND VLM S (L ATEST VS . OTHERS ) IN A RCHETYPAL MOTIONS .
+
+                                      Morphology-aligned Cues                                 Morphology-extended Cues
+                                      Gemini-3.1-pro       2.5-pro   2.5-flash                Gemini-3.1-pro       2.5-pro   2.5-flash
+Type         Metric      Human                                                   Human
+                                 Video    Frame    Annot   Annot      Annot              Video    Frame    Annot   Annot      Annot
+             F1            –      –         –          –        –       –          –      –         –          –     –          –
+Binary       Precision     –      –         –          –        –       –          –      –         –          –     –          –
+             Recall        –      –         –          –        –       –          –      –         –          –     –          –
+MCQ (4)      Accuracy      –      –         –          –        –       –          –      –         –          –     –          –
+

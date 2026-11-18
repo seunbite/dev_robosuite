@@ -15,7 +15,7 @@ import json
 import random
 import tempfile
 import numpy as np
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 from PIL import Image, ImageDraw
 from datetime import datetime
 
@@ -27,8 +27,13 @@ import mujoco
 # Import JacobianCalculator and pose configuration
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from alphabet_jacobian import JacobianCalculator
 from arm_pose_config import direction_pose_set, pose_set, poses, pitch_poses, height_map
+from motion_speed import stretch_duration as _stretch_duration
+from motion_speed import max_ee_m_s as _max_ee_m_s
+from motion_speed import max_qdot_rad_s as _max_qdot_rad_s
+from droid_traj import strip_to_cue
 
 # Fixed joint indices
 FIXED_JOINT_INDICES = {
@@ -61,12 +66,75 @@ PATH_SPEED_DEG_PER_SEC = 30.0
 POSE_TRIM_STEP_M = 0.03
 POSE_TRIM_MAX_DQ_RAD = 0.14
 MOVEMENT_MAX_DQ_RAD = np.deg2rad(12.0)
-_EE_PCT_BOUNDS_CACHE: dict[str, tuple[float, float]] | None = None
+CUE_HOME_HOLD_S = 0.25
+CUE_INTRO_HOLD_S = 0.60
+_EE_PCT_BOUNDS_CACHE: dict[str, dict[str, tuple[float, float]]] = {}
 _EE_AXIS_SPAN_FALLBACK_M = {"x": 0.38, "y": 0.36, "z": 0.48}
+
+# Panda / FR3 bank left/right labels are inverted vs IIWA / camera.
+_POSE_BANK_ALIAS = {"FR3": "Panda"}
+_FRANKA_FAMILY = {"Panda", "FR3"}
+FR3_HARDWARE = {
+    "component": "Franka Research 3 Arm",
+    "version": "2.0",
+    "model_number": "10070602",
+    "article": "309969",
+    "payload_kg": 3,
+    "reach_mm": 855,
+    "mass_kg": 18,
+    "product_manual": "R02210",
+    "droid_action_space": "joint_position",
+    "joint_names": [
+        "fr3_joint1",
+        "fr3_joint2",
+        "fr3_joint3",
+        "fr3_joint4",
+        "fr3_joint5",
+        "fr3_joint6",
+        "fr3_joint7",
+    ],
+    "pose_bank_robot": "Panda",
+    "sim_note": "robosuite FR3 uses the 7-DoF Franka family XML (DROID joint order)",
+}
+
+
+def _pose_bank_robot(robot_name: Optional[str]) -> str:
+    name = str(robot_name)
+    return _POSE_BANK_ALIAS.get(name, name)
+
+
+def _is_franka_family(robot_name: Optional[str]) -> bool:
+    return str(robot_name) in _FRANKA_FAMILY
+# front/back keep the bank labels (a previous front↔back remap looked swapped).
+_PANDA_DIR_REMAP = {
+    "left": "right",
+    "right": "left",
+}
+
+# When the cue omits an axis, still rank the bank toward a dir-typical location
+# (trim only moves axes the cue actually set).
+_DIR_XYZ_RANK_HINTS = {
+    "front": {"x": 80, "y": 50, "z": 60},
+    "back": {"x": 20, "y": 50, "z": 60},
+    "left": {"x": 55, "y": 20, "z": 60},
+    "right": {"x": 55, "y": 80, "z": 60},
+    "up": {"x": 50, "y": 50, "z": 85},
+    "down": {"x": 50, "y": 50, "z": 25},
+}
 
 
 def _pose_xyz_resolution_mode() -> str:
     return os.environ.get("MANIPULATOR_POSE_XYZ_MODE", "legacy").strip().lower()
+
+
+def _pose_def_for_bank_rank(pose_def: Optional[Dict]) -> Dict:
+    """Copy pose_def and fill missing xyz with dir-typical hints for bank ranking."""
+    out: Dict = dict(pose_def or {})
+    d = str(out.get("dir") or "").strip().lower()
+    for axis, val in _DIR_XYZ_RANK_HINTS.get(d, {}).items():
+        if not isinstance(out.get(axis), (int, float)):
+            out[axis] = val
+    return out
 
 
 def _pose_xyz_axes_specified(pose_def: dict) -> tuple[str, ...]:
@@ -89,6 +157,23 @@ def _hold_frame_count(hold_time: float, hz: int) -> int:
 def _motion_frame_count(duration: float, hz: int) -> int:
     """At least one frame per movement/transition segment."""
     return max(1, int(duration * hz))
+
+
+def _safe_motion_frames(
+    authored_s: float,
+    hz: int,
+    *,
+    max_abs_dq_rad: float = 0.0,
+    ee_travel_m: float = 0.0,
+) -> tuple[float, int]:
+    duration, why = _stretch_duration(
+        authored_s,
+        ee_travel_m=ee_travel_m,
+        max_abs_dq_rad=max_abs_dq_rad,
+    )
+    if why:
+        print(f"  speed-safe: {float(authored_s):.2f}s → {duration:.2f}s ({why})")
+    return duration, _motion_frame_count(duration, hz)
 
 
 def _smoothstep01(t: float) -> float:
@@ -122,14 +207,21 @@ def _normalize_path_axis_value(axis: str, value: float, sign_multiplier: float) 
 
 
 def _swap_gripper_orientation_for_robot(robot_name: Optional[str], orientation: Optional[str]) -> Optional[str]:
-    # Experimental compatibility shim: Panda currently looks visually inverted
-    # relative to the shared vertical / horizontal pose labels, so swap only the
-    # lookup label for Panda when querying the pose database.
+    # Panda bank vert/horiz is visually inverted vs IIWA / schema.
     if orientation not in {"vertical", "horizontal"}:
         return orientation
-    if str(robot_name) != "Panda":
+    if not _is_franka_family(robot_name):
         return orientation
     return "horizontal" if orientation == "vertical" else "vertical"
+
+
+def _remap_dir_for_robot(robot_name: Optional[str], direction: Optional[str]) -> Optional[str]:
+    if direction is None:
+        return direction
+    if not _is_franka_family(robot_name):
+        return direction
+    key = str(direction).strip().lower()
+    return _PANDA_DIR_REMAP.get(key, direction)
 
 
 def _extract_render_modifiers(cue_config_data: Dict) -> Dict[str, float]:
@@ -388,6 +480,10 @@ class MotionGenerator:
         self.camera_azimuth_deg = float(camera_azimuth_deg)
         self.camera_spherical_m = float(camera_spherical_m)
         self.ignore_xyz = bool(ignore_xyz)
+        # Per-frame arm q (rad). Filled when generate(..., record_joints=True).
+        self._joint_traj: Optional[List[np.ndarray]] = None
+        self._ee_traj: Optional[List[np.ndarray]] = None
+        self._cue_pose_frame: int = 0
         
         # Create output directory
         os.makedirs(self.output_dir, exist_ok=True)
@@ -507,7 +603,8 @@ class MotionGenerator:
         if not direction_name:
             print(f"Error: Pose definition missing 'dir' field: {pose_def}")
             return []
-        
+
+        query_dir = _remap_dir_for_robot(robot_name, direction_name)
         if grip_orient:
             orientations_to_try = [_swap_gripper_orientation_for_robot(robot_name, grip_orient)]
         else:
@@ -521,15 +618,16 @@ class MotionGenerator:
         for orient in orientations_to_try:
             poses = self.jacobian_calculator._find_matching_poses(
                 robot_name=robot_name,
-                dir_name=direction_name,
+                dir_name=query_dir,
                 pitch_type=orient,
             )
             all_matching_poses.extend(poses)
         
         orient_label = grip_orient or 'vertical+horizontal'
         query_label = orientations_to_try[0] if len(orientations_to_try) == 1 else "+".join(orientations_to_try)
+        dir_note = f" (bank dir='{query_dir}')" if query_dir != direction_name else ""
         print(
-            f"  Searching for poses: dir='{direction_name}', "
+            f"  Searching for poses: dir='{direction_name}'{dir_note}, "
             f"gripper_orientation='{orient_label}'"
             + (f" (query='{query_label}')" if query_label != orient_label else "")
             + f" → {len(all_matching_poses)} found"
@@ -831,15 +929,40 @@ class MotionGenerator:
             if i < len(joint_angles_rad):
                 if active_joint_idx < len(joint_pos):
                     joint_pos[active_joint_idx] = joint_angles_rad[i]
-        
+        if str(self.robot_name) == "FR3":
+            from robosuite.models.robots.manipulators.fr3_robot import apply_bank_gripper_clock
+
+            joint_pos[:7] = apply_bank_gripper_clock(joint_pos[:7])
         return joint_pos
     
     def _get_joint_positions(self):
         """Get current joint positions."""
         return self.robot._joint_positions.copy()
     
+    def _joint_limits(self) -> tuple[np.ndarray, np.ndarray]:
+        """Arm joint ranges (rad). Downstream replay clamps to these, so generation must too."""
+        cached = getattr(self, "_jnt_range_cache", None)
+        if cached is not None:
+            return cached
+        model = self.env.sim.model
+        names = list(self.robot.robot_model.joints)[:7]
+        rng = np.array(
+            [model.jnt_range[model.joint_name2id(n)] for n in names], dtype=float
+        )
+        cached = (rng[:, 0].copy(), rng[:, 1].copy())
+        self._jnt_range_cache = cached
+        return cached
+
+    def _clip_to_limits(self, q):
+        q = np.asarray(q, dtype=float).copy()
+        lo, hi = self._joint_limits()
+        n = min(len(q), len(lo))
+        q[:n] = np.clip(q[:n], lo[:n], hi[:n])
+        return q
+
     def _set_joint_positions(self, joint_positions):
         """Set joint positions."""
+        joint_positions = self._clip_to_limits(joint_positions)
         self.robot.set_robot_joint_positions(joint_positions)
         self.env.sim.forward()
         
@@ -847,10 +970,32 @@ class MotionGenerator:
         for _ in range(10):
             self.env.sim.data.qvel[:] = 0
             self.env.sim.forward()
+
+    def _record_q_lerp(self, start_q, end_q, hz: int, frames) -> None:
+        """Record a speed-capped lerp. GIF and npz share these frames."""
+        start_q = np.asarray(start_q, dtype=np.float64).copy()
+        end_q = np.asarray(end_q, dtype=np.float64).copy()
+        max_dq = float(np.max(np.abs(end_q - start_q)))
+        if max_dq < 1e-4:
+            self._set_joint_positions(end_q)
+            frames.append(Image.fromarray(self._capture_image()))
+            return
+        duration, n = _safe_motion_frames(0.0, hz, max_abs_dq_rad=max_dq)
+        n = max(2, n)
+        self._set_joint_positions(start_q)
+        for i in range(n):
+            u = _smoothstep01((i + 1) / n)
+            q = start_q * (1.0 - u) + end_q * u
+            self._set_joint_positions(q)
+            frames.append(Image.fromarray(self._capture_image()))
     
     def _capture_image(self):
         """Capture current camera view."""
         _debug_log("capture_image:start")
+        if self._joint_traj is not None:
+            self._joint_traj.append(np.asarray(self._get_joint_positions(), dtype=np.float64).copy())
+            if self._ee_traj is not None:
+                self._ee_traj.append(np.asarray(self._get_eef_position(), dtype=np.float64).copy())
         obs = self.env.sim.render(
             camera_name="frontview",
             width=self.capture_image_width,
@@ -875,7 +1020,11 @@ class MotionGenerator:
         # configuration. Without restore, the first xyz-trim in a process (often
         # cue1) continues from the last calibration pose instead of the bank pose.
         saved_q = self._get_joint_positions().copy()
-        poses = self.jacobian_calculator.pose_database
+        poses = [
+            p
+            for p in self.jacobian_calculator.pose_database
+            if p.get("robot") == _pose_bank_robot(self.robot_name)
+        ]
         bounds: dict[str, tuple[float, float]] = {}
         try:
             for axis_idx, axis in enumerate(("x", "y", "z")):
@@ -905,66 +1054,253 @@ class MotionGenerator:
         return bounds
 
     def _ensure_ee_pct_bounds(self) -> dict[str, tuple[float, float]]:
-        global _EE_PCT_BOUNDS_CACHE
-        if _EE_PCT_BOUNDS_CACHE is None:
-            _EE_PCT_BOUNDS_CACHE = self._calibrate_ee_pct_bounds()
-        return _EE_PCT_BOUNDS_CACHE
+        key = str(self.robot_name)
+        if key not in _EE_PCT_BOUNDS_CACHE:
+            _EE_PCT_BOUNDS_CACHE[key] = self._calibrate_ee_pct_bounds()
+        return _EE_PCT_BOUNDS_CACHE[key]
+
+    def _apply_ik_qpos_to_robot(self) -> None:
+        """Refresh robosuite joints from sim qpos after IK wrote MuJoCo state."""
+        robot = self.robot
+        indexes = list(robot.joint_indexes)
+        q = robot._joint_positions.copy()
+        n = min(len(q), len(indexes))
+        q[:n] = np.asarray(self.env.sim.data.qpos[indexes[:n]], dtype=float)
+        self._set_joint_positions(q)
 
     def _apply_pose_xyz_trim_instant(self, pose_def: dict, bank_pose: dict) -> None:
-        """EE line correction per axis — instant, no GIF frames (same rule as tiago trim)."""
+        """Hold bank orientation; translate EE to percentile targets (world AABB)."""
+        del bank_pose  # seed pose is already set; targets come from pose_def + bounds
         axes = _pose_xyz_axes_specified(pose_def)
         if not axes:
             return
-        try:
-            from legacy.path_ee_ik import get_eef_quat_wxyz, ik_move_eef_to
-        except ImportError:
-            from path_ee_ik import get_eef_quat_wxyz, ik_move_eef_to
 
         bounds = self._ensure_ee_pct_bounds()
         mujoco_model = self.env.sim.model._model
         mujoco_data = self.env.sim.data._data
-        ik = self.jacobian_calculator.ik_solver
-        site_id = ik.site_ids[0]
+        site_id = self._ee_site_id()
         axis_idx = {"x": 0, "y": 1, "z": 2}
-        trim_spec: list[tuple[str, float]] = []
-        for axis in axes:
-            target_pct = float(pose_def[axis])
-            selected_pct = float(bank_pose.get(f"{axis}_pct", 50))
-            delta_pct = target_pct - selected_pct
-            if abs(delta_pct) < 0.01:
-                continue
-            delta_m = _pose_pct_delta_to_meters(axis, delta_pct, bounds)
-            if abs(delta_m) < 1e-6:
-                continue
-            trim_spec.append((axis, delta_m))
-        if not trim_spec:
-            return
 
         mujoco.mj_forward(mujoco_model, mujoco_data)
-        hold_quat = get_eef_quat_wxyz(mujoco_model, mujoco_data, site_id)
-        anchor = self._get_joint_positions().copy()
-        for axis, distance_m in trim_spec:
-            ai = axis_idx[axis]
-            n_sub = max(1, int(np.ceil(abs(distance_m) / POSE_TRIM_STEP_M)))
-            step_m = distance_m / n_sub
-            for _ in range(n_sub):
-                cur = self._get_eef_position()
-                target = cur.copy()
-                target[ai] += step_m
-                ik_move_eef_to(
-                    ik_solver=ik,
-                    mujoco_model=mujoco_model,
-                    mujoco_data=mujoco_data,
-                    site_id=site_id,
-                    target_pos=target,
-                    quat_wxyz=hold_quat,
+        start = self._get_eef_position()
+        target = start.copy()
+        for axis in axes:
+            lo, hi = bounds[axis]
+            t = max(0.0, min(1.0, float(pose_def[axis]) / 100.0))
+            target[axis_idx[axis]] = float(lo + t * (hi - lo))
+        travel = float(np.linalg.norm(target - start))
+        if travel < 0.02:
+            print(f"  xyz-translate skip ({travel*1000:.1f}mm)")
+            return
+
+        R_des = (
+            np.asarray(mujoco_data.site_xmat[site_id], dtype=float).reshape(3, 3).copy()
+        )
+        start_q = self._get_joint_positions().copy()
+        q_best, err, o_err, w_ori = self._solve_ee_pose(
+            target,
+            R_des,
+            accept=lambda p: float(np.linalg.norm(p - target)) < 0.02,
+            weights=(1.0, 0.4, 0.15),
+        )
+        self._set_joint_positions(q_best)
+        after = self._get_eef_position()
+        if err > max(0.04, 0.5 * travel):
+            self._set_joint_positions(start_q)
+            after = self._get_eef_position()
+            print(
+                f"  xyz-translate REVERT axes={list(axes)} "
+                f"EE {np.round(start, 3).tolist()} -> {np.round(target, 3).tolist()} "
+                f"ik_err={err*1000:.1f}mm kept bank"
+            )
+            return
+        print(
+            f"  xyz-translate axes={list(axes)} "
+            f"EE {np.round(start, 3).tolist()} -> {np.round(target, 3).tolist()} "
+            f"after={np.round(after, 3).tolist()} err={err*1000:.1f}mm "
+            f"ori_err={np.rad2deg(o_err):.1f}deg"
+        )
+
+    def _arm_dof_ids(self) -> np.ndarray:
+        model = self.env.sim.model
+        names = list(self.robot.robot_model.joints)[:7]
+        return np.array(
+            [int(model.jnt_dofadr[model.joint_name2id(n)]) for n in names], dtype=int
+        )
+
+    def _arm_qpos_ids(self) -> np.ndarray:
+        model = self.env.sim.model
+        names = list(self.robot.robot_model.joints)[:7]
+        return np.array(
+            [int(model.jnt_qposadr[model.joint_name2id(n)]) for n in names], dtype=int
+        )
+
+    def _ee_site_id(self) -> int:
+        return mujoco.mj_name2id(
+            self.env.sim.model._model,
+            mujoco.mjtObj.mjOBJ_SITE,
+            self.jacobian_calculator.eef_site_name,
+        )
+
+    def _dls_translate_ee(
+        self,
+        q_seed: np.ndarray,
+        target: np.ndarray,
+        R_des: np.ndarray,
+        *,
+        w_ori: float,
+        step_m: float = 0.05,
+        iters: int = 90,
+    ) -> tuple[np.ndarray, float, float]:
+        """DLS EE translate over all 7 arm joints. Returns (q, pos_err, ori_err)."""
+        model = self.env.sim.model._model
+        data = self.env.sim.data._data
+        site_id = self._ee_site_id()
+        dof_ids = self._arm_dof_ids()
+        qpos_ids = self._arm_qpos_ids()
+        lo, hi = self._joint_limits()
+        jacp = np.zeros((3, model.nv))
+        jacr = np.zeros((3, model.nv))
+
+        q = np.clip(np.asarray(q_seed, dtype=float)[:7].copy(), lo, hi)
+        data.qpos[qpos_ids] = q
+        mujoco.mj_forward(model, data)
+        start = np.array(data.site_xpos[site_id], dtype=float).copy()
+        n_sub = max(1, int(np.ceil(np.linalg.norm(target - start) / step_m)))
+        pos_err = ori_err = 0.0
+        for k in range(1, n_sub + 1):
+            waypoint = start + (target - start) * (k / n_sub)
+            for _ in range(iters):
+                mujoco.mj_jacSite(model, data, jacp, jacr, site_id)
+                xpos = np.asarray(data.site_xpos[site_id], dtype=float)
+                R_cur = np.asarray(data.site_xmat[site_id], dtype=float).reshape(3, 3)
+                Re = R_des @ R_cur.T
+                e_r = 0.5 * np.array(
+                    [Re[2, 1] - Re[1, 2], Re[0, 2] - Re[2, 0], Re[1, 0] - Re[0, 1]]
                 )
-                new_q = self._get_joint_positions()
-                delta = new_q - anchor
-                delta = np.clip(delta, -POSE_TRIM_MAX_DQ_RAD, POSE_TRIM_MAX_DQ_RAD)
-                self._set_joint_positions(anchor + delta)
-                anchor = self._get_joint_positions().copy()
-        print(f"  Applied xyz-trim on axes: {[a for a, _ in trim_spec]}")
+                e_p = waypoint - xpos
+                pos_err = float(np.linalg.norm(e_p))
+                ori_err = float(np.linalg.norm(e_r))
+                if pos_err < 0.002 and ori_err < 0.02:
+                    break
+                J = np.vstack([jacp[:, dof_ids], w_ori * jacr[:, dof_ids]])
+                e = np.concatenate([e_p, w_ori * e_r])
+                dq = J.T @ np.linalg.solve(J @ J.T + 2e-3 * np.eye(6), e)
+                q = np.clip(q + np.clip(dq, -0.12, 0.12), lo, hi)
+                data.qpos[qpos_ids] = q
+                mujoco.mj_forward(model, data)
+        xpos = np.asarray(data.site_xpos[site_id], dtype=float)
+        R_cur = np.asarray(data.site_xmat[site_id], dtype=float).reshape(3, 3)
+        Re = R_des @ R_cur.T
+        ori_err = float(
+            np.linalg.norm(
+                0.5 * np.array([Re[2, 1] - Re[1, 2], Re[0, 2] - Re[2, 0], Re[1, 0] - Re[0, 1]])
+            )
+        )
+        return q, float(np.linalg.norm(target - xpos)), ori_err
+
+    def _ik_seeds(self, q_cur: np.ndarray, n_random: int = 10) -> list[np.ndarray]:
+        lo, hi = self._joint_limits()
+        base = np.clip(np.asarray(q_cur, dtype=float)[:7].copy(), lo, hi)
+        mid = 0.5 * (lo + hi)
+        seeds = [base, 0.5 * base + 0.5 * mid]
+        rng = np.random.default_rng(7)
+        for i in range(n_random):
+            sigma = 0.4 if i < n_random // 2 else 0.8
+            seeds.append(np.clip(base + rng.normal(0.0, sigma, 7), lo, hi))
+        return seeds
+
+    def _solve_ee_pose(
+        self,
+        target: np.ndarray,
+        R_des: np.ndarray,
+        *,
+        accept: Callable[[np.ndarray], bool] | None = None,
+        weights: tuple[float, ...] = (3.0, 1.0, 0.4),
+    ) -> tuple[np.ndarray, float, float, float]:
+        """Multi-seed, orientation-first IK. Returns (q, pos_err, ori_err, w_ori)."""
+        model = self.env.sim.model._model
+        data = self.env.sim.data._data
+        site_id = self._ee_site_id()
+        q_cur = self._get_joint_positions().copy()
+        seeds = self._ik_seeds(q_cur)
+        best_key = None
+        best = None
+        for w_ori in weights:
+            for seed in seeds:
+                q, p_err, o_err = self._dls_translate_ee(
+                    seed, target, R_des, w_ori=w_ori
+                )
+                ok = True if accept is None else bool(accept(np.asarray(data.site_xpos[site_id])))
+                key = (0 if ok else 1, round(o_err, 3), p_err)
+                if best_key is None or key < best_key:
+                    best_key, best = key, (q.copy(), p_err, o_err, w_ori)
+            if best_key[0] == 0 and best_key[1] < 0.17:
+                break
+        # restore sim to the caller's state; caller decides whether to commit
+        data.qpos[self._arm_qpos_ids()] = np.clip(q_cur[:7], *self._joint_limits())
+        mujoco.mj_forward(model, data)
+        return best
+
+    def _clip_ee_into_gallery_cube(self) -> None:
+        """Keep dir/grip; slide EE to the nearest point inside the ±15 cm gallery cube."""
+        if os.environ.get("MANIPULATOR_CUBE_CLIP", "").strip().lower() not in {
+            "1",
+            "true",
+            "yes",
+        }:
+            return
+        try:
+            from replay_cube import _HALF_M, cube_center
+        except ImportError:
+            return
+
+        center = cube_center()
+        lo, hi = center - _HALF_M, center + _HALF_M
+        start = np.asarray(self._get_eef_position(), dtype=float)
+        # Aim a little inside the face so IK slack does not push the result back out.
+        margin = min(0.03, 0.5 * _HALF_M)
+        target = np.clip(start, lo + margin, hi - margin)
+        travel = float(np.linalg.norm(target - start))
+        if travel < 0.01:
+            print(f"  cube-clip skip (inside) EE {np.round(start, 3).tolist()}")
+            return
+
+        model = self.env.sim.model._model
+        data = self.env.sim.data._data
+        mujoco.mj_forward(model, data)
+        site_id = self._ee_site_id()
+        R_des = np.asarray(data.site_xmat[site_id], dtype=float).reshape(3, 3).copy()
+        start_q = self._get_joint_positions().copy()
+
+        # Orientation is the semantic content (dir/grip), so hold it first and settle
+        # for any reachable point inside the cube rather than the exact clipped corner.
+        def _inside(p: np.ndarray) -> bool:
+            return bool(np.all(p >= lo - 0.005) and np.all(p <= hi + 0.005))
+
+        q_best, p_err, o_err, w_ori = self._solve_ee_pose(target, R_des, accept=_inside)
+        self._set_joint_positions(q_best)
+        if not _inside(self._get_eef_position()):
+            # Being outside the cube breaks the gallery framing, so trade orientation for it.
+            self._set_joint_positions(start_q)
+            q_best, p_err, o_err, w_ori = self._solve_ee_pose(
+                target, R_des, accept=_inside, weights=(0.15, 0.05, 0.0)
+            )
+            self._set_joint_positions(q_best)
+        after = self._get_eef_position()
+        if not _inside(after):
+            self._set_joint_positions(start_q)
+            print(
+                f"  cube-clip REVERT EE {np.round(start, 3).tolist()} -> "
+                f"{np.round(target, 3).tolist()} ik_err={p_err*1000:.1f}mm "
+                f"ori_err={np.rad2deg(o_err):.1f}deg"
+            )
+            return
+        print(
+            f"  cube-clip EE {np.round(start, 3).tolist()} -> {np.round(after, 3).tolist()} "
+            f"(shift {100*travel:.1f}cm w_ori={w_ori} corner_err={p_err*1000:.1f}mm "
+            f"ori_err={np.rad2deg(o_err):.1f}deg)"
+        )
 
     def _select_bank_pose_trim_mode(
         self,
@@ -981,6 +1317,11 @@ class MotionGenerator:
         if current_joint_pos is not None:
             selected, _ = self._find_closest_pose(current_joint_pos, matching_poses, pose_def=None)
             return selected
+        # Closest pose among dir+grip matches, then EE translate to the exact xyz.
+        if isinstance(pose_def, dict) and _pose_xyz_axes_specified(pose_def):
+            ranked = _select_initial_poses(matching_poses, pose_def, top_k=1)
+            if ranked:
+                return ranked[0]
         return sorted(
             matching_poses,
             key=lambda p: (float(p.get("orientation_diff_deg", 999)), int(p.get("pose_id", 0))),
@@ -990,6 +1331,7 @@ class MotionGenerator:
         self.jacobian_calculator._set_pose_from_data(bank_pose)
         if self._use_xyz_trim() and isinstance(pose_def, dict):
             self._apply_pose_xyz_trim_instant(pose_def, bank_pose)
+        self._clip_ee_into_gallery_cube()
 
     def _joint_positions_for_pose(self, pose_def: Optional[Dict], bank_pose: Dict) -> np.ndarray:
         """Bank pose + xyz-trim target joints (apply trim before transition lerp)."""
@@ -1158,6 +1500,7 @@ class MotionGenerator:
         save_gif: bool = True,
         overlay_progress_bar: bool = True,
         progress_bar_style: str = "typed",
+        start_from_neutral: bool = False,
     ):
         """
         Execute a cue (e.g., 'waving').
@@ -1171,6 +1514,9 @@ class MotionGenerator:
             save_gif: If True, save GIF to disk (and return filepath). If False, return (frames, pose_id).
             overlay_progress_bar: If True, overlay a progress bar onto frames.
             progress_bar_style: "typed", "simple", or "none".
+            start_from_neutral: If True, render a neutral hold and transition into
+                the first authored pose. If False, the first GIF frame is the
+                first authored pose.
         """
         print(f"\n{'='*60}")
         print(f"Executing cue: {cue}")
@@ -1306,19 +1652,31 @@ class MotionGenerator:
                 hold_time = parameters.get('hold_time', 1.0)
                 
                 if current_pose is None:
-                    # First pose: just set it and hold (no speed/interpolation needed)
-                    print("Setting first pose...")
                     pose_def = pose_param if isinstance(pose_param, dict) else None
-                    self._set_pose_from_bank(pose_def, selected_pose)
-                    current_pose_name = pose_param  # Store the pose parameter (string or dict)
+                    end_q = self._joint_positions_for_pose(pose_def, selected_pose)
+                    if start_from_neutral:
+                        print("Approaching first pose from home...")
+                        home_q = self.initial_joint_pos.copy()
+                        self._set_joint_positions(home_q)
+                        for _ in range(max(1, _hold_frame_count(CUE_HOME_HOLD_S, hz))):
+                            image = self._capture_image()
+                            frames.append(Image.fromarray(image))
+                        self._record_q_lerp(home_q, end_q, hz, frames)
+                    else:
+                        print("Starting directly from first authored pose...")
+                        self._set_joint_positions(end_q)
+                    current_pose_name = pose_param
                     current_pose = selected_pose
-                    
-                    # Hold at pose for hold_time
-                    num_frames = _hold_frame_count(hold_time, hz)
+                    intro = max(float(hold_time), CUE_INTRO_HOLD_S)
+                    num_frames = _hold_frame_count(intro, hz)
                     for _ in range(num_frames):
                         image = self._capture_image()
                         frames.append(Image.fromarray(image))
-                    print(f"Captured {num_frames} frames (hold_time: {hold_time}s, hz: {hz})")
+                    prefix = f"home {CUE_HOME_HOLD_S:.2f}s + approach + " if start_from_neutral else ""
+                    print(f"Captured {prefix}intro hold {intro:.2f}s ({num_frames} hold frames, hz={hz})")
+                    if self._joint_traj is not None:
+                        self._cue_pose_frame = max(0, len(self._joint_traj) - 1) if start_from_neutral else 0
+                        print(f"  cue pose_frame={self._cue_pose_frame}")
                 else:
                     # Transition from current pose to selected pose with speed
                     # Create display names for logging
@@ -1336,8 +1694,11 @@ class MotionGenerator:
                     end_joint_pos = self._joint_positions_for_pose(pose_def, selected_pose)
                     
                     # Calculate movement duration and number of frames
-                    duration = 1.0 / speed
-                    num_transition_frames = _motion_frame_count(duration, hz)
+                    authored_s = 1.0 / max(0.1, float(speed))
+                    max_dq = float(np.max(np.abs(end_joint_pos - start_joint_pos)))
+                    duration, num_transition_frames = _safe_motion_frames(
+                        authored_s, hz, max_abs_dq_rad=max_dq
+                    )
                     
                     # Lerp to trim-inclusive target (tiago: trim before transition)
                     q_prev = start_joint_pos.copy()
@@ -1506,12 +1867,16 @@ class MotionGenerator:
                             except Exception:
                                 secondary_joint_idx = None
 
-                        duration = 1.0 / effective_dir_speed
-                        num_movement_frames = _motion_frame_count(duration, hz)
                         joint_offsets = {}
                         for move in axis_moves:
                             joint_offsets.setdefault(move["joint_idx"], 0.0)
                             joint_offsets[move["joint_idx"]] += np.deg2rad(move["degrees"])
+
+                        authored_s = 1.0 / max(0.1, float(effective_dir_speed))
+                        max_dq = max((abs(v) for v in joint_offsets.values()), default=0.0)
+                        duration, num_movement_frames = _safe_motion_frames(
+                            authored_s, hz, max_abs_dq_rad=max_dq
+                        )
 
                         safe_joint_offsets = dict(joint_offsets)
                         safe_angle_scale = 1.0
@@ -1666,8 +2031,11 @@ class MotionGenerator:
                         start_joint_pos = current_joint_pos
                         pose_def = target_pose if isinstance(target_pose, dict) else None
                         end_joint_pos = self._joint_positions_for_pose(pose_def, selected_pose)
-                        duration = 1.0 / path_speed
-                        num_transition_frames = _motion_frame_count(duration, hz)
+                        duration, num_transition_frames = _safe_motion_frames(
+                            1.0 / max(0.1, float(path_speed)),
+                            hz,
+                            max_abs_dq_rad=float(np.max(np.abs(end_joint_pos - start_joint_pos))),
+                        )
 
                         q_prev = start_joint_pos.copy()
                         for frame_idx in range(num_transition_frames):
@@ -1880,6 +2248,80 @@ def _scaled_preview_config(
     return preview
 
 
+def _write_joint_traj(
+    generator: "MotionGenerator",
+    hz: int,
+    cue: str,
+    cue_idx: Optional[int],
+    traj_out_path: Optional[str],
+    gif_path: Optional[str],
+) -> str:
+    """Write per-frame arm q (rad) + EE xyz at the GIF clock."""
+    qs = np.stack(generator._joint_traj, axis=0)
+    ee = (
+        np.stack(generator._ee_traj, axis=0)
+        if generator._ee_traj
+        else np.zeros((len(qs), 3), dtype=np.float64)
+    )
+    gripper = np.zeros((len(qs),), dtype=np.float64)
+    if traj_out_path:
+        out = traj_out_path
+        if out.endswith(".json"):
+            out = out[:-5]
+        elif out.endswith(".npz"):
+            out = out[:-4]
+    else:
+        out = os.path.join(generator.output_dir, f"{cue}_traj")
+    os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+    pose_frame = int(getattr(generator, "_cue_pose_frame", 0) or 0)
+    qs, gripper, ee, pose_frame = strip_to_cue(qs, gripper, ee, pose_frame)
+    print(f"  npz cue pose is frame 0 ({qs.shape[0]} frames after dropping sim-home prefix)")
+    np.savez(
+        out + ".npz",
+        hz=np.array(hz, dtype=np.float64),
+        joints_rad=qs,
+        gripper=gripper,
+        ee_xyz=ee,
+        robot=np.array(generator.robot_name),
+        pose_frame=np.array(pose_frame, dtype=np.int32),
+        joint_names=np.array(FR3_HARDWARE["joint_names"] if generator.robot_name == "FR3" else [f"q{i}" for i in range(qs.shape[1])]),
+    )
+    payload = {
+        "cue": cue,
+        "idx": cue_idx,
+        "robot": generator.robot_name,
+        "hardware": FR3_HARDWARE if generator.robot_name == "FR3" else {"sim_robot": generator.robot_name},
+        "hz": int(hz),
+        "n_frames": int(qs.shape[0]),
+        "pose_frame": pose_frame,
+        "duration_s": float(qs.shape[0] / max(hz, 1)),
+        "joint_dim": int(qs.shape[1]),
+        "gripper_open": 0.0,
+        "gripper_note": "DROID gripper_position 0 = open (Franka Hand / Robotiq: confirm scale on the laptop)",
+        "units": "arm joints radians (DROID/FR3 order j1-j7), EE meters in robosuite world",
+        "speed_cap": {
+            "max_ee_m_s": _max_ee_m_s(),
+            "max_qdot_deg_s": float(np.degrees(_max_qdot_rad_s())),
+            "note": "GIF/npz time-stretched so EE and joint rates never exceed these",
+        },
+        "gif": gif_path,
+        "joints_rad": qs.tolist(),
+        "gripper": gripper.tolist(),
+        "ee_xyz": ee.tolist(),
+    }
+    json_path = out + ".json"
+    with open(json_path, "w") as f:
+        json.dump(payload, f, indent=2)
+    dq = np.diff(qs, axis=0)
+    max_dq = float(np.max(np.abs(dq))) if len(dq) else 0.0
+    print(f"Wrote joint traj: {json_path}")
+    print(
+        f"  frames={qs.shape[0]} hz={hz} duration={payload['duration_s']:.2f}s "
+        f"qdim={qs.shape[1]} max_|Δq|={max_dq:.4f} rad/frame"
+    )
+    return json_path
+
+
 def generate(
     robot: str = "IIWA",
     env: str = "EmptySpace",
@@ -1908,6 +2350,9 @@ def generate(
     progress_bar_style: str = "typed",
     gif_filename_suffix: Optional[str] = None,
     ignore_xyz: bool = True,
+    record_joints: bool = False,
+    traj_out_path: Optional[str] = None,
+    start_from_neutral: bool = False,
 ):
     """
     Main function to generate robot motions.
@@ -1936,6 +2381,10 @@ def generate(
         progress_bar_style: ``typed``, ``simple``, or ``none`` (only used when overlay is on).
         gif_filename_suffix: Optional suffix embedded in output ``.gif`` name (helps locate the file).
         ignore_xyz: If False, use xyz-trim renderer (closest dir/grip pose + EE trim to target xyz).
+        record_joints: If True, log arm q and EE xyz on every GIF frame (same clock as ``hz``).
+        traj_out_path: Optional json/npz stem. Defaults to ``<output_dir>/<robot>/<cue>_traj.json``.
+        start_from_neutral: If True, retain the optional neutral-to-first-pose
+            lead-in. The default starts the GIF directly at the first pose.
     """
 
     if not ignore_xyz:
@@ -2018,6 +2467,9 @@ def generate(
         camera_spherical_m=camera_spherical_m,
         ignore_xyz=ignore_xyz,
     )
+    if record_joints:
+        generator._joint_traj = []
+        generator._ee_traj = []
     _debug_log("generate: MotionGenerator constructed")
 
     try:
@@ -2035,6 +2487,7 @@ def generate(
                 overlay_progress_bar=overlay_progress_bar,
                 progress_bar_style=progress_bar_style,
                 filename_suffix=gif_filename_suffix,
+                start_from_neutral=start_from_neutral,
             )
             if isinstance(_ret, str):
                 saved_gif_path = _ret
@@ -2076,6 +2529,7 @@ def generate(
                     overlay_progress_bar=overlay_progress_bar,
                     progress_bar_style=progress_bar_style,
                     filename_suffix=gif_filename_suffix,
+                    start_from_neutral=start_from_neutral,
                 )
                 if isinstance(_ret, str):
                     saved_gif_path = _ret
@@ -2096,6 +2550,7 @@ def generate(
                             save_gif=False,
                             overlay_progress_bar=overlay_progress_bar,
                             progress_bar_style=progress_bar_style,
+                            start_from_neutral=start_from_neutral,
                         )
                         variations.append((frames, pid, pose))
                     except Exception as e:
@@ -2106,6 +2561,15 @@ def generate(
 
                 _save_tiled_gif(variations, generator.output_dir, robot, cue, effective_hz, cue_idx)
     finally:
+        if record_joints and generator._joint_traj:
+            _write_joint_traj(
+                generator,
+                hz=effective_hz,
+                cue=cue,
+                cue_idx=cue_idx,
+                traj_out_path=traj_out_path,
+                gif_path=saved_gif_path,
+            )
         generator.close()
         if temp_config_path and os.path.exists(temp_config_path):
             os.unlink(temp_config_path)

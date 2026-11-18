@@ -18,6 +18,7 @@ ROBOT_CLASS_MAPPING = {
     "Jaco": FixedBaseRobot,
     "Kinova3": FixedBaseRobot,
     "Panda": FixedBaseRobot,
+    "FR3": FixedBaseRobot,
     "Sawyer": FixedBaseRobot,
     "UR5e": FixedBaseRobot,
     "SpotWithArm": LeggedRobot,

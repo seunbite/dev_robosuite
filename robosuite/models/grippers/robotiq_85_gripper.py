@@ -3,8 +3,9 @@
 """
 import numpy as np
 
+import robosuite.utils.transform_utils as T
 from robosuite.models.grippers.gripper_model import GripperModel
-from robosuite.utils.mjcf_utils import xml_path_completion
+from robosuite.utils.mjcf_utils import find_elements, string_to_array, xml_path_completion
 
 
 class Robotiq85GripperBase(GripperModel):
@@ -74,3 +75,28 @@ class Robotiq85Gripper(Robotiq85GripperBase):
     @property
     def dof(self):
         return 1
+
+
+class DroidRobotiq85Gripper(Robotiq85Gripper):
+    """Robotiq 2F-85 with an extra +45° yaw about the tool axis.
+
+    Panda ``right_hand`` is already -45°. This adapter clock cancels that
+    so the 2F-85 opening follows the Franka flange (left-right at the
+    measured desk-neutral). Panda pose-bank joints still need
+    ``FR3.apply_bank_gripper_clock`` (−45° on q7) so grip=horiz/vert
+    keep the same visual opening.
+    """
+
+    _CLOCK_QUAT_WXYZ = "0.9238795 0 0 0.3826834"  # +45° about Z
+
+    def __init__(self, idn=0):
+        super().__init__(idn=idn)
+        self.worldbody[0].set("quat", self._CLOCK_QUAT_WXYZ)
+        base_quat = np.fromstring(self.worldbody[0].get("quat", "1 0 0 0"), dtype=np.float64, sep=" ")[
+            [1, 2, 3, 0]
+        ]
+        eef_element = find_elements(
+            root=self.root, tags="body", attribs={"name": self.correct_naming("eef")}, return_first=True
+        )
+        eef_relative_quat = string_to_array(eef_element.get("quat", "1 0 0 0"))[[1, 2, 3, 0]]
+        self.rotation_offset = T.quat_multiply(eef_relative_quat, base_quat)
