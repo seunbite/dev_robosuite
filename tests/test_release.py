@@ -1,10 +1,7 @@
 from pathlib import Path
 
 from motion_programs.compiler import compile_motion_code
-from motion_programs.pose_envelopes import (
-    is_valid_configuration,
-    validate_pose_envelopes,
-)
+from motion_programs.pose_envelopes import is_valid_configuration, validate_pose_envelopes
 from motion_programs.release import validate_release
 
 

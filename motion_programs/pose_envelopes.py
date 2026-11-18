@@ -62,15 +62,8 @@ def validate_pose_envelopes(
             if int(payload["n_poses"]) != len(actual):
                 raise ValueError("unitree_g1: n_poses does not match pose records")
         elif embodiment == "tiago":
-            rows = [
-                json.loads(line)
-                for line in records_path.read_text(encoding="utf-8").splitlines()
-                if line.strip()
-            ]
-            actual = [
-                f"{row['arm_position']}|{row['gripper_orientation']}|{row['tile_idx']}"
-                for row in rows
-            ]
+            rows = [json.loads(line) for line in records_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            actual = [f"{row['arm_position']}|{row['gripper_orientation']}|{row['tile_idx']}" for row in rows]
         else:
             raise KeyError(f"unsupported pose envelope: {embodiment}")
 

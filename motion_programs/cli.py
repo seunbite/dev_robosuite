@@ -18,13 +18,9 @@ def main() -> None:
     compile_parser = sub.add_parser("compile", help="compile one Motion Code")
     compile_parser.add_argument("code")
     compile_parser.add_argument("--platform", required=True)
-    pose_parser = sub.add_parser(
-        "pose-valid", help="check a G1 or TIAGo configuration ID against the allowlist"
-    )
+    pose_parser = sub.add_parser("pose-valid", help="check a G1 or TIAGo configuration ID against the allowlist")
     pose_parser.add_argument("configuration_id")
-    pose_parser.add_argument(
-        "--platform", choices=("unitree_g1", "tiago"), required=True
-    )
+    pose_parser.add_argument("--platform", choices=("unitree_g1", "tiago"), required=True)
     args = parser.parse_args()
 
     if args.command == "validate":
