@@ -1,6 +1,8 @@
 # --- Pilot experiment bundle (tracked) ---
 data/*
 !data/seed/
+!data/paper/
+!data/paper/**
 data/seed/*
 !data/seed/yml/
 !data/seed/shots/
@@ -26,6 +28,7 @@ bin/*
 # JSON: allow experiment configs/results; ignore adhoc scratch
 *.json
 !data/seed/**/*.json
+!data/paper/**/*.json
 !data/seed/**/*.yml
 !data/results/motion_configs/**/*.json
 !data/results/verify/**/*.json
@@ -151,6 +154,56 @@ MUJOCO_LOG.TXT
 .idea
 
 .pytest_cache/
+
+# Research-workspace build, preview, and editor artifacts
+.chart-data-*/
+tmp/
+**/tmp/
+**/.build/
+**/.figvenv/
+**/.venv/
+**/.codex_pptx/
+**/.cursor/
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.pid
+*.bak
+
+# Generated research outputs. Curated release data lives in data/paper/.
+data/results/
+output/
+!docs/assets/
+
+# Paper build products. Keep only the figures referenced by root.tex and the
+# small, source-like human-evaluation app / synthetic MJCF files.
+papers/icra2027_motion_abstraction/*.html
+papers/icra2027_motion_abstraction/figure_critical_attributes.png
+papers/icra2027_motion_abstraction/analysis/*.html
+papers/icra2027_motion_abstraction/figures/*.html
+papers/icra2027_motion_abstraction/figures/*.png
+papers/icra2027_motion_abstraction/figures/*.pdf
+papers/icra2027_motion_abstraction/figures/*.svg
+!papers/icra2027_motion_abstraction/figures/figure1_human_llm_humanoid_roomba_4up.pdf
+!papers/icra2027_motion_abstraction/figures/figure_critical_signature_venn.png
+!papers/icra2027_motion_abstraction/figures/figure_rq2_all_morphologies_updated_tiago31.png
+!papers/icra2027_motion_abstraction/figures/figure_humanoid_attr_bars.pdf
+!papers/icra2027_motion_abstraction/figures/figure_extension20_structural_audit.pdf
+!papers/icra2027_motion_abstraction/figures/figure_physical_difficulty_grid.png
+!papers/icra2027_motion_abstraction/figures/figure_extension20_failure_examples.png
+papers/icra2027_motion_abstraction/career_emergence_pilot/
+papers/icra2027_motion_abstraction/cue_hand_location_dots/
+papers/icra2027_motion_abstraction/franka_attr_smoke/
+papers/icra2027_motion_abstraction/franka_paper30/
+papers/icra2027_motion_abstraction/humanlike90_4afc_eval/
+papers/icra2027_motion_abstraction/olm_gt_negatives_pilot/
+papers/icra2027_motion_abstraction/olm_regen_3x3/
+papers/icra2027_motion_abstraction/motion_code/*.html
+!papers/icra2027_motion_abstraction/synthetic_morphology/xml/
+!papers/icra2027_motion_abstraction/synthetic_morphology/xml/**
 
 # private macros
 macros_private.py

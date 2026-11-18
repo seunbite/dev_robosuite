@@ -1,0 +1,1614 @@
+# Unified Motion Code schema for all embodiments.
+# Source of truth for prompt_exp0 / agent-fill / Gemini generation / GT audits.
+#
+# Attribute key conventions (recommended):
+#   definition   — full prose (from prompt_exp0; not shortened)
+#   values       — categorical enum (canonical tokens)
+#   aliases      — input synonyms → canonical value
+#   type         — enum | float | int | bool | range | compound | positional
+#   unit         — degrees | meters | seconds | percentile | none
+#   range        — {min, max, typical_min, typical_max} for continuous attrs
+#   forms        — accepted literal forms (scalar, ±, [lo,hi], list, categorical)
+#   default      — value when omitted
+#   required     — whether the attr must appear when the component is used
+#   dsl_key      — Motion Code keyword (e.g. dir, grip, spd)
+#   json_key     — field name after convert_code / in movements JSON
+#   examples     — short Motion Code fragments
+#   notes        — caveats, parser rewrites, platform limits
+#   unsupported  — tokens seen in Human GT (or elsewhere) that should NOT be emitted
+#   maps_to      — bank / semantic remapping (e.g. in → left on single_arm)
+
+meta:
+  version: "1.0"
+  join: "+"
+  components_order: [pose, move, path, hold]
+  # Step scheduling on each movements[] entry (JSON field ``order``):
+  #   sequential — play in list order (default; formerly “차례로”)
+  #   together   — this step plays concurrently with the *next* step
+  # DSL: path(..., order=together) + move(...)  → A.order=together, B.order=sequential
+  step_order:
+    json_key: order
+    type: enum
+    values: [sequential, together]
+    default: sequential
+    value_definitions:
+      sequential: "Play this step, then the next (in list order)."
+      together: "Play this step concurrently with the immediately following step."
+  timing_shared: &timing_shared
+    speed:
+      dsl_key: spd
+      json_key: speed
+      type: float
+      unit: none
+      definition: >
+        Playback / motion speed multiplier. 0.3 = slow / soft approach;
+        4.0 = sharp / strike. Vary setup (0.6–1.2), core (1.5–3.5),
+        settle (0.5–1.0). Avoid all beats at 3–4 unless one sharp strike.
+      range: {min: 0.3, max: 4.0, typical_min: 0.5, typical_max: 3.5}
+      default: 1.0
+      required: false
+    repetition:
+      dsl_key: rep
+      json_key: repetition
+      type: int
+      definition: >
+        Number of identical repeats of the same joint/axis/range or path stroke
+        (e.g. nod 3×, path y ping-pong 4×). Asymmetric rhythms (move–pause–move–move)
+        must use separate steps — do not fake them with a high rep + high speed.
+      range: {min: 1, max: 8, typical_min: 1, typical_max: 4}
+      default: 1
+      required: false
+    hold_time:
+      dsl_key: hold
+      json_key: hold_time
+      type: float
+      unit: seconds
+      definition: >
+        Pause after the beat so the viewer sees move → hold → move.
+        Typical readable holds 0.15–1.5s; multi-beat cues (beckon, rub, pat)
+        often need ≥0.25s between beats. Static emblem freezes often use 1.2–1.5s.
+      range: {min: 0.0, max: 2.5, typical_min: 0.1, typical_max: 1.5}
+      default: 0.0
+      required: false
+
+  coordinate_frame_world: &coord_world
+    definition: >
+      World frame shared by manipulator-like platforms:
+      +x = forward toward the human viewer,
+      +y = robot left,
+      +z = up (ceiling).
+    axes:
+      x: {meaning: depth_forward_back, positive: toward_viewer}
+      y: {meaning: lateral_left_right, positive: robot_left}
+      z: {meaning: height_up_down, positive: up}
+
+# ---------------------------------------------------------------------------
+# HUMANOID — Unitree G1
+# ---------------------------------------------------------------------------
+humanoid:
+  robot: Unitree G1
+  components: [pose, move, path, hold]
+  coordinate_frame: *coord_world
+  notes: >
+    Right arm is the primary gesturing arm unless left_arm=mirror (or an
+    independent left dir) is set. Prefer starting with pose. Total steps 2–8.
+    At least one move, path, or hold after the opening pose when the cue needs
+    dynamics or a readable freeze.
+
+  pose:
+    syntax: "pose(dir=..., grip=..., head=..., torso=..., left_arm=..., elbow=..., x=..., y=..., z=..., t=...)"
+    definition: >
+      Opening body configuration: dominant right-arm reach, gripper/palm class,
+      head gaze, torso height, optional left-arm relation, elbow bend, and EE
+      workspace percentiles. Join follow-on steps with +.
+
+    arm_direction:
+      dsl_key: dir
+      json_key: arm_position
+      type: enum
+      required: false
+      default: still
+      definition: >
+        Dominant reach direction of the right arm relative to the torso.
+        Omit dir or set still for head-only cues (nod, shake, tilt) so arms do
+        not invent a raised pose.
+      values: [front, back, in, out, up, down, still]
+      aliases:
+      value_definitions:
+        front: "reach toward the viewer (+x). Example: offer, point forward, handshake."
+        back: "reach toward own torso (−x). Example: hand on chest, retract."
+        in: "reach inward across / toward midline (+y from the right arm). Example: beckon, palms together, rub chest."
+        out: "reach outward to the side (−y). Example: side wave, open branch."
+        up: "reach toward the ceiling (+z). Example: stretch, surrender."
+        down: "reach / rest downward (−z); treated like still for lowered arms."
+        still: "lowered / rest."
+      examples:
+        - "pose(dir=front, grip=vert, z=50)"
+        - "pose(head=center, torso=mid)"  # dir omitted → still
+
+    gripper_orientation:
+      dsl_key: grip
+      json_key: gripper_orientation
+      type: compound
+      required: false
+      default: vertical
+      definition: >
+        Gripper / hand orientation. Wrist class is the jaw-opening line projected
+        onto the plane perpendicular to arm reach: vertical = | (up–down),
+        horizontal = ㅡ (left–right). Humanoid bank also accepts palm-normal
+        compounds joined with | (e.g. vert|palmin, horiz|palmfront). Prefer a
+        compound when palm facing is semantically load-bearing (stop, shrug,
+        welcome, fist).
+      values:
+        - vertical
+        - horizontal
+        - vertical|palmin
+        - vertical|palmout
+        - horizontal|palmdown
+        - horizontal|palmup
+        - horizontal|palmfront
+        - horizontal|palmback
+      aliases:
+        vert: vertical
+        horiz: horizontal
+        "vert|palmin": "vertical|palmin"
+        "horiz|palmdown": "horizontal|palmdown"
+        "horiz|palmup": "horizontal|palmup"
+        "horiz|palmfront": "horizontal|palmfront"
+        "horiz|palmback": "horizontal|palmback"
+      value_definitions:
+        vertical: "jaw-opening line reads as | (up–down). Example: handshake, point."
+        horizontal: "jaw-opening line reads as ㅡ (left–right). Example: wave, stop."
+        palmin: "palm toward midline / body."
+        palmfront: "palm toward viewer (stop / high-five)."
+        palmup: "open-hand invite / palms-up."
+        palmdown: "press-down / palms-down."
+        palmback: "fist / palm back toward self."
+        palmout: "palm facing outward laterally."
+      examples:
+        - "pose(dir=up, grip=horiz|palmfront, z=60)"
+        - "pose(dir=in, grip=vert|palmin, z=80, y=50)"
+
+    head:
+      dsl_key: head
+      json_key: head
+      type: enum
+      required: false
+      default: center
+      definition: >
+        Preset gaze / head orientation from the robot's perspective before any
+        move(head, …) deltas.
+      values: [center, left, right, up, down]
+      value_definitions:
+        center: "look forward."
+        left: "pan left."
+        right: "pan right."
+        up: "tilt toward ceiling."
+        down: "tilt toward floor."
+
+    torso_height:
+      dsl_key: torso
+      json_key: torso_height
+      type: enum
+      required: false
+      default: mid
+      definition: >
+        Torso / body height preset for the opening silhouette.
+      values: [low, mid, high]
+      aliases: {tall: high}
+      value_definitions:
+        low: "lowered / crouched torso."
+        mid: "neutral mid height (default)."
+        high: "raised / tall torso (tall alias)."
+
+    left_arm:
+      dsl_key: left_arm
+      json_key: left_arm
+      type: enum
+      required: false
+      default: still
+      definition: >
+        Left-arm relation to the right arm. still = left stays at rest.
+        mirror = left copies the right arm direction (symmetric: stretch,
+        surrender, palms together, hug). Use mirror when both arms share the
+        same direction — do not set left to the same categorical value as right.
+        Or an independent dir value when left differs from right.
+      values: [still, mirror, front, back, in, out, up, down]
+      examples:
+        - "pose(dir=out, grip=horiz|palmup, z=70, left_arm=mirror)"
+
+    elbow_bended:
+      dsl_key: elbow
+      json_key: elbow_bended
+      type: bool
+      required: false
+      definition: >
+        Whether the elbow is flexed within the same (dir, grip) class.
+        Use T/true for flexed salutes / raised-index / draw-circle;
+        F/false for straight point / reach.
+      values: [true, false]
+      dsl_literals: [T, F, true, false]
+      aliases: {T: true, F: false, "true": true, "false": false}
+      examples:
+        - "pose(dir=front, grip=vert, z=60, elbow=T)"
+        - "pose(dir=front, grip=vert, z=50, elbow=F)"
+
+    ee_percentile_x:
+      dsl_key: x
+      json_key: x
+      type: float
+      unit: percentile
+      required: false
+      default: none
+      definition: >
+        Depth 0–100: 0 = furthest back, cover chest ≈70, cover face ≈60,
+        100 = furthest forward toward the viewer.
+        Omit x unless forward/back placement characterizes the cue.
+      landmarks: {back: 0, cover_chest: 70, cover_face: 60, forward_max: 100}
+      range: {min: 0, max: 100}
+
+    ee_percentile_y:
+      dsl_key: y
+      json_key: y
+      type: float
+      unit: percentile
+      required: false
+      default: none
+      definition: >
+        Lateral 0–100 (viewer-facing): 0 = leftmost / outer full reach, right shoulder ≈25,
+        body center ≈50, left shoulder ≈75, 100 = rightmost / opposite-side full reach.
+        Omit y unless left–right placement characterizes the cue.
+      landmarks: {left_max: 0, right_shoulder: 60, body_center: 75, left_shoulder: 90, right_max: 100}
+      range: {min: 0, max: 100}
+
+    ee_percentile_z:
+      dsl_key: z
+      json_key: z
+      type: float
+      unit: percentile
+      required: false
+      default: none
+      definition: >
+        Height 0–100: waist ≈40, solar plexus ≈70, neck ≈85, face center ≈90,
+        top of head / overhead ≈95–100.
+        Omit z unless height placement characterizes the cue.
+      landmarks: {waist: 40, solar_plexus: 50, neck: 70, face_center: 80, head_top: 95, overhead_max: 100}
+      range: {min: 0, max: 100}
+
+    duration:
+      dsl_key: t
+      json_key: duration
+      type: float
+      unit: seconds
+      required: false
+      default: 0.0
+      definition: >
+        Optional pose settle duration before follow-on beats.
+      range: {min: 0.1, max: 2.0, typical_min: 0.5, typical_max: 0.8}
+
+  move:
+    syntax: "move(joint, axis, degrees, rep=..., spd=..., hold=...)"
+    definition: >
+      Joint-space beat relative to the current pose. Degrees: a scalar −20 means
+      one-way [0, −20]; ±15 or [-15,15] means ping-pong; [20] is a one-sided list.
+
+    joint:
+      dsl_key: null  # positional arg 0
+      type: enum
+      required: true
+      definition: >
+        Which joint group receives the beat. shoulder/elbow/wrist use Cartesian
+        axes x/y/z (depth / lateral / height). head uses pan (left/right) or tilt
+        (up/down). torso uses height with categorical low|mid|high, or small
+        cartesian proxies (x lean in meters).
+      values: [shoulder, elbow, wrist, head, torso]
+      axis_by_joint:
+        shoulder: [x, y, z]
+        elbow: [x, y, z]
+        wrist: [x, y, z]
+        head: [pan, tilt]
+        torso: [height, x, y, z]
+
+    axis:
+      dsl_key: null  # positional arg 1
+      type: enum
+      required: true
+      definition: >
+        Axis of the joint beat. For arm joints: x=depth, y=lateral, z=height.
+        For head: pan=left/right, tilt=up/down. For torso: height (categorical
+        or meter range) or small cartesian lean.
+      values: [x, y, z, pan, tilt, height]
+
+    degrees:
+      dsl_key: null  # positional arg 2; also degrees=/deg=
+      json_key: degrees
+      type: range
+      unit: degrees
+      required: true
+      forms: [scalar, "±", "[lo,hi]", "[one_sided]", categorical_height]
+      definition: >
+        Angle or displacement range for the beat. Scalar −20 → one-way [0,−20].
+        ±15 or [-15,15] → ping-pong. [20] → one-sided list. For torso height,
+        categorical low|mid|high is also accepted. Typical arm ±5–45° (wrist
+        ±5–20; shoulder/elbow ±15–50). Hard limit about ±50° for rotational axes.
+        Head pan/tilt typical ±8–30° per beat.
+      range: {min: -50, max: 50, typical_min: -35, typical_max: 35}
+      examples:
+        - "move(head, tilt, [-22,22], rep=3, spd=1.5, hold=0.1)"
+        - "move(shoulder, z, ±25, rep=3, spd=2.5)"
+        - "move(torso, height, low, spd=0.5)"
+
+    speed:
+      dsl_key: spd
+      json_key: speed
+      type: float
+      unit: none
+      required: false
+      default: 1.0
+      definition: >
+        Playback speed for this beat. 0.3 = slow / soft; 4.0 = sharp / strike.
+        Vary setup (0.6–1.2), core (1.5–3.5), settle (0.5–1.0). Avoid all beats
+        at 3–4 unless one sharp strike.
+      range: {min: 0.3, max: 4.0, typical_min: 0.5, typical_max: 3.5}
+      examples:
+        - "move(head, tilt, [-22,22], rep=3, spd=1.5, hold=0.1)"
+        - "move(shoulder, z, [+35,-35], rep=3, spd=3.5, hold=0.1)"
+
+    hold:
+      dsl_key: hold
+      json_key: hold_time
+      type: float
+      unit: seconds
+      required: false
+      default: 0.0
+      definition: >
+        Pause after this beat so the viewer sees move → hold → move.
+        Typical readable holds 0.15–1.5s; multi-beat cues often need ≥0.25s
+        between beats. Tiny holds (~0.1s) are fine for rapid repeats (nod, pump).
+      range: {min: 0.0, max: 2.5, typical_min: 0.1, typical_max: 1.5}
+      examples:
+        - "move(head, pan, -45, spd=1.0, hold=1.5)"
+        - "move(wrist, y, ±25, rep=3, spd=2.0, hold=0.1)"
+
+    repetition:
+      dsl_key: rep
+      json_key: repetition
+      type: int
+      required: false
+      default: 1
+      definition: >
+        Identical repeats of the same joint/axis/range (e.g. nod 3×).
+        Asymmetric rhythms must use separate steps — not a high rep alone.
+      range: {min: 1, max: 8, typical_min: 1, typical_max: 4}
+
+  path:
+    syntax: "path(ee|base, line|arc, ...)"
+    definition: >
+      Cartesian draw in world space. EE line/arc for end-effector strokes;
+      base line/arc rare on humanoid. Never invent arm joint fields on path.
+      Typical EE stroke 0.03–0.25 m; arc radius 0.03–0.20 m; tiny rub arcs ≈0.01–0.03 m.
+    timing: *timing_shared
+
+    mode:
+      dsl_key: null  # positional arg 0
+      json_key: mode
+      type: enum
+      required: true
+      definition: >
+        ee = end-effector IK stroke.
+      values: [ee]
+      default: ee
+
+    shape:
+      dsl_key: null  # positional arg 1
+      json_key: shape
+      type: enum
+      required: true
+      definition: "line = straight translation; arc = curved sweep in a plane."
+      values: [line, arc]
+
+    axis:
+      dsl_key: axis
+      json_key: axis
+      type: enum
+      required: false  # line only
+      definition: >
+        For EE line: world axis of translation (x/y/z).
+      values: [x, y, z]
+      applies_when: {shape: line, mode: ee}
+
+    distance:
+      dsl_key: dist
+      json_key: distance
+      type: range
+      unit: meters
+      required: false
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: >
+        Signed EE line displacement in meters along axis. Typical 0.03–0.25 m
+        (local stroke 0.03–0.08; reach/slash up to ~0.25).
+      range: {min: -0.40, max: 0.40, typical_min: -0.25, typical_max: 0.25}
+      applies_when: {shape: line, mode: ee}
+
+    plane:
+      dsl_key: plane
+      json_key: plane
+      type: enum
+      required: false
+      definition: "For EE arc: plane containing the arc."
+      values: [xy, xz, yz]
+      applies_when: {shape: arc, mode: ee}
+
+    radius:
+      dsl_key: r
+      json_key: radius
+      type: float
+      unit: meters
+      required: false
+      definition: >
+        Arc radius in meters. Typical 0.03–0.20; tiny rub ~0.01–0.03; large scoop ~0.25.
+      range: {min: 0.0, max: 0.50, typical_min: 0.01, typical_max: 0.25}
+      applies_when: {shape: arc}
+
+    sweep:
+      dsl_key: sweep
+      json_key: sweep
+      aliases: {deg: sweep, degrees: sweep}
+      type: range
+      unit: degrees
+      required: false
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: >
+        Arc sweep angle in degrees (signed). +180 and −180 travel opposite ways
+        (no clockwise/ccw attribute). On plane=yz/xz, negative bulges downward
+        (bowl ∪); positive bulges upward. 360 = full circle.
+      range: {min: -720, max: 720, typical_min: -180, typical_max: 360}
+      applies_when: {shape: arc}
+      unsupported: [direction, clockwise, cw, ccw]
+
+  hold:
+    syntax: "hold(t=...)"
+    definition: >
+      First-class freeze beat. pose + hold is valid for static emblems
+      (point, stop, welcome). Parser rewrites hold to a zero-distance EE line
+      path with hold_time (no separate JSON type "hold").
+    duration:
+      dsl_key: t
+      json_key: hold_time
+      type: float
+      unit: seconds
+      required: true
+      definition: "Freeze duration in seconds so the silhouette reads."
+      range: {min: 0.15, max: 2.5, typical_min: 1.0, typical_max: 1.5}
+      examples:
+        - "pose(dir=front, grip=vert, z=50) + hold(t=1.5)"
+
+# ---------------------------------------------------------------------------
+# GOOGLE ROBOT — mobile bimanual manipulator
+# ---------------------------------------------------------------------------
+tiago:
+  robot: Tiago
+  components: [pose, move, path, hold]
+  coordinate_frame: *coord_world
+  notes: >
+    Same Motion Code DSL family as humanoid, but gripper bank is simple
+    horiz/vert only (no palm compounds). Optional base path when planar motion helps.
+    Prefer starting with pose. Total steps 2–8.
+
+  pose:
+    syntax: "pose(dir=..., grip=..., head=..., torso=..., left_arm=..., elbow=..., x=..., y=..., z=...)"
+    definition: >
+      Opening configuration for Tiago: arm_position, gripper_orientation,
+      head, torso_height, left_arm, elbow_bended, EE percentiles.
+
+    arm_direction:
+      dsl_key: dir
+      json_key: arm_position
+      type: enum
+      required: false
+      default: still
+      definition: >
+        Dominant reach direction of the right arm relative to the torso.
+        Omit dir or set still for head-only cues (nod, shake, tilt) so arms do
+        not invent a raised pose.
+      values: [front, back, in, out, up, down, still]
+      value_definitions:
+        front: "reach toward the viewer (+x). Example: offer, point forward, handshake."
+        back: "reach toward own torso (−x). Example: hand on chest, retract."
+        in: "reach inward across / toward midline (+y from the right arm). Example: beckon, palms together, rub chest."
+        out: "reach outward to the side (−y). Example: side wave, open branch."
+        up: "reach toward the ceiling (+z). Example: stretch, surrender."
+        down: "reach / rest downward (−z); treated like still for lowered arms."
+        still: "lowered / rest."
+      examples:
+        - "pose(dir=front, grip=vert, z=50)"
+        - "pose(head=center, torso=mid)"  # dir omitted → still
+
+    gripper_orientation:
+      dsl_key: grip
+      json_key: gripper_orientation
+      type: enum
+      required: false
+      default: vertical
+      definition: >
+        Tiago bank uses simple wrist class only (no palm compounds).
+        Wrist class is the jaw-opening line projected onto the plane perpendicular
+        to arm reach: vertical = | (up–down), horizontal = ㅡ (left–right).
+        close/closed → vertical clenched; open → horizontal.
+      values: [vertical, horizontal]
+      aliases: {vert: vertical, horiz: horizontal, open: horizontal, close: vertical, closed: vertical}
+      value_definitions:
+        vertical: "jaw-opening line reads as | (up–down). Example: handshake, point."
+        horizontal: "jaw-opening line reads as ㅡ (left–right). Example: wave, stop."
+      examples:
+        - "pose(dir=up, grip=horiz, z=60)"
+        - "pose(dir=front, grip=vert, z=50, elbow=F)"
+
+    head:
+      dsl_key: head
+      json_key: head
+      type: enum
+      required: false
+      default: center
+      definition: >
+        Preset gaze / head orientation from the robot's perspective before any
+        move(head, …) deltas.
+      values: [center, left, right, up, down]
+      value_definitions:
+        center: "look forward."
+        left: "pan left."
+        right: "pan right."
+        up: "tilt toward ceiling."
+        down: "tilt toward floor."
+
+    torso_height:
+      dsl_key: torso
+      json_key: torso_height
+      type: enum
+      required: false
+      default: mid
+      definition: >
+        Torso / body height preset for the opening silhouette.
+      values: [low, mid, high]
+      aliases: {tall: high}
+      value_definitions:
+        low: "lowered / crouched torso."
+        mid: "neutral mid height (default)."
+        high: "raised / tall torso (tall alias)."
+
+    left_arm:
+      dsl_key: left_arm
+      json_key: left_arm
+      type: enum
+      required: false
+      default: still
+      definition: >
+        Left-arm relation to the right arm. still = left stays at rest.
+        mirror = left copies the right arm direction (symmetric: stretch,
+        surrender, palms together, hug). Use mirror when both arms share the
+        same direction — do not set left to the same categorical value as right.
+        Or an independent dir value when left differs from right.
+      values: [still, mirror, front, back, in, out, up, down]
+      examples:
+        - "pose(dir=out, grip=horiz, z=55, left_arm=mirror)"
+
+    elbow_bended:
+      dsl_key: elbow
+      json_key: elbow_bended
+      type: bool
+      required: false
+      definition: >
+        Whether the elbow is flexed within the same (dir, grip) class.
+        Use T/true for flexed salutes / raised-index / draw-circle;
+        F/false for straight point / reach.
+      values: [true, false]
+      dsl_literals: [T, F, true, false]
+      aliases: {T: true, F: false, "true": true, "false": false}
+      examples:
+        - "pose(dir=front, grip=vert, z=60, elbow=T)"
+        - "pose(dir=front, grip=vert, z=50, elbow=F)"
+
+    ee_percentile_x:
+      dsl_key: x
+      json_key: x
+      type: float
+      unit: percentile
+      required: false
+      default: none
+      definition: >
+        Depth 0–100: 0 = furthest back, cover chest ≈60, cover face ≈70,
+        100 = furthest forward toward the viewer.
+        Omit x unless forward/back placement characterizes the cue.
+      landmarks: {back: 0, cover_chest: 60, cover_face: 70, forward_max: 100}
+      range: {min: 0, max: 100}
+
+    ee_percentile_y:
+      dsl_key: y
+      json_key: y
+      type: float
+      unit: percentile
+      required: false
+      default: none
+      definition: >
+        Lateral 0–100 (viewer-facing): 0 = leftmost / outer full reach, right shoulder ≈25,
+        body center ≈50, left shoulder ≈75, 100 = rightmost / opposite-side full reach.
+        Omit y unless left–right placement characterizes the cue.
+      landmarks: {left_max: 0, right_shoulder: 60, body_center: 70, left_shoulder: 80, right_max: 100}
+      range: {min: 0, max: 100}
+
+    ee_percentile_z:
+      dsl_key: z
+      json_key: z
+      type: float
+      unit: percentile
+      required: false
+      default: none
+      definition: >
+        Height 0–100: solar plexus ≈50, neck ≈50, top of head ≈65,
+        overhead max = 100.
+        Omit z unless height placement characterizes the cue.
+      landmarks: {solar_plexus: 50, neck: 50, head_top: 65, overhead_max: 100}
+      range: {min: 0, max: 100}
+
+  move:
+    syntax: "move(joint, axis, degrees, rep=..., spd=..., hold=...)"
+    definition: >
+      Joint-space beat relative to the current pose. Degrees: a scalar −20 means
+      one-way [0, −20]; ±15 or [-15,15] means ping-pong; [20] is a one-sided list.
+
+    joint:
+      dsl_key: null  # positional arg 0
+      type: enum
+      required: true
+      definition: >
+        Which joint group receives the beat. shoulder/elbow/wrist use Cartesian
+        axes x/y/z (depth / lateral / height). head uses pan (left/right) or tilt
+        (up/down). torso uses height with categorical low|mid|high, or small
+        cartesian proxies (x lean in meters).
+      values: [shoulder, elbow, wrist, head, torso]
+      axis_by_joint:
+        shoulder: [x, y, z]
+        elbow: [x, y, z]
+        wrist: [x, y, z]
+        head: [pan, tilt]
+        torso: [height, x, y, z]
+
+    axis:
+      dsl_key: null  # positional arg 1
+      type: enum
+      required: true
+      definition: >
+        Axis of the joint beat. For arm joints: x=depth, y=lateral, z=height.
+        For head: pan=left/right, tilt=up/down. For torso: height (categorical
+        or meter range) or small cartesian lean.
+      values: [x, y, z, pan, tilt, height]
+
+    degrees:
+      dsl_key: null  # positional arg 2; also degrees=/deg=
+      json_key: degrees
+      type: range
+      unit: degrees
+      required: true
+      forms: [scalar, "±", "[lo,hi]", "[one_sided]", categorical_height]
+      definition: >
+        Angle or displacement range for the beat. Scalar −20 → one-way [0,−20].
+        ±15 or [-15,15] → ping-pong. [20] → one-sided list. For torso height,
+        categorical low|mid|high is also accepted. Typical arm ±5–45° (wrist
+        ±5–20; shoulder/elbow ±15–50). Hard limit about ±50° for rotational axes.
+        Head pan/tilt typical ±8–30° per beat. Google GT occasionally uses wrist ±60.
+      range: {min: -60, max: 60, typical_min: -35, typical_max: 45}
+      examples:
+        - "move(head, tilt, [-22,22], rep=3, spd=1.5, hold=0.1)"
+        - "move(shoulder, z, ±25, rep=3, spd=2.5)"
+        - "move(torso, height, low, spd=0.5)"
+
+    speed:
+      dsl_key: spd
+      json_key: speed
+      type: float
+      unit: none
+      required: false
+      default: 1.0
+      definition: >
+        Playback speed for this beat. 0.3 = slow / soft; 4.0 = sharp / strike.
+        Vary setup (0.6–1.2), core (1.5–3.5), settle (0.5–1.0). Avoid all beats
+        at 3–4 unless one sharp strike.
+      range: {min: 0.3, max: 4.0, typical_min: 0.5, typical_max: 3.5}
+      examples:
+        - "move(head, tilt, [-22,22], rep=3, spd=1.5, hold=0.1)"
+        - "move(shoulder, z, [+30,-30], rep=3, spd=3.5, hold=0.1)"
+
+    hold:
+      dsl_key: hold
+      json_key: hold_time
+      type: float
+      unit: seconds
+      required: false
+      default: 0.0
+      definition: >
+        Pause after this beat so the viewer sees move → hold → move.
+        Typical readable holds 0.15–1.5s; multi-beat cues often need ≥0.25s
+        between beats. Tiny holds (~0.1s) are fine for rapid repeats (nod, pump).
+      range: {min: 0.0, max: 2.5, typical_min: 0.1, typical_max: 1.5}
+      examples:
+        - "move(head, pan, -45, spd=1.0, hold=1.5)"
+        - "move(wrist, y, ±25, rep=3, spd=2.0, hold=0.1)"
+
+    repetition:
+      dsl_key: rep
+      json_key: repetition
+      type: int
+      required: false
+      default: 1
+      definition: >
+        Identical repeats of the same joint/axis/range (e.g. nod 3×).
+        Asymmetric rhythms must use separate steps — not a high rep alone.
+      range: {min: 1, max: 8, typical_min: 1, typical_max: 4}
+
+  path:
+    syntax: "path(ee|base, line|arc, ...)"
+    definition: >
+      Cartesian draw in world space. EE line/arc for end-effector strokes;
+      optional base line/arc when planar motion helps. Never invent arm joint
+      fields on path. Typical EE stroke 0.03–0.25 m; arc radius 0.03–0.20 m;
+      tiny rub arcs ≈0.01–0.03 m.
+    timing: *timing_shared
+
+    mode:
+      dsl_key: null  # positional arg 0
+      json_key: mode
+      type: enum
+      required: true
+      definition: >
+        ee = end-effector IK stroke; base = mobile-base planar stroke (optional).
+      values: [ee, base]
+      default: ee
+
+    shape:
+      dsl_key: null  # positional arg 1
+      json_key: shape
+      type: enum
+      required: true
+      definition: "line = straight translation; arc = curved sweep in a plane."
+      values: [line, arc]
+
+    axis:
+      dsl_key: axis
+      json_key: axis
+      type: enum
+      required: false
+      definition: >
+        For EE line: world axis of translation (x/y/z).
+      values: [x, y, z]
+      applies_when: {shape: line, mode: ee}
+
+    distance:
+      dsl_key: dist
+      json_key: distance
+      type: range
+      unit: meters
+      required: false
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: >
+        Signed EE line displacement in meters along axis. Typical 0.03–0.25 m
+        (local stroke 0.03–0.08; reach/slash up to ~0.25).
+      range: {min: -0.40, max: 0.40, typical_min: -0.25, typical_max: 0.25}
+      applies_when: {shape: line, mode: ee}
+
+    plane:
+      dsl_key: plane
+      json_key: plane
+      type: enum
+      required: false
+      definition: "For EE arc: plane containing the arc."
+      values: [xy, xz, yz]
+      applies_when: {shape: arc, mode: ee}
+
+    radius:
+      dsl_key: r
+      json_key: radius
+      type: float
+      unit: meters
+      required: false
+      definition: >
+        Arc radius in meters. Typical 0.03–0.20; tiny rub ~0.01–0.03; large scoop ~0.25.
+      range: {min: 0.0, max: 0.50, typical_min: 0.01, typical_max: 0.25}
+      applies_when: {shape: arc}
+
+    sweep:
+      dsl_key: sweep
+      json_key: sweep
+      aliases: {deg: sweep, degrees: sweep}
+      type: range
+      unit: degrees
+      required: false
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: >
+        Arc sweep angle in degrees (signed). +180 and −180 travel opposite ways
+        (no clockwise/ccw attribute). On plane=yz/xz, negative bulges downward
+        (bowl ∪); positive bulges upward. 360 = full circle.
+      range: {min: -720, max: 720, typical_min: -180, typical_max: 360}
+      applies_when: {shape: arc}
+      unsupported: [direction, clockwise, cw, ccw]
+
+    base_x:
+      dsl_key: x
+      json_key: x
+      type: range
+      unit: meters
+      required: false
+      definition: "Base line forward (+) / back (−) meters."
+      applies_when: {mode: base, shape: line}
+
+    base_y:
+      dsl_key: y
+      json_key: y
+      type: range
+      unit: meters
+      required: false
+      definition: "Base line left (+) / right (−) meters."
+      applies_when: {mode: base, shape: line}
+
+  hold:
+    syntax: "hold(t=...)"
+    definition: >
+      First-class freeze beat. pose + hold is valid for static emblems
+      (point, stop, thank-you freeze). Parser rewrites hold to a zero-distance
+      EE line path with hold_time (no separate JSON type "hold").
+    duration:
+      dsl_key: t
+      json_key: hold_time
+      type: float
+      unit: seconds
+      required: true
+      definition: "Freeze duration in seconds so the silhouette reads."
+      range: {min: 0.15, max: 2.5, typical_min: 1.0, typical_max: 1.5}
+      examples:
+        - "pose(dir=front, grip=vert, z=50, elbow=F) + hold(t=1.5)"
+        - "pose(dir=out, grip=horiz, z=55, left_arm=mirror) + hold(t=1.5)"
+
+# ---------------------------------------------------------------------------
+# SINGLE-ARM — IIWA-like
+# ---------------------------------------------------------------------------
+single_arm:
+  robot: Single-arm (IIWA)
+  components: [pose, move, path, hold]
+  coordinate_frame: *coord_world
+  notes: >
+    EE pointing axis runs wrist → fingertips. No mobile base, no second arm,
+    no humanoid head/torso fields in final Motion Code (parser ignores them).
+    Express nod/shake/thank-you with shoulder/wrist move or EE path.
+    Prefer setting z almost always; y≈50 for midline.
+
+  pose:
+    syntax: "pose(dir=..., grip=..., x=..., y=..., z=...)"
+    definition: >
+      Opening EE pointing direction + gripper orientation + optional workspace
+      percentiles. Parser always injects pose-level speed/hold_time defaults.
+
+    ee_direction:
+      dsl_key: dir
+      json_key: dir
+      type: enum
+      required: false
+      default: front
+      definition: >
+        Where the EE points. up/down/front/back/left/right.
+        Motion Code in ≈ across-body → bank left; out ≈ to the side → bank right.
+        Prefer explicit geometry over gesture-name presets.
+      values: [front, back, up, down, left, right]
+      maps_to:
+        in: left
+        out: right
+        still: front
+      aliases: {in: left, out: right, still: front}
+      value_definitions:
+        front: "EE points toward viewer (+x)."
+        back: "EE points toward own body (−x)."
+        up: "EE points up (+z)."
+        down: "EE points down (−z)."
+        left: "EE points across-body / left (+y)."
+        right: "EE points to the side / right (−y)."
+      notes: >
+        Human GT often writes dir=in|out; converter maps to left|right.
+        left_arm / elbow / torso sometimes appear in GT but are ignored.
+
+    gripper_orientation:
+      dsl_key: grip
+      json_key: gripper_orientation
+      type: enum
+      required: false
+      default: vertical
+      definition: >
+        vert/vertical = projected jaw line |. horiz/horizontal/open = ㅡ.
+        close/closed → vertical. Palm compounds are ignored — use simple horiz/vert only.
+      values: [vertical, horizontal]
+      aliases: {vert: vertical, vertical: vertical, horiz: horizontal, open: horizontal, close: vertical, closed: vertical}
+
+    ee_percentile_x:
+      dsl_key: x
+      json_key: x
+      type: float
+      unit: percentile
+      required: false
+      default: none
+      definition: >
+        Depth 0–100: 0 = furthest back, body/chest depth ≈50, forward reach ≈75,
+        100 = furthest forward toward the viewer.
+        Omit x unless forward/back placement characterizes the cue.
+      landmarks: {back: 0, body_center: 50, forward_reach: 75, forward_max: 100}
+      range: {min: 0, max: 100}
+
+    ee_percentile_y:
+      dsl_key: y
+      json_key: y
+      type: float
+      unit: percentile
+      required: false
+      default: none
+      definition: >
+        Lateral 0–100 (viewer-facing): 0 = leftmost / outer full reach, right shoulder ≈25,
+        body center ≈50, left shoulder ≈75, 100 = rightmost / opposite-side full reach.
+        Omit y unless left–right placement characterizes the cue.
+      landmarks: {left_max: 0, right_shoulder: 25, body_center: 50, left_shoulder: 75, right_max: 100}
+      range: {min: 0, max: 100}
+
+    ee_percentile_z:
+      dsl_key: z
+      json_key: z
+      type: float
+      unit: percentile
+      required: false
+      default: none
+      definition: >
+        Height 0–100: waist ≈40, solar plexus ≈50, neck ≈70, face center ≈80,
+        top of head / overhead ≈90–100.
+        Omit z unless height placement characterizes the cue.
+      landmarks: {solar_plexus: 40, neck: 70, face_center: 75, head_top: 90, overhead_max: 100}
+      range: {min: 0, max: 100}
+
+    ignored_in_dsl:
+      definition: >
+        Fields that may appear in handwritten GT but are NOT part of the
+        single_arm schema (parser ignores).
+      unsupported: [head, torso, left_arm, elbow]
+
+  move:
+    syntax: "move(shoulder|elbow|wrist, x|y|z, degrees, rep=..., spd=..., hold=...)"
+    definition: >
+      Joint-space beat on shoulder/elbow/wrist only (no head). Axes x|y|z.
+      Scalar degrees = one-way; ± / [lo,hi] = ping-pong. Speed 0.3–4.0;
+      hold 0.15–1.5s. JSON shape is flat {joint, directions[{degrees{axis}, speed, hold_time}], repetition}
+      (not nested movement.joints like google/humanoid).
+    timing: *timing_shared
+    joint:
+      type: enum
+      required: true
+      values: [shoulder, elbow, wrist]
+      definition: "Arm joint for the beat. No head/torso joints on this platform."
+      unsupported: [head, torso]
+      gt_legacy_seen: [torso]  # Human GT occasionally writes move(torso, …); ignore / rewrite to shoulder
+    axis:
+      type: enum
+      required: true
+      values: [x, y, z]
+      definition: "x=depth, y=lateral, z=height."
+    degrees:
+      type: range
+      unit: degrees
+      required: true
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Angle range for the beat."
+      range: {min: -60, max: 60, typical_min: -35, typical_max: 35}
+    notes: >
+      Rare GT forms like move(wrist, axis=y, dist=-0.08) are non-canonical;
+      prefer positional move(wrist, y, degrees, …).
+      Human GT also has a typo path axis=7 on one cue — not a valid axis.
+
+  path:
+    syntax: "path(ee, line|arc, ...)"
+    definition: >
+      EE-only Cartesian path (no base, no mode field in JSON).
+      line: axis + dist (±m or [a,b] oscillatory).
+      arc: plane + r + sweep.
+    timing: *timing_shared
+    mode:
+      type: enum
+      values: [ee]
+      notes: "Always EE; mode omitted in single_arm JSON."
+    shape:
+      type: enum
+      values: [line, arc]
+      required: true
+    axis:
+      type: enum
+      values: [x, y, z]
+      gt_typos_seen: ["7"]  # Human GT rub_eye_tired had axis=7 — invalid
+    distance:
+      dsl_key: dist
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      range: {min: -0.40, max: 0.40, typical_min: -0.25, typical_max: 0.25}
+    plane:
+      type: enum
+      values: [xy, xz, yz]
+    radius:
+      dsl_key: r
+      type: float
+      unit: meters
+      range: {min: 0.01, max: 0.40, typical_min: 0.01, typical_max: 0.25}
+    sweep:
+      type: range
+      unit: degrees
+      forms: [scalar, "±"]
+      definition: >
+        Signed degrees. +180/−180 opposite; no cw/ccw. Negative on yz/xz = downward bowl ∪.
+      range: {min: -360, max: 360, typical_min: -180, typical_max: 360}
+      unsupported: [direction, clockwise, cw, ccw]
+
+  hold:
+    syntax: "hold(t=...)"
+    definition: >
+      After pose for static emblems (point, stop, high-five invite).
+      No mobile base.
+    duration:
+      dsl_key: t
+      type: float
+      unit: seconds
+      required: true
+      range: {min: 0.15, max: 2.5, typical_min: 1.0, typical_max: 1.5}
+
+# ---------------------------------------------------------------------------
+# STRETCH — Hello Robot Stretch 3 (mujoco_menagerie MJCF)
+# Expressiveness: between single_arm and roomba (base + lift + telescope + wrist/head;
+# no second arm, no Tiago bimanual bank).
+# ---------------------------------------------------------------------------
+stretch:
+  robot: Hello Robot Stretch 3
+  components: [pose, move, path, hold]
+  coordinate_frame: *coord_world
+  notes: >
+    Official Stretch 3 MJCF: differential-drive base, vertical lift, telescoping
+    horizontal arm, wrist yaw/pitch/roll, pan/tilt head. No left_arm / mirror.
+    Grip bank is simple horiz/vert. torso → lift height; dir → arm extension +
+    wrist. Prefer pose first; path(base,…) for approach; path(ee,…) for strokes.
+    Total steps 2–8. Head-only cues must omit dir or set dir=still.
+  examples:
+    - "pose(head=center, torso=mid) + move(head, tilt, [-22,22], rep=3, spd=1.5, hold=0.1)"
+    - "pose(dir=front, grip=vert, z=55, torso=mid) + hold(t=1.5)"
+    - "pose(dir=up, grip=vert, torso=high, z=80) + move(shoulder, z, [+25,-25], rep=3, spd=3.0, hold=0.1)"
+    - "pose(dir=front, grip=horiz, z=60) + path(ee, arc, plane=xy, r=0.08, sweep=120, spd=1.2)"
+    - "pose(dir=still, torso=mid) + path(base, line, x=+0.25, spd=1.4) + hold(t=0.8)"
+    - "pose(dir=out, grip=horiz, z=70) + move(wrist, y, [-25,25], rep=3, spd=2.2, hold=0.1)"
+
+  pose:
+    syntax: "pose(dir=..., grip=..., torso=..., head=..., elbow=..., x=..., y=..., z=...)"
+    definition: >
+      Opening configuration: arm reach direction, gripper, lift height (torso),
+      head, optional wrist bend (elbow) and EE percentiles. No second arm.
+    examples:
+      - "pose(dir=front, grip=vert, z=55, torso=mid)"
+      - "pose(head=center, torso=mid)"  # dir omitted → still
+      - "pose(dir=up, grip=horiz, torso=high, z=85)"
+
+    arm_direction:
+      dsl_key: dir
+      json_key: arm_position
+      type: enum
+      required: false
+      default: still
+      definition: >
+        Dominant reach of the telescoping arm + wrist. Omit or still for
+        head/base-only cues.
+      values: [front, back, in, out, up, down, still]
+      value_definitions:
+        front: "arm extended toward the viewer (+x), wrist_yaw=0. Example: point, offer, high-five."
+        back: "arm retracted, wrist yaw ~π (toward mast). Example: point-self / retract."
+        in: "wrist yaw +90° toward midline (+y). Exact 90° from front. Example: beckon, rub near body."
+        out: "wrist yaw −90° outward (−y). Exact 90° from front (out/front/in are 90° steps). Example: side wave, open branch."
+        up: "lift high + wrist pitch up. Example: stretch, fist pump prep."
+        down: "lift low + wrist pitch down. Example: pick / point floor."
+        still: "arm mostly retracted at mid lift. Example: nod / shake head."
+      examples:
+        - "pose(dir=front, grip=vert, z=55)"
+        - "pose(dir=still, head=center, torso=mid)"
+
+    gripper_orientation:
+      dsl_key: grip
+      json_key: gripper_orientation
+      type: enum
+      required: false
+      default: vertical
+      definition: >
+        Simple jaw orientation only — vert or horiz. No palm compounds.
+        vert ≈ | jaw line; horiz ≈ ㅡ.
+      values: [vertical, horizontal]
+      aliases: {vert: vertical, horiz: horizontal, open: horizontal, close: vertical, closed: vertical}
+      value_definitions:
+        vertical: "jaw-opening line reads as | (up–down). Example: point, handshake."
+        horizontal: "jaw-opening line reads as ㅡ (left–right). Example: wave, stop."
+      examples:
+        - "pose(dir=front, grip=vert, z=50)"
+        - "pose(dir=out, grip=horiz, z=70)"
+
+    torso_height:
+      dsl_key: torso
+      json_key: torso_height
+      type: enum
+      required: false
+      default: mid
+      definition: >
+        Vertical lift height of the arm carriage on the mast (not a humanoid waist).
+        low ≈ near base; mid ≈ chest; high/tall ≈ near head.
+      values: [low, mid, high]
+      aliases: {tall: high, short: low}
+      examples:
+        - "pose(dir=still, torso=low)"
+        - "pose(dir=up, torso=high, z=85)"
+
+    head:
+      dsl_key: head
+      json_key: head
+      type: enum
+      required: false
+      default: center
+      definition: "Pan/tilt look of the head camera module before move(head,…)."
+      values: [center, left, right, up, down]
+      value_definitions:
+        center: "look forward along the base."
+        left: "pan left."
+        right: "pan right."
+        up: "tilt toward ceiling."
+        down: "tilt toward floor."
+      examples:
+        - "pose(head=left, torso=mid)"
+        - "pose(dir=still, head=up)"
+
+    elbow_bended:
+      dsl_key: elbow
+      json_key: elbow_bended
+      type: bool
+      required: false
+      definition: >
+        On Stretch this biases wrist pitch: T = more bent (wrist down);
+        F = straighter reach. Prefer for point / poke cues.
+      values: [true, false]
+      aliases: {T: true, F: false, bent: true, straight: false}
+      examples:
+        - "pose(dir=front, grip=vert, elbow=F, z=55)"
+
+    ee_percentile_x:
+      dsl_key: x
+      json_key: x
+      type: float
+      unit: percentile
+      required: false
+      definition: "Maps to arm telescope extension (0 = retracted, 100 = full reach)."
+      range: {min: 0, max: 100}
+      examples:
+        - "pose(dir=front, grip=vert, x=75, z=55)"
+    ee_percentile_y:
+      dsl_key: y
+      json_key: y
+      type: float
+      unit: percentile
+      required: false
+      definition: "Maps to wrist yaw offset (50 ≈ neutral; 0/100 = extreme side)."
+      range: {min: 0, max: 100}
+    ee_percentile_z:
+      dsl_key: z
+      json_key: z
+      type: float
+      unit: percentile
+      required: false
+      definition: "Maps to lift height (0 = low, 100 = high). Prefer setting z for arm cues."
+      range: {min: 0, max: 100}
+      notes: "Prefer setting z for most arm poses."
+      examples:
+        - "pose(dir=front, grip=vert, z=40)"
+        - "pose(dir=front, grip=vert, z=80)"
+
+    unsupported_fields:
+      unsupported: [left_arm, mirror]
+      notes: "Unimanual only — never emit left_arm=mirror."
+
+  move:
+    syntax: "move(shoulder|elbow|wrist|head|torso, axis, degrees|level, rep=..., spd=..., hold=...)"
+    definition: >
+      Stretch joint aliases: shoulder → arm telescope wave; elbow → wrist_pitch;
+      wrist → wrist_yaw/roll; head pan|tilt; torso height. Base locomotion is
+      path(base,…), not move.
+    timing: *timing_shared
+    examples:
+      - "move(head, tilt, [-22,22], rep=3, spd=1.5, hold=0.1)"
+      - "move(shoulder, z, [+30,-30], rep=3, spd=3.0, hold=0.1)"
+      - "move(wrist, y, [-25,25], rep=3, spd=2.2, hold=0.1)"
+      - "move(torso, height, high, spd=0.8, hold=0.3)"
+    joint:
+      type: enum
+      required: true
+      values: [shoulder, elbow, wrist, head, torso]
+      value_definitions:
+        shoulder: "arm joint alias. axis=x → telescope; axis=z → mast lift (vertical bob)."
+        elbow: "wrist pitch wave."
+        wrist: "wrist yaw (y/z) or roll (x)."
+        head: "head pan or tilt."
+        torso: "lift height change."
+    axis:
+      type: enum
+      required: true
+      values: [x, y, z, pan, tilt, height]
+      notes: >
+        head → pan|tilt; torso → height (or low|mid|high as degrees token).
+        shoulder z = vertical lift only; arm telescope uses shoulder x.
+        path(ee, arc, plane=yz) = wrist-only (arm/lift frozen).
+    degrees:
+      type: range
+      unit: degrees
+      required: false
+      forms: [scalar, "±", "[lo,hi]", level]
+      range: {min: -60, max: 60, typical_min: -35, typical_max: 35}
+
+  path:
+    syntax: "path(ee|base, line|arc, ...)"
+    definition: >
+      ee = end-effector stroke (line/arc) via lift/arm/wrist IK; base = planar
+      locomotion like roomba (line x/y meters; arc r + deg, r=0 = in-place yaw).
+    timing: *timing_shared
+    examples:
+      - "path(ee, line, axis=z, dist=0.12, spd=1.2, hold=0.3)"
+      - "path(ee, arc, plane=xy, r=0.08, sweep=120, spd=1.2)"
+      - "path(base, line, x=+0.25, spd=1.4)"
+      - "path(base, arc, r=0, deg=90, spd=1.2)"
+    mode:
+      type: enum
+      values: [ee, base]
+      required: true
+      default: ee
+    shape:
+      type: enum
+      values: [line, arc]
+      required: true
+    axis:
+      type: enum
+      values: [x, y, z]
+      applies_when: {shape: line, mode: ee}
+    distance:
+      dsl_key: dist
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      range: {min: -0.35, max: 0.35, typical_min: -0.20, typical_max: 0.20}
+      applies_when: {shape: line, mode: ee}
+    plane:
+      type: enum
+      values: [xy, xz, yz]
+      applies_when: {shape: arc, mode: ee}
+      value_definitions:
+        xy: "horizontal wrist sweep (yaw); arm mostly fixed."
+        xz: "reach + lift arc (telescope and mast move)."
+        yz: "wrist-only circle; arm/lift frozen. Vertical bob uses axis=z, not yz arc."
+    radius:
+      dsl_key: r
+      type: float
+      unit: meters
+      range: {min: 0.0, max: 0.40, typical_min: 0.0, typical_max: 0.20}
+    sweep:
+      dsl_key: sweep
+      aliases: {deg: sweep, degrees: sweep}
+      type: range
+      unit: degrees
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: >
+        Signed degrees. +180/−180 opposite; no cw/ccw. Negative on yz/xz = downward bowl ∪.
+      range: {min: -720, max: 720, typical_min: -180, typical_max: 360}
+      unsupported: [direction, clockwise, cw, ccw]
+    base_x:
+      dsl_key: x
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      applies_when: {mode: base, shape: line}
+      range: {min: -0.50, max: 0.50, typical_min: -0.15, typical_max: 0.35}
+    base_y:
+      dsl_key: y
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      applies_when: {mode: base, shape: line}
+      range: {min: -0.25, max: 0.25, typical_min: -0.08, typical_max: 0.08}
+
+  hold:
+    syntax: "hold(t=...)"
+    definition: >
+      First-class freeze of current base/lift/arm/head. Prefer hold over a
+      zero-length EE path rewrite.
+    examples:
+      - "pose(dir=front, grip=vert, z=55) + hold(t=1.5)"
+      - "pose(dir=up, grip=horiz, torso=high) + hold(t=1.2)"
+    duration:
+      dsl_key: t
+      type: float
+      unit: seconds
+      required: true
+      range: {min: 0.15, max: 2.5, typical_min: 0.5, typical_max: 1.5}
+
+# ---------------------------------------------------------------------------
+# QUADRUPED — Unitree Go2
+# ---------------------------------------------------------------------------
+quadruped:
+  robot: Unitree Go2
+  components: [pose, move, path, hold]
+  coordinate_frame:
+    definition: "+x = forward, +y = robot left, +z = up."
+    axes:
+      x: {meaning: forward_back, positive: forward}
+      y: {meaning: left_right, positive: robot_left}
+      z: {meaning: up_down, positive: up}
+  notes: >
+    Go2 has no neck — never use head= or move(head, …).
+    Do not use dir= on pose. Feet stay gravity-planted; express cues with
+    stance, lifted paw, and base locomotion. Total steps 2–10.
+
+  pose:
+    syntax: "pose(stance=stand|sit|crouch|play_bow|threelegs_front, front_height=..., back_height=...)"
+    definition: >
+      Body silhouette via stance (maps to front_height + back_height) and optional
+      three-leg lift. Only one three-leg mode: stance=threelegs_front
+      (legacy three_legs=front|up maps to front).
+
+    stance:
+      dsl_key: stance
+      json_key: null  # expands to front_height/back_height/three_legs
+      type: enum
+      required: false
+      default: stand
+      definition: >
+        Stance presets:
+        stand = front mid + back mid (upright ready);
+        sit = front high + back low (haunches down);
+        crouch = front low + back low (compressed / charge);
+        play_bow = front low + back high (front down, rear up);
+        threelegs_front = stand + lift right-front paw forward.
+      values: [stand, sit, crouch, play_bow, threelegs_front]
+      stance_heights:
+        stand: {front: mid, back: mid}
+        sit: {front: high, back: low}
+        crouch: {front: low, back: low}
+        play_bow: {front: low, back: high}
+        threelegs_front: {front: mid, back: mid, three_legs: true, hand_position: front}
+      unsupported: [roll_over, rear_up]
+      gt_legacy_seen: [roll_over, rear_up, "front_legs=extend"]
+      notes: >
+        Human GT sometimes uses stance=roll_over / rear_up / front_legs=extend
+        and pose(head=…). These are NOT renderable — do not emit.
+
+    three_legs:
+      dsl_key: three_legs
+      json_key: three_legs
+      type: enum
+      required: false
+      default: none
+      definition: >
+        Legacy lift token. none = all four planted; front|up = lift right-front paw
+        (prefer stance=threelegs_front in new code).
+      values: [none, front, up]
+      aliases: {"false": none, "true": front}
+
+    front_height:
+      dsl_key: front_height
+      json_key: front_height
+      type: enum
+      required: false
+      definition: "Optional override of front body height (low|mid|high)."
+      values: [low, mid, high]
+
+    back_height:
+      dsl_key: back_height
+      json_key: back_height
+      type: enum
+      required: false
+      definition: "Optional override of back body height (low|mid|high)."
+      values: [low, mid, high]
+
+    unsupported_fields:
+      definition: "Rejected by parser / not in renderable bank."
+      unsupported: [head, dir]
+      gt_legacy_seen: [head=center, head=up, head=down, head=right, stance=roll_over, stance=rear_up, front_legs=extend]
+
+  move:
+    syntax: "move(front_legs|back_legs|left_front|right_front|..., axis, degrees, rep=..., spd=..., hold=...)"
+    definition: >
+      Pair legs (front_legs|forelegs|back_legs): axis x or z only.
+      z sign (full body pitch, same as stance poses): − → play_bow (front low + back high);
+      + → sit (front high + back low); [-a,+a] alternates those. Rendered as pose steps.
+      x = reach forward/back via foot IK.
+      Single leg (left_front|right_front|left_back|right_back): axes x|y|z;
+      prefer with stance=threelegs_front. Use right_front for fist-pump / wave / salute.
+      If Motion Code omits threelegs (e.g. pose(stance=sit)+move(right_front,…)),
+      the Motion Code→JSON converter injects a three_legs brace pose (same stance
+      heights) before the paw move — renderer unchanged.
+      Degrees may be angles ([-22,22]) or small meter-like offsets (−0.15);
+      parser scales |v|≤1 to degrees when needed. Never move(head, …).
+    timing: *timing_shared
+    joint:
+      type: enum
+      required: true
+      values: [front_legs, forelegs, back_legs, rear_legs, left_front, right_front, left_back, right_back, left_rear, right_rear]
+      unsupported: [head]
+      gt_legacy_seen: [head]  # Human GT uses move(head, pan|tilt) heavily; parser rejects
+      definition: "Pair or single leg selector."
+    axis:
+      type: enum
+      required: true
+      values: [x, y, z]
+      unsupported: [pan, tilt]  # only appear with illegal move(head, …)
+      gt_legacy_seen: [pan, tilt]
+      notes: "Pair legs: x|z only. Single leg: x|y|z. pan/tilt are head-only and unsupported."
+    degrees:
+      type: range
+      unit: degrees
+      required: true
+      forms: [scalar, "±", "[lo,hi]", meters_offset]
+      definition: "Angle range or small meter-like offset for leg IK."
+      range: {min: -45, max: 45, typical_min: -30, typical_max: 30}
+
+  path:
+    syntax: "path(base, line|arc, ...)"
+    definition: >
+      Base locomotion. line: x=±m; arc: r + deg.
+      r=0 + deg=±… ≈ in-place yaw (±90 alternates CW/CCW each half × rep).
+      r>0 + deg=360|720 = forward-walking circles (nose first); rep repeats sweeps.
+      Non-stand pose before a line/arc auto-rises to stand, then locomotes.
+      With three_legs≠none, either wave the lifted paw or move the base.
+    timing: *timing_shared
+    mode:
+      type: enum
+      values: [base]
+      required: true
+    shape:
+      type: enum
+      values: [line, arc]
+      required: true
+    x:
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Base line forward (+) / back (−)."
+      range: {min: -0.50, max: 0.50, typical_min: -0.20, typical_max: 0.30}
+    radius:
+      dsl_key: r
+      type: float
+      unit: meters
+      definition: "Turning radius; 0 = in-place yaw."
+      range: {min: 0.0, max: 1.0, typical_min: 0.0, typical_max: 0.5}
+    degrees:
+      dsl_key: deg
+      type: range
+      unit: degrees
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Arc yaw / sweep amount."
+      range: {min: -720, max: 720, typical_min: -90, typical_max: 360}
+
+  hold:
+    syntax: "hold(t=...)"
+    definition: >
+      Freeze current stance / paw for readability.
+      Parser → empty movement hold (not a path rewrite like manipulators).
+    duration:
+      dsl_key: t
+      type: float
+      unit: seconds
+      required: true
+      range: {min: 0.15, max: 2.0, typical_min: 0.3, typical_max: 1.5}
+
+# ---------------------------------------------------------------------------
+# ROOMBA — planar mobile base
+# ---------------------------------------------------------------------------
+roomba:
+  robot: Roomba-style base
+  components: [pose, path, hold]
+  coordinate_frame:
+    definition: >
+      Planar world: +x = forward toward the human viewer, +y = robot left,
+      yaw positive ≈ left turn. No z arm workspace. Never invent arms, grippers,
+      or head joints.
+    axes:
+      x: {meaning: forward_back, positive: toward_viewer}
+      y: {meaning: left_right, positive: robot_left}
+  notes: >
+    Most cues are path-only (pose facing optional). move(...) discouraged
+    (becomes tiny in-place yaw). Total steps 1–8; hold-only allowed when
+    stillness is the cue. Soft approach; sharp strike.
+
+  pose:
+    syntax: "pose(dir=front|back|left|right)"
+    definition: >
+      Facing only. Use when orientation itself carries meaning; otherwise skip
+      pose and start with path/hold. Almost unused in Human GT (path/hold dominate).
+
+    facing:
+      dsl_key: dir
+      json_key: dir
+      type: enum
+      required: true
+      definition: >
+        front = face the viewer; back = face away; left/right = face sideways.
+      values: [front, back, left, right]
+      aliases: {forward: front, facing_person: front, orient_to_person: front, face_person: front}
+
+  path:
+    syntax: "path(base, line|arc, ...)"
+    definition: >
+      Only planar base strokes. line: x forward(+)/back(−), y left(+)/right(−).
+      Typical approach x=+0.15–+0.40; small scoots 0.05–0.15; lateral sway y=±0.05.
+      Oscillation: x=±0.15 with rep, or x=[0.20,-0.15] explicit list.
+      Arc: r turning radius; r=0 = rotate in place (nod/shake/tilt proxies via yaw).
+      deg signed sweep (positive ≈ CCW/left); ±30 or deg=[+22,-22] for oscillatory yaw.
+      Full loops deg=360 (or 720 spin emphasis). Figure-eight / flying: prefer linked
+      opposing arcs over identical carousel spins.
+    timing: *timing_shared
+    mode:
+      type: enum
+      values: [base]
+      required: true
+      default: base
+    shape:
+      type: enum
+      values: [line, arc]
+      required: true
+    x:
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Forward (+) / back (−) meters."
+      range: {min: -0.50, max: 0.50, typical_min: -0.15, typical_max: 0.40}
+    y:
+      type: range
+      unit: meters
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Left (+) / right (−) meters (lateral sway)."
+      range: {min: -0.20, max: 0.20, typical_min: -0.05, typical_max: 0.05}
+    radius:
+      dsl_key: r
+      type: float
+      unit: meters
+      definition: "Turning radius; 0 = in-place rotate."
+      range: {min: 0.0, max: 1.0, typical_min: 0.0, typical_max: 0.8}
+    degrees:
+      dsl_key: deg
+      type: range
+      unit: degrees
+      forms: [scalar, "±", "[lo,hi]"]
+      definition: "Signed yaw sweep; 360/720 for full spins."
+      range: {min: -720, max: 720, typical_min: -180, typical_max: 360}
+    speed:
+      dsl_key: spd
+      json_key: speed
+      type: float
+      definition: >
+        0.3 = slow / soft approach; 4.0 = sharp. Soft approach; sharp strike.
+        Occasional >4.0 only for extreme spin emphasis.
+      range: {min: 0.3, max: 4.5, typical_min: 0.3, typical_max: 4.0}
+      notes: "Human GT uses up to spd=4.5 on roomba spin cues."
+
+  hold:
+    syntax: "hold(t=...)"
+    definition: >
+      Freeze so the viewer sees stroke → pause → stroke.
+      Pure hold(t=…) alone is allowed for stillness emblems
+      (embarrassed pause, tree, facepalm proxy).
+      Parser rewrites hold → zero-x base line with hold_time.
+    duration:
+      dsl_key: t
+      type: float
+      unit: seconds
+      required: true
+      definition: "Freeze duration 0.3–2.5s typical."
+      range: {min: 0.3, max: 2.5, typical_min: 0.5, typical_max: 2.0}
+
+  move:
+    definition: >
+      Discouraged on roomba. If emitted, becomes a tiny in-place yaw wiggle only.
+    unsupported: true

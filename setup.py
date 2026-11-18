@@ -16,7 +16,9 @@ setup(
     packages=[
         package
         for package in find_packages()
-        if package.startswith("robosuite") or package.startswith("dev_locomotion")
+        if package.startswith("robosuite")
+        or package.startswith("dev_locomotion")
+        or package.startswith("motion_programs")
     ],
     install_requires=[
         "numpy>=1.13.3",
@@ -31,6 +33,7 @@ setup(
         "termcolor",
         "pytest",
         "tqdm",
+        "PyYAML>=6.0",
     ],
     eager_resources=["*"],
     include_package_data=True,

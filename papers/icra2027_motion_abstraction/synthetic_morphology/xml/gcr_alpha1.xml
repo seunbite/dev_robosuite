@@ -1,0 +1,159 @@
+<!-- Oddkin α=1.0: "Branching Gesture Tree" — Y-spine, heterogenous arms, claw cluster.
+     Inspired by RoboGrammar branching / freeform endoskeletal complexity. -->
+<mujoco model="oddkin_alpha1">
+  <compiler angle="radian" autolimits="true"/>
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+  <visual>
+    <headlight ambient="0.5 0.5 0.5" diffuse="0.55 0.55 0.55"/>
+  </visual>
+  <default>
+    <default class="hinge">
+      <joint type="hinge" damping="0.8" armature="0.02" limited="true"/>
+    </default>
+  </default>
+  <asset>
+    <material name="floor" rgba="0.55 0.56 0.58 1" reflectance="0.0" specular="0.0" shininess="0"/>
+    <!-- role palette: body / leg / arm / spine / head / joint / marker -->
+    <material name="body" rgba="0.18 0.20 0.24 1"/>
+    <material name="leg" rgba="0.42 0.52 0.62 1"/>
+    <material name="arm" rgba="0.78 0.58 0.32 1"/>
+    <material name="spine" rgba="0.72 0.74 0.78 1"/>
+    <material name="head" rgba="0.55 0.62 0.72 1"/>
+    <material name="joint" rgba="0.28 0.30 0.34 1"/>
+    <material name="marker" rgba="0.92 0.93 0.95 1"/>
+  </asset>
+  <worldbody>
+    <light pos="1.5 -2.5 5.5" dir="-0.25 0.35 -1"/>
+    <light pos="-2.5 1 3.5" dir="0.5 -0.1 -1" diffuse="0.22 0.23 0.25"/>
+    <geom type="plane" size="4 4 0.1" material="floor"/>
+
+    <body name="base" pos="0 0 0.13">
+      <freejoint name="base_free"/>
+      <!-- splayed star pedestal -->
+      <geom type="cylinder" size="0.10 0.06" material="body"/>
+      <!-- forward nose: +x toward camera -->
+      <geom type="box" size="0.035 0.02 0.02" pos="0.11 0 0.04" material="marker"/>
+      <geom type="capsule" fromto="0 0 0  0.22 0.10 -0.05" size="0.03" material="leg"/>
+      <geom type="capsule" fromto="0 0 0  0.22 -0.10 -0.05" size="0.03" material="leg"/>
+      <geom type="capsule" fromto="0 0 0  -0.18 0.16 -0.04" size="0.028" material="leg"/>
+      <geom type="capsule" fromto="0 0 0  -0.18 -0.16 -0.04" size="0.028" material="leg"/>
+      <geom type="capsule" fromto="0 0 0  0.02 0.24 -0.05" size="0.026" material="leg"/>
+      <geom type="sphere" size="0.05" pos="0 0 0.07" material="joint"/>
+
+      <!-- tall segmented trunk; +x = forward (toward camera / viewer) -->
+      <body name="trunk1" pos="0 0 0.10">
+        <joint name="trunk1_yaw" class="hinge" axis="0 0 1" range="-1.0 1.0"/>
+        <joint name="trunk1_pitch" class="hinge" axis="0 1 0" range="-0.5 0.8"/>
+        <geom type="cylinder" size="0.055 0.09" material="spine"/>
+        <!-- forward chest plate (facing marker) -->
+        <geom type="box" size="0.02 0.05 0.05" pos="0.055 0 0.01" material="marker"/>
+
+        <body name="trunk2" pos="0 0 0.18">
+          <joint name="trunk2_yaw" class="hinge" axis="0 0 1" range="-1.2 1.2"/>
+          <joint name="trunk2_pitch" class="hinge" axis="0 1 0" range="-0.7 0.9"/>
+          <geom type="box" size="0.06 0.05 0.09" material="spine"/>
+          <geom type="cylinder" size="0.09 0.018" pos="0 0 0" euler="1.57 0 0" material="spine"/>
+
+          <!-- orbiting satellite ring -->
+          <body name="sat_ring" pos="0 0 0">
+            <joint name="sat_spin" class="hinge" axis="0 0 1" range="-3.14 3.14"/>
+            <geom type="sphere" size="0.03" pos="0.12 0 0" material="marker"/>
+            <geom type="sphere" size="0.025" pos="-0.06 0.10 0" material="marker"/>
+            <geom type="sphere" size="0.025" pos="-0.06 -0.10 0" material="marker"/>
+          </body>
+
+          <body name="trunk3" pos="0 0 0.18">
+            <joint name="trunk3_pitch" class="hinge" axis="0 1 0" range="-0.9 1.0"/>
+            <joint name="trunk3_roll" class="hinge" axis="1 0 0" range="-0.8 0.8"/>
+            <geom type="ellipsoid" size="0.07 0.06 0.08" material="body"/>
+
+            <!-- arms planted on the FRONT (+x) of the crown, reaching toward camera -->
+            <body name="branch_l0" pos="0.08 0.04 0.0" euler="0 -0.35 0.20">
+              <joint name="bl0" class="hinge" axis="0 0 1" range="-1.0 1.2"/>
+              <geom type="capsule" fromto="0 0 0  0.14 0 0" size="0.028" material="arm"/>
+              <body name="branch_l1" pos="0.14 0 0">
+                <joint name="bl1" class="hinge" axis="0 1 0" range="-2.0 0.5"/>
+                <geom type="sphere" size="0.035" material="joint"/>
+                <geom type="cylinder" size="0.07 0.012" pos="0.06 0 0" euler="0 1.57 0" material="arm"/>
+                <geom type="box" size="0.08 0.015 0.01" pos="0.12 0 0" material="arm"/>
+                <body name="branch_l2" pos="0.14 0 0">
+                  <joint name="bl2" class="hinge" axis="1 0 0" range="-1.5 1.5"/>
+                  <geom type="box" size="0.05 0.04 0.012" material="arm"/>
+                  <geom type="box" size="0.02 0.06 0.01" pos="0.04 0 0" material="arm"/>
+                </body>
+              </body>
+            </body>
+
+            <body name="branch_r0" pos="0.08 -0.04 0.0" euler="0 -0.35 -0.20">
+              <joint name="br0" class="hinge" axis="0 0 1" range="-1.2 1.0"/>
+              <geom type="capsule" fromto="0 0 0  0.16 0 0" size="0.03" material="arm"/>
+              <body name="branch_r1" pos="0.16 0 0">
+                <joint name="br1" class="hinge" axis="0 1 0" range="-2.2 0.4"/>
+                <geom type="sphere" size="0.036" material="joint"/>
+                <geom type="capsule" fromto="0 0 0  0.15 0 0" size="0.026" material="spine"/>
+                <body name="branch_r2" pos="0.15 0 0">
+                  <joint name="br2" class="hinge" axis="0 1 0" range="-2.0 0.5"/>
+                  <geom type="capsule" fromto="0 0 0  0.12 0 0" size="0.022" material="spine"/>
+                  <body name="branch_r3" pos="0.12 0 0">
+                    <joint name="br3" class="hinge" axis="1 0 0" range="-1.57 1.57"/>
+                    <geom type="box" size="0.03 0.03 0.03" material="body"/>
+                    <body name="claw0" pos="0.03 0.03 0">
+                      <joint name="claw0" class="hinge" axis="0 0 1" range="-0.2 1.2"/>
+                      <geom type="capsule" fromto="0 0 0  0.07 0.03 0" size="0.012" material="arm"/>
+                    </body>
+                    <body name="claw1" pos="0.03 -0.03 0">
+                      <joint name="claw1" class="hinge" axis="0 0 1" range="-1.2 0.2"/>
+                      <geom type="capsule" fromto="0 0 0  0.07 -0.03 0" size="0.012" material="arm"/>
+                    </body>
+                    <body name="claw2" pos="0.03 0 0.03">
+                      <joint name="claw2" class="hinge" axis="0 1 0" range="-1.0 0.3"/>
+                      <geom type="capsule" fromto="0 0 0  0.06 0 0.04" size="0.011" material="arm"/>
+                    </body>
+                    <site name="ee" pos="0.08 0 0" size="0.02"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+
+            <!-- head sits upright on crown; face markers on +x only -->
+            <body name="neck" pos="0 0 0.09">
+              <joint name="neck_yaw" class="hinge" axis="0 0 1" range="-1.2 1.2"/>
+              <joint name="neck_pitch" class="hinge" axis="0 1 0" range="-0.9 0.9"/>
+              <geom type="capsule" fromto="0 0 0  0 0 0.06" size="0.018" material="head"/>
+              <body name="head" pos="0 0 0.08">
+                <joint name="head_roll" class="hinge" axis="1 0 0" range="-1.0 1.0"/>
+                <geom type="sphere" size="0.055" material="head"/>
+                <!-- face: eyes + snout clearly on the camera-facing hemisphere -->
+                <geom type="sphere" size="0.015" pos="0.050 0.020 0.008" material="marker"/>
+                <geom type="sphere" size="0.015" pos="0.050 -0.020 0.008" material="marker"/>
+                <geom type="cylinder" size="0.012 0.022" pos="0.060 0 -0.010" euler="0 1.57 0" material="marker"/>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <position name="a_t1y" joint="trunk1_yaw" kp="45" ctrlrange="-1 1"/>
+    <position name="a_t1p" joint="trunk1_pitch" kp="45" ctrlrange="-0.5 0.8"/>
+    <position name="a_t2y" joint="trunk2_yaw" kp="45" ctrlrange="-1.2 1.2"/>
+    <position name="a_t2p" joint="trunk2_pitch" kp="45" ctrlrange="-0.7 0.9"/>
+    <position name="a_sat" joint="sat_spin" kp="20" ctrlrange="-3.14 3.14"/>
+    <position name="a_t3p" joint="trunk3_pitch" kp="45" ctrlrange="-0.9 1"/>
+    <position name="a_t3r" joint="trunk3_roll" kp="40" ctrlrange="-0.8 0.8"/>
+    <position name="a_bl0" joint="bl0" kp="35" ctrlrange="-1.6 1.6"/>
+    <position name="a_bl1" joint="bl1" kp="35" ctrlrange="-2 0.5"/>
+    <position name="a_bl2" joint="bl2" kp="30" ctrlrange="-1.5 1.5"/>
+    <position name="a_br0" joint="br0" kp="35" ctrlrange="-1.8 1.8"/>
+    <position name="a_br1" joint="br1" kp="35" ctrlrange="-2.2 0.4"/>
+    <position name="a_br2" joint="br2" kp="35" ctrlrange="-2 0.5"/>
+    <position name="a_br3" joint="br3" kp="30" ctrlrange="-1.57 1.57"/>
+    <position name="a_c0" joint="claw0" kp="25" ctrlrange="-0.2 1.2"/>
+    <position name="a_c1" joint="claw1" kp="25" ctrlrange="-1.2 0.2"/>
+    <position name="a_c2" joint="claw2" kp="25" ctrlrange="-1 0.3"/>
+    <position name="a_ny" joint="neck_yaw" kp="30" ctrlrange="-1.2 1.2"/>
+    <position name="a_np" joint="neck_pitch" kp="30" ctrlrange="-0.9 0.9"/>
+    <position name="a_hr" joint="head_roll" kp="25" ctrlrange="-1 1"/>
+  </actuator>
+</mujoco>

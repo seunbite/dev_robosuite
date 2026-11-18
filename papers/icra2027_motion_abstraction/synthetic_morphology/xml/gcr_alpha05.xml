@@ -1,0 +1,133 @@
+<!-- Oddkin α=0.5: "Canted Spine Crab" — asymmetric branched morphology.
+     Adds multi-vertebra canted spine + unequal pincer chains + collar ring. -->
+<mujoco model="oddkin_alpha05">
+  <compiler angle="radian" autolimits="true"/>
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+  <visual>
+    <headlight ambient="0.55 0.55 0.55" diffuse="0.45 0.45 0.45"/>
+  </visual>
+  <default>
+    <default class="hinge">
+      <joint type="hinge" damping="0.7" armature="0.02" limited="true"/>
+    </default>
+    <default class="slide">
+      <joint type="slide" damping="1.0" armature="0.03" limited="true"/>
+    </default>
+  </default>
+  <asset>
+    <material name="floor" rgba="0.55 0.56 0.58 1" reflectance="0.0" specular="0.0" shininess="0"/>
+    <!-- role palette: body / leg / arm / spine / head / joint / marker -->
+    <material name="body" rgba="0.18 0.20 0.24 1"/>
+    <material name="leg" rgba="0.42 0.52 0.62 1"/>
+    <material name="arm" rgba="0.78 0.58 0.32 1"/>
+    <material name="spine" rgba="0.72 0.74 0.78 1"/>
+    <material name="head" rgba="0.55 0.62 0.72 1"/>
+    <material name="joint" rgba="0.28 0.30 0.34 1"/>
+    <material name="marker" rgba="0.92 0.93 0.95 1"/>
+  </asset>
+  <worldbody>
+    <light pos="1.2 -2 5" dir="-0.2 0.3 -1"/>
+    <light pos="-2 1.5 3" dir="0.5 -0.2 -1" diffuse="0.22 0.23 0.25"/>
+    <geom type="plane" size="4 4 0.1" material="floor"/>
+
+    <body name="base" pos="0 0 0.11">
+      <freejoint name="base_free"/>
+      <!-- crab-like flat body, asymmetric -->
+      <geom type="ellipsoid" size="0.24 0.16 0.055" material="body"/>
+      <geom type="box" size="0.08 0.18 0.03" pos="-0.12 0 0.02" euler="0 0 0.2" material="body"/>
+      <geom type="cylinder" size="0.05 0.04" pos="0.16 0.06 0.04" euler="0.3 0.2 0" material="body"/>
+      <geom type="box" size="0.03 0.02 0.025" pos="0.22 0 0.05" material="marker"/>
+
+      <!-- front strut legs (short, mostly structural look + small flap) -->
+      <body name="flap_l" pos="0.10 0.14 0">
+        <joint name="flap_l" class="hinge" axis="1 0 0" range="-0.8 0.8"/>
+        <geom type="capsule" fromto="0 0 0  0.05 0.12 -0.04" size="0.022" material="leg"/>
+        <geom type="box" size="0.035 0.015 0.012" pos="0.05 0.12 -0.04" material="leg"/>
+      </body>
+      <body name="flap_r" pos="0.10 -0.14 0">
+        <joint name="flap_r" class="hinge" axis="1 0 0" range="-0.8 0.8"/>
+        <geom type="capsule" fromto="0 0 0  0.05 -0.12 -0.04" size="0.022" material="leg"/>
+        <geom type="box" size="0.035 0.015 0.012" pos="0.05 -0.12 -0.04" material="leg"/>
+      </body>
+
+      <!-- CANTED multi-vertebra spine (continuous height via stacked pitch) -->
+      <body name="v1" pos="-0.05 0 0.06" euler="0 0.35 0">
+        <joint name="v1_pitch" class="hinge" axis="0 1 0" range="-0.6 0.9"/>
+        <joint name="v1_yaw" class="hinge" axis="0 0 1" range="-0.7 0.7"/>
+        <geom type="cylinder" size="0.045 0.06" material="spine"/>
+        <geom type="sphere" size="0.05" pos="0 0 0.07" material="joint"/>
+
+        <body name="v2" pos="0 0 0.13" euler="0 0.25 0.15">
+          <joint name="v2_pitch" class="hinge" axis="0 1 0" range="-0.7 0.9"/>
+          <joint name="v2_twist" class="hinge" axis="0 0 1" range="-1.0 1.0"/>
+          <geom type="box" size="0.05 0.04 0.07" material="spine"/>
+          <geom type="cylinder" size="0.07 0.015" pos="0 0 0.02" euler="1.57 0 0" material="spine"/>
+
+          <!-- rotating collar on mid spine -->
+          <body name="collar" pos="0 0 0.02">
+            <joint name="collar_spin" class="hinge" axis="0 0 1" range="-3.14 3.14"/>
+            <geom type="box" size="0.10 0.012 0.02" material="spine"/>
+            <geom type="box" size="0.012 0.10 0.02" material="spine"/>
+            <geom type="sphere" size="0.025" pos="0.10 0 0" material="spine"/>
+            <geom type="sphere" size="0.025" pos="-0.10 0 0" material="spine"/>
+          </body>
+
+          <body name="v3" pos="0 0 0.14" euler="0 0.2 -0.1">
+            <joint name="v3_pitch" class="hinge" axis="0 1 0" range="-0.8 1.0"/>
+            <geom type="ellipsoid" size="0.06 0.05 0.07" material="spine"/>
+            <geom type="box" size="0.08 0.02 0.02" pos="0.06 0 0.02" material="marker"/>
+
+            <!-- LONG right pincer chain -->
+            <body name="pin_r0" pos="0.06 0.04 0" euler="0 0.3 0.4">
+              <joint name="pin_r0" class="hinge" axis="0 0 1" range="-1.5 1.5"/>
+              <geom type="capsule" fromto="0 0 0  0.15 0 0" size="0.025" material="arm"/>
+              <body name="pin_r1" pos="0.15 0 0">
+                <joint name="pin_r1" class="hinge" axis="0 1 0" range="-2.0 0.4"/>
+                <geom type="sphere" size="0.03" material="joint"/>
+                <geom type="capsule" fromto="0 0 0  0.13 0.02 0" size="0.02" material="arm"/>
+                <body name="pin_r2" pos="0.13 0.02 0">
+                  <joint name="pin_r2" class="hinge" axis="0 0 1" range="-1.2 1.2"/>
+                  <geom type="box" size="0.05 0.015 0.02" material="arm"/>
+                  <geom type="box" size="0.03 0.01 0.035" pos="0.04 0.02 0" material="arm"/>
+                </body>
+              </body>
+            </body>
+
+            <!-- SHORT left stub branch (asymmetric) -->
+            <body name="pin_l0" pos="0.04 -0.05 0" euler="0 0.2 -0.9">
+              <joint name="pin_l0" class="hinge" axis="0 0 1" range="-1.2 1.2"/>
+              <geom type="capsule" fromto="0 0 0  0.10 0 0" size="0.022" material="arm"/>
+              <body name="pin_l1" pos="0.10 0 0">
+                <joint name="pin_l1" class="hinge" axis="0 1 0" range="-1.5 0.5"/>
+                <geom type="ellipsoid" size="0.04 0.025 0.025" material="arm"/>
+              </body>
+            </body>
+
+            <!-- antenna -->
+            <body name="antenna" pos="-0.02 0 0.07">
+              <joint name="antenna" class="hinge" axis="1 0 0" range="-1.0 1.0"/>
+              <geom type="capsule" fromto="0 0 0  0 0 0.18" size="0.012" material="head"/>
+              <geom type="sphere" size="0.028" pos="0 0 0.18" material="head"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <position name="a_fl" joint="flap_l" kp="25" ctrlrange="-0.8 0.8"/>
+    <position name="a_fr" joint="flap_r" kp="25" ctrlrange="-0.8 0.8"/>
+    <position name="a_v1p" joint="v1_pitch" kp="50" ctrlrange="-0.6 0.9"/>
+    <position name="a_v1y" joint="v1_yaw" kp="40" ctrlrange="-0.7 0.7"/>
+    <position name="a_v2p" joint="v2_pitch" kp="50" ctrlrange="-0.7 0.9"/>
+    <position name="a_v2t" joint="v2_twist" kp="40" ctrlrange="-1 1"/>
+    <position name="a_col" joint="collar_spin" kp="25" ctrlrange="-3.14 3.14"/>
+    <position name="a_v3p" joint="v3_pitch" kp="50" ctrlrange="-0.8 1"/>
+    <position name="a_pr0" joint="pin_r0" kp="35" ctrlrange="-1.5 1.5"/>
+    <position name="a_pr1" joint="pin_r1" kp="35" ctrlrange="-2 0.4"/>
+    <position name="a_pr2" joint="pin_r2" kp="30" ctrlrange="-1.2 1.2"/>
+    <position name="a_pl0" joint="pin_l0" kp="30" ctrlrange="-1.2 1.2"/>
+    <position name="a_pl1" joint="pin_l1" kp="30" ctrlrange="-1.5 0.5"/>
+    <position name="a_ant" joint="antenna" kp="20" ctrlrange="-1 1"/>
+  </actuator>
+</mujoco>

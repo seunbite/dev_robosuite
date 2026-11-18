@@ -1,0 +1,1318 @@
+{
+ "n_cues": 30,
+ "bodies": [
+  "tiago",
+  "single_arm",
+  "stretch",
+  "roomba",
+  "roomba_strategy",
+  "stretch_strategy",
+  "single_arm_strategy"
+ ],
+ "counts": {
+  "tiago": {
+   "carrier": 14,
+   "none": 8,
+   "additive": 6,
+   "trace": 2
+  },
+  "single_arm": {
+   "additive": 3,
+   "carrier": 12,
+   "none": 13,
+   "trace": 2
+  },
+  "stretch": {
+   "carrier": 9,
+   "none": 11,
+   "additive": 6,
+   "trace": 4
+  },
+  "roomba": {
+   "carrier": 6,
+   "trace": 8,
+   "additive": 10,
+   "none": 6
+  },
+  "roomba_strategy": {
+   "carrier": 8,
+   "trace": 10,
+   "additive": 11,
+   "none": 1
+  },
+  "stretch_strategy": {
+   "carrier": 17,
+   "additive": 11,
+   "none": 1,
+   "trace": 1
+  },
+  "single_arm_strategy": {
+   "carrier": 11,
+   "none": 7,
+   "additive": 11,
+   "trace": 1
+  }
+ },
+ "cells": [
+  {
+   "cue": "nod_yes",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(head=center) + move(head, tilt, [-20, 5], rep=2, spd=1.5, hold=0.1)"
+  },
+  {
+   "cue": "nod_yes",
+   "body": "single_arm",
+   "strategy": "additive",
+   "code": "pose(y=50, z=65, dir=front) + move(wrist, z, \u00b120, rep=2, spd=1.2)"
+  },
+  {
+   "cue": "nod_yes",
+   "body": "stretch",
+   "strategy": "carrier",
+   "code": "pose(head=center, torso=mid) + move(head, tilt, [20, 0], rep=2, spd=1.5, hold=0.1)"
+  },
+  {
+   "cue": "nod_yes",
+   "body": "roomba",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, line, x=[0.12, -0.12], rep=2, spd=1.8)"
+  },
+  {
+   "cue": "nod_yes",
+   "body": "roomba_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, line, len=0.15, spd=2.5) + path(base, line, len=-0.15, spd=2.0) + path(base, line, len=0.15, spd=2.5) + path(base, line, len=-0.15, spd=2.0)"
+  },
+  {
+   "cue": "nod_yes",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(torso=mid) + move(head, tilt, [-22, 22], rep=3, spd=1.5, hold=0.1)"
+  },
+  {
+   "cue": "nod_yes",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, y=50, z=70) + move(wrist, x, [-25, 0], rep=2, spd=1.8)"
+  },
+  {
+   "cue": "shake_head_no",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose() + move(head, pan, [-25,25], rep=2, spd=2.2)"
+  },
+  {
+   "cue": "shake_head_no",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, y=50, z=70) + move(wrist, y, \u00b130, rep=2, spd=2.8)"
+  },
+  {
+   "cue": "shake_head_no",
+   "body": "stretch",
+   "strategy": "carrier",
+   "code": "pose(dir=still, torso=mid) + move(head, pan, [-30, 30], rep=2, spd=2.2, hold=0.1)"
+  },
+  {
+   "cue": "shake_head_no",
+   "body": "roomba",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=[35, -70, 35], rep=2, spd=2.8)"
+  },
+  {
+   "cue": "shake_head_no",
+   "body": "roomba_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=[35, -70, 35], rep=2, spd=2.8)"
+  },
+  {
+   "cue": "shake_head_no",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=still, torso=mid) + move(head, pan, [-30, 30], rep=2, spd=2.2, hold=0.1)"
+  },
+  {
+   "cue": "shake_head_no",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, y=50, z=70) + move(wrist, y, \u00b130, rep=2, spd=2.8)"
+  },
+  {
+   "cue": "draw_circle_repeat",
+   "body": "tiago",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, z=70, elbow=T) + path(ee, arc, plane=yz, r=0.08, sweep=360, rep=3, spd=1.8)"
+  },
+  {
+   "cue": "draw_circle_repeat",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, x=65, y=50, z=60) + path(ee, arc, plane=yz, r=0.12, sweep=360, rep=3, spd=1.5)"
+  },
+  {
+   "cue": "draw_circle_repeat",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, z=65) + path(ee, arc, plane=yz, r=0.1, sweep=360, rep=4, spd=1.8)"
+  },
+  {
+   "cue": "draw_circle_repeat",
+   "body": "roomba",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.25, deg=360, spd=2.0, rep=3)"
+  },
+  {
+   "cue": "draw_circle_repeat",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.25, deg=360, spd=1.8) + path(base, arc, r=0.25, deg=360, spd=1.8)"
+  },
+  {
+   "cue": "draw_circle_repeat",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=mid, z=70, x=35) + move(wrist, pan, 360, rep=2, spd=2.0) + hold(t=0.5)"
+  },
+  {
+   "cue": "draw_circle_repeat",
+   "body": "single_arm_strategy",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=close, z=60, x=50) + path(ee, arc, plane=xz, r=0.20, sweep=360, rep=2, spd=1.5)"
+  },
+  {
+   "cue": "gaze_shift_avoid",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(head=center) + move(head, pan, -45, spd=0.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "gaze_shift_avoid",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(dir=front, z=75, y=50) + move(wrist, y, -45, spd=1.8) + hold(t=1.2)"
+  },
+  {
+   "cue": "gaze_shift_avoid",
+   "body": "stretch",
+   "strategy": "carrier",
+   "code": "pose(dir=still, torso=mid) + move(head, pan, 45, spd=0.7) + hold(t=1.3)"
+  },
+  {
+   "cue": "gaze_shift_avoid",
+   "body": "roomba",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=75, spd=0.9) + hold(t=1.5)"
+  },
+  {
+   "cue": "gaze_shift_avoid",
+   "body": "roomba_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=-60, spd=1.8) + hold(t=2.0)"
+  },
+  {
+   "cue": "gaze_shift_avoid",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, torso=mid, z=60, x=15) + move(head, pan, -45, spd=1.2) & path(base, arc, deg=+20, spd=1.2) + hold(t=1.5)"
+  },
+  {
+   "cue": "gaze_shift_avoid",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, y=40, z=60) + move(wrist, y, -60, spd=1.5, hold=1.5) & move(elbow, y, +20, spd=1.5)"
+  },
+  {
+   "cue": "fist_pump",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=closed, elbow=T, z=60) + move(shoulder, z, \u00b120, rep=3, spd=3.5, hold=0.1)"
+  },
+  {
+   "cue": "fist_pump",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(dir=up, grip=vert, y=50, z=60) + move(shoulder, z, 25, spd=3.5, rep=2)"
+  },
+  {
+   "cue": "fist_pump",
+   "body": "stretch",
+   "strategy": "carrier",
+   "code": "pose(dir=up, grip=vert, torso=high, z=85) + move(shoulder, z, [+20, -20], rep=3, spd=3.0, hold=0.1)"
+  },
+  {
+   "cue": "fist_pump",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, x=[0.15, -0.15], spd=3.8, rep=3)"
+  },
+  {
+   "cue": "fist_pump",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, len=0.2, spd=4.0) + path(base, line, len=-0.15, spd=2.0) + path(base, line, len=0.2, spd=4.0) + hold(t=1.2)"
+  },
+  {
+   "cue": "fist_pump",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, torso=high, z=85, x=40) + move(torso, height, [+12], rep=2, spd=4.5, hold=0.2) + hold(t=1.0)"
+  },
+  {
+   "cue": "fist_pump",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=up, grip=close, z=80, x=50, elbow=T) + move(shoulder, z, +25, rep=2, spd=4.5, hold=0.4)"
+  },
+  {
+   "cue": "tilt_head_curious",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(head=center) + move(head, pan, 20, spd=0.6) + hold(t=1.4)"
+  },
+  {
+   "cue": "tilt_head_curious",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, y=50, z=75) + move(shoulder, y, -20, spd=0.6) + hold(t=1.2)"
+  },
+  {
+   "cue": "tilt_head_curious",
+   "body": "stretch",
+   "strategy": "additive",
+   "code": "pose(dir=still, torso=mid) + move(head, tilt, 25, spd=0.8, hold=1.2)"
+  },
+  {
+   "cue": "tilt_head_curious",
+   "body": "roomba",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.1, deg=25, spd=0.6) + hold(t=1.2)"
+  },
+  {
+   "cue": "tilt_head_curious",
+   "body": "roomba_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, line, dist=0.1, spd=0.5) + path(base, arc, r=0, deg=30, spd=0.8) + hold(t=2.5)"
+  },
+  {
+   "cue": "tilt_head_curious",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(torso=mid) + move(head, pan, 30, spd=0.7) & move(torso, height, -10, spd=0.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "tilt_head_curious",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, z=70, x=50) + move(wrist, x, +35, spd=0.7, hold=1.5) & move(elbow, y, +10, spd=0.6)"
+  },
+  {
+   "cue": "cover_yawn_sleepy",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=horiz, elbow=T, z=55, x=65, y=70) + move(torso, x, -0.05, spd=0.7) + move(head, tilt, 10, spd=0.7) + hold(t=1.2)"
+  },
+  {
+   "cue": "cover_yawn_sleepy",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(grip=horiz, dir=up, y=50, z=75, x=60, spd=0.7) + path(ee, line, axis=x, dist=-0.05, spd=0.6) + hold(t=1.0) + pose(grip=vert, y=50, z=40, spd=0.8)"
+  },
+  {
+   "cue": "cover_yawn_sleepy",
+   "body": "stretch",
+   "strategy": "trace",
+   "code": "pose(dir=front, grip=horiz, z=60, x=25) + path(ee, arc, plane=xz, r=0.15, sweep=90, spd=0.6) + move(head, tilt, -20, spd=0.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "cover_yawn_sleepy",
+   "body": "roomba",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.4, deg=-25, spd=0.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "cover_yawn_sleepy",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.25, deg=-45, spd=0.4) + path(base, arc, r=0, deg=[10, -20, 10], spd=0.7) + path(base, line, d=-0.05, spd=0.4)"
+  },
+  {
+   "cue": "cover_yawn_sleepy",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, torso=mid, z=70, x=25) + move(head, tilt, +15, spd=0.4) + move(torso, height, -25, spd=0.7) & move(head, tilt, -40, spd=0.6) + hold(t=1.8)"
+  },
+  {
+   "cue": "cover_yawn_sleepy",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, y=50, z=60, x=40, elbow=T) + move(wrist, y, +15, spd=0.5) & move(elbow, y, -25, spd=0.6) + hold(t=1.5)"
+  },
+  {
+   "cue": "rub_eye_tired",
+   "body": "tiago",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=closed, elbow=T, head=down, x=70, y=65, z=60) + path(ee, arc, plane=yz, r=0.015, sweep=360, rep=3, spd=1.2)"
+  },
+  {
+   "cue": "rub_eye_tired",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(grip=vertical, dir=back, y=45, z=80) + path(ee, arc, plane=yz, r=0.02, sweep=360, rep=3, spd=1.5, hold=0.2)"
+  },
+  {
+   "cue": "rub_eye_tired",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=in, grip=vert, torso=high, z=90) + path(ee, arc, plane=yz, r=0.03, sweep=360, rep=4, spd=0.9, hold=0.2)"
+  },
+  {
+   "cue": "rub_eye_tired",
+   "body": "roomba",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, line, x=0.1, y=-0.05, spd=0.7) + path(base, arc, r=0.08, deg=[-60, 60], rep=2, spd=1.2)"
+  },
+  {
+   "cue": "rub_eye_tired",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=[25, -50, 25], rep=3, spd=1.5) + hold(t=2.0)"
+  },
+  {
+   "cue": "rub_eye_tired",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=high, z=85, x=15) + move(head, tilt, [-20, -10], rep=2, spd=0.8) & move(torso, height, [-15], spd=0.6) + hold(t=1.5)"
+  },
+  {
+   "cue": "rub_eye_tired",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=in, grip=vert, z=80, y=50, x=60, elbow=T) + move(elbow, y, -45, spd=0.4, hold=2.0)"
+  },
+  {
+   "cue": "point_you",
+   "body": "tiago",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, elbow=F, z=55, x=70) + path(ee, line, axis=x, dist=0.1, spd=2.5) + hold(t=1.2)"
+  },
+  {
+   "cue": "point_you",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vertical, x=40, y=50, z=65) + path(ee, line, axis=x, dist=0.3, spd=2.5) + hold(t=1.2)"
+  },
+  {
+   "cue": "point_you",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, torso=mid, z=60, x=30, elbow=F) + path(ee, line, axis=x, dist=+0.12, spd=2.0) + hold(t=1.3)"
+  },
+  {
+   "cue": "point_you",
+   "body": "roomba",
+   "strategy": "none",
+   "code": "pose(dir=front) + path(base, line, x=0.3, spd=3.5, hold=1.2)"
+  },
+  {
+   "cue": "point_you",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, d=0.2, spd=2.5) + hold(t=1.5) + path(base, line, d=-0.2, spd=2.0)"
+  },
+  {
+   "cue": "point_you",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=mid, z=60, x=40) + move(wrist, x, [45, 40], rep=2, spd=2.5, hold=0.1) + hold(t=1.2)"
+  },
+  {
+   "cue": "point_you",
+   "body": "single_arm_strategy",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=close, z=50, x=40, elbow=F) + path(ee, line, axis=x, dist=0.1, spd=2.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "point_self",
+   "body": "tiago",
+   "strategy": "additive",
+   "code": "pose(dir=back, grip=vert, z=45, x=60, elbow=T) + move(shoulder, x, -5, spd=1.5) + hold(t=1.2)"
+  },
+  {
+   "cue": "point_self",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vertical, y=35, z=65, x=60) + pose(dir=back, grip=vertical, y=50, z=55, x=45, spd=2.2) + hold(t=1.3)"
+  },
+  {
+   "cue": "point_self",
+   "body": "stretch",
+   "strategy": "additive",
+   "code": "pose(dir=back, grip=vert, elbow=T, x=20, z=55) + path(ee, line, axis=x, dist=-0.05, spd=1.8) + hold(t=1.2)"
+  },
+  {
+   "cue": "point_self",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, x=+0.1, spd=0.8) + path(base, line, x=-0.2, spd=2.5, hold=0.7)"
+  },
+  {
+   "cue": "point_self",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, len=-0.08, spd=1.5) + path(base, line, len=0.1, spd=3.0) + hold(t=1.2) + path(base, line, len=-0.02, spd=1.0)"
+  },
+  {
+   "cue": "point_self",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=in, grip=vert, torso=mid, z=60, x=10) + move(head, tilt, [-20], spd=1.2) & move(wrist, x, [-4], spd=0.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "point_self",
+   "body": "single_arm_strategy",
+   "strategy": "none",
+   "code": "pose(dir=down, grip=close, x=30, y=50, z=60) + path(ee, line, x=10, y=50, z=20, spd=0.8, hold=1.5)"
+  },
+  {
+   "cue": "beckon_come_here",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=horiz, z=60, x=75, elbow=T) + path(ee, line, axis=x, dist=[-0.12], rep=3, spd=2.5, hold=0.1)"
+  },
+  {
+   "cue": "beckon_come_here",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, x=75, y=50, z=60) + move(wrist, x, \u00b135, rep=3, spd=2.8, hold=0.2)"
+  },
+  {
+   "cue": "beckon_come_here",
+   "body": "stretch",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=horiz, z=65, x=50) + move(elbow, y, [-40, 5], rep=3, spd=2.0, hold=0.25)"
+  },
+  {
+   "cue": "beckon_come_here",
+   "body": "roomba",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, line, x=[0.20, -0.15], spd=1.8, rep=3, hold=0.25)"
+  },
+  {
+   "cue": "beckon_come_here",
+   "body": "roomba_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, line, len=-0.12, spd=2.8) + hold(t=0.2) + path(base, line, len=-0.12, spd=2.8) + path(base, line, len=0.24, spd=1.5)"
+  },
+  {
+   "cue": "beckon_come_here",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=horiz, torso=mid, z=70, x=50) + move(torso, x, [50, 25], rep=3, spd=2.8, hold=0.1)"
+  },
+  {
+   "cue": "beckon_come_here",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=horiz, y=60, z=60, x=20) + move(elbow, y, \u00b135, rep=3, spd=3.0) + hold(t=1.0)"
+  },
+  {
+   "cue": "stop_palm_out",
+   "body": "tiago",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=horiz, z=65, elbow=T) + path(ee, line, axis=z, dist=0.10, spd=2.2) + hold(t=1.2)"
+  },
+  {
+   "cue": "stop_palm_out",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(dir=up, grip=horiz, y=50, z=65, x=60, spd=1.5) + path(ee, line, axis=x, dist=0.08, spd=2.5) + hold(t=1.3)"
+  },
+  {
+   "cue": "stop_palm_out",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=horiz, torso=high, z=80, x=25) + path(ee, line, axis=x, dist=+0.15, spd=1.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "stop_palm_out",
+   "body": "roomba",
+   "strategy": "none",
+   "code": "pose(dir=front) + path(base, line, x=0.20, spd=3.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "stop_palm_out",
+   "body": "roomba_strategy",
+   "strategy": "none",
+   "code": "pose(dir=front) + path(base, line, len=0.15, spd=3.0) + hold(t=2.0)"
+  },
+  {
+   "cue": "stop_palm_out",
+   "body": "stretch_strategy",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, torso=high, z=80, x=25) + path(base, line, dist=0.04, rep=2, spd=2.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "stop_palm_out",
+   "body": "single_arm_strategy",
+   "strategy": "none",
+   "code": "pose(dir=out, grip=vert, z=70, y=50, x=10) + path(ee, line, axis=x, dist=0.15, spd=3.0, hold=2.0)"
+  },
+  {
+   "cue": "salute",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(dir=up, grip=horiz, elbow=T, z=60, y=60, x=70) + move(shoulder, z, 10, spd=2.5) + hold(t=1.2)"
+  },
+  {
+   "cue": "salute",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, y=40, z=50) + path(ee, line, axis=z, dist=0.15, spd=2.5) + pose(dir=up, grip=horiz, y=35, z=85) + hold(t=1.3)"
+  },
+  {
+   "cue": "salute",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=in, grip=horiz, torso=mid, z=60, x=10) + path(ee, line, axis=z, dist=+0.30, spd=2.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "salute",
+   "body": "roomba",
+   "strategy": "none",
+   "code": "pose(dir=front) + path(base, line, x=0.20, spd=3.0) + hold(t=1.2)"
+  },
+  {
+   "cue": "salute",
+   "body": "roomba_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, line, len=0.1, spd=3.5) + path(base, arc, r=0, deg=20, spd=3.5) + hold(t=2.0)"
+  },
+  {
+   "cue": "salute",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=in, grip=horiz, torso=high, z=95, x=20) + move(head, tilt, [15, 0], spd=3.0) + hold(t=1.5)"
+  },
+  {
+   "cue": "salute",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=horiz, z=80, x=60, y=50) + move(wrist, y, +45, spd=4.0, hold=1.5)"
+  },
+  {
+   "cue": "raise_index_one_moment",
+   "body": "tiago",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, z=45, elbow=T) + path(ee, line, axis=z, dist=0.15, spd=2.0) + hold(t=0.9)"
+  },
+  {
+   "cue": "raise_index_one_moment",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, y=50, z=45, spd=0.8) + pose(dir=up, grip=vert, z=70, spd=2.2) + hold(t=0.8)"
+  },
+  {
+   "cue": "raise_index_one_moment",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, torso=mid, z=55) + path(ee, line, axis=z, dist=+0.25, spd=1.6) + hold(t=1.2)"
+  },
+  {
+   "cue": "raise_index_one_moment",
+   "body": "roomba",
+   "strategy": "none",
+   "code": "pose(dir=front) + path(base, line, x=0.2, spd=2.0) + hold(t=0.9)"
+  },
+  {
+   "cue": "raise_index_one_moment",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, len=-0.05, spd=3.0) + path(base, line, len=0.15, spd=3.5) + hold(t=2.5)"
+  },
+  {
+   "cue": "raise_index_one_moment",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, torso=mid, z=60, x=25) + move(torso, height, [+15], spd=1.5) & move(head, tilt, [-10], spd=1.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "raise_index_one_moment",
+   "body": "single_arm_strategy",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, z=50, x=60, elbow=T) + path(ee, line, axis=z, dist=0.2, spd=2.0, hold=1.5)"
+  },
+  {
+   "cue": "highfive_invite",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=horiz, z=60, x=65, elbow=T) + move(head, tilt, [8], spd=0.9) + hold(t=1.3)"
+  },
+  {
+   "cue": "highfive_invite",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(dir=down, grip=vert, z=35, y=50, x=50) + pose(dir=front, grip=open, z=55, y=50, x=65, spd=0.9) + path(ee, line, axis=x, dist=0.03, spd=0.6) + hold(t=1.3)"
+  },
+  {
+   "cue": "highfive_invite",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=horiz, z=60, torso=mid) + path(ee, line, axis=z, dist=0.15, spd=1.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "highfive_invite",
+   "body": "roomba",
+   "strategy": "none",
+   "code": "pose(dir=front) + path(base, line, x=0.20, spd=1.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "highfive_invite",
+   "body": "roomba_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=[20, -40, 20], spd=3.0) + path(base, line, dist=0.25, spd=1.2) + hold(t=3.0)"
+  },
+  {
+   "cue": "highfive_invite",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=high, z=85, x=35) + move(torso, height, [87, 85], rep=2, spd=2.5) + hold(t=2.0)"
+  },
+  {
+   "cue": "highfive_invite",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, y=50, z=80, elbow=T) + move(wrist, y, +25, spd=3.0) + hold(t=2.0)"
+  },
+  {
+   "cue": "shrug_idk",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(dir=out, left_arm=mirror, grip=horiz, elbow=T, z=60) + move(shoulder, z, 25, spd=2.0, hold=0.4) + move(shoulder, z, -25, spd=1.0)"
+  },
+  {
+   "cue": "shrug_idk",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(dir=right, grip=vertical, y=30, z=45) + move(shoulder, z, 20, spd=2.2) + move(wrist, y, 45, spd=1.8, hold=0.9)"
+  },
+  {
+   "cue": "shrug_idk",
+   "body": "stretch",
+   "strategy": "carrier",
+   "code": "pose(dir=out, grip=horiz, torso=mid, z=70) + move(torso, height, high, spd=2.5, hold=0.5) + move(torso, height, mid, spd=1.5)"
+  },
+  {
+   "cue": "shrug_idk",
+   "body": "roomba",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.2, deg=35, spd=1.8) + path(base, arc, r=-0.2, deg=-35, spd=1.8) + hold(t=0.6)"
+  },
+  {
+   "cue": "shrug_idk",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.15, deg=-35, spd=3.0) + path(base, arc, r=-0.15, deg=-35, spd=3.0) + hold(t=1.0)"
+  },
+  {
+   "cue": "shrug_idk",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=out, grip=horiz, torso=mid, z=40, x=30) + move(torso, height, [+15, -15], spd=1.5, hold=0.3) & move(head, tilt, [+15, -15], spd=1.5) + hold(t=0.5)"
+  },
+  {
+   "cue": "shrug_idk",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=out, grip=horiz, z=40, y=30, elbow=T) + move(shoulder, z, [+15, -15], spd=1.2, hold=0.8)"
+  },
+  {
+   "cue": "flex_bicep",
+   "body": "tiago",
+   "strategy": "none",
+   "code": "pose(dir=in, grip=closed, z=80, elbow=T, torso=tall) + path(ee, line, axis=z, dist=0.03, spd=2.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "flex_bicep",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(dir=up, grip=vertical, y=50, z=40) + move(elbow, z, -60, spd=2.5) + hold(t=1.2)"
+  },
+  {
+   "cue": "flex_bicep",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=out, grip=vert, torso=mid, z=70, elbow=F) + path(ee, arc, plane=yz, r=0.12, sweep=90, spd=2.0) + hold(t=1.4)"
+  },
+  {
+   "cue": "flex_bicep",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, x=0.15, spd=1.2) + path(base, arc, r=0, deg=25, spd=3.5) + hold(t=1.2)"
+  },
+  {
+   "cue": "flex_bicep",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, line, d=[-0.15, 0], spd=2.5) + path(base, arc, r=0.4, deg=45, spd=4.0) + hold(t=2.0)"
+  },
+  {
+   "cue": "flex_bicep",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=in, grip=vert, torso=high, z=90, x=5) + move(torso, height, 5, spd=3.0) + hold(t=1.8)"
+  },
+  {
+   "cue": "flex_bicep",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=in, grip=close, elbow=T, z=80, y=60) + move(elbow, y, +15, spd=3.0, hold=2.0)"
+  },
+  {
+   "cue": "air_quotes",
+   "body": "tiago",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, z=60, left_arm=mirror, elbow=T) + move(wrist, x, \u00b120, rep=2, spd=2.5, hold=0.1)"
+  },
+  {
+   "cue": "air_quotes",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, y=40, z=75, spd=1.2) + move(wrist, z, \u00b115, rep=2, spd=3.0, hold=0.2)"
+  },
+  {
+   "cue": "air_quotes",
+   "body": "stretch",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=high, z=85) + move(wrist, x, [-25, 25], rep=2, spd=3.2, hold=0.1)"
+  },
+  {
+   "cue": "air_quotes",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=[22, -22], rep=2, spd=3.5, hold=0.2)"
+  },
+  {
+   "cue": "air_quotes",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=[15, -30, 15], rep=2, spd=3.5)"
+  },
+  {
+   "cue": "air_quotes",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=high, z=85, x=25) + move(wrist, tilt, [-20, 20], rep=2, spd=2.5, hold=0.1)"
+  },
+  {
+   "cue": "air_quotes",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=horiz, z=75, y=60, x=0) + move(wrist, z, [-20, 20], rep=2, spd=2.2, hold=0.1)"
+  },
+  {
+   "cue": "arms_open_welcome",
+   "body": "tiago",
+   "strategy": "additive",
+   "code": "pose(dir=out, left_arm=mirror, grip=horiz, z=55, elbow=F) + move(shoulder, z, 10, spd=0.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "arms_open_welcome",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(grip=vert, y=50, z=50) + pose(dir=right, grip=horiz, y=15, z=55, spd=0.8) + hold(t=1.3)"
+  },
+  {
+   "cue": "arms_open_welcome",
+   "body": "stretch",
+   "strategy": "trace",
+   "code": "pose(dir=front, grip=horiz, torso=mid, z=60) + path(ee, arc, plane=xy, r=0.2, sweep=-90, spd=1.2) + hold(t=1.5)"
+  },
+  {
+   "cue": "arms_open_welcome",
+   "body": "roomba",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.4, deg=35, spd=0.9) + path(base, arc, r=0.4, deg=-35, spd=0.9) + hold(t=1.2)"
+  },
+  {
+   "cue": "arms_open_welcome",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, line, d=-0.15, spd=1.0) + path(base, arc, r=0.8, deg=45, spd=1.8) + path(base, arc, r=-0.8, deg=45, spd=1.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "arms_open_welcome",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=horiz, torso=mid, z=60, x=30) + pose(dir=out, grip=horiz, torso=high, z=95, x=95) & move(head, tilt, [15], spd=1.5) + hold(t=1.8)"
+  },
+  {
+   "cue": "arms_open_welcome",
+   "body": "single_arm_strategy",
+   "strategy": "none",
+   "code": "pose(dir=in, grip=open, y=15, z=55, x=35) + path(ee, arc, plane=xy, r=0.4, sweep=160, spd=1.2) + hold(t=2.0)"
+  },
+  {
+   "cue": "hands_up_surrender",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(dir=up, left_arm=mirror, grip=horiz, z=80, elbow=T) + move(shoulder, z, 15, spd=2.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "hands_up_surrender",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=horizontal, y=50, z=45) + path(ee, line, z, dist=0.3, spd=2.8) + hold(t=1.2)"
+  },
+  {
+   "cue": "hands_up_surrender",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=horiz, torso=mid, z=60) + path(ee, arc, plane=xz, r=0.25, sweep=90, spd=1.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "hands_up_surrender",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, x=-0.15, spd=2.5) + hold(t=1.8)"
+  },
+  {
+   "cue": "hands_up_surrender",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, x=-0.25, spd=2.0) + hold(t=2.5)"
+  },
+  {
+   "cue": "hands_up_surrender",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=horiz, torso=high, z=90, x=30) + move(torso, height, [90, 100], spd=1.5) & path(base, line, dist=-0.15, spd=1.0) + hold(t=2.0)"
+  },
+  {
+   "cue": "hands_up_surrender",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=open, z=80, x=60, elbow=T) + move(shoulder, z, +15, spd=0.7) + hold(t=2.5)"
+  },
+  {
+   "cue": "stretch_arms_up",
+   "body": "tiago",
+   "strategy": "none",
+   "code": "pose(dir=up, left_arm=mirror, torso=tall, z=60) + path(ee, line, axis=z, dist=0.25, spd=0.7) + hold(t=1.5)"
+  },
+  {
+   "cue": "stretch_arms_up",
+   "body": "single_arm",
+   "strategy": "additive",
+   "code": "pose(dir=up, grip=horiz, y=50, z=50) + path(ee, line, z, dist=0.3, spd=0.8) + path(ee, line, z, dist=0.05, spd=0.5) + hold(t=1.2)"
+  },
+  {
+   "cue": "stretch_arms_up",
+   "body": "stretch",
+   "strategy": "additive",
+   "code": "pose(dir=up, grip=horiz, torso=mid, z=70) + move(torso, height, high, spd=0.7) + hold(t=1.5)"
+  },
+  {
+   "cue": "stretch_arms_up",
+   "body": "roomba",
+   "strategy": "none",
+   "code": "pose(dir=front) + path(base, line, x=0.3, spd=0.6) + hold(t=1.8)"
+  },
+  {
+   "cue": "stretch_arms_up",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, len=-0.1, spd=1.2) + path(base, line, len=0.3, spd=0.8) + hold(t=1.5) + path(base, line, len=-0.2, spd=1.0)"
+  },
+  {
+   "cue": "stretch_arms_up",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=low, z=20, x=10) + pose(dir=up, grip=vert, torso=high, z=100, x=50, spd=0.8) & move(head, tilt, [-30], spd=0.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "stretch_arms_up",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=up, grip=horiz, z=40, elbow=T) + path(ee, line, axis=z, dist=0.5, spd=0.8) + move(elbow, y, +30, spd=0.4, hold=1.5)"
+  },
+  {
+   "cue": "raise_fists_victory",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(torso=high, dir=front, grip=vert, z=60, elbow=T, left_arm=mirror) + move(shoulder, z, 40, spd=3.0) + hold(t=1.5)"
+  },
+  {
+   "cue": "raise_fists_victory",
+   "body": "single_arm",
+   "strategy": "additive",
+   "code": "pose(grip=vertical, y=50, z=40) + move(shoulder, y, -35, spd=2.0) + move(elbow, y, -50, spd=2.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "raise_fists_victory",
+   "body": "stretch",
+   "strategy": "carrier",
+   "code": "pose(dir=up, grip=vert, torso=mid, z=70) + move(torso, height, high, spd=2.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "raise_fists_victory",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=720, spd=4.0) + hold(t=1.5)"
+  },
+  {
+   "cue": "raise_fists_victory",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, arc, r=0, deg=720, spd=4.0) + hold(t=1.5)"
+  },
+  {
+   "cue": "raise_fists_victory",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=up, grip=vert, torso=mid, z=80, x=25) + move(torso, height, [20], spd=3.5) & move(head, tilt, [-30], spd=3.0) + move(arm, x, [3, -3], rep=2, spd=3.0) + hold(t=1.5)"
+  },
+  {
+   "cue": "raise_fists_victory",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=up, grip=close, z=75, x=0, y=40, elbow=T) + move(shoulder, z, +50, spd=3.2, hold=2.0)"
+  },
+  {
+   "cue": "cross_arms_defensive",
+   "body": "tiago",
+   "strategy": "additive",
+   "code": "pose(dir=in, left_arm=in, grip=vert, elbow=T, x=60, z=50) + move(head, tilt, -12, spd=0.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "cross_arms_defensive",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, y=25, z=45) + pose(dir=left, grip=vert, y=75, z=55, spd=2.2) + hold(t=1.5)"
+  },
+  {
+   "cue": "cross_arms_defensive",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=out, grip=vert, torso=mid, head=down, z=60) + path(ee, line, axis=y, dist=0.25, spd=1.2) + hold(t=1.8)"
+  },
+  {
+   "cue": "cross_arms_defensive",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, x=-0.15, spd=1.8) + path(base, arc, r=0, deg=-80, spd=2.5) + hold(t=1.6)"
+  },
+  {
+   "cue": "cross_arms_defensive",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, arc, r=-0.15, deg=-60, spd=3.0) + hold(t=2.0)"
+  },
+  {
+   "cue": "cross_arms_defensive",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=mid, z=70, x=25) + path(base, arc, r=0, deg=40, spd=1.8) & move(arm, x, [-20], spd=1.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "cross_arms_defensive",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=in, grip=vert, x=50, y=40, z=55, elbow=T) + path(ee, line, axis=y, dist=-80, spd=1.2) + move(wrist, z, -20, spd=2.5, hold=2.0)"
+  },
+  {
+   "cue": "palms_together_thank_you",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(dir=in, left_arm=mirror, grip=vert, elbow=T, z=55, y=70, x=60) + move(head, tilt, -20, spd=0.8) + hold(t=1.2)"
+  },
+  {
+   "cue": "palms_together_thank_you",
+   "body": "single_arm",
+   "strategy": "trace",
+   "code": "pose(dir=up, grip=vert, y=50, z=60, x=55) + path(ee, arc, plane=xz, r=0.1, sweep=-30, spd=0.8) + hold(t=1.2)"
+  },
+  {
+   "cue": "palms_together_thank_you",
+   "body": "stretch",
+   "strategy": "carrier",
+   "code": "pose(dir=down, grip=vert, torso=low, z=30) + path(ee, line, axis=z, dist=0.15, spd=1.0) + move(head, tilt, [25], spd=0.9, hold=1.2)"
+  },
+  {
+   "cue": "palms_together_thank_you",
+   "body": "roomba",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, line, x=+0.15, spd=0.6) + path(base, arc, r=0, deg=+25, spd=0.8) + hold(t=0.6) + path(base, arc, r=0, deg=-25, spd=0.9)"
+  },
+  {
+   "cue": "palms_together_thank_you",
+   "body": "roomba_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, line, d=-0.05, spd=0.5) + hold(t=0.5) + path(base, line, d=0.15, spd=0.4) + hold(t=1.5) + path(base, line, d=-0.10, spd=0.6)"
+  },
+  {
+   "cue": "palms_together_thank_you",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=up, grip=vert, torso=mid, z=65, x=15) + move(head, tilt, -25, spd=0.5) & move(torso, height, [-8], spd=0.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "palms_together_thank_you",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=up, grip=close, y=0, x=40, z=60) + move(wrist, y, -25, spd=0.5, hold=1.2)"
+  },
+  {
+   "cue": "facepalm",
+   "body": "tiago",
+   "strategy": "trace",
+   "code": "pose(dir=out, grip=horiz, z=50, elbow=T) + path(ee, arc, plane=yz, r=0.15, sweep=60, spd=1.2) + move(head, tilt, -25, spd=0.6) + hold(t=1.5)"
+  },
+  {
+   "cue": "facepalm",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(grip=horiz, y=50, z=50) + pose(dir=back, grip=horiz, x=45, y=50, z=80, spd=2.2) + hold(t=1.2) + move(elbow, z, -20, spd=0.6)"
+  },
+  {
+   "cue": "facepalm",
+   "body": "stretch",
+   "strategy": "carrier",
+   "code": "pose(dir=back, grip=horiz, torso=high, z=95) + hold(t=0.8) + move(head, tilt, -30, spd=0.7) + move(torso, height, mid, spd=0.6)"
+  },
+  {
+   "cue": "facepalm",
+   "body": "roomba",
+   "strategy": "carrier",
+   "code": "pose(dir=front) + path(base, line, x=0.25, spd=3.5) + hold(t=1.5) + path(base, line, x=-0.15, spd=0.5)"
+  },
+  {
+   "cue": "facepalm",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.25, deg=-90, spd=3.5) + hold(t=2.0)"
+  },
+  {
+   "cue": "facepalm",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=in, grip=vert, torso=high, z=90, x=15) + move(head, tilt, -35, spd=3.0) & move(torso, height, -40, spd=1.0) + hold(t=1.5)"
+  },
+  {
+   "cue": "facepalm",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=horiz, y=50, z=80, x=20) + path(ee, line, axis=x, dist=-0.15, spd=4.0) + move(elbow, y, -45, spd=0.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "depict_tree",
+   "body": "tiago",
+   "strategy": "additive",
+   "code": "pose(torso=high, z=50, y=70, left_arm=mirror, grip=open) + path(ee, line, axis=z, dist=0.3, spd=1.0) + path(ee, line, axis=y, dist=-0.2, spd=1.5) + hold(t=1.2)"
+  },
+  {
+   "cue": "depict_tree",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(z=40, y=50, dir=front) + pose(z=90, dir=up) + pose(y=20, dir=right, grip=horiz) + hold(t=1.2)"
+  },
+  {
+   "cue": "depict_tree",
+   "body": "stretch",
+   "strategy": "trace",
+   "code": "pose(dir=front, grip=horiz, torso=mid, z=60) + path(ee, arc, plane=yz, r=0.2, sweep=-90, spd=1.2) + hold(t=1.5)"
+  },
+  {
+   "cue": "depict_tree",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, x=0.2, spd=0.7) + path(base, arc, r=0, deg=[-30, 30], spd=1.8) + hold(t=1.5)"
+  },
+  {
+   "cue": "depict_tree",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.4, deg=60, spd=1.5) + path(base, arc, r=-0.4, deg=60, spd=1.5)"
+  },
+  {
+   "cue": "depict_tree",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=out, grip=vert, torso=low, z=30, x=10) + move(torso, height, [30, 90], spd=0.7) & move(arm, x, [10, 50], spd=0.7) & path(base, arc, r=0, deg=\u00b125, spd=0.5) + hold(t=2.0)"
+  },
+  {
+   "cue": "depict_tree",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=up, grip=horiz, z=90) + move(elbow, y, +20, spd=0.5, hold=2.0)"
+  },
+  {
+   "cue": "depict_big_bowl",
+   "body": "tiago",
+   "strategy": "trace",
+   "code": "pose(dir=front, grip=horiz, left_arm=mirror, z=55, y=65, x=50) + path(ee, arc, plane=yz, r=0.22, sweep=-90, spd=1.2) + hold(t=1.2)"
+  },
+  {
+   "cue": "depict_big_bowl",
+   "body": "single_arm",
+   "strategy": "trace",
+   "code": "pose(dir=up, grip=horiz, y=65, z=65, x=70) + path(ee, arc, plane=yz, r=0.2, sweep=-160, spd=0.9) + hold(t=0.5)"
+  },
+  {
+   "cue": "depict_big_bowl",
+   "body": "stretch",
+   "strategy": "trace",
+   "code": "pose(dir=in, grip=horiz, torso=high, z=80) + path(ee, arc, plane=yz, r=0.25, sweep=-180, spd=0.9) + hold(t=1.0)"
+  },
+  {
+   "cue": "depict_big_bowl",
+   "body": "roomba",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.35, deg=90, spd=1.5) + path(base, arc, r=-0.35, deg=90, spd=1.5) + path(base, arc, r=0, deg=180, spd=2.0)"
+  },
+  {
+   "cue": "depict_big_bowl",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.4, deg=90, spd=1.5) + path(base, arc, r=-0.4, deg=90, spd=1.5) + hold(t=1.0)"
+  },
+  {
+   "cue": "depict_big_bowl",
+   "body": "stretch_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=out, grip=horiz, torso=mid, z=70, x=30) + pose(dir=in, grip=horiz, torso=mid, z=55, x=20) + path(ee, arc, plane=yz, r=0.18, sweep=-160, spd=1.0) + hold(t=1.2)"
+  },
+  {
+   "cue": "depict_big_bowl",
+   "body": "single_arm_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=out, grip=horiz, y=-40, z=70, x=30) + path(ee, arc, plane=yz, r=0.3, sweep=-160, spd=1.0) + hold(t=1.5)"
+  },
+  {
+   "cue": "depict_lion",
+   "body": "tiago",
+   "strategy": "additive",
+   "code": "pose(dir=front, left_arm=mirror, grip=close, torso=low, z=55, elbow=T, head=down) + path(ee, line, axis=x, dist=0.25, spd=3.5) + move(head, tilt, 25, spd=3.0) + hold(t=0.7)"
+  },
+  {
+   "cue": "depict_lion",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(grip=horiz, dir=front, x=35, z=75, y=50) + path(ee, line, x, dist=0.3, spd=3.8) + move(wrist, z, \u00b115, spd=4.0, rep=2) + hold(t=0.8)"
+  },
+  {
+   "cue": "depict_lion",
+   "body": "stretch",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=low, z=45) + path(base, line, x=+0.25, spd=3.0) + move(head, pan, [-10,10], rep=2, spd=4.0, hold=0.5)"
+  },
+  {
+   "cue": "depict_lion",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, x=-0.15, spd=0.8) + path(base, line, x=+0.4, spd=3.8) + hold(t=0.8)"
+  },
+  {
+   "cue": "depict_lion",
+   "body": "roomba_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, d=-0.15, spd=1.0) + hold(t=0.5) + path(base, line, d=0.6, spd=4.0) + path(base, arc, r=0, deg=[20, -40, 20], spd=4.5)"
+  },
+  {
+   "cue": "depict_lion",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=front, grip=vert, torso=high, z=90, x=15) + path(base, line, dist=0.15, spd=3.5) & move(torso, x, 50, spd=3.5) & move(torso, height, -40, spd=3.5) & move(head, tilt, -20, spd=3.5) + hold(t=1.0)"
+  },
+  {
+   "cue": "depict_lion",
+   "body": "single_arm_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=open, z=80, y=50, x=40, elbow=T) + path(ee, line, axis=x, dist=30, spd=3.0) & move(shoulder, y, -25, spd=3.0) + pose(grip=close) + hold(t=0.8)"
+  },
+  {
+   "cue": "depict_small_object",
+   "body": "tiago",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, z=55, x=60, elbow=T) + path(ee, line, axis=x, dist=0.05, spd=1.5) + hold(t=1.5)"
+  },
+  {
+   "cue": "depict_small_object",
+   "body": "single_arm",
+   "strategy": "none",
+   "code": "pose(grip=horiz, dir=front, x=50, y=50, z=50) + pose(grip=vert, x=60, z=70, spd=0.8) + hold(t=1.2)"
+  },
+  {
+   "cue": "depict_small_object",
+   "body": "stretch",
+   "strategy": "none",
+   "code": "pose(dir=front, grip=vert, z=55, head=down) + path(ee, line, axis=z, dist=+0.05, spd=0.8) + hold(t=1.2)"
+  },
+  {
+   "cue": "depict_small_object",
+   "body": "roomba",
+   "strategy": "additive",
+   "code": "pose(dir=front) + path(base, line, x=0.12, spd=0.7) + path(base, arc, r=0, deg=18, spd=2.8) + hold(t=1.8)"
+  },
+  {
+   "cue": "depict_small_object",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, line, dist=0.15, spd=0.5) + path(base, arc, r=0.1, deg=-300, spd=0.8) + hold(t=2.0)"
+  },
+  {
+   "cue": "depict_small_object",
+   "body": "stretch_strategy",
+   "strategy": "additive",
+   "code": "pose(dir=front, grip=vert, torso=mid, z=60, x=35) + move(head, tilt, [-15], spd=1.5) & move(wrist, pan, [-4, 4], rep=2, spd=2.5, hold=0.1) + hold(t=1.5)"
+  },
+  {
+   "cue": "depict_small_object",
+   "body": "single_arm_strategy",
+   "strategy": "none",
+   "code": "pose(dir=up, grip=close, y=40, x=50, z=55) + path(ee, line, axis=z, dist=0.08, spd=0.4, hold=2.0)"
+  },
+  {
+   "cue": "depict_flying_bird",
+   "body": "tiago",
+   "strategy": "carrier",
+   "code": "pose(dir=out, left_arm=mirror, grip=horiz, z=60, elbow=F, torso=high) + move(shoulder, z, \u00b135, rep=4, spd=2.8)"
+  },
+  {
+   "cue": "depict_flying_bird",
+   "body": "single_arm",
+   "strategy": "carrier",
+   "code": "pose(dir=right, grip=horiz, y=20, z=65, spd=1.2) + move(shoulder, z, [-25, 25], rep=3, spd=2.5)"
+  },
+  {
+   "cue": "depict_flying_bird",
+   "body": "stretch",
+   "strategy": "carrier",
+   "code": "pose(dir=out, grip=horiz, torso=high, z=80) + move(shoulder, z, [+20, -20], rep=3, spd=2.8, hold=0.1)"
+  },
+  {
+   "cue": "depict_flying_bird",
+   "body": "roomba",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.2, deg=180, spd=2.2) + path(base, arc, r=0.2, deg=-180, spd=2.2) + path(base, arc, r=0.2, deg=180, spd=2.2) + path(base, arc, r=0.2, deg=-180, spd=2.2)"
+  },
+  {
+   "cue": "depict_flying_bird",
+   "body": "roomba_strategy",
+   "strategy": "trace",
+   "code": "pose(dir=front) + path(base, arc, r=0.4, deg=80, spd=2.2) + path(base, arc, r=-0.4, deg=160, spd=2.2) + path(base, arc, r=0.4, deg=80, spd=2.2)"
+  },
+  {
+   "cue": "depict_flying_bird",
+   "body": "stretch_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=out, grip=horiz, torso=mid, x=100, z=50) + move(torso, height, [-8, 8], rep=4, spd=2.5) & path(base, arc, r=0, deg=\u00b15, rep=4, spd=1.0) + hold(t=1.0)"
+  },
+  {
+   "cue": "depict_flying_bird",
+   "body": "single_arm_strategy",
+   "strategy": "carrier",
+   "code": "pose(dir=out, grip=horiz, z=65, x=20) + move(elbow, z, \u00b130, rep=3, spd=2.5) + hold(t=1.0)"
+  }
+ ]
+}

@@ -22,12 +22,7 @@ for p in (_REPO, _HERE, _GOOGLE, _REPO / "adhoc/generation"):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-DEFAULT_XLSX = Path(
-    "/Users/sb/Library/Application Support/Claude/local-agent-mode-sessions/"
-    "2c2cb05d-69f7-4540-9b45-083b53d3c3f6/"
-    "6bc2a0ab-1d3f-4800-a82e-32c096149213/"
-    "local_f6b1d6a9-bbfc-405f-aa49-c9ffd6b0cb8c/outputs/gesture_embodiment_table.xlsx"
-)
+DEFAULT_XLSX = _REPO / "data/seed/gesture_embodiment_table.xlsx"
 OUT_JSON_DIR = _REPO / "data/results/motion_configs/embodiment_motion_code"
 OUT_RENDER = _REPO / "data/results/render/embodiment_motion_code"
 SHEET_NAME = "Renderable JSON"
@@ -36,7 +31,6 @@ PLATFORM_COLS = {
     4: "humanoid",
     5: "tiago",
     6: "single_arm",
-    7: "quadruped",
     8: "roomba",
     9: "stretch",  # Hello Robot Stretch 3 (new; after legacy 5 cols)
 }
@@ -46,7 +40,6 @@ PLATFORMS_ORDER = (
     "tiago",
     "single_arm",
     "stretch",
-    "quadruped",
     "roomba",
 )
 PLATFORM_HEADERS = {
@@ -54,7 +47,6 @@ PLATFORM_HEADERS = {
     "tiago": "Tiago",
     "single_arm": "Single-arm (IIWA)",
     "stretch": "Stretch (Hello Robot)",
-    "quadruped": "Quadruped (Unitree Go2)",
     "roomba": "Roomba",
 }
 
@@ -2212,53 +2204,11 @@ def render_manipulator(
     return out
 
 
-def render_quadruped(
-    rows: list[dict[str, Any]],
-    *,
-    config_path: Path,
-    out_root: Path,
-    force: bool = False,
-) -> dict[str, Path]:
-    """Use the existing Unitree Go2 MJLab config renderer."""
-    from adhoc.generation.quadruped.render import run as render_go2
-
-    # The Go2 runner launches one subprocess per cue from its own directory.
-    # Absolute paths are therefore required for both generated per-cue configs
-    # and output media.
-    config_path = config_path.resolve()
-    gif_dir = (out_root / "quadruped" / "gif").resolve()
-    python_bin = Path("/Users/sb/micromamba/envs/robosuite/bin/python")
-    if not python_bin.is_file():
-        raise FileNotFoundError(f"MJLab Python missing: {python_bin}")
-    render_go2(
-        config_json=str(config_path),
-        output_dir=str(gif_dir),
-        python_bin=str(python_bin),
-        auto_generate_if_missing=False,
-        do_html=False,
-        camera="front",
-        skip_existing=not force,
-    )
-    results: dict[str, Path] = {}
-    for row in rows:
-        idx, cue = int(row["idx"]), str(row["cue"])
-        source = gif_dir / f"lc19_g{idx:02d}_{cue}_mjlab_earth.gif"
-        target = gif_dir / f"emb_g{idx:02d}_{cue}.gif"
-        if source.is_file():
-            shutil.copy2(source, target)
-            source_mp4 = source.with_suffix(".mp4")
-            if source_mp4.is_file():
-                shutil.copy2(source_mp4, target.with_suffix(".mp4"))
-            results[cue] = target
-    return results
-
-
 _HTML_PLAT_GIF = {
     "humanoid": ("Humanoid (Unitree G1)", ("humanoid", "gif")),
     "tiago": ("Tiago", ("tiago", "gif")),
     "single_arm": ("Single-arm (IIWA)", ("manipulator", "gif", "IIWA")),
     "stretch": ("Stretch (Hello Robot)", ("stretch", "gif")),
-    "quadruped": ("Quadruped (Unitree Go2)", ("quadruped", "gif")),
     "roomba": ("Roomba", ("roomba", "gif")),
 }
 
@@ -2357,7 +2307,7 @@ def main() -> None:
     ap.add_argument("--max-cues", type=int, default=0, help="0 = all")
     ap.add_argument(
         "--platforms",
-        default="humanoid,tiago,single_arm,stretch,quadruped,roomba",
+        default="humanoid,tiago,single_arm,stretch,roomba",
         help="Comma list to render",
     )
     ap.add_argument(
@@ -2448,14 +2398,6 @@ def main() -> None:
                 args.out_render / "stretch" / "gif",
                 force=args.force_render,
             )
-        if "quadruped" in want:
-            q_rows = [e["platforms"]["quadruped"] for e in configs]
-            render_quadruped(
-                q_rows,
-                config_path=args.out_json / "result_quadruped.json",
-                out_root=args.out_render,
-                force=args.force_render,
-            )
         if "roomba" in want:
             r_rows = [e["platforms"]["roomba"] for e in configs]
             render_roomba(
@@ -2470,7 +2412,7 @@ def main() -> None:
         ] + list(args.extra_html_out or [])
         title = args.html_title or "Embodiment — Motion Code renders"
         meta = (
-            f"{len(configs)} gestures · 6 platforms · source sheet {args.sheet!r} · "
+            f"{len(configs)} gestures · {len(PLATFORMS_ORDER)} platforms · source sheet {args.sheet!r} · "
             f"render {args.out_render}"
         )
         for html_path in html_paths:

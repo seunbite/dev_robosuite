@@ -1,0 +1,102 @@
+<!-- Oddkin α=0: "Trileg Crown" — arthropod-like radial body (RoboGrammar-inspired).
+     Communicative channels: base x/y/yaw + 3 multi-link legs + crown spin. -->
+<mujoco model="oddkin_alpha0">
+  <compiler angle="radian" autolimits="true"/>
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+  <visual>
+    <headlight ambient="0.55 0.55 0.55" diffuse="0.45 0.45 0.45"/>
+    <rgba haze="0.15 0.18 0.22 1"/>
+  </visual>
+  <default>
+    <default class="hinge">
+      <joint type="hinge" damping="0.6" armature="0.015" limited="true"/>
+      <geom friction="0.8 0.1 0.01" condim="3"/>
+    </default>
+  </default>
+  <asset>
+    <material name="floor" rgba="0.55 0.56 0.58 1" reflectance="0.0" specular="0.0" shininess="0"/>
+    <!-- role palette: body / leg / arm / spine / joint / marker -->
+    <material name="body" rgba="0.18 0.20 0.24 1"/>
+    <material name="leg" rgba="0.42 0.52 0.62 1"/>
+    <material name="arm" rgba="0.78 0.58 0.32 1"/>
+    <material name="spine" rgba="0.72 0.74 0.78 1"/>
+    <material name="joint" rgba="0.28 0.30 0.34 1"/>
+    <material name="marker" rgba="0.92 0.93 0.95 1"/>
+  </asset>
+  <worldbody>
+    <light pos="1 -2 5" dir="-0.2 0.3 -1" diffuse="0.55 0.55 0.55"/>
+    <light pos="-2 1 3" dir="0.4 -0.1 -1" diffuse="0.25 0.26 0.28"/>
+    <geom type="plane" size="4 4 0.1" material="floor"/>
+
+    <body name="base" pos="0 0 0.12">
+      <freejoint name="base_free"/>
+      <!-- irregular hex-ish chassis -->
+      <geom type="cylinder" size="0.22 0.05" material="body"/>
+      <geom type="box" size="0.18 0.10 0.04" pos="0.06 0 0.02" euler="0 0 0.35" material="body"/>
+      <geom type="box" size="0.12 0.14 0.035" pos="-0.05 0.08 0.015" euler="0 0 -0.5" material="body"/>
+      <geom type="box" size="0.04 0.02 0.02" pos="0.20 0 0.06" material="marker"/>
+      <!-- dorsal ridges = spine/dorsal family -->
+      <geom type="box" size="0.10 0.015 0.03" pos="0 0 0.07" euler="0 0 0.4" material="spine"/>
+      <geom type="box" size="0.08 0.015 0.025" pos="0 0 0.07" euler="0 0 -0.7" material="spine"/>
+      <geom type="sphere" size="0.035" pos="0 0 0.09" material="joint"/>
+
+      <!-- LEG 0 at 0° -->
+      <body name="hip0" pos="0.20 0 0" euler="0 0 0">
+        <joint name="hip0" class="hinge" axis="0 0 1" range="-1.2 1.2"/>
+        <geom type="sphere" size="0.04" material="joint"/>
+        <geom type="capsule" fromto="0 0 0  0.16 0 -0.02" size="0.028" material="leg"/>
+        <body name="knee0" pos="0.16 0 -0.02">
+          <joint name="knee0" class="hinge" axis="0 1 0" range="-1.8 0.3"/>
+          <geom type="sphere" size="0.032" material="joint"/>
+          <geom type="capsule" fromto="0 0 0  0.14 0.04 -0.06" size="0.024" material="leg"/>
+          <geom type="box" size="0.04 0.02 0.015" pos="0.14 0.04 -0.06" material="leg"/>
+        </body>
+      </body>
+
+      <!-- LEG 1 at 120° -->
+      <body name="hip1" pos="-0.10 0.173 0" euler="0 0 2.094">
+        <joint name="hip1" class="hinge" axis="0 0 1" range="-1.2 1.2"/>
+        <geom type="sphere" size="0.04" material="joint"/>
+        <geom type="capsule" fromto="0 0 0  0.16 0 -0.02" size="0.028" material="leg"/>
+        <body name="knee1" pos="0.16 0 -0.02">
+          <joint name="knee1" class="hinge" axis="0 1 0" range="-1.8 0.3"/>
+          <geom type="sphere" size="0.032" material="joint"/>
+          <geom type="capsule" fromto="0 0 0  0.14 -0.04 -0.06" size="0.024" material="leg"/>
+          <geom type="box" size="0.04 0.02 0.015" pos="0.14 -0.04 -0.06" material="leg"/>
+        </body>
+      </body>
+
+      <!-- LEG 2 at 240° -->
+      <body name="hip2" pos="-0.10 -0.173 0" euler="0 0 -2.094">
+        <joint name="hip2" class="hinge" axis="0 0 1" range="-1.2 1.2"/>
+        <geom type="sphere" size="0.04" material="joint"/>
+        <geom type="capsule" fromto="0 0 0  0.16 0 -0.02" size="0.028" material="leg"/>
+        <body name="knee2" pos="0.16 0 -0.02">
+          <joint name="knee2" class="hinge" axis="0 1 0" range="-1.8 0.3"/>
+          <geom type="sphere" size="0.032" material="joint"/>
+          <geom type="capsule" fromto="0 0 0  0.14 0.02 -0.06" size="0.024" material="leg"/>
+          <geom type="box" size="0.04 0.02 0.015" pos="0.14 0.02 -0.06" material="leg"/>
+        </body>
+      </body>
+
+      <!-- crown = dorsal / spine family -->
+      <body name="crown" pos="0 0 0.10">
+        <joint name="crown_spin" class="hinge" axis="0 0 1" range="-3.14 3.14"/>
+        <geom type="cylinder" size="0.06 0.02" material="spine"/>
+        <geom type="box" size="0.11 0.012 0.018" pos="0.08 0 0.03" material="spine"/>
+        <geom type="box" size="0.11 0.012 0.018" pos="-0.04 0.07 0.03" euler="0 0 2.1" material="spine"/>
+        <geom type="box" size="0.11 0.012 0.018" pos="-0.04 -0.07 0.03" euler="0 0 -2.1" material="spine"/>
+        <geom type="box" size="0.07 0.01 0.03" pos="0 0 0.05" euler="0.4 0 0.6" material="spine"/>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <position name="a_hip0" joint="hip0" kp="40" ctrlrange="-1.2 1.2"/>
+    <position name="a_knee0" joint="knee0" kp="40" ctrlrange="-1.8 0.3"/>
+    <position name="a_hip1" joint="hip1" kp="40" ctrlrange="-1.2 1.2"/>
+    <position name="a_knee1" joint="knee1" kp="40" ctrlrange="-1.8 0.3"/>
+    <position name="a_hip2" joint="hip2" kp="40" ctrlrange="-1.2 1.2"/>
+    <position name="a_knee2" joint="knee2" kp="40" ctrlrange="-1.8 0.3"/>
+    <position name="a_crown" joint="crown_spin" kp="30" ctrlrange="-3.14 3.14"/>
+  </actuator>
+</mujoco>
